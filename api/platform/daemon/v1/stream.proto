@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package platform.daemon.stream.v1;
+
+option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
+
+service DaemonStreamService {
+  rpc Communicate(stream DaemonMessage) returns (stream ServerMessage) {}
+}
+
+message DaemonMessage {
+  oneof message {
+    Heartbeat heartbeat = 1;
+    ShutdownAlert shutdown_alert = 2;
+  }
+}
+
+message ServerMessage {
+  oneof message {
+    Heartbeat heartbeat = 1;
+  }
+}
+
+message Heartbeat { }
+
+message ShutdownAlert { }
