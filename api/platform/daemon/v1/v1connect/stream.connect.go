@@ -22,7 +22,7 @@ const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// DaemonStreamServiceName is the fully-qualified name of the DaemonStreamService service.
-	DaemonStreamServiceName = "platform.daemon.stream.v1.DaemonStreamService"
+	DaemonStreamServiceName = "platform.daemon.v1.DaemonStreamService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -35,7 +35,7 @@ const (
 const (
 	// DaemonStreamServiceCommunicateProcedure is the fully-qualified name of the DaemonStreamService's
 	// Communicate RPC.
-	DaemonStreamServiceCommunicateProcedure = "/platform.daemon.stream.v1.DaemonStreamService/Communicate"
+	DaemonStreamServiceCommunicateProcedure = "/platform.daemon.v1.DaemonStreamService/Communicate"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -44,17 +44,15 @@ var (
 	daemonStreamServiceCommunicateMethodDescriptor = daemonStreamServiceServiceDescriptor.Methods().ByName("Communicate")
 )
 
-// DaemonStreamServiceClient is a client for the platform.daemon.stream.v1.DaemonStreamService
-// service.
+// DaemonStreamServiceClient is a client for the platform.daemon.v1.DaemonStreamService service.
 type DaemonStreamServiceClient interface {
 	Communicate(context.Context) *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
 }
 
-// NewDaemonStreamServiceClient constructs a client for the
-// platform.daemon.stream.v1.DaemonStreamService service. By default, it uses the Connect protocol
-// with the binary Protobuf Codec, asks for gzipped responses, and sends uncompressed requests. To
-// use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or connect.WithGRPCWeb()
-// options.
+// NewDaemonStreamServiceClient constructs a client for the platform.daemon.v1.DaemonStreamService
+// service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
+// gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
+// the connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
@@ -75,13 +73,13 @@ type daemonStreamServiceClient struct {
 	communicate *connect.Client[v1.DaemonMessage, v1.ServerMessage]
 }
 
-// Communicate calls platform.daemon.stream.v1.DaemonStreamService.Communicate.
+// Communicate calls platform.daemon.v1.DaemonStreamService.Communicate.
 func (c *daemonStreamServiceClient) Communicate(ctx context.Context) *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage] {
 	return c.communicate.CallBidiStream(ctx)
 }
 
-// DaemonStreamServiceHandler is an implementation of the
-// platform.daemon.stream.v1.DaemonStreamService service.
+// DaemonStreamServiceHandler is an implementation of the platform.daemon.v1.DaemonStreamService
+// service.
 type DaemonStreamServiceHandler interface {
 	Communicate(context.Context, *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error
 }
@@ -98,7 +96,7 @@ func NewDaemonStreamServiceHandler(svc DaemonStreamServiceHandler, opts ...conne
 		connect.WithSchema(daemonStreamServiceCommunicateMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/platform.daemon.stream.v1.DaemonStreamService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/platform.daemon.v1.DaemonStreamService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DaemonStreamServiceCommunicateProcedure:
 			daemonStreamServiceCommunicateHandler.ServeHTTP(w, r)
@@ -112,5 +110,5 @@ func NewDaemonStreamServiceHandler(svc DaemonStreamServiceHandler, opts ...conne
 type UnimplementedDaemonStreamServiceHandler struct{}
 
 func (UnimplementedDaemonStreamServiceHandler) Communicate(context.Context, *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.stream.v1.DaemonStreamService.Communicate is not implemented"))
+	return connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonStreamService.Communicate is not implemented"))
 }
