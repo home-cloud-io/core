@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package platform.daemon.stream.v1;
+package platform.daemon.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
 

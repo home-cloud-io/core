@@ -2,7 +2,7 @@ go 1.21.3
 
 use (
 	./api
-	./services/core/daemon
-	./services/core/operator
-	./services/core/server
+	./services/platform/daemon
+	./services/platform/operator
+	./services/platform/server
 )
