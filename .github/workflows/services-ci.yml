@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ${{ vars.REGISTRY || 'ghcr.io' }}
-  TARGET_PLATFORMS: linux/amd64,linux/arm64
+  TARGET_PLATFORMS: linux/amd64
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,7 +34,6 @@ jobs:
         service-path: ${{ fromJSON(needs.changed.outputs.matrix) }}
     env:
       GOPRIVATE: github.com/home-cloud-io/core
-
     steps:
       - uses: actions/checkout@v4
 
