@@ -44,21 +44,27 @@ jobs:
         run: |
           git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
+      - name: Check for web client
+        uses: andstor/file-existence-action@v3
+        id: check_files
+        with:
+          files: "services/${{ matrix.service-path }}/web-client/package-lock.json"
+
       - uses: actions/setup-node@v4
-        if: ${{ hashFiles("services/${{ matrix.service-path }}/web-client/package-lock.json") != '' }}
+        if:  steps.check_files.outputs.files_exists == 'true'
         with:
           node-version: 18
           cache-dependency-path: services/${{ matrix.service-path }}/web-client/package-lock.json
 
       - name: Install Node dependencies
-        if: ${{ hashFiles("services/${{ matrix.service-path }}/web-client/package-lock.json") != '' }}
+        if:  steps.check_files.outputs.files_exists == 'true'
         run: |
           cd services/${{ matrix.service-path }}/web-client &&
           npm i -D @swc/cli @swc/core &&
           npm install
 
       - name: Build web-client
-        if: ${{ hashFiles("services/${{ matrix.service-path }}/web-client/package-lock.json") != '' }}
+        if:  steps.check_files.outputs.files_exists == 'true'
         run: |
           cd services/${{ matrix.service-path }}/web-client &&
           npm run build
