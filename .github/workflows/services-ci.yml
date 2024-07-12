@@ -45,20 +45,20 @@ jobs:
           git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
       - uses: actions/setup-node@v4
-        if: matrix.service-path == 'core/blueprint'
+        if: ${{ hashFiles("services/${{ matrix.service-path }}/web-client/package-lock.json") != '' }}
         with:
           node-version: 18
           cache-dependency-path: services/${{ matrix.service-path }}/web-client/package-lock.json
 
       - name: Install Node dependencies
-        if: matrix.service-path == 'core/blueprint'
+        if: ${{ hashFiles("services/${{ matrix.service-path }}/web-client/package-lock.json") != '' }}
         run: |
           cd services/${{ matrix.service-path }}/web-client &&
           npm i -D @swc/cli @swc/core &&
           npm install
 
       - name: Build web-client
-        if: matrix.service-path == 'core/blueprint'
+        if: ${{ hashFiles("services/${{ matrix.service-path }}/web-client/package-lock.json") != '' }}
         run: |
           cd services/${{ matrix.service-path }}/web-client &&
           npm run build
