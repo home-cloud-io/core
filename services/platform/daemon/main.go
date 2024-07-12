@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	v1 "github.com/home-cloud-io/core/api/core/daemon/v1"
-	sdConnect "github.com/home-cloud-io/core/api/core/daemon/v1/v1connect"
+	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	sdConnect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
