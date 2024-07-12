@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package core.daemon.stream.v1;
+package platform.daemon.stream.v1;
 
-option go_package = "github.com/home-cloud-io/core/api/core/daemon/v1";
+option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
 
 service DaemonStreamService {
   rpc Communicate(stream DaemonMessage) returns (stream ServerMessage) {}
