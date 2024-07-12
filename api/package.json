@@ -1,0 +1,23 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "To serve as the home for type definitions, rpc service's, model's, validation of messages, and gateway generation. All of the above are declared in [protocol buffer's]() and compiled using [buf]() inside of a docker container to reduce protoc compiler, and compiler plugin environment dependencies.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@bufbuild/buf": "^1.28.1",
+    "@bufbuild/protobuf": "^1.6.0",
+    "@bufbuild/protoc-gen-es": "^1.6.0",
+    "@connectrpc/connect": "^1.3.0",
+    "@connectrpc/connect-query": "^1.1.3",
+    "@connectrpc/protoc-gen-connect-es": "^1.3.0",
+    "@connectrpc/protoc-gen-connect-query": "^1.1.3",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

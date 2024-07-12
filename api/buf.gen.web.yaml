@@ -1,0 +1,24 @@
+version: v1
+plugins:
+  - plugin: es
+    out: .
+    opt:
+      - target=ts
+  - plugin: es
+    out: .
+    opt:
+      - target=js
+  - plugin: connect-es
+    out: .
+    opt:
+      - target=ts
+  - plugin: connect-es
+    out: .
+    opt:
+      - target=js
+  - name: connect-query
+    out: .
+    opt: target=ts
+  - name: connect-query
+    out: .
+    opt: target=js
