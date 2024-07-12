@@ -40,7 +40,7 @@ jobs:
 
       - name: Git config
         env:
-          GH_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
         run: |
           git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
@@ -126,4 +126,4 @@ jobs:
           build-args: |
             DOMAIN=${{ steps.info.outputs.domain}}
             SERVICE=${{ steps.info.outputs.service}}
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN=${{ secrets.GH_ACCESS_TOKEN }}
