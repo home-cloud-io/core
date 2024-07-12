@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+.vscode
+**/.vscode
+.git
+.gitignore
+Dockerfile
+.dockerignore
