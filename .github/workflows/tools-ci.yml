@@ -1,0 +1,46 @@
+name: tools - CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - tools/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  changed:
+    name: Prepare
+    uses: ./.github/workflows/changes.yml
+    with:
+      path: tools
+
+  build-and-test:
+    name: Build-Test (${{ matrix.tool }})
+    needs: [changed]
+    runs-on: ubuntu-latest
+    if: needs.changed.outputs.any_changed == 'true'
+    strategy:
+      matrix:
+        go-version: ['1.21.x']
+        tool: ${{ fromJSON(needs.changed.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache-dependency-path: tools/${{ matrix.tool }}/go.sum
+
+      - name: Test
+        working-directory: tools/${{ matrix.tool }}
+        run: go test ./...
+
+      - name: Build
+        working-directory: tools/${{ matrix.tool }}
+        run: go build main.go

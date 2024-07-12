@@ -1,0 +1,39 @@
+name: Changed Files
+
+on:
+  workflow_call:
+    inputs:
+      path:
+        type: string
+        required: true
+      dir_names_max_depth:
+        type: number
+        default: 1
+    outputs:
+      matrix:
+        description: "matrix object"
+        value: ${{ jobs.changed.outputs.matrix }}
+      any_changed:
+        description: "boolean"
+        value: ${{ jobs.changed.outputs.any_changed }}
+
+jobs:
+  changed:
+    name: Changes (${{ inputs.path }})
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.changed-files.outputs.all_changed_files }}
+      any_changed: ${{ steps.changed-files.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          dir_names: true
+          diff_relative: true
+          path: ${{ inputs.path }}
+          dir_names_max_depth: ${{ inputs.dir_names_max_depth }}
+          matrix: true
