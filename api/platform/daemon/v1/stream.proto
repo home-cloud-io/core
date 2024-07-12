@@ -18,9 +18,21 @@ message DaemonMessage {
 message ServerMessage {
   oneof message {
     Heartbeat heartbeat = 1;
+    ShutdownCommand shutdown = 2;
+    RebootCommand reboot = 3;
   }
 }
 
+// Bidirectional
+
 message Heartbeat { }
 
+// Daemon -> Server
+
 message ShutdownAlert { }
+
+// Server -> Daemon
+
+message ShutdownCommand { }
+
+message RebootCommand { }

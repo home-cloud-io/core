@@ -33,6 +33,7 @@ func run(logger chassis.Logger) {
 	client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), "http://localhost:2225")
 	stream := client.Communicate(context.Background())
 
+	// listen for messages
 	go func() {
 		for {
 			_, err := stream.Receive()
@@ -44,6 +45,7 @@ func run(logger chassis.Logger) {
 		}
 	}()
 
+	// send heartbeats
 	go func() {
 		for {
 			err := stream.Send(&v1.DaemonMessage{
