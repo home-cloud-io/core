@@ -19,17 +19,10 @@ This repository is built on top of the [Draft framework](https://github.com/stea
 go install github.com/steady-bytes/draft/tools/dctl@latest
 ```
 
-We'll need to import this project into `dctl` so it can manage things for us. After cloning the repo run the below command from the reoot of the repo:
+We'll need to import this project as a context into `dctl` so it can manage things for us. After cloning the repo run the below command from the root of the repo:
 
 ```shell
-dctl project import -p .
-# example output:
-# dctl  - Using config file: $HOME/.config/dctl/config.yaml
-# dctl  - What is the name of this project?
-# home-cloud-core
-# dctl  - What is the git repository for this project? (e.g. github.com/steady-bytes/draft)
-# github.com/home-cloud-io/core
-# dctl  - The current project is now: home-cloud-core
+dctl context import
 ```
 
 Let's do a quick test of building the Home Cloud API protobufs:
