@@ -1,0 +1,8 @@
+go 1.21.3
+
+use (
+	./api
+	./services/core/daemon
+	./services/core/operator
+	./services/core/server
+)

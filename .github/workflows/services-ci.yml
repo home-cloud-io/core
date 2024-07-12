@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ${{ vars.REGISTRY || 'ghcr.io' }}
-  TARGET_PLATFORMS: linux/amd64,linux/arm64
+  TARGET_PLATFORMS: linux/amd64
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,25 +32,38 @@ jobs:
       matrix:
         go-version: ['1.21.x']
         service-path: ${{ fromJSON(needs.changed.outputs.matrix) }}
-
+    env:
+      GOPRIVATE: github.com/home-cloud-io/core
     steps:
       - uses: actions/checkout@v4
 
+      - name: Git config
+        env:
+          GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+        run: |
+          git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+
+      - name: Check for web client
+        uses: andstor/file-existence-action@v3
+        id: check_files
+        with:
+          files: "services/${{ matrix.service-path }}/web-client/package-lock.json"
+
       - uses: actions/setup-node@v4
-        if: matrix.service-path == 'core/blueprint'
+        if:  steps.check_files.outputs.files_exists == 'true'
         with:
           node-version: 18
           cache-dependency-path: services/${{ matrix.service-path }}/web-client/package-lock.json
 
       - name: Install Node dependencies
-        if: matrix.service-path == 'core/blueprint'
+        if:  steps.check_files.outputs.files_exists == 'true'
         run: |
           cd services/${{ matrix.service-path }}/web-client &&
           npm i -D @swc/cli @swc/core &&
           npm install
 
       - name: Build web-client
-        if: matrix.service-path == 'core/blueprint'
+        if:  steps.check_files.outputs.files_exists == 'true'
         run: |
           cd services/${{ matrix.service-path }}/web-client &&
           npm run build
@@ -118,3 +131,4 @@ jobs:
           build-args: |
             DOMAIN=${{ steps.info.outputs.domain}}
             SERVICE=${{ steps.info.outputs.service}}
+            GITHUB_TOKEN=${{ secrets.GH_ACCESS_TOKEN }}

@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: home-cloud-operator-admin
+subjects:
+- kind: ServiceAccount
+  name: home-cloud-controller-manager
+  namespace: home-cloud-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io

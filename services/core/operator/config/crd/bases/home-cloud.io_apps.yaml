@@ -1,0 +1,72 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.13.0
+  name: apps.home-cloud.io
+spec:
+  group: home-cloud.io
+  names:
+    kind: App
+    listKind: AppList
+    plural: apps
+    singular: app
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: App is the Schema for the apps API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AppSpec defines the desired state of an App
+            properties:
+              chart:
+                description: Chart is the Helm chart which defines the App.
+                type: string
+              release:
+                description: Release is the name of the Helm release of the App.
+                type: string
+              repo:
+                description: Repo is the URL for the chart repository.
+                type: string
+              values:
+                description: Values optionally defines the values that will be applied
+                  to the Chart.
+                type: string
+            required:
+            - chart
+            - release
+            - repo
+            type: object
+          status:
+            description: AppStatus defines the observed state of an App
+            properties:
+              values:
+                description: Values that were used for the current Chart install.
+                type: string
+              version:
+                description: Version is the version of the Chart that is currently
+                  installed.
+                type: string
+            required:
+            - version
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

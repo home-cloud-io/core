@@ -1,0 +1,31 @@
+# permissions for end users to edit apps.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: app-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: home-cloud
+    app.kubernetes.io/part-of: home-cloud
+    app.kubernetes.io/managed-by: kustomize
+  name: app-editor-role
+rules:
+- apiGroups:
+  - apps.home-cloud.io
+  resources:
+  - apps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps.home-cloud.io
+  resources:
+  - apps/status
+  verbs:
+  - get

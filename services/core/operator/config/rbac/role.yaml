@@ -1,0 +1,32 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - home-cloud.io
+  resources:
+  - apps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - home-cloud.io
+  resources:
+  - apps/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - home-cloud.io
+  resources:
+  - apps/status
+  verbs:
+  - get
+  - patch
+  - update
