@@ -18,8 +18,8 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	appsv1 "github.com/home-cloud-io/core/services/core/operator/api/v1"
-	"github.com/home-cloud-io/core/services/core/operator/internal/controller"
+	appsv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	"github.com/home-cloud-io/core/services/platform/operator/internal/controller"
 	//+kubebuilder:scaffold:imports
 )
 

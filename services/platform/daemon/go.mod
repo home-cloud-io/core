@@ -1,22 +1,20 @@
-module github.com/home-cloud-io/core/services/core/server
+module github.com/home-cloud-io/core/services/platform/daemon
 
 go 1.21.3
 
 // replace (
 // 	github.com/home-cloud-io/core/api => ../../../api
-// 	github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 // )
 
 require (
-	connectrpc.com/connect v1.16.2
 	github.com/home-cloud-io/core/api v0.0.1
-	github.com/pion/mdns/v2 v2.0.7
 	github.com/steady-bytes/draft/pkg/chassis v0.2.0
 	github.com/steady-bytes/draft/pkg/loggers v0.1.0
 	golang.org/x/net v0.25.0
 )
 
 require (
+	connectrpc.com/connect v1.16.2 // indirect
 	connectrpc.com/grpcreflect v1.2.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/boltdb/bolt v1.3.1 // indirect
@@ -36,7 +34,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
-	github.com/pion/logging v0.2.2 // indirect
 	github.com/rs/cors v1.10.1 // indirect
 	github.com/rs/zerolog v1.32.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect

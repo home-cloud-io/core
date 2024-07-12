@@ -3,8 +3,8 @@ package main
 import (
 	"embed"
 
-	"github.com/home-cloud-io/core/services/core/server/daemon"
-	"github.com/home-cloud-io/core/services/core/server/mdns"
+	"github.com/home-cloud-io/core/services/platform/server/daemon"
+	"github.com/home-cloud-io/core/services/platform/server/mdns"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
 )

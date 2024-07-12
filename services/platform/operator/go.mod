@@ -1,4 +1,4 @@
-module github.com/home-cloud-io/core/services/core/operator
+module github.com/home-cloud-io/core/services/platform/operator
 
 go 1.21
 

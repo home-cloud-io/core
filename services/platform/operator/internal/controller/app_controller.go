@@ -23,7 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	v1 "github.com/home-cloud-io/core/services/core/operator/api/v1"
+	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 )
 
 const AppFinalizer = "apps.home-cloud.io/finalizer"
