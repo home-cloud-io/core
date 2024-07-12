@@ -1,0 +1,47 @@
+apiVersion: home-cloud.io/v1
+kind: App
+metadata:
+  name: home-cloud-hello-world
+  namespace: home-cloud-system
+  finalizers:
+    - apps.home-cloud.io/finalizer
+spec:
+  repo: jack.kawell.us/helm-charts
+  chart: hello-world
+  release: home-cloud-hello-world
+  values: >-
+    replicaCount: 1
+---
+apiVersion: home-cloud.io/v1
+kind: App
+metadata:
+  name: home-cloud-postgres
+  namespace: home-cloud-system
+  finalizers:
+    - apps.home-cloud.io/finalizer
+spec:
+  repo: jack.kawell.us/helm-charts
+  chart: postgres
+  release: home-cloud-postgres
+  values: >-
+    nodeAffinity:
+      hostname: 'raspberrypi5'
+---
+apiVersion: home-cloud.io/v1
+kind: App
+metadata:
+  name: home-cloud-immich
+  namespace: home-cloud-system
+  finalizers:
+    - apps.home-cloud.io/finalizer
+spec:
+  repo: jack.kawell.us/helm-charts
+  chart: immich
+  release: home-cloud-immich
+  values: >-
+    database:
+      name: postgres
+      user: postgres
+      password: postgres
+    nodeAffinity:
+      hostname: 'raspberrypi5'

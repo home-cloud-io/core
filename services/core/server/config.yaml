@@ -1,0 +1,6 @@
+service:
+  name: home-cloud-server
+  env: local
+  logging:
+    level: info
+  port: 2225

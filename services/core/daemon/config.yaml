@@ -1,0 +1,6 @@
+service:
+  name: home-cloud-daemon
+  env: local
+  logging:
+    level: info
+  port: 2226
