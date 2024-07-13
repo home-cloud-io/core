@@ -23,6 +23,8 @@ export const ServerMessage = proto3.makeMessageType(
   "platform.daemon.v1.ServerMessage",
   () => [
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
+    { no: 2, name: "shutdown", kind: "message", T: ShutdownCommand, oneof: "message" },
+    { no: 3, name: "reboot", kind: "message", T: RebootCommand, oneof: "message" },
   ],
 );
 
@@ -35,10 +37,56 @@ export const Heartbeat = proto3.makeMessageType(
 );
 
 /**
+ * ShutdownAlert notifies the Server that the host is about to shutdown
+ *
  * @generated from message platform.daemon.v1.ShutdownAlert
  */
 export const ShutdownAlert = proto3.makeMessageType(
   "platform.daemon.v1.ShutdownAlert",
+  [],
+);
+
+/**
+ * @generated from message platform.daemon.v1.UpgradeAvailableAlert
+ */
+export const UpgradeAvailableAlert = proto3.makeMessageType(
+  "platform.daemon.v1.UpgradeAvailableAlert",
+  () => [
+    { no: 1, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * ShutdownCommand tells the daemon to shutdown the host: shutdown
+ *
+ * @generated from message platform.daemon.v1.ShutdownCommand
+ */
+export const ShutdownCommand = proto3.makeMessageType(
+  "platform.daemon.v1.ShutdownCommand",
+  [],
+);
+
+/**
+ * RebootCommand tells the daemon to reboot the host: reboot
+ *
+ * @generated from message platform.daemon.v1.RebootCommand
+ */
+export const RebootCommand = proto3.makeMessageType(
+  "platform.daemon.v1.RebootCommand",
+  [],
+);
+
+/**
+ * CheckForUpdatesCommand tells the daemon to check for updates to the host:
+ * - nixos-rebuild build
+ * - nvd diff /run/current-system ./result
+ * - publish the results of this to the Server using the UpgradeAvailableAlert
+ * - rm ./result
+ *
+ * @generated from message platform.daemon.v1.CheckForUpdatesCommand
+ */
+export const CheckForUpdatesCommand = proto3.makeMessageType(
+  "platform.daemon.v1.CheckForUpdatesCommand",
   [],
 );
 
