@@ -6,10 +6,10 @@ import (
 	"os/exec"
 )
 
-// ExecuteCommandReturnStdout executes a command and returns the output of stdout as a string.
+// Execute runs a command and returns the output of stdout as a string.
 // It does not print the output to the console. This can be used to get the output of a command.
 // It will not return until the command has completed or the context is cancelled.
-func ExecuteCommandReturnStdout(ctx context.Context, cmd *exec.Cmd) (string, error) {
+func Execute(ctx context.Context, cmd *exec.Cmd) (output string, err error) {
 	// create a pipe for the output
 	cmdReader, err := cmd.StdoutPipe()
 	if err != nil {
@@ -18,7 +18,6 @@ func ExecuteCommandReturnStdout(ctx context.Context, cmd *exec.Cmd) (string, err
 
 	// scanner for output
 	scanner := bufio.NewScanner(cmdReader)
-	var output string
 	go func() {
 		for scanner.Scan() {
 			if output != "" {

@@ -18,16 +18,12 @@ import (
 func main() {
 	logger := zerolog.New()
 
-	runtime := chassis.New(logger)
-	defer runtime.Start()
-
-	go func() {
-		time.Sleep(1 * time.Second)
-		run(logger)
-	}()
+	defer chassis.New(logger).
+		WithRunner(run).
+		Start()
 }
 
-func run(logger chassis.Logger) {
+func run(logger chassis.Logger, _ chassis.Config) {
 	logger.Info("starting")
 
 	client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), "http://localhost:2225")
