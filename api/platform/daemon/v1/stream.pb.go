@@ -90,11 +90,11 @@ type isDaemonMessage_Message interface {
 }
 
 type DaemonMessage_Heartbeat struct {
-	Heartbeat *Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof" bun:"heartbeat" yaml:"heartbeat" csv:"heartbeat" json:"heartbeat" pg:"heartbeat"`
+	Heartbeat *Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof" pg:"heartbeat" bun:"heartbeat" yaml:"heartbeat" csv:"heartbeat" json:"heartbeat"`
 }
 
 type DaemonMessage_ShutdownAlert struct {
-	ShutdownAlert *ShutdownAlert `protobuf:"bytes,2,opt,name=shutdown_alert,json=shutdownAlert,proto3,oneof" bun:"shutdown_alert" yaml:"shutdown_alert" csv:"shutdown_alert" json:"shutdown_alert" pg:"shutdown_alert"`
+	ShutdownAlert *ShutdownAlert `protobuf:"bytes,2,opt,name=shutdown_alert,json=shutdownAlert,proto3,oneof" pg:"shutdown_alert" bun:"shutdown_alert" yaml:"shutdown_alert" csv:"shutdown_alert" json:"shutdown_alert"`
 }
 
 func (*DaemonMessage_Heartbeat) isDaemonMessage_Message() {}
