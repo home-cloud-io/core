@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"connectrpc.com/connect"
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 
+	"connectrpc.com/connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/net/http2"
 	"golang.org/x/sync/errgroup"
@@ -22,6 +22,7 @@ type (
 	}
 	client struct {
 		logger chassis.Logger
+		config chassis.Reader
 	}
 )
 
@@ -32,6 +33,7 @@ const (
 func New(logger chassis.Logger) Client {
 	return &client{
 		logger: logger,
+		config: chassis.GetConfig(),
 	}
 }
 
@@ -39,7 +41,7 @@ func (c *client) Listen() {
 	ctx := context.Background()
 	c.logger.Info("starting")
 	for {
-		client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), "http://localhost:2225")
+		client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), c.config.GetString("daemon.server"))
 		stream := client.Communicate(ctx)
 
 		// spin off workers

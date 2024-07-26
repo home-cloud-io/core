@@ -4,3 +4,6 @@ service:
   logging:
     level: info
   port: 2226
+
+daemon:
+  server: http://localhost:81
