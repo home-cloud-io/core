@@ -69,6 +69,18 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: Heartbeat;
     case: "heartbeat";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.ShutdownCommand shutdown = 2;
+     */
+    value: ShutdownCommand;
+    case: "shutdown";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.RebootCommand reboot = 3;
+     */
+    value: RebootCommand;
+    case: "reboot";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -80,6 +92,8 @@ export class ServerMessage extends Message<ServerMessage> {
   static readonly typeName = "platform.daemon.v1.ServerMessage";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
+    { no: 2, name: "shutdown", kind: "message", T: ShutdownCommand, oneof: "message" },
+    { no: 3, name: "reboot", kind: "message", T: RebootCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -131,6 +145,8 @@ export class Heartbeat extends Message<Heartbeat> {
 }
 
 /**
+ * ShutdownAlert notifies the Server that the host is about to shutdown
+ *
  * @generated from message platform.daemon.v1.ShutdownAlert
  */
 export class ShutdownAlert extends Message<ShutdownAlert> {
@@ -158,6 +174,146 @@ export class ShutdownAlert extends Message<ShutdownAlert> {
 
   static equals(a: ShutdownAlert | PlainMessage<ShutdownAlert> | undefined, b: ShutdownAlert | PlainMessage<ShutdownAlert> | undefined): boolean {
     return proto3.util.equals(ShutdownAlert, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.UpgradeAvailableAlert
+ */
+export class UpgradeAvailableAlert extends Message<UpgradeAvailableAlert> {
+  /**
+   * @generated from field: string description = 1;
+   */
+  description = "";
+
+  constructor(data?: PartialMessage<UpgradeAvailableAlert>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.UpgradeAvailableAlert";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpgradeAvailableAlert {
+    return new UpgradeAvailableAlert().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpgradeAvailableAlert {
+    return new UpgradeAvailableAlert().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpgradeAvailableAlert {
+    return new UpgradeAvailableAlert().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpgradeAvailableAlert | PlainMessage<UpgradeAvailableAlert> | undefined, b: UpgradeAvailableAlert | PlainMessage<UpgradeAvailableAlert> | undefined): boolean {
+    return proto3.util.equals(UpgradeAvailableAlert, a, b);
+  }
+}
+
+/**
+ * ShutdownCommand tells the daemon to shutdown the host: shutdown
+ *
+ * @generated from message platform.daemon.v1.ShutdownCommand
+ */
+export class ShutdownCommand extends Message<ShutdownCommand> {
+  constructor(data?: PartialMessage<ShutdownCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.ShutdownCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ShutdownCommand {
+    return new ShutdownCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ShutdownCommand {
+    return new ShutdownCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ShutdownCommand {
+    return new ShutdownCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ShutdownCommand | PlainMessage<ShutdownCommand> | undefined, b: ShutdownCommand | PlainMessage<ShutdownCommand> | undefined): boolean {
+    return proto3.util.equals(ShutdownCommand, a, b);
+  }
+}
+
+/**
+ * RebootCommand tells the daemon to reboot the host: reboot
+ *
+ * @generated from message platform.daemon.v1.RebootCommand
+ */
+export class RebootCommand extends Message<RebootCommand> {
+  constructor(data?: PartialMessage<RebootCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.RebootCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RebootCommand {
+    return new RebootCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RebootCommand {
+    return new RebootCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RebootCommand {
+    return new RebootCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RebootCommand | PlainMessage<RebootCommand> | undefined, b: RebootCommand | PlainMessage<RebootCommand> | undefined): boolean {
+    return proto3.util.equals(RebootCommand, a, b);
+  }
+}
+
+/**
+ * CheckForUpdatesCommand tells the daemon to check for updates to the host:
+ * - nixos-rebuild build
+ * - nvd diff /run/current-system ./result
+ * - publish the results of this to the Server using the UpgradeAvailableAlert
+ * - rm ./result
+ *
+ * @generated from message platform.daemon.v1.CheckForUpdatesCommand
+ */
+export class CheckForUpdatesCommand extends Message<CheckForUpdatesCommand> {
+  constructor(data?: PartialMessage<CheckForUpdatesCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.CheckForUpdatesCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckForUpdatesCommand {
+    return new CheckForUpdatesCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckForUpdatesCommand {
+    return new CheckForUpdatesCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckForUpdatesCommand {
+    return new CheckForUpdatesCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CheckForUpdatesCommand | PlainMessage<CheckForUpdatesCommand> | undefined, b: CheckForUpdatesCommand | PlainMessage<CheckForUpdatesCommand> | undefined): boolean {
+    return proto3.util.equals(CheckForUpdatesCommand, a, b);
   }
 }
 

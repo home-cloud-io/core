@@ -286,6 +286,88 @@ func (m *ServerMessage) validate(all bool) error {
 			}
 		}
 
+	case *ServerMessage_Shutdown:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetShutdown()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "Shutdown",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "Shutdown",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetShutdown()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "Shutdown",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_Reboot:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetReboot()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "Reboot",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "Reboot",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetReboot()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "Reboot",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -566,3 +648,409 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ShutdownAlertValidationError{}
+
+// Validate checks the field values on UpgradeAvailableAlert with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpgradeAvailableAlert) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpgradeAvailableAlert with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpgradeAvailableAlertMultiError, or nil if none found.
+func (m *UpgradeAvailableAlert) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpgradeAvailableAlert) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Description
+
+	if len(errors) > 0 {
+		return UpgradeAvailableAlertMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpgradeAvailableAlertMultiError is an error wrapping multiple validation
+// errors returned by UpgradeAvailableAlert.ValidateAll() if the designated
+// constraints aren't met.
+type UpgradeAvailableAlertMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpgradeAvailableAlertMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpgradeAvailableAlertMultiError) AllErrors() []error { return m }
+
+// UpgradeAvailableAlertValidationError is the validation error returned by
+// UpgradeAvailableAlert.Validate if the designated constraints aren't met.
+type UpgradeAvailableAlertValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpgradeAvailableAlertValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpgradeAvailableAlertValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpgradeAvailableAlertValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpgradeAvailableAlertValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpgradeAvailableAlertValidationError) ErrorName() string {
+	return "UpgradeAvailableAlertValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpgradeAvailableAlertValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpgradeAvailableAlert.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpgradeAvailableAlertValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpgradeAvailableAlertValidationError{}
+
+// Validate checks the field values on ShutdownCommand with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ShutdownCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ShutdownCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ShutdownCommandMultiError, or nil if none found.
+func (m *ShutdownCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ShutdownCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return ShutdownCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// ShutdownCommandMultiError is an error wrapping multiple validation errors
+// returned by ShutdownCommand.ValidateAll() if the designated constraints
+// aren't met.
+type ShutdownCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ShutdownCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ShutdownCommandMultiError) AllErrors() []error { return m }
+
+// ShutdownCommandValidationError is the validation error returned by
+// ShutdownCommand.Validate if the designated constraints aren't met.
+type ShutdownCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ShutdownCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ShutdownCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ShutdownCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ShutdownCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ShutdownCommandValidationError) ErrorName() string { return "ShutdownCommandValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ShutdownCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sShutdownCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ShutdownCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ShutdownCommandValidationError{}
+
+// Validate checks the field values on RebootCommand with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *RebootCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RebootCommand with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RebootCommandMultiError, or
+// nil if none found.
+func (m *RebootCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RebootCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return RebootCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// RebootCommandMultiError is an error wrapping multiple validation errors
+// returned by RebootCommand.ValidateAll() if the designated constraints
+// aren't met.
+type RebootCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RebootCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RebootCommandMultiError) AllErrors() []error { return m }
+
+// RebootCommandValidationError is the validation error returned by
+// RebootCommand.Validate if the designated constraints aren't met.
+type RebootCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RebootCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RebootCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RebootCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RebootCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RebootCommandValidationError) ErrorName() string { return "RebootCommandValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RebootCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRebootCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RebootCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RebootCommandValidationError{}
+
+// Validate checks the field values on CheckForUpdatesCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CheckForUpdatesCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CheckForUpdatesCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CheckForUpdatesCommandMultiError, or nil if none found.
+func (m *CheckForUpdatesCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CheckForUpdatesCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return CheckForUpdatesCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// CheckForUpdatesCommandMultiError is an error wrapping multiple validation
+// errors returned by CheckForUpdatesCommand.ValidateAll() if the designated
+// constraints aren't met.
+type CheckForUpdatesCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CheckForUpdatesCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CheckForUpdatesCommandMultiError) AllErrors() []error { return m }
+
+// CheckForUpdatesCommandValidationError is the validation error returned by
+// CheckForUpdatesCommand.Validate if the designated constraints aren't met.
+type CheckForUpdatesCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CheckForUpdatesCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CheckForUpdatesCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CheckForUpdatesCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CheckForUpdatesCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CheckForUpdatesCommandValidationError) ErrorName() string {
+	return "CheckForUpdatesCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CheckForUpdatesCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCheckForUpdatesCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CheckForUpdatesCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CheckForUpdatesCommandValidationError{}
