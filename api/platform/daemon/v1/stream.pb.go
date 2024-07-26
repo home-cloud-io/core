@@ -90,11 +90,11 @@ type isDaemonMessage_Message interface {
 }
 
 type DaemonMessage_Heartbeat struct {
-	Heartbeat *Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof" pg:"heartbeat" bun:"heartbeat" yaml:"heartbeat" csv:"heartbeat" json:"heartbeat"`
+	Heartbeat *Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof" bun:"heartbeat" yaml:"heartbeat" csv:"heartbeat" json:"heartbeat" pg:"heartbeat"`
 }
 
 type DaemonMessage_ShutdownAlert struct {
-	ShutdownAlert *ShutdownAlert `protobuf:"bytes,2,opt,name=shutdown_alert,json=shutdownAlert,proto3,oneof" csv:"shutdown_alert" json:"shutdown_alert" pg:"shutdown_alert" bun:"shutdown_alert" yaml:"shutdown_alert"`
+	ShutdownAlert *ShutdownAlert `protobuf:"bytes,2,opt,name=shutdown_alert,json=shutdownAlert,proto3,oneof" bun:"shutdown_alert" yaml:"shutdown_alert" csv:"shutdown_alert" json:"shutdown_alert" pg:"shutdown_alert"`
 }
 
 func (*DaemonMessage_Heartbeat) isDaemonMessage_Message() {}
@@ -183,11 +183,11 @@ type ServerMessage_Heartbeat struct {
 }
 
 type ServerMessage_Shutdown struct {
-	Shutdown *ShutdownCommand `protobuf:"bytes,2,opt,name=shutdown,proto3,oneof" bun:"shutdown" yaml:"shutdown" csv:"shutdown" json:"shutdown" pg:"shutdown"`
+	Shutdown *ShutdownCommand `protobuf:"bytes,2,opt,name=shutdown,proto3,oneof" csv:"shutdown" json:"shutdown" pg:"shutdown" bun:"shutdown" yaml:"shutdown"`
 }
 
 type ServerMessage_Reboot struct {
-	Reboot *RebootCommand `protobuf:"bytes,3,opt,name=reboot,proto3,oneof" csv:"reboot" json:"reboot" pg:"reboot" bun:"reboot" yaml:"reboot"`
+	Reboot *RebootCommand `protobuf:"bytes,3,opt,name=reboot,proto3,oneof" pg:"reboot" bun:"reboot" yaml:"reboot" csv:"reboot" json:"reboot"`
 }
 
 func (*ServerMessage_Heartbeat) isServerMessage_Message() {}
@@ -278,7 +278,7 @@ type UpgradeAvailableAlert struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description" yaml:"description" csv:"description" pg:"description" bun:"description"`
+	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description" pg:"description" bun:"description" yaml:"description" csv:"description"`
 }
 
 func (x *UpgradeAvailableAlert) Reset() {
