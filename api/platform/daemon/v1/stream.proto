@@ -18,9 +18,35 @@ message DaemonMessage {
 message ServerMessage {
   oneof message {
     Heartbeat heartbeat = 1;
+    ShutdownCommand shutdown = 2;
+    RebootCommand reboot = 3;
   }
 }
 
+// Bidirectional
+
 message Heartbeat { }
 
+// Daemon -> Server
+
+// ShutdownAlert notifies the Server that the host is about to shutdown
 message ShutdownAlert { }
+
+message UpgradeAvailableAlert {
+  string description = 1;
+}
+
+// Server -> Daemon
+
+// ShutdownCommand tells the daemon to shutdown the host: shutdown
+message ShutdownCommand { }
+
+// RebootCommand tells the daemon to reboot the host: reboot
+message RebootCommand { }
+
+// CheckForUpdatesCommand tells the daemon to check for updates to the host:
+// - nixos-rebuild build
+// - nvd diff /run/current-system ./result
+// - publish the results of this to the Server using the UpgradeAvailableAlert
+// - rm ./result
+message CheckForUpdatesCommand { }
