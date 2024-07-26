@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package platform.daemon.v1;
+
+option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
+
+service HostService {
+  rpc ShutdownAlert(ShutdownAlertRequest) returns (ShutdownAlertResponse) {}
+}
+
+message ShutdownAlertRequest {}
+message ShutdownAlertResponse {}
