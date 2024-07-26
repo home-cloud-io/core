@@ -2,10 +2,10 @@ module github.com/home-cloud-io/core/services/platform/server
 
 go 1.21.3
 
-// replace (
-// 	github.com/home-cloud-io/core/api => ../../../api
-// 	github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
-// )
+replace (
+	github.com/home-cloud-io/core/api => ../../../api
+	github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
+)
 
 require (
 	connectrpc.com/connect v1.16.2

@@ -16,12 +16,13 @@ var files embed.FS
 func main() {
 	var (
 		logger    = zerolog.New()
-		daemonRPC = daemon.New()
+		daemonRPC = daemon.New(logger)
 	)
 
 	defer chassis.New(logger).
 		WithClientApplication(files).
 		WithRPCHandler(daemonRPC).
+		WithRunner(daemonRPC.Run).
 		Start()
 
 	go mdns.ServeMDNS(logger)
