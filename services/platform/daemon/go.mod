@@ -2,15 +2,13 @@ module github.com/home-cloud-io/core/services/platform/daemon
 
 go 1.21.3
 
-replace (
-	github.com/home-cloud-io/core/api => ../../../api
-	github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
-)
+// replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 
 require (
 	connectrpc.com/connect v1.16.2
-	github.com/home-cloud-io/core/api v0.1.0
-	github.com/steady-bytes/draft/pkg/chassis v0.2.0
+	github.com/home-cloud-io/core/api v0.2.0
+	github.com/steady-bytes/draft/pkg/chassis v0.2.2
 	github.com/steady-bytes/draft/pkg/loggers v0.1.0
 	golang.org/x/net v0.25.0
 	golang.org/x/sync v0.7.0

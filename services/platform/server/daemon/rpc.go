@@ -15,7 +15,7 @@ type (
 	Rpc interface {
 		chassis.RPCRegistrar
 		sdConnect.DaemonStreamServiceHandler
-		Run(logger chassis.Logger, _ chassis.Config)
+		Run()
 	}
 
 	rpc struct {
@@ -56,23 +56,23 @@ func (h *rpc) Communicate(ctx context.Context, stream *connect.BidiStream[v1.Dae
 	}
 }
 
-func (h *rpc) Run(logger chassis.Logger, _ chassis.Config) {
+func (h *rpc) Run() {
 	for {
-		// if h.stream != nil {
-		// 	h.stream.Send(&v1.ServerMessage{
-		// 		Message: &v1.ServerMessage_Reboot{},
-		// 	})
-		// } else {
-		// 	logger.Warn("no stream")
-		// }
-		// time.Sleep(1 * time.Second)
-		// if h.stream != nil {
-		// 	h.stream.Send(&v1.ServerMessage{
-		// 		Message: &v1.ServerMessage_Shutdown{},
-		// 	})
-		// } else {
-		// 	logger.Warn("no stream")
-		// }
+		if h.stream != nil {
+			h.stream.Send(&v1.ServerMessage{
+				Message: &v1.ServerMessage_Reboot{},
+			})
+		} else {
+			h.logger.Warn("no stream")
+		}
+		time.Sleep(1 * time.Second)
+		if h.stream != nil {
+			h.stream.Send(&v1.ServerMessage{
+				Message: &v1.ServerMessage_Shutdown{},
+			})
+		} else {
+			h.logger.Warn("no stream")
+		}
 		time.Sleep(1 * time.Second)
 	}
 }

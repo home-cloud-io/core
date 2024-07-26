@@ -18,7 +18,7 @@ import (
 
 type (
 	Client interface {
-		Listen(logger chassis.Logger, _ chassis.Config)
+		Listen()
 	}
 	client struct {
 		logger chassis.Logger
@@ -35,9 +35,9 @@ func New(logger chassis.Logger) Client {
 	}
 }
 
-func (c *client) Listen(logger chassis.Logger, _ chassis.Config) {
+func (c *client) Listen() {
 	ctx := context.Background()
-	logger.Info("starting")
+	c.logger.Info("starting")
 	for {
 		client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), "http://localhost:2225")
 		stream := client.Communicate(ctx)
@@ -53,7 +53,7 @@ func (c *client) Listen(logger chassis.Logger, _ chassis.Config) {
 
 		// wait on errors
 		if err := g.Wait(); err != nil {
-			logger.WithError(err).Error("stream failure")
+			c.logger.WithError(err).Error("stream failure")
 		}
 
 		time.Sleep(1 * time.Second)
