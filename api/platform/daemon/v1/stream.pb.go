@@ -183,11 +183,11 @@ type ServerMessage_Heartbeat struct {
 }
 
 type ServerMessage_Shutdown struct {
-	Shutdown *ShutdownCommand `protobuf:"bytes,2,opt,name=shutdown,proto3,oneof" csv:"shutdown" json:"shutdown" pg:"shutdown" bun:"shutdown" yaml:"shutdown"`
+	Shutdown *ShutdownCommand `protobuf:"bytes,2,opt,name=shutdown,proto3,oneof" pg:"shutdown" bun:"shutdown" yaml:"shutdown" csv:"shutdown" json:"shutdown"`
 }
 
 type ServerMessage_Reboot struct {
-	Reboot *RebootCommand `protobuf:"bytes,3,opt,name=reboot,proto3,oneof" pg:"reboot" bun:"reboot" yaml:"reboot" csv:"reboot" json:"reboot"`
+	Reboot *RebootCommand `protobuf:"bytes,3,opt,name=reboot,proto3,oneof" yaml:"reboot" csv:"reboot" json:"reboot" pg:"reboot" bun:"reboot"`
 }
 
 func (*ServerMessage_Heartbeat) isServerMessage_Message() {}
