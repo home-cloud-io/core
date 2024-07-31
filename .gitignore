@@ -2,3 +2,4 @@ bin
 main
 node_modules
 dist
+vendor

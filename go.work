@@ -1,8 +1,0 @@
-go 1.21.3
-
-use (
-	./api
-	./services/platform/daemon
-	./services/platform/operator
-	./services/platform/server
-)
