@@ -22,7 +22,6 @@ type (
 	}
 	client struct {
 		logger chassis.Logger
-		config chassis.Reader
 	}
 )
 
@@ -33,15 +32,15 @@ const (
 func New(logger chassis.Logger) Client {
 	return &client{
 		logger: logger,
-		config: chassis.GetConfig(),
 	}
 }
 
 func (c *client) Listen() {
 	ctx := context.Background()
+	config := chassis.GetConfig()
 	c.logger.Info("starting")
 	for {
-		client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), c.config.GetString("daemon.server"))
+		client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), config.GetString("daemon.server"))
 		stream := client.Communicate(ctx)
 
 		// spin off workers

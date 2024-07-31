@@ -5,6 +5,8 @@ import (
 
 	"github.com/home-cloud-io/core/services/platform/server/daemon"
 	"github.com/home-cloud-io/core/services/platform/server/mdns"
+
+	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
 )
@@ -23,6 +25,11 @@ func main() {
 		WithClientApplication(files).
 		WithRPCHandler(daemonRPC).
 		WithRunner(daemonRPC.Run).
+		WithRoute(&ntv1.Route{
+			Match: &ntv1.RouteMatch{
+				Prefix: "/",
+			},
+		}).
 		Start()
 
 	go mdns.ServeMDNS(logger)

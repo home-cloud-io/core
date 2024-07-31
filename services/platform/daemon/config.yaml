@@ -1,9 +1,9 @@
 service:
   name: home-cloud-daemon
-  env: local
-  logging:
-    level: info
-  port: 2226
+  domain: platform
+  network:
+    port: 8091
+    bind_address: localhost
 
 daemon:
-  server: http://localhost:81
+  server: http://localhost
