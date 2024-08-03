@@ -130,3 +130,89 @@ export class RestartHostResponse extends Message<RestartHostResponse> {
   }
 }
 
+/**
+ * @generated from message platform.server.v1.InstallAppRequest
+ */
+export class InstallAppRequest extends Message<InstallAppRequest> {
+  /**
+   * @generated from field: string chart = 1;
+   */
+  chart = "";
+
+  /**
+   * @generated from field: string repo = 2;
+   */
+  repo = "";
+
+  /**
+   * @generated from field: string release = 3;
+   */
+  release = "";
+
+  /**
+   * @generated from field: string values = 4;
+   */
+  values = "";
+
+  constructor(data?: PartialMessage<InstallAppRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.InstallAppRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "chart", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "values", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InstallAppRequest {
+    return new InstallAppRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InstallAppRequest {
+    return new InstallAppRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InstallAppRequest {
+    return new InstallAppRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: InstallAppRequest | PlainMessage<InstallAppRequest> | undefined, b: InstallAppRequest | PlainMessage<InstallAppRequest> | undefined): boolean {
+    return proto3.util.equals(InstallAppRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.InstallAppResponse
+ */
+export class InstallAppResponse extends Message<InstallAppResponse> {
+  constructor(data?: PartialMessage<InstallAppResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.InstallAppResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InstallAppResponse {
+    return new InstallAppResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InstallAppResponse {
+    return new InstallAppResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InstallAppResponse {
+    return new InstallAppResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: InstallAppResponse | PlainMessage<InstallAppResponse> | undefined, b: InstallAppResponse | PlainMessage<InstallAppResponse> | undefined): boolean {
+    return proto3.util.equals(InstallAppResponse, a, b);
+  }
+}
+

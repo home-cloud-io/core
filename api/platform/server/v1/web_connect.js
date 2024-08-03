@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse } from "./web_pb.js";
+import { InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -28,6 +28,15 @@ export const WebService = {
       name: "RestartHost",
       I: RestartHostRequest,
       O: RestartHostResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc platform.server.v1.WebService.InstallApp
+     */
+    installApp: {
+      name: "InstallApp",
+      I: InstallAppRequest,
+      O: InstallAppResponse,
       kind: MethodKind.Unary,
     },
   }

@@ -37,3 +37,24 @@ export const RestartHostResponse = proto3.makeMessageType(
   [],
 );
 
+/**
+ * @generated from message platform.server.v1.InstallAppRequest
+ */
+export const InstallAppRequest = proto3.makeMessageType(
+  "platform.server.v1.InstallAppRequest",
+  () => [
+    { no: 1, name: "chart", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "values", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.InstallAppResponse
+ */
+export const InstallAppResponse = proto3.makeMessageType(
+  "platform.server.v1.InstallAppResponse",
+  [],
+);
+
