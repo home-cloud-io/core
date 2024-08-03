@@ -4,13 +4,9 @@ service:
   entrypoint: http://localhost:2221
 
   network:
-    port: 8090
+    port: 8000
     internal:
-      # e.g. this could be http://file_host.examples.svc.cluster.local:8080 if running in kubernetes
       host: localhost
-      # the port to route internal traffic to (e.g. envoy -> process)
-      port: 8090
-    # routing information from outside of the draft cluster
+      port: 8000
     external:
-      # e.g. this could be file_host.examples.steady-bytes.com
       host: localhost

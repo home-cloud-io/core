@@ -5,6 +5,7 @@ import (
 
 	"github.com/home-cloud-io/core/services/platform/server/daemon"
 	"github.com/home-cloud-io/core/services/platform/server/mdns"
+	"github.com/home-cloud-io/core/services/platform/server/web"
 
 	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -19,12 +20,13 @@ func main() {
 	var (
 		logger    = zerolog.New()
 		daemonRPC = daemon.New(logger)
+		webRPC = web.New(logger)
 	)
 
 	defer chassis.New(logger).
 		WithClientApplication(files).
 		WithRPCHandler(daemonRPC).
-		WithRunner(daemonRPC.Run).
+		WithRPCHandler(webRPC).
 		WithRoute(&ntv1.Route{
 			Match: &ntv1.RouteMatch{
 				Prefix: "/",

@@ -10,7 +10,7 @@ go 1.21.3
 
 require (
 	connectrpc.com/connect v1.16.2
-	github.com/home-cloud-io/core/api v0.2.0
+	github.com/home-cloud-io/core/api v0.2.1
 	github.com/pion/mdns/v2 v2.0.7
 	github.com/steady-bytes/draft/api v0.3.1
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0
