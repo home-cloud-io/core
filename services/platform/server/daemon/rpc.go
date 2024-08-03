@@ -2,7 +2,6 @@ package daemon
 
 import (
 	"context"
-	"time"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
@@ -15,64 +14,49 @@ type (
 	Rpc interface {
 		chassis.RPCRegistrar
 		sdConnect.DaemonStreamServiceHandler
-		Run()
 	}
 
 	rpc struct {
-		logger chassis.Logger
-		stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]
+		logger    chassis.Logger
+		commander Commander
 	}
 )
 
 func New(logger chassis.Logger) Rpc {
 	return &rpc{
-		logger: logger,
+		logger:    logger,
+		commander: NewCommander(),
 	}
 }
 
-// Implement the `RPCRegistrar` interface of draft so the `grpc` handlers are enabled
 func (h *rpc) RegisterRPC(server chassis.Rpcer) {
 	pattern, handler := sdConnect.NewDaemonStreamServiceHandler(h)
 	server.AddHandler(pattern, handler, true)
 }
 
 func (h *rpc) Communicate(ctx context.Context, stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error {
-	if h.stream == nil {
-		h.stream = stream
+	err := h.commander.SetStream(stream)
+	if err != nil {
+		return err
 	}
 	h.logger.Info("establishing stream")
 	for {
-		_, err := stream.Receive()
+		message, err := stream.Receive()
 		if err != nil {
 			h.logger.WithError(err).Error("failed to recieve message")
-			// "close" public stream
-			h.stream = nil
+			h.commander.CloseStream()
 			return err
 		}
-		h.logger.Debug("heartbeat received")
+		switch message.Message.(type) {
+		case *v1.DaemonMessage_ShutdownAlert:
+			h.logger.Info("shutdown alert")
+		case *v1.DaemonMessage_Heartbeat:
+			h.logger.Debug("heartbeat received")
+		default:
+			h.logger.WithField("message", message).Warn("unknown message type received")
+		}
 		stream.Send(&v1.ServerMessage{
 			Message: &v1.ServerMessage_Heartbeat{},
 		})
-	}
-}
-
-func (h *rpc) Run() {
-	for {
-		if h.stream != nil {
-			h.stream.Send(&v1.ServerMessage{
-				Message: &v1.ServerMessage_Reboot{},
-			})
-		} else {
-			h.logger.Warn("no stream")
-		}
-		time.Sleep(1 * time.Second)
-		if h.stream != nil {
-			h.stream.Send(&v1.ServerMessage{
-				Message: &v1.ServerMessage_Shutdown{},
-			})
-		} else {
-			h.logger.Warn("no stream")
-		}
-		time.Sleep(1 * time.Second)
 	}
 }
