@@ -5,10 +5,12 @@ import (
 	"crypto/tls"
 	"net"
 	"net/http"
+	"os/exec"
 	"time"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
+	"github.com/home-cloud-io/core/services/platform/daemon/execute"
 
 	"connectrpc.com/connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -57,7 +59,7 @@ func (c *client) Listen() {
 		// spin off workers
 		g, _ := errgroup.WithContext(ctx)
 		g.Go(func() error {
-			return c.listen()
+			return c.listen(ctx)
 		})
 		g.Go(func() error {
 			return c.heartbeat()
@@ -76,7 +78,7 @@ func (c *client) Send(message *v1.DaemonMessage) error {
 	return c.stream.Send(message)
 }
 
-func (c *client) listen() error {
+func (c *client) listen(ctx context.Context) error {
 	for {
 		message, err := c.stream.Receive()
 		if err != nil {
@@ -85,8 +87,18 @@ func (c *client) listen() error {
 		switch message.Message.(type) {
 		case *v1.ServerMessage_Restart:
 			c.logger.Info("restart command")
+			_, err := execute.Execute(ctx, exec.Command("reboot", "now"))
+			if err != nil {
+				c.logger.WithError(err).Error("failed to execute restart command")
+				// TODO: send error back to server
+			}
 		case *v1.ServerMessage_Shutdown:
 			c.logger.Info("shutdown command")
+			_, err := execute.Execute(ctx, exec.Command("shutdown", "now"))
+			if err != nil {
+				c.logger.WithError(err).Error("failed to execute shutdown command")
+				// TODO: send error back to server
+			}
 		case *v1.ServerMessage_Heartbeat:
 			c.logger.Debug("heartbeat received")
 		default:

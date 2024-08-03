@@ -7,7 +7,6 @@ import (
 )
 
 // Execute runs a command and returns the output of stdout as a string.
-// It does not print the output to the console. This can be used to get the output of a command.
 // It will not return until the command has completed or the context is cancelled.
 func Execute(ctx context.Context, cmd *exec.Cmd) (output string, err error) {
 	// create a pipe for the output
