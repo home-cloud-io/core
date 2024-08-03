@@ -24,7 +24,7 @@ export const ServerMessage = proto3.makeMessageType(
   () => [
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown", kind: "message", T: ShutdownCommand, oneof: "message" },
-    { no: 3, name: "reboot", kind: "message", T: RebootCommand, oneof: "message" },
+    { no: 3, name: "restart", kind: "message", T: RestartCommand, oneof: "message" },
   ],
 );
 
@@ -57,7 +57,7 @@ export const UpgradeAvailableAlert = proto3.makeMessageType(
 );
 
 /**
- * ShutdownCommand tells the daemon to shutdown the host: shutdown
+ * ShutdownCommand tells the daemon to shutdown the host: `shutdown now`
  *
  * @generated from message platform.daemon.v1.ShutdownCommand
  */
@@ -67,12 +67,12 @@ export const ShutdownCommand = proto3.makeMessageType(
 );
 
 /**
- * RebootCommand tells the daemon to reboot the host: reboot
+ * RestartCommand tells the daemon to restart the host: `reboot now`
  *
- * @generated from message platform.daemon.v1.RebootCommand
+ * @generated from message platform.daemon.v1.RestartCommand
  */
-export const RebootCommand = proto3.makeMessageType(
-  "platform.daemon.v1.RebootCommand",
+export const RestartCommand = proto3.makeMessageType(
+  "platform.daemon.v1.RestartCommand",
   [],
 );
 

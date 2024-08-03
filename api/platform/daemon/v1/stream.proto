@@ -19,7 +19,7 @@ message ServerMessage {
   oneof message {
     Heartbeat heartbeat = 1;
     ShutdownCommand shutdown = 2;
-    RebootCommand reboot = 3;
+    RestartCommand restart = 3;
   }
 }
 
@@ -38,11 +38,11 @@ message UpgradeAvailableAlert {
 
 // Server -> Daemon
 
-// ShutdownCommand tells the daemon to shutdown the host: shutdown
+// ShutdownCommand tells the daemon to shutdown the host: `shutdown now`
 message ShutdownCommand { }
 
-// RebootCommand tells the daemon to reboot the host: reboot
-message RebootCommand { }
+// RestartCommand tells the daemon to restart the host: `reboot now`
+message RestartCommand { }
 
 // CheckForUpdatesCommand tells the daemon to check for updates to the host:
 // - nixos-rebuild build

@@ -327,7 +327,7 @@ func (m *ServerMessage) validate(all bool) error {
 			}
 		}
 
-	case *ServerMessage_Reboot:
+	case *ServerMessage_Restart:
 		if v == nil {
 			err := ServerMessageValidationError{
 				field:  "Message",
@@ -340,11 +340,11 @@ func (m *ServerMessage) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetReboot()).(type) {
+			switch v := interface{}(m.GetRestart()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, ServerMessageValidationError{
-						field:  "Reboot",
+						field:  "Restart",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -352,16 +352,16 @@ func (m *ServerMessage) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, ServerMessageValidationError{
-						field:  "Reboot",
+						field:  "Restart",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetReboot()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetRestart()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
-					field:  "Reboot",
+					field:  "Restart",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -853,22 +853,22 @@ var _ interface {
 	ErrorName() string
 } = ShutdownCommandValidationError{}
 
-// Validate checks the field values on RebootCommand with the rules defined in
+// Validate checks the field values on RestartCommand with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *RebootCommand) Validate() error {
+func (m *RestartCommand) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on RebootCommand with the rules defined
+// ValidateAll checks the field values on RestartCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in RebootCommandMultiError, or
-// nil if none found.
-func (m *RebootCommand) ValidateAll() error {
+// result is a list of violation errors wrapped in RestartCommandMultiError,
+// or nil if none found.
+func (m *RestartCommand) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *RebootCommand) validate(all bool) error {
+func (m *RestartCommand) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -876,19 +876,19 @@ func (m *RebootCommand) validate(all bool) error {
 	var errors []error
 
 	if len(errors) > 0 {
-		return RebootCommandMultiError(errors)
+		return RestartCommandMultiError(errors)
 	}
 
 	return nil
 }
 
-// RebootCommandMultiError is an error wrapping multiple validation errors
-// returned by RebootCommand.ValidateAll() if the designated constraints
+// RestartCommandMultiError is an error wrapping multiple validation errors
+// returned by RestartCommand.ValidateAll() if the designated constraints
 // aren't met.
-type RebootCommandMultiError []error
+type RestartCommandMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m RebootCommandMultiError) Error() string {
+func (m RestartCommandMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -897,11 +897,11 @@ func (m RebootCommandMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m RebootCommandMultiError) AllErrors() []error { return m }
+func (m RestartCommandMultiError) AllErrors() []error { return m }
 
-// RebootCommandValidationError is the validation error returned by
-// RebootCommand.Validate if the designated constraints aren't met.
-type RebootCommandValidationError struct {
+// RestartCommandValidationError is the validation error returned by
+// RestartCommand.Validate if the designated constraints aren't met.
+type RestartCommandValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -909,22 +909,22 @@ type RebootCommandValidationError struct {
 }
 
 // Field function returns field value.
-func (e RebootCommandValidationError) Field() string { return e.field }
+func (e RestartCommandValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e RebootCommandValidationError) Reason() string { return e.reason }
+func (e RestartCommandValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e RebootCommandValidationError) Cause() error { return e.cause }
+func (e RestartCommandValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e RebootCommandValidationError) Key() bool { return e.key }
+func (e RestartCommandValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e RebootCommandValidationError) ErrorName() string { return "RebootCommandValidationError" }
+func (e RestartCommandValidationError) ErrorName() string { return "RestartCommandValidationError" }
 
 // Error satisfies the builtin error interface
-func (e RebootCommandValidationError) Error() string {
+func (e RestartCommandValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -936,14 +936,14 @@ func (e RebootCommandValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sRebootCommand.%s: %s%s",
+		"invalid %sRestartCommand.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = RebootCommandValidationError{}
+var _ error = RestartCommandValidationError{}
 
 var _ interface {
 	Field() string
@@ -951,7 +951,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = RebootCommandValidationError{}
+} = RestartCommandValidationError{}
 
 // Validate checks the field values on CheckForUpdatesCommand with the rules
 // defined in the proto definition for this message. If any rules are
