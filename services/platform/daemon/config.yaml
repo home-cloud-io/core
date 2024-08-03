@@ -2,7 +2,7 @@ service:
   name: home-cloud-daemon
   domain: platform
   network:
-    port: 8091
+    port: 9000
     bind_address: localhost
 
 daemon:

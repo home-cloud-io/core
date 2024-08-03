@@ -19,9 +19,11 @@ import (
 type (
 	Client interface {
 		Listen()
+		Send(*v1.DaemonMessage) error
 	}
 	client struct {
 		logger chassis.Logger
+		stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
 	}
 )
 
@@ -29,10 +31,19 @@ const (
 	heartbeatRate = 5 * time.Second
 )
 
+var (
+	clientSingleton Client
+)
+
 func New(logger chassis.Logger) Client {
-	return &client{
+	clientSingleton = &client{
 		logger: logger,
 	}
+	return clientSingleton
+}
+
+func GetClient() Client {
+	return clientSingleton
 }
 
 func (c *client) Listen() {
@@ -41,15 +52,15 @@ func (c *client) Listen() {
 	c.logger.Info("starting")
 	for {
 		client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), config.GetString("daemon.server"))
-		stream := client.Communicate(ctx)
+		c.stream = client.Communicate(ctx)
 
 		// spin off workers
 		g, _ := errgroup.WithContext(ctx)
 		g.Go(func() error {
-			return c.listen(stream)
+			return c.listen()
 		})
 		g.Go(func() error {
-			return c.heartbeat(stream)
+			return c.heartbeat()
 		})
 
 		// wait on errors
@@ -61,26 +72,32 @@ func (c *client) Listen() {
 	}
 }
 
-func (c *client) listen(stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]) error {
+func (c *client) Send(message *v1.DaemonMessage) error {
+	return c.stream.Send(message)
+}
+
+func (c *client) listen() error {
 	for {
-		message, err := stream.Receive()
+		message, err := c.stream.Receive()
 		if err != nil {
 			return err
 		}
 		switch message.Message.(type) {
-		case *v1.ServerMessage_Reboot:
-			c.logger.Info("reboot command")
+		case *v1.ServerMessage_Restart:
+			c.logger.Info("restart command")
 		case *v1.ServerMessage_Shutdown:
 			c.logger.Info("shutdown command")
 		case *v1.ServerMessage_Heartbeat:
 			c.logger.Debug("heartbeat received")
+		default:
+			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
 	}
 }
 
-func (c *client) heartbeat(stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]) error {
+func (c *client) heartbeat() error {
 	for {
-		err := stream.Send(&v1.DaemonMessage{
+		err := c.stream.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_Heartbeat{},
 		})
 		if err != nil {
