@@ -77,10 +77,10 @@ export class ServerMessage extends Message<ServerMessage> {
     case: "shutdown";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.RebootCommand reboot = 3;
+     * @generated from field: platform.daemon.v1.RestartCommand restart = 3;
      */
-    value: RebootCommand;
-    case: "reboot";
+    value: RestartCommand;
+    case: "restart";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -93,7 +93,7 @@ export class ServerMessage extends Message<ServerMessage> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown", kind: "message", T: ShutdownCommand, oneof: "message" },
-    { no: 3, name: "reboot", kind: "message", T: RebootCommand, oneof: "message" },
+    { no: 3, name: "restart", kind: "message", T: RestartCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -215,7 +215,7 @@ export class UpgradeAvailableAlert extends Message<UpgradeAvailableAlert> {
 }
 
 /**
- * ShutdownCommand tells the daemon to shutdown the host: shutdown
+ * ShutdownCommand tells the daemon to shutdown the host: `shutdown now`
  *
  * @generated from message platform.daemon.v1.ShutdownCommand
  */
@@ -248,35 +248,35 @@ export class ShutdownCommand extends Message<ShutdownCommand> {
 }
 
 /**
- * RebootCommand tells the daemon to reboot the host: reboot
+ * RestartCommand tells the daemon to restart the host: `reboot now`
  *
- * @generated from message platform.daemon.v1.RebootCommand
+ * @generated from message platform.daemon.v1.RestartCommand
  */
-export class RebootCommand extends Message<RebootCommand> {
-  constructor(data?: PartialMessage<RebootCommand>) {
+export class RestartCommand extends Message<RestartCommand> {
+  constructor(data?: PartialMessage<RestartCommand>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.daemon.v1.RebootCommand";
+  static readonly typeName = "platform.daemon.v1.RestartCommand";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RebootCommand {
-    return new RebootCommand().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RestartCommand {
+    return new RestartCommand().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RebootCommand {
-    return new RebootCommand().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RestartCommand {
+    return new RestartCommand().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RebootCommand {
-    return new RebootCommand().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RestartCommand {
+    return new RestartCommand().fromJsonString(jsonString, options);
   }
 
-  static equals(a: RebootCommand | PlainMessage<RebootCommand> | undefined, b: RebootCommand | PlainMessage<RebootCommand> | undefined): boolean {
-    return proto3.util.equals(RebootCommand, a, b);
+  static equals(a: RestartCommand | PlainMessage<RestartCommand> | undefined, b: RestartCommand | PlainMessage<RestartCommand> | undefined): boolean {
+    return proto3.util.equals(RestartCommand, a, b);
   }
 }
 

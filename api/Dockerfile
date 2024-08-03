@@ -3,7 +3,7 @@ FROM golang:1.21-alpine
 RUN apk add --update --no-cache npm
 
 # Install buf
-RUN go install github.com/bufbuild/buf/cmd/buf@v1.28.1
+RUN go install github.com/bufbuild/buf/cmd/buf@v1.35.1
 
 # install protoc plugins
 

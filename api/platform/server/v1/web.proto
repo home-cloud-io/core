@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package platform.server.v1;
+
+option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
+
+service WebService {
+  rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
+  rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
+}
+
+message ShutdownHostRequest {}
+
+message ShutdownHostResponse {}
+
+message RestartHostRequest {}
+
+message RestartHostResponse {}
