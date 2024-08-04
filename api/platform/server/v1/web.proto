@@ -9,6 +9,7 @@ service WebService {
   rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
   rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {}
   rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
+  rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -33,3 +34,12 @@ message DeleteAppRequest {
 }
 
 message DeleteAppResponse {}
+
+message UpdateAppRequest {
+  string chart = 1;
+  string repo = 2;
+  string release = 3;
+  string values = 4;
+}
+
+message UpdateAppResponse {}

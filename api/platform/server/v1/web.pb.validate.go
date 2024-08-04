@@ -858,3 +858,213 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteAppResponseValidationError{}
+
+// Validate checks the field values on UpdateAppRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateAppRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateAppRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateAppRequestMultiError, or nil if none found.
+func (m *UpdateAppRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateAppRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Chart
+
+	// no validation rules for Repo
+
+	// no validation rules for Release
+
+	// no validation rules for Values
+
+	if len(errors) > 0 {
+		return UpdateAppRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateAppRequestMultiError is an error wrapping multiple validation errors
+// returned by UpdateAppRequest.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateAppRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateAppRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateAppRequestMultiError) AllErrors() []error { return m }
+
+// UpdateAppRequestValidationError is the validation error returned by
+// UpdateAppRequest.Validate if the designated constraints aren't met.
+type UpdateAppRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateAppRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateAppRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateAppRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateAppRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateAppRequestValidationError) ErrorName() string { return "UpdateAppRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpdateAppRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateAppRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateAppRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateAppRequestValidationError{}
+
+// Validate checks the field values on UpdateAppResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdateAppResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateAppResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdateAppResponseMultiError, or nil if none found.
+func (m *UpdateAppResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateAppResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpdateAppResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdateAppResponseMultiError is an error wrapping multiple validation errors
+// returned by UpdateAppResponse.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateAppResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateAppResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateAppResponseMultiError) AllErrors() []error { return m }
+
+// UpdateAppResponseValidationError is the validation error returned by
+// UpdateAppResponse.Validate if the designated constraints aren't met.
+type UpdateAppResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateAppResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateAppResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateAppResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateAppResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateAppResponseValidationError) ErrorName() string {
+	return "UpdateAppResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateAppResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateAppResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateAppResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateAppResponseValidationError{}
