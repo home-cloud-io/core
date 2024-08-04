@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { restart, shutdown } from '../services/web_rpc';
+import {
+  deleteApp,
+  installApp,
+  restart,
+  shutdown,
+  updateApp,
+} from '../services/web_rpc';
 
 export default function Home() {
   return (
@@ -73,13 +79,33 @@ export default function Home() {
         </div>
       </header>
       <body>
-        <button onClick={() => shutdown()}>
-          Shutdown Host
-        </button>
+        <button onClick={() => shutdown()}>Shutdown Host</button>{' '}
+        <button onClick={() => restart()}>Restart Host</button>
         <br></br>
-        <button onClick={() => restart()}>
-          Restart Host
-        </button>
+        Hello World
+        <br></br>
+        <button onClick={() => installApp('hello-world')}>Install App</button>
+        {'  '}
+        <button onClick={() => deleteApp('hello-world')}>Delete App</button>
+        {'  '}
+        <button onClick={() => updateApp('hello-world')}>Update App</button>
+        <br></br>
+        Postgres
+        <br></br>
+        <button onClick={() => installApp('postgres')}>Install App</button>
+        {'  '}
+        <button onClick={() => deleteApp('postgres')}>Delete App</button>
+        {'  '}
+        <button onClick={() => updateApp('postgres')}>Update App</button>
+        <br></br>
+        Immich
+        <br></br>
+        <button onClick={() => installApp('immich')}>Install App</button>
+        {'  '}
+        <button onClick={() => deleteApp('immich')}>Delete App</button>
+        {'  '}
+        <button onClick={() => updateApp('immich')}>Update App</button>
+        <br></br>
       </body>
     </>
   );
