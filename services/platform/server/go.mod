@@ -1,6 +1,6 @@
 module github.com/home-cloud-io/core/services/platform/server
 
-go 1.22.0
+go 1.22.5
 
 // replace github.com/home-cloud-io/core/api => ../../../api
 

@@ -1,8 +1,6 @@
 module github.com/home-cloud-io/core/services/platform/operator
 
-go 1.21
-
-toolchain go1.21.3
+go 1.22.5
 
 require (
 	golang.org/x/mod v0.13.0
