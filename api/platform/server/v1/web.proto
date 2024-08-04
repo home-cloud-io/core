@@ -7,6 +7,9 @@ option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 service WebService {
   rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
   rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
+  rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {}
+  rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
+  rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -16,3 +19,27 @@ message ShutdownHostResponse {}
 message RestartHostRequest {}
 
 message RestartHostResponse {}
+
+message InstallAppRequest {
+  string chart = 1;
+  string repo = 2;
+  string release = 3;
+  string values = 4;
+}
+
+message InstallAppResponse {}
+
+message DeleteAppRequest {
+  string release = 1;
+}
+
+message DeleteAppResponse {}
+
+message UpdateAppRequest {
+  string chart = 1;
+  string repo = 2;
+  string release = 3;
+  string values = 4;
+}
+
+message UpdateAppResponse {}
