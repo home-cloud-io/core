@@ -10,3 +10,8 @@ service:
       port: 8000
     external:
       host: localhost
+
+server:
+  k8s:
+    config_path: YOUR_HOME_DIRECTORY/.kube/config
+    master_url: https://home-cloud.local:6443
