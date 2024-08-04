@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse } from "./web_pb.js";
+import { DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse } from "./web_pb.js";
 
 /**
  * @generated from rpc platform.server.v1.WebService.ShutdownHost
@@ -43,6 +43,20 @@ export const installApp = {
   kind: MethodKind.Unary,
   I: InstallAppRequest,
   O: InstallAppResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * @generated from rpc platform.server.v1.WebService.DeleteApp
+ */
+export const deleteApp = {
+  localName: "deleteApp",
+  name: "DeleteApp",
+  kind: MethodKind.Unary,
+  I: DeleteAppRequest,
+  O: DeleteAppResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

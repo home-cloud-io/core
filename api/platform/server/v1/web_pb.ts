@@ -216,3 +216,71 @@ export class InstallAppResponse extends Message<InstallAppResponse> {
   }
 }
 
+/**
+ * @generated from message platform.server.v1.DeleteAppRequest
+ */
+export class DeleteAppRequest extends Message<DeleteAppRequest> {
+  /**
+   * @generated from field: string release = 1;
+   */
+  release = "";
+
+  constructor(data?: PartialMessage<DeleteAppRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DeleteAppRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAppRequest {
+    return new DeleteAppRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAppRequest {
+    return new DeleteAppRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAppRequest {
+    return new DeleteAppRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteAppRequest | PlainMessage<DeleteAppRequest> | undefined, b: DeleteAppRequest | PlainMessage<DeleteAppRequest> | undefined): boolean {
+    return proto3.util.equals(DeleteAppRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DeleteAppResponse
+ */
+export class DeleteAppResponse extends Message<DeleteAppResponse> {
+  constructor(data?: PartialMessage<DeleteAppResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DeleteAppResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAppResponse {
+    return new DeleteAppResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAppResponse {
+    return new DeleteAppResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAppResponse {
+    return new DeleteAppResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteAppResponse | PlainMessage<DeleteAppResponse> | undefined, b: DeleteAppResponse | PlainMessage<DeleteAppResponse> | undefined): boolean {
+    return proto3.util.equals(DeleteAppResponse, a, b);
+  }
+}
+

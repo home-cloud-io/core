@@ -58,3 +58,21 @@ export const InstallAppResponse = proto3.makeMessageType(
   [],
 );
 
+/**
+ * @generated from message platform.server.v1.DeleteAppRequest
+ */
+export const DeleteAppRequest = proto3.makeMessageType(
+  "platform.server.v1.DeleteAppRequest",
+  () => [
+    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DeleteAppResponse
+ */
+export const DeleteAppResponse = proto3.makeMessageType(
+  "platform.server.v1.DeleteAppResponse",
+  [],
+);
+

@@ -654,3 +654,207 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = InstallAppResponseValidationError{}
+
+// Validate checks the field values on DeleteAppRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DeleteAppRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteAppRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteAppRequestMultiError, or nil if none found.
+func (m *DeleteAppRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteAppRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Release
+
+	if len(errors) > 0 {
+		return DeleteAppRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteAppRequestMultiError is an error wrapping multiple validation errors
+// returned by DeleteAppRequest.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteAppRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteAppRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteAppRequestMultiError) AllErrors() []error { return m }
+
+// DeleteAppRequestValidationError is the validation error returned by
+// DeleteAppRequest.Validate if the designated constraints aren't met.
+type DeleteAppRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteAppRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteAppRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteAppRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteAppRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteAppRequestValidationError) ErrorName() string { return "DeleteAppRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DeleteAppRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteAppRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteAppRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteAppRequestValidationError{}
+
+// Validate checks the field values on DeleteAppResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DeleteAppResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteAppResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteAppResponseMultiError, or nil if none found.
+func (m *DeleteAppResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteAppResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeleteAppResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteAppResponseMultiError is an error wrapping multiple validation errors
+// returned by DeleteAppResponse.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteAppResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteAppResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteAppResponseMultiError) AllErrors() []error { return m }
+
+// DeleteAppResponseValidationError is the validation error returned by
+// DeleteAppResponse.Validate if the designated constraints aren't met.
+type DeleteAppResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteAppResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteAppResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteAppResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteAppResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteAppResponseValidationError) ErrorName() string {
+	return "DeleteAppResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteAppResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteAppResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteAppResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteAppResponseValidationError{}

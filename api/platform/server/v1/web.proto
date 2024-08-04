@@ -8,6 +8,7 @@ service WebService {
   rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
   rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
   rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {}
+  rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -26,3 +27,9 @@ message InstallAppRequest {
 }
 
 message InstallAppResponse {}
+
+message DeleteAppRequest {
+  string release = 1;
+}
+
+message DeleteAppResponse {}

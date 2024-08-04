@@ -39,6 +39,8 @@ const (
 	WebServiceRestartHostProcedure = "/platform.server.v1.WebService/RestartHost"
 	// WebServiceInstallAppProcedure is the fully-qualified name of the WebService's InstallApp RPC.
 	WebServiceInstallAppProcedure = "/platform.server.v1.WebService/InstallApp"
+	// WebServiceDeleteAppProcedure is the fully-qualified name of the WebService's DeleteApp RPC.
+	WebServiceDeleteAppProcedure = "/platform.server.v1.WebService/DeleteApp"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -47,6 +49,7 @@ var (
 	webServiceShutdownHostMethodDescriptor = webServiceServiceDescriptor.Methods().ByName("ShutdownHost")
 	webServiceRestartHostMethodDescriptor  = webServiceServiceDescriptor.Methods().ByName("RestartHost")
 	webServiceInstallAppMethodDescriptor   = webServiceServiceDescriptor.Methods().ByName("InstallApp")
+	webServiceDeleteAppMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("DeleteApp")
 )
 
 // WebServiceClient is a client for the platform.server.v1.WebService service.
@@ -54,6 +57,7 @@ type WebServiceClient interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
 	RestartHost(context.Context, *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error)
 	InstallApp(context.Context, *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error)
+	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
 }
 
 // NewWebServiceClient constructs a client for the platform.server.v1.WebService service. By
@@ -84,6 +88,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceInstallAppMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		deleteApp: connect.NewClient[v1.DeleteAppRequest, v1.DeleteAppResponse](
+			httpClient,
+			baseURL+WebServiceDeleteAppProcedure,
+			connect.WithSchema(webServiceDeleteAppMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -92,6 +102,7 @@ type webServiceClient struct {
 	shutdownHost *connect.Client[v1.ShutdownHostRequest, v1.ShutdownHostResponse]
 	restartHost  *connect.Client[v1.RestartHostRequest, v1.RestartHostResponse]
 	installApp   *connect.Client[v1.InstallAppRequest, v1.InstallAppResponse]
+	deleteApp    *connect.Client[v1.DeleteAppRequest, v1.DeleteAppResponse]
 }
 
 // ShutdownHost calls platform.server.v1.WebService.ShutdownHost.
@@ -109,11 +120,17 @@ func (c *webServiceClient) InstallApp(ctx context.Context, req *connect.Request[
 	return c.installApp.CallUnary(ctx, req)
 }
 
+// DeleteApp calls platform.server.v1.WebService.DeleteApp.
+func (c *webServiceClient) DeleteApp(ctx context.Context, req *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error) {
+	return c.deleteApp.CallUnary(ctx, req)
+}
+
 // WebServiceHandler is an implementation of the platform.server.v1.WebService service.
 type WebServiceHandler interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
 	RestartHost(context.Context, *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error)
 	InstallApp(context.Context, *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error)
+	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
 }
 
 // NewWebServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -140,6 +157,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceInstallAppMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceDeleteAppHandler := connect.NewUnaryHandler(
+		WebServiceDeleteAppProcedure,
+		svc.DeleteApp,
+		connect.WithSchema(webServiceDeleteAppMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.server.v1.WebService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case WebServiceShutdownHostProcedure:
@@ -148,6 +171,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceRestartHostHandler.ServeHTTP(w, r)
 		case WebServiceInstallAppProcedure:
 			webServiceInstallAppHandler.ServeHTTP(w, r)
+		case WebServiceDeleteAppProcedure:
+			webServiceDeleteAppHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -167,4 +192,8 @@ func (UnimplementedWebServiceHandler) RestartHost(context.Context, *connect.Requ
 
 func (UnimplementedWebServiceHandler) InstallApp(context.Context, *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.InstallApp is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.DeleteApp is not implemented"))
 }
