@@ -3,8 +3,8 @@ import { createPromiseClient } from '@connectrpc/connect';
 import { WebService } from 'api/platform/server/v1/web_connect';
 
 const transport = createConnectTransport({
-  // baseUrl: 'http://home-cloud.local',
-  baseUrl: 'http://localhost:8000',
+  baseUrl: 'http://home-cloud.local',
+  // baseUrl: 'http://localhost:8000',
 });
 
 const values = new Map([
