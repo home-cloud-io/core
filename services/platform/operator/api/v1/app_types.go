@@ -14,6 +14,9 @@ type AppSpec struct {
 	Release string `json:"release"`
 	// Values optionally defines the values that will be applied to the Chart.
 	Values string `json:"values,omitempty"`
+	// TODO: generate with this and support it
+	// Version is the version of the chart.
+	Version string `json:"version"`
 }
 
 // AppStatus defines the observed state of an App
