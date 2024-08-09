@@ -59,11 +59,12 @@ func (r *Runner) run() {
 	for {
 		select {
 		case advertiseResource := <-notifyMdns:
-			if advertiseResource.Namespace == namespace {
+			if advertiseResource.Namespace != namespace {
 				continue
 			}
 
 			hostname := fmt.Sprintf("%s-home-cloud.local", advertiseResource.Name)
+			r.logger.Infof("advertising: %s", hostname)
 			switch advertiseResource.Action {
 			case resource.Added:
 				err := mdnsServer.AddHost(ctx, hostname)
@@ -77,7 +78,7 @@ func (r *Runner) run() {
 				}
 			}
 		case <-stopper:
-			fmt.Println("Stopping program")
+			r.logger.Info("stopping program")
 		}
 	}
 
