@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
 	k8sclient "github.com/home-cloud-io/services/platform/mdns/k8s-client"
 	"github.com/home-cloud-io/services/platform/mdns/mdns"
@@ -56,8 +57,14 @@ func (r *Runner) run() {
 	go serviceController.Run(stopper)
 
 
-	// initialize server
+	// initialize server and add host
 	mdnsServer := mdns.New(r.logger)
+	err = mdnsServer.AddHost(ctx, fmt.Sprintf("%s.local", os.Getenv("HOST_NAME")))
+	if err != nil {
+		panic(err)
+	}
+
+	// listen for resource events
 	for {
 		select {
 		case advertiseResource := <-notifyMdns:
