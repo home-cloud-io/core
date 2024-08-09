@@ -4,7 +4,6 @@ import (
 	"embed"
 
 	"github.com/home-cloud-io/core/services/platform/server/daemon"
-	"github.com/home-cloud-io/core/services/platform/server/mdns"
 	"github.com/home-cloud-io/core/services/platform/server/web"
 
 	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
@@ -31,8 +30,7 @@ func main() {
 			Match: &ntv1.RouteMatch{
 				Prefix: "/",
 			},
+			EnableHttp2: true,
 		}).
 		Start()
-
-	go mdns.ServeMDNS(logger)
 }

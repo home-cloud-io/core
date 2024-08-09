@@ -12,11 +12,9 @@ require (
 	connectrpc.com/connect v1.16.2
 	github.com/home-cloud-io/core/api v0.3.0
 	github.com/home-cloud-io/core/services/platform/operator v0.0.1
-	github.com/pion/mdns/v2 v2.0.7
-	github.com/steady-bytes/draft/api v0.3.1
+	github.com/steady-bytes/draft/api v0.3.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0
 	github.com/steady-bytes/draft/pkg/loggers v0.1.0
-	golang.org/x/net v0.25.0
 	k8s.io/apimachinery v0.30.3
 	k8s.io/client-go v0.30.3
 	sigs.k8s.io/controller-runtime v0.18.4
@@ -61,7 +59,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
-	github.com/pion/logging v0.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rs/cors v1.10.1 // indirect
 	github.com/rs/zerolog v1.32.0 // indirect
@@ -76,6 +73,7 @@ require (
 	go.etcd.io/bbolt v1.3.8 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
+	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/oauth2 v0.20.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
