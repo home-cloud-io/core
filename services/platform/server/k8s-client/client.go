@@ -37,7 +37,6 @@ func NewClient(logger chassis.Logger) Client {
 	if err != nil {
 		logger.WithError(err).Panic("failed to create new k8s client")
 	}
-	// c.Scheme().AddKnownTypes(opv1.GroupVersion, &opv1.App{}, &opv1.AppList{})
 	opv1.AddToScheme(c.Scheme())
 
 	return &client{

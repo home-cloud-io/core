@@ -10,27 +10,15 @@ const transport = createConnectTransport({
 const values = new Map([
   [
     'hello-world',
-    `
-replicaCount: 1
-`,
+    ``,
   ],
   [
     'postgres',
-    `
-nodeAffinity:
-  hostname: home-cloud
-`,
+    ``,
   ],
   [
     'immich',
-    `
-database:
-  name: postgres
-  user: postgres
-  password: postgres
-nodeAffinity:
-  hostname: home-cloud
-`,
+    ``,
   ],
 ]);
 
@@ -49,9 +37,9 @@ export function restart() {
 export function installApp(app) {
   console.log(`installing app: ${app}`);
   client.installApp({
-    repo: 'jack.kawell.us/helm-charts',
+    repo: 'home-cloud-io.github.io/store',
     chart: app,
-    release: `home-cloud-${app}`,
+    release: `${app}`,
     values: values.get(app),
   });
 }
@@ -59,16 +47,16 @@ export function installApp(app) {
 export function deleteApp(app) {
   console.log('delete app called');
   client.deleteApp({
-    release: `home-cloud-${app}`,
+    release: `${app}`,
   });
 }
 
 export function updateApp(app) {
   console.log('update app called');
   client.updateApp({
-    repo: 'jack.kawell.us/helm-charts',
+    repo: 'home-cloud-io.github.io/store',
     chart: app,
-    release: `home-cloud-${app}`,
+    release: `${app}`,
     values: values.get(app),
   });
 }

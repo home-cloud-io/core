@@ -1,0 +1,8 @@
+service:
+  name: home-cloud-mdns
+  domain: platform
+
+server:
+  k8s:
+    config_path: /home/jgkawell/.kube/config
+    master_url: https://home-cloud.local:6443
