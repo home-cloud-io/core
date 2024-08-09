@@ -61,10 +61,6 @@ func (r *Runner) run() {
 	for {
 		select {
 		case advertiseResource := <-notifyMdns:
-			if advertiseResource.Namespace != namespace {
-				continue
-			}
-
 			hostname := fmt.Sprintf("%s-home-cloud.local", advertiseResource.Name)
 			r.logger.Infof("advertising: %s", hostname)
 			switch advertiseResource.Action {

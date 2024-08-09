@@ -124,13 +124,19 @@ func (h *EventHandler) buildRecord(obj interface{}, action Action) (*Resource, e
 		IP: service.Spec.ExternalName,
 	}
 
-	// only support ExternalName type
-	if service.Spec.Type != corev1.ServiceTypeExternalName {
+	// ignore anything that doesn't match the given namespace
+	if resource.Namespace != h.namespace {
 		logger.Debug("ignoring service not in selected namespace")
 		return nil, nil
 	}
 
+	// only support ExternalName type
+	if service.Spec.Type != corev1.ServiceTypeExternalName {
+		logger.Debug("ignoring service not of ExternalName type")
+		return nil, nil
+	}
 
+	// requires the IP to be set
 	if resource.IP == "" {
 		return resource, fmt.Errorf("service must contain an ExternalName")
 	}
