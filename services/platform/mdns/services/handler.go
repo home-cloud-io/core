@@ -28,19 +28,16 @@ func (s *EventHandler) Run(stopCh chan struct{}) {
 
 func (s *EventHandler) onAdd(obj interface{}) {
 	resource, err := s.buildRecord(obj, Added)
-	logger := s.logger.WithFields(chassis.Fields{
-		"namespace": resource.Namespace,
-		"name":      resource.Name,
-	})
 	if err != nil {
-		logger.WithError(err).WithFields(chassis.Fields{
-			"namespace": resource.Namespace,
-			"name":      resource.Name,
-		}).Error("failed to build record")
+		s.logger.WithError(err).Error("failed to build record")
 	}
 	if resource == nil {
 		return
 	}
+	logger := s.logger.WithFields(chassis.Fields{
+		"namespace": resource.Namespace,
+		"name":      resource.Name,
+	})
 
 	if resource.Namespace != s.namespace {
 		logger.WithFields(chassis.Fields{
@@ -56,36 +53,24 @@ func (s *EventHandler) onAdd(obj interface{}) {
 
 func (s *EventHandler) onDelete(obj interface{}) {
 	resource, err := s.buildRecord(obj, Deleted)
-	logger := s.logger.WithFields(chassis.Fields{
-		"namespace": resource.Namespace,
-		"name":      resource.Name,
-	})
 	if err != nil {
-		logger.WithError(err).WithFields(chassis.Fields{
-			"namespace": resource.Namespace,
-			"name":      resource.Name,
-		}).Error("failed to build record")
+		s.logger.WithError(err).Error("failed to build record")
 	}
 	if resource == nil {
 		return
 	}
-
-	s.logger.Info("deleting record")
+	s.logger.WithFields(chassis.Fields{
+		"namespace": resource.Namespace,
+		"name":      resource.Name,
+	}).Info("deleting record")
 	s.notifyChan <- *resource
 }
 
 func (s *EventHandler) onUpdate(oldObj interface{}, newObj interface{}) {
 
 	oldResource, err := s.buildRecord(oldObj, Deleted)
-	logger := s.logger.WithFields(chassis.Fields{
-		"namespace": oldResource.Namespace,
-		"name":      oldResource.Name,
-	})
 	if err != nil {
-		logger.WithError(err).WithFields(chassis.Fields{
-			"namespace": oldResource.Namespace,
-			"name":      oldResource.Name,
-		}).Error("failed to build old record")
+		s.logger.Error("failed to build old record")
 	}
 	if oldResource != nil {
 		s.logger.Info("deleting old record")
@@ -94,13 +79,10 @@ func (s *EventHandler) onUpdate(oldObj interface{}, newObj interface{}) {
 
 	newResource, err := s.buildRecord(newObj, Added)
 	if err != nil {
-		logger.WithError(err).WithFields(chassis.Fields{
-			"namespace": newResource.Namespace,
-			"name":      newResource.Name,
-		}).Error("failed to build new record")
+		s.logger.WithError(err).Error("failed to build new record")
 	}
 	if newResource != nil {
-		logger.Info("adding new record")
+		s.logger.Info("adding new record")
 		s.notifyChan <- *newResource
 	}
 }
