@@ -1,4 +1,4 @@
-module github.com/blake/external-mdns
+module github.com/home-cloud-io/services/platform/mdns
 
 go 1.22.0
 

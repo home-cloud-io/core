@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	k8sclient "github.com/blake/external-mdns/k8s-client"
-	"github.com/blake/external-mdns/mdns"
-	"github.com/blake/external-mdns/resource"
-	"github.com/blake/external-mdns/source"
+	k8sclient "github.com/home-cloud-io/services/platform/mdns/k8s-client"
+	"github.com/home-cloud-io/services/platform/mdns/mdns"
+	"github.com/home-cloud-io/services/platform/mdns/services"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
 
@@ -41,7 +40,7 @@ func (r *Runner) run() {
 	ctx := context.Background()
 
 	// channels
-	notifyMdns := make(chan resource.Resource)
+	notifyMdns := make(chan services.Resource)
 	stopper := make(chan struct{})
 
 	// closers
@@ -50,7 +49,10 @@ func (r *Runner) run() {
 
 	// run listener in the background
 	factory := informers.NewSharedInformerFactory(k8sClient, 0)
-	serviceController := source.NewServicesWatcher(r.logger, factory, namespace, notifyMdns)
+	serviceController, err := services.NewServicesWatcher(r.logger, factory, namespace, notifyMdns)
+	if err != nil {
+		r.logger.WithError(err).Panic("failed to initialize services watcher")
+	}
 	go serviceController.Run(stopper)
 
 
@@ -66,12 +68,12 @@ func (r *Runner) run() {
 			hostname := fmt.Sprintf("%s-home-cloud.local", advertiseResource.Name)
 			r.logger.Infof("advertising: %s", hostname)
 			switch advertiseResource.Action {
-			case resource.Added:
+			case services.Added:
 				err := mdnsServer.AddHost(ctx, hostname)
 				if err != nil {
 					panic(err)
 				}
-			case resource.Deleted:
+			case services.Deleted:
 				err := mdnsServer.RemoveHost(ctx, hostname)
 				if err != nil {
 					panic(err)

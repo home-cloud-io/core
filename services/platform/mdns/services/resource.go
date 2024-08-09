@@ -1,4 +1,4 @@
-package resource
+package services
 
 type Action int64
 
@@ -11,9 +11,8 @@ const (
 
 // Resource represents a resource to advertise over mDNS
 type Resource struct {
-	SourceType string
 	Action     Action
-	IPs        []string
+	IP         string
 	Name       string
 	Namespace  string
 }

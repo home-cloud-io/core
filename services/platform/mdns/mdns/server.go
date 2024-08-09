@@ -3,6 +3,7 @@ package mdns
 import (
 	"context"
 	"net"
+	"os"
 
 	"github.com/pion/mdns/v2"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -49,8 +50,7 @@ func (s *server) Serve(ctx context.Context) error {
 	// server hosts
 	conn, err := mdns.Server(ipv4.NewPacketConn(l4), nil, &mdns.Config{
 		LocalNames:   s.hosts,
-		LocalAddress: net.ParseIP("192.168.1.184"),
-		// LocalAddress: net.ParseIP(os.Getenv("HOST_IP")),
+		LocalAddress: net.ParseIP(os.Getenv("HOST_IP")),
 	})
 	if err != nil {
 		return err
@@ -60,7 +60,7 @@ func (s *server) Serve(ctx context.Context) error {
 	if s.conn != nil {
 		err := s.Close(ctx)
 		if err != nil {
-			s.logger.Infof("failed to close connection: %v\n", err)
+			s.logger.WithError(err).Error("failed to close connection")
 		}
 	}
 
@@ -89,11 +89,13 @@ func (s *server) AddHost(ctx context.Context, host string) error {
 }
 
 func (s *server) RemoveHost(ctx context.Context, host string) error {
+	// TODO: should change this to a thread-safe map using a mutex
 	hosts := []string{}
 	for _, h := range s.hosts {
 		if h != host {
 			hosts = append(hosts, h)
 		}
 	}
+	s.hosts = hosts
 	return s.Serve(ctx)
 }
