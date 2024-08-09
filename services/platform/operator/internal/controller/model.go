@@ -17,7 +17,7 @@ type (
 	}
 	AppService struct {
 		Name string
-		Port int
+		Port uint32
 	}
 	AppDatabase struct {
 		Name string

@@ -8,6 +8,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence, app *v1.App, namespace string) error {
@@ -49,7 +50,7 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 			// TODO: NodeAffinity
 		},
 	})
-	if err != nil {
+	if client.IgnoreAlreadyExists(err) != nil {
 		return err
 	}
 
@@ -71,7 +72,7 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 			},
 		},
 	})
-	if err != nil {
+	if client.IgnoreAlreadyExists(err) != nil {
 		return err
 	}
 

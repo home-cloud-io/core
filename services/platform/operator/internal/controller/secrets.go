@@ -6,6 +6,7 @@ import (
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/secrets"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *AppReconciler) createSecret(ctx context.Context, s AppSecret, namespace string) error {
@@ -27,7 +28,7 @@ func (r *AppReconciler) createSecret(ctx context.Context, s AppSecret, namespace
 		Type: corev1.SecretTypeOpaque,
 		Data: data,
 	})
-	if err != nil {
+	if client.IgnoreAlreadyExists(err) != nil {
 		return err
 	}
 

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
 
 	"github.com/imdario/mergo"
 	"golang.org/x/mod/semver"
@@ -141,7 +142,7 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App, version string
 			Name: namespace,
 		},
 	})
-	if err != nil {
+	if client.IgnoreAlreadyExists(err) != nil {
 		return err
 	}
 
@@ -170,6 +171,38 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App, version string
 	// create database (and users/initialization scripts)
 	for _, d := range appConfig.Databases {
 		err := r.createDatabase(ctx, d, namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// create routes
+	for _, route := range appConfig.Routes {
+		err := r.createRoute(ctx, &ntv1.Route{
+			Name: route.Name,
+			Match: &ntv1.RouteMatch{
+				Prefix: "/",
+				Host:   fmt.Sprintf("%s.home-cloud.local", route.Name),
+			},
+			Endpoint: &ntv1.Endpoint{
+				Host: fmt.Sprintf("%s.%s.svc.cluster.local", route.Service.Name, namespace),
+				Port: route.Service.Port,
+			},
+		})
+		if err != nil {
+			return err
+		}
+		err = r.createRoute(ctx, &ntv1.Route{
+			Name: route.Name,
+			Match: &ntv1.RouteMatch{
+				Prefix: "/",
+				Host:   fmt.Sprintf("%s-home-cloud.local", route.Name),
+			},
+			Endpoint: &ntv1.Endpoint{
+				Host: fmt.Sprintf("%s.%s.svc.cluster.local", route.Service.Name, namespace),
+				Port: route.Service.Port,
+			},
+		})
 		if err != nil {
 			return err
 		}
@@ -222,14 +255,7 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 		return err
 	}
 
-	// delete namespace
-	r.Client.Delete(ctx, &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: app.Spec.Release,
-		},
-	})
-
-	// TODO: delete all other add-on components (secrets, PV/PVCs, etc.)
+	// TODO: option to hard-delete all add-on components (namespace, secrets, PV/PVCs, etc.)
 
 	return nil
 }
