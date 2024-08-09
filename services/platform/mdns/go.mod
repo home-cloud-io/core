@@ -5,7 +5,6 @@ go 1.22.0
 toolchain go1.22.5
 
 require (
-	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pion/mdns/v2 v2.0.7
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0
 	github.com/steady-bytes/draft/pkg/loggers v0.2.0
