@@ -8,6 +8,10 @@ import (
 	"os"
 	"time"
 
+	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
+
+	"github.com/imdario/mergo"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
@@ -15,15 +19,15 @@ import (
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/registry"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 )
 
 const AppFinalizer = "apps.home-cloud.io/finalizer"
@@ -120,17 +124,91 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App, version string
 		return err
 	}
 
+	// construct helm configuration
 	act := action.NewInstall(actionConfiguration)
 	act.Version = version
 	act.Namespace = app.Namespace
 	act.RepoURL = repoURL(app)
 	act.ReleaseName = app.Spec.Release
-
+	namespace := app.Spec.Release
 	chart, values, err := getChartAndValues(act.ChartPathOptions, app)
 	if err != nil {
 		return err
 	}
 
+	// create namespace before installing anything else
+	err = r.Client.Create(ctx, &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: namespace,
+		},
+	})
+	if client.IgnoreAlreadyExists(err) != nil {
+		return err
+	}
+
+	// read combined app config from chart values and override values configured in the app
+	appConfig, err := config(chart, app)
+	if err != nil {
+		return err
+	}
+
+	// create secrets
+	for _, s := range appConfig.Secrets {
+		err := r.createSecret(ctx, s, namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// create persistence (PV/PVCs)
+	for _, p := range appConfig.Persistence {
+		err := r.createPersistence(ctx, p, app, namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// create database (and users/initialization scripts)
+	for _, d := range appConfig.Databases {
+		err := r.createDatabase(ctx, d, namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// create routes
+	for _, route := range appConfig.Routes {
+		err := r.createRoute(ctx, &ntv1.Route{
+			Name: route.Name,
+			Match: &ntv1.RouteMatch{
+				Prefix: "/",
+				Host:   fmt.Sprintf("%s.home-cloud.local", route.Name),
+			},
+			Endpoint: &ntv1.Endpoint{
+				Host: fmt.Sprintf("%s.%s.svc.cluster.local", route.Service.Name, namespace),
+				Port: route.Service.Port,
+			},
+		})
+		if err != nil {
+			return err
+		}
+		err = r.createRoute(ctx, &ntv1.Route{
+			Name: route.Name,
+			Match: &ntv1.RouteMatch{
+				Prefix: "/",
+				Host:   fmt.Sprintf("%s-home-cloud.local", route.Name),
+			},
+			Endpoint: &ntv1.Endpoint{
+				Host: fmt.Sprintf("%s.%s.svc.cluster.local", route.Service.Name, namespace),
+				Port: route.Service.Port,
+			},
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	// finally, install helm chart
 	_, err = act.Run(chart, values)
 	if err != nil {
 		return err
@@ -163,7 +241,7 @@ func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App, version string
 	return r.updateStatus(ctx, app, version)
 }
 
-func (r *AppReconciler) uninstall(app *v1.App) error {
+func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 	actionConfiguration, err := createHelmAction(app.Namespace)
 	if err != nil {
 		return err
@@ -177,6 +255,8 @@ func (r *AppReconciler) uninstall(app *v1.App) error {
 		return err
 	}
 
+	// TODO: option to hard-delete all add-on components (namespace, secrets, PV/PVCs, etc.)
+
 	return nil
 }
 
@@ -188,8 +268,7 @@ func (r *AppReconciler) updateStatus(ctx context.Context, app *v1.App, version s
 
 func (r *AppReconciler) tryDeletions(ctx context.Context, app *v1.App) error {
 	if controllerutil.ContainsFinalizer(app, AppFinalizer) {
-
-		err := r.uninstall(app)
+		err := r.uninstall(ctx, app)
 		if err != nil {
 			return err
 		}
@@ -225,9 +304,9 @@ func createHelmAction(namespace string) (*action.Configuration, error) {
 
 // getChartAndValues returns the chart and values for a given app by downloading the chart from the registry and converting the values
 // from the string in the CRD to a map.
-func getChartAndValues(upgrade action.ChartPathOptions, app *v1.App) (*chart.Chart, map[string]interface{}, error) {
+func getChartAndValues(opt action.ChartPathOptions, app *v1.App) (*chart.Chart, map[string]interface{}, error) {
 	// download the chart to the file system
-	path, err := upgrade.LocateChart(app.Spec.Chart, cli.New())
+	path, err := opt.LocateChart(app.Spec.Chart, cli.New())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -237,7 +316,7 @@ func getChartAndValues(upgrade action.ChartPathOptions, app *v1.App) (*chart.Cha
 		return nil, nil, err
 	}
 
-	// convert app.Spec.Values from string to map[string]interface{}
+	// values for the chart install
 	values := make(map[string]interface{})
 	if len(app.Spec.Values) != 0 {
 		err := yaml.Unmarshal([]byte(app.Spec.Values), &values)
@@ -297,4 +376,40 @@ func getLatestVersion(app *v1.App) (string, error) {
 
 func repoURL(app *v1.App) string {
 	return "https://" + app.Spec.Repo
+}
+
+func config(chart *chart.Chart, app *v1.App) (config *AppConfig, err error) {
+	values, err := yaml.Marshal(chart.Values)
+	if err != nil {
+		return nil, err
+	}
+
+	base, err := valuesToConfig(values)
+	if err != nil {
+		return nil, err
+	}
+
+	override, err := valuesToConfig([]byte(app.Spec.Values))
+	if err != nil {
+		return nil, err
+	}
+
+	err = mergo.Merge(override, base)
+	if err != nil {
+		return nil, err
+	}
+
+	return override, nil
+}
+
+func valuesToConfig(values []byte) (*AppConfig, error) {
+	if len(values) == 0 {
+		return &AppConfig{}, nil
+	}
+	appValues := AppValues{}
+	err := yaml.Unmarshal(values, &appValues)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal app values: %v", err)
+	}
+	return &appValues.Config, nil
 }
