@@ -61,6 +61,7 @@ func (r *AppReconciler) createRoute(ctx context.Context, route *ntv1.Route) erro
 		},
 		Spec: corev1.ServiceSpec{
 			Type:         corev1.ServiceTypeExternalName,
+			// TODO: this needs to take into account the node the app is deployed on
 			ExternalName: os.Getenv("HOST_IP"),
 		},
 	})

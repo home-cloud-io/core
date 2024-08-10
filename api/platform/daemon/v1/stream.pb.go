@@ -90,11 +90,11 @@ type isDaemonMessage_Message interface {
 }
 
 type DaemonMessage_Heartbeat struct {
-	Heartbeat *Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof" json:"heartbeat" pg:"heartbeat" bun:"heartbeat" yaml:"heartbeat" csv:"heartbeat"`
+	Heartbeat *Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof" bun:"heartbeat" csv:"heartbeat" json:"heartbeat" pg:"heartbeat" yaml:"heartbeat"`
 }
 
 type DaemonMessage_ShutdownAlert struct {
-	ShutdownAlert *ShutdownAlert `protobuf:"bytes,2,opt,name=shutdown_alert,json=shutdownAlert,proto3,oneof" csv:"shutdown_alert" json:"shutdown_alert" pg:"shutdown_alert" bun:"shutdown_alert" yaml:"shutdown_alert"`
+	ShutdownAlert *ShutdownAlert `protobuf:"bytes,2,opt,name=shutdown_alert,json=shutdownAlert,proto3,oneof" bun:"shutdown_alert" csv:"shutdown_alert" json:"shutdown_alert" pg:"shutdown_alert" yaml:"shutdown_alert"`
 }
 
 func (*DaemonMessage_Heartbeat) isDaemonMessage_Message() {}
@@ -179,15 +179,15 @@ type isServerMessage_Message interface {
 }
 
 type ServerMessage_Heartbeat struct {
-	Heartbeat *Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof" pg:"heartbeat" bun:"heartbeat" yaml:"heartbeat" csv:"heartbeat" json:"heartbeat"`
+	Heartbeat *Heartbeat `protobuf:"bytes,1,opt,name=heartbeat,proto3,oneof" bun:"heartbeat" csv:"heartbeat" json:"heartbeat" pg:"heartbeat" yaml:"heartbeat"`
 }
 
 type ServerMessage_Shutdown struct {
-	Shutdown *ShutdownCommand `protobuf:"bytes,2,opt,name=shutdown,proto3,oneof" bun:"shutdown" yaml:"shutdown" csv:"shutdown" json:"shutdown" pg:"shutdown"`
+	Shutdown *ShutdownCommand `protobuf:"bytes,2,opt,name=shutdown,proto3,oneof" bun:"shutdown" csv:"shutdown" json:"shutdown" pg:"shutdown" yaml:"shutdown"`
 }
 
 type ServerMessage_Restart struct {
-	Restart *RestartCommand `protobuf:"bytes,3,opt,name=restart,proto3,oneof" json:"restart" pg:"restart" bun:"restart" yaml:"restart" csv:"restart"`
+	Restart *RestartCommand `protobuf:"bytes,3,opt,name=restart,proto3,oneof" bun:"restart" csv:"restart" json:"restart" pg:"restart" yaml:"restart"`
 }
 
 func (*ServerMessage_Heartbeat) isServerMessage_Message() {}
@@ -278,7 +278,7 @@ type UpgradeAvailableAlert struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description" pg:"description" bun:"description" yaml:"description" csv:"description"`
+	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description" bun:"description" csv:"description" pg:"description" yaml:"description"`
 }
 
 func (x *UpgradeAvailableAlert) Reset() {
