@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { DeleteAppRequest, DeleteAppResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetDeviceUsageStatsRequest, GetDeviceUsageStatsResponse, GetInstalledAppsRequest, GetInstalledAppsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -55,6 +55,83 @@ export const WebService = {
       name: "UpdateApp",
       I: UpdateAppRequest,
       O: UpdateAppResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Check to validate if the device has gone through the onboarding process
+     *
+     * @generated from rpc platform.server.v1.WebService.IsDeviceSetup
+     */
+    isDeviceSetup: {
+      name: "IsDeviceSetup",
+      I: IsDeviceSetupRequest,
+      O: IsDeviceSetupResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Initialize the device with the user's credentials and settings
+     *
+     * @generated from rpc platform.server.v1.WebService.InitializeDevice
+     */
+    initializeDevice: {
+      name: "InitializeDevice",
+      I: InitializeDeviceRequest,
+      O: InitializeDeviceResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Login to the device
+     *
+     * @generated from rpc platform.server.v1.WebService.Login
+     */
+    login: {
+      name: "Login",
+      I: LoginRequest,
+      O: LoginResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get usage statistics for the device
+     *
+     * @generated from rpc platform.server.v1.WebService.GetDeviceUsageStats
+     */
+    getDeviceUsageStats: {
+      name: "GetDeviceUsageStats",
+      I: GetDeviceUsageStatsRequest,
+      O: GetDeviceUsageStatsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get the status of all installed apps
+     *
+     * @generated from rpc platform.server.v1.WebService.GetInstalledApps
+     */
+    getInstalledApps: {
+      name: "GetInstalledApps",
+      I: GetInstalledAppsRequest,
+      O: GetInstalledAppsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get all apps available in the store
+     *
+     * @generated from rpc platform.server.v1.WebService.GetAppsInStore
+     */
+    getAppsInStore: {
+      name: "GetAppsInStore",
+      I: GetAppsInStoreRequest,
+      O: GetAppsInStoreResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get the device settings
+     *
+     * @generated from rpc platform.server.v1.WebService.GetDeviceSettings
+     */
+    getDeviceSettings: {
+      name: "GetDeviceSettings",
+      I: GetDeviceSettingsRequest,
+      O: GetDeviceSettingsResponse,
       kind: MethodKind.Unary,
     },
   }

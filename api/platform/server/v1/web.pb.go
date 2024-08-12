@@ -20,6 +20,936 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type IsDeviceSetupRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *IsDeviceSetupRequest) Reset() {
+	*x = IsDeviceSetupRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IsDeviceSetupRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IsDeviceSetupRequest) ProtoMessage() {}
+
+func (x *IsDeviceSetupRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IsDeviceSetupRequest.ProtoReflect.Descriptor instead.
+func (*IsDeviceSetupRequest) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{0}
+}
+
+type IsDeviceSetupResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// If false the device is not setup, and the user should be redirected into the onboarding flow
+	Setup bool `protobuf:"varint,1,opt,name=setup,proto3" json:"setup" bun:"setup" csv:"setup" pg:"setup" yaml:"setup"`
+}
+
+func (x *IsDeviceSetupResponse) Reset() {
+	*x = IsDeviceSetupResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IsDeviceSetupResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IsDeviceSetupResponse) ProtoMessage() {}
+
+func (x *IsDeviceSetupResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IsDeviceSetupResponse.ProtoReflect.Descriptor instead.
+func (*IsDeviceSetupResponse) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *IsDeviceSetupResponse) GetSetup() bool {
+	if x != nil {
+		return x.Setup
+	}
+	return false
+}
+
+type InitializeDeviceRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Username       string   `protobuf:"bytes,1,opt,name=username,proto3" json:"username" bun:"username" csv:"username" pg:"username" yaml:"username"`
+	Password       string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password" bun:"password" csv:"password" pg:"password" yaml:"password"`
+	Timezone       string   `protobuf:"bytes,3,opt,name=timezone,proto3" json:"timezone" bun:"timezone" csv:"timezone" pg:"timezone" yaml:"timezone"`
+	AutoUpdateApps bool     `protobuf:"varint,4,opt,name=auto_update_apps,json=autoUpdateApps,proto3" json:"auto_update_apps" bun:"auto_update_apps" csv:"auto_update_apps" pg:"auto_update_apps" yaml:"auto_update_apps"`
+	AutoUpdateOs   bool     `protobuf:"varint,5,opt,name=auto_update_os,json=autoUpdateOs,proto3" json:"auto_update_os" bun:"auto_update_os" csv:"auto_update_os" pg:"auto_update_os" yaml:"auto_update_os"`
+	DefaultApps    []string `protobuf:"bytes,6,rep,name=default_apps,json=defaultApps,proto3" json:"default_apps" bun:"default_apps" csv:"default_apps" pg:"default_apps" yaml:"default_apps"`
+}
+
+func (x *InitializeDeviceRequest) Reset() {
+	*x = InitializeDeviceRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *InitializeDeviceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InitializeDeviceRequest) ProtoMessage() {}
+
+func (x *InitializeDeviceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InitializeDeviceRequest.ProtoReflect.Descriptor instead.
+func (*InitializeDeviceRequest) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *InitializeDeviceRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *InitializeDeviceRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *InitializeDeviceRequest) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+func (x *InitializeDeviceRequest) GetAutoUpdateApps() bool {
+	if x != nil {
+		return x.AutoUpdateApps
+	}
+	return false
+}
+
+func (x *InitializeDeviceRequest) GetAutoUpdateOs() bool {
+	if x != nil {
+		return x.AutoUpdateOs
+	}
+	return false
+}
+
+func (x *InitializeDeviceRequest) GetDefaultApps() []string {
+	if x != nil {
+		return x.DefaultApps
+	}
+	return nil
+}
+
+type InitializeDeviceResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Setup bool `protobuf:"varint,1,opt,name=setup,proto3" json:"setup" bun:"setup" csv:"setup" pg:"setup" yaml:"setup"`
+}
+
+func (x *InitializeDeviceResponse) Reset() {
+	*x = InitializeDeviceResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *InitializeDeviceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InitializeDeviceResponse) ProtoMessage() {}
+
+func (x *InitializeDeviceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InitializeDeviceResponse.ProtoReflect.Descriptor instead.
+func (*InitializeDeviceResponse) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *InitializeDeviceResponse) GetSetup() bool {
+	if x != nil {
+		return x.Setup
+	}
+	return false
+}
+
+type LoginRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username" bun:"username" csv:"username" pg:"username" yaml:"username"`
+	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password" bun:"password" csv:"password" pg:"password" yaml:"password"`
+}
+
+func (x *LoginRequest) Reset() {
+	*x = LoginRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginRequest) ProtoMessage() {}
+
+func (x *LoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
+func (*LoginRequest) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *LoginRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *LoginRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type LoginResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token" bun:"token" csv:"token" pg:"token" yaml:"token"`
+}
+
+func (x *LoginResponse) Reset() {
+	*x = LoginResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LoginResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginResponse) ProtoMessage() {}
+
+func (x *LoginResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
+func (*LoginResponse) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *LoginResponse) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type GetDeviceUsageStatsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetDeviceUsageStatsRequest) Reset() {
+	*x = GetDeviceUsageStatsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetDeviceUsageStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceUsageStatsRequest) ProtoMessage() {}
+
+func (x *GetDeviceUsageStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceUsageStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceUsageStatsRequest) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{6}
+}
+
+type GetDeviceUsageStatsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Disk        *DiskStats `protobuf:"bytes,3,opt,name=disk,proto3" json:"disk" bun:"disk" csv:"disk" pg:"disk" yaml:"disk"`
+	Temperature uint32     `protobuf:"varint,4,opt,name=temperature,proto3" json:"temperature" bun:"temperature" csv:"temperature" pg:"temperature" yaml:"temperature"`
+}
+
+func (x *GetDeviceUsageStatsResponse) Reset() {
+	*x = GetDeviceUsageStatsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetDeviceUsageStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceUsageStatsResponse) ProtoMessage() {}
+
+func (x *GetDeviceUsageStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceUsageStatsResponse.ProtoReflect.Descriptor instead.
+func (*GetDeviceUsageStatsResponse) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetDeviceUsageStatsResponse) GetDisk() *DiskStats {
+	if x != nil {
+		return x.Disk
+	}
+	return nil
+}
+
+func (x *GetDeviceUsageStatsResponse) GetTemperature() uint32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+type DiskStats struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Total int64 `protobuf:"varint,1,opt,name=total,proto3" json:"total" bun:"total" csv:"total" pg:"total" yaml:"total"`
+	Used  int64 `protobuf:"varint,2,opt,name=used,proto3" json:"used" bun:"used" csv:"used" pg:"used" yaml:"used"`
+	Free  int64 `protobuf:"varint,3,opt,name=free,proto3" json:"free" bun:"free" csv:"free" pg:"free" yaml:"free"`
+}
+
+func (x *DiskStats) Reset() {
+	*x = DiskStats{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DiskStats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DiskStats) ProtoMessage() {}
+
+func (x *DiskStats) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DiskStats.ProtoReflect.Descriptor instead.
+func (*DiskStats) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *DiskStats) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *DiskStats) GetUsed() int64 {
+	if x != nil {
+		return x.Used
+	}
+	return 0
+}
+
+func (x *DiskStats) GetFree() int64 {
+	if x != nil {
+		return x.Free
+	}
+	return 0
+}
+
+type GetInstalledAppsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetInstalledAppsRequest) Reset() {
+	*x = GetInstalledAppsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetInstalledAppsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInstalledAppsRequest) ProtoMessage() {}
+
+func (x *GetInstalledAppsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInstalledAppsRequest.ProtoReflect.Descriptor instead.
+func (*GetInstalledAppsRequest) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{9}
+}
+
+type GetInstalledAppsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Apps []*AppStatus `protobuf:"bytes,1,rep,name=apps,proto3" json:"apps" bun:"apps" csv:"apps" pg:"apps" yaml:"apps"`
+}
+
+func (x *GetInstalledAppsResponse) Reset() {
+	*x = GetInstalledAppsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetInstalledAppsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInstalledAppsResponse) ProtoMessage() {}
+
+func (x *GetInstalledAppsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInstalledAppsResponse.ProtoReflect.Descriptor instead.
+func (*GetInstalledAppsResponse) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetInstalledAppsResponse) GetApps() []*AppStatus {
+	if x != nil {
+		return x.Apps
+	}
+	return nil
+}
+
+type AppStatus struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name    string `protobuf:"bytes,1,opt,name=name,proto3" json:"name" bun:"name" csv:"name" pg:"name" yaml:"name"`
+	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version" bun:"version" csv:"version" pg:"version" yaml:"version"`
+	Status  string `protobuf:"bytes,3,opt,name=status,proto3" json:"status" bun:"status" csv:"status" pg:"status" yaml:"status"`
+}
+
+func (x *AppStatus) Reset() {
+	*x = AppStatus{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AppStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppStatus) ProtoMessage() {}
+
+func (x *AppStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppStatus.ProtoReflect.Descriptor instead.
+func (*AppStatus) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *AppStatus) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AppStatus) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *AppStatus) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type GetAppsInStoreRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetAppsInStoreRequest) Reset() {
+	*x = GetAppsInStoreRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetAppsInStoreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAppsInStoreRequest) ProtoMessage() {}
+
+func (x *GetAppsInStoreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAppsInStoreRequest.ProtoReflect.Descriptor instead.
+func (*GetAppsInStoreRequest) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{12}
+}
+
+type GetAppsInStoreResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Apps []*App `protobuf:"bytes,1,rep,name=apps,proto3" json:"apps" bun:"apps" csv:"apps" pg:"apps" yaml:"apps"`
+}
+
+func (x *GetAppsInStoreResponse) Reset() {
+	*x = GetAppsInStoreResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetAppsInStoreResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAppsInStoreResponse) ProtoMessage() {}
+
+func (x *GetAppsInStoreResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAppsInStoreResponse.ProtoReflect.Descriptor instead.
+func (*GetAppsInStoreResponse) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetAppsInStoreResponse) GetApps() []*App {
+	if x != nil {
+		return x.Apps
+	}
+	return nil
+}
+
+type App struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name" bun:"name" csv:"name" pg:"name" yaml:"name"`
+	Version     string `protobuf:"bytes,2,opt,name=version,proto3" json:"version" bun:"version" csv:"version" pg:"version" yaml:"version"`
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description" bun:"description" csv:"description" pg:"description" yaml:"description"`
+	Icon        string `protobuf:"bytes,4,opt,name=icon,proto3" json:"icon" bun:"icon" csv:"icon" pg:"icon" yaml:"icon"`
+}
+
+func (x *App) Reset() {
+	*x = App{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *App) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*App) ProtoMessage() {}
+
+func (x *App) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use App.ProtoReflect.Descriptor instead.
+func (*App) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *App) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *App) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *App) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *App) GetIcon() string {
+	if x != nil {
+		return x.Icon
+	}
+	return ""
+}
+
+type GetDeviceSettingsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetDeviceSettingsRequest) Reset() {
+	*x = GetDeviceSettingsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetDeviceSettingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceSettingsRequest) ProtoMessage() {}
+
+func (x *GetDeviceSettingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceSettingsRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceSettingsRequest) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{15}
+}
+
+type GetDeviceSettingsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Settings *DeviceSettings `protobuf:"bytes,1,opt,name=settings,proto3" json:"settings" bun:"settings" csv:"settings" pg:"settings" yaml:"settings"`
+}
+
+func (x *GetDeviceSettingsResponse) Reset() {
+	*x = GetDeviceSettingsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetDeviceSettingsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceSettingsResponse) ProtoMessage() {}
+
+func (x *GetDeviceSettingsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceSettingsResponse.ProtoReflect.Descriptor instead.
+func (*GetDeviceSettingsResponse) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetDeviceSettingsResponse) GetSettings() *DeviceSettings {
+	if x != nil {
+		return x.Settings
+	}
+	return nil
+}
+
+type DeviceSettings struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Timezone       string `protobuf:"bytes,1,opt,name=timezone,proto3" json:"timezone" bun:"timezone" csv:"timezone" pg:"timezone" yaml:"timezone"`
+	AutoUpdateApps bool   `protobuf:"varint,2,opt,name=auto_update_apps,json=autoUpdateApps,proto3" json:"auto_update_apps" bun:"auto_update_apps" csv:"auto_update_apps" pg:"auto_update_apps" yaml:"auto_update_apps"`
+	AutoUpdateOs   bool   `protobuf:"varint,3,opt,name=auto_update_os,json=autoUpdateOs,proto3" json:"auto_update_os" bun:"auto_update_os" csv:"auto_update_os" pg:"auto_update_os" yaml:"auto_update_os"`
+}
+
+func (x *DeviceSettings) Reset() {
+	*x = DeviceSettings{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeviceSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceSettings) ProtoMessage() {}
+
+func (x *DeviceSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceSettings.ProtoReflect.Descriptor instead.
+func (*DeviceSettings) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *DeviceSettings) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+func (x *DeviceSettings) GetAutoUpdateApps() bool {
+	if x != nil {
+		return x.AutoUpdateApps
+	}
+	return false
+}
+
+func (x *DeviceSettings) GetAutoUpdateOs() bool {
+	if x != nil {
+		return x.AutoUpdateOs
+	}
+	return false
+}
+
 type ShutdownHostRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -29,7 +959,7 @@ type ShutdownHostRequest struct {
 func (x *ShutdownHostRequest) Reset() {
 	*x = ShutdownHostRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[0]
+		mi := &file_platform_server_v1_web_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -42,7 +972,7 @@ func (x *ShutdownHostRequest) String() string {
 func (*ShutdownHostRequest) ProtoMessage() {}
 
 func (x *ShutdownHostRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[0]
+	mi := &file_platform_server_v1_web_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +985,7 @@ func (x *ShutdownHostRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShutdownHostRequest.ProtoReflect.Descriptor instead.
 func (*ShutdownHostRequest) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{0}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{18}
 }
 
 type ShutdownHostResponse struct {
@@ -67,7 +997,7 @@ type ShutdownHostResponse struct {
 func (x *ShutdownHostResponse) Reset() {
 	*x = ShutdownHostResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[1]
+		mi := &file_platform_server_v1_web_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -80,7 +1010,7 @@ func (x *ShutdownHostResponse) String() string {
 func (*ShutdownHostResponse) ProtoMessage() {}
 
 func (x *ShutdownHostResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[1]
+	mi := &file_platform_server_v1_web_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -93,7 +1023,7 @@ func (x *ShutdownHostResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShutdownHostResponse.ProtoReflect.Descriptor instead.
 func (*ShutdownHostResponse) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{1}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{19}
 }
 
 type RestartHostRequest struct {
@@ -105,7 +1035,7 @@ type RestartHostRequest struct {
 func (x *RestartHostRequest) Reset() {
 	*x = RestartHostRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[2]
+		mi := &file_platform_server_v1_web_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -118,7 +1048,7 @@ func (x *RestartHostRequest) String() string {
 func (*RestartHostRequest) ProtoMessage() {}
 
 func (x *RestartHostRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[2]
+	mi := &file_platform_server_v1_web_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -131,7 +1061,7 @@ func (x *RestartHostRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestartHostRequest.ProtoReflect.Descriptor instead.
 func (*RestartHostRequest) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{2}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{20}
 }
 
 type RestartHostResponse struct {
@@ -143,7 +1073,7 @@ type RestartHostResponse struct {
 func (x *RestartHostResponse) Reset() {
 	*x = RestartHostResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[3]
+		mi := &file_platform_server_v1_web_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -156,7 +1086,7 @@ func (x *RestartHostResponse) String() string {
 func (*RestartHostResponse) ProtoMessage() {}
 
 func (x *RestartHostResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[3]
+	mi := &file_platform_server_v1_web_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -169,7 +1099,7 @@ func (x *RestartHostResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestartHostResponse.ProtoReflect.Descriptor instead.
 func (*RestartHostResponse) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{3}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{21}
 }
 
 type InstallAppRequest struct {
@@ -186,7 +1116,7 @@ type InstallAppRequest struct {
 func (x *InstallAppRequest) Reset() {
 	*x = InstallAppRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[4]
+		mi := &file_platform_server_v1_web_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -199,7 +1129,7 @@ func (x *InstallAppRequest) String() string {
 func (*InstallAppRequest) ProtoMessage() {}
 
 func (x *InstallAppRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[4]
+	mi := &file_platform_server_v1_web_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -212,7 +1142,7 @@ func (x *InstallAppRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InstallAppRequest.ProtoReflect.Descriptor instead.
 func (*InstallAppRequest) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{4}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *InstallAppRequest) GetChart() string {
@@ -252,7 +1182,7 @@ type InstallAppResponse struct {
 func (x *InstallAppResponse) Reset() {
 	*x = InstallAppResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[5]
+		mi := &file_platform_server_v1_web_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -265,7 +1195,7 @@ func (x *InstallAppResponse) String() string {
 func (*InstallAppResponse) ProtoMessage() {}
 
 func (x *InstallAppResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[5]
+	mi := &file_platform_server_v1_web_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -278,7 +1208,7 @@ func (x *InstallAppResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InstallAppResponse.ProtoReflect.Descriptor instead.
 func (*InstallAppResponse) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{5}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{23}
 }
 
 type DeleteAppRequest struct {
@@ -292,7 +1222,7 @@ type DeleteAppRequest struct {
 func (x *DeleteAppRequest) Reset() {
 	*x = DeleteAppRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[6]
+		mi := &file_platform_server_v1_web_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -305,7 +1235,7 @@ func (x *DeleteAppRequest) String() string {
 func (*DeleteAppRequest) ProtoMessage() {}
 
 func (x *DeleteAppRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[6]
+	mi := &file_platform_server_v1_web_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -318,7 +1248,7 @@ func (x *DeleteAppRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAppRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAppRequest) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{6}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *DeleteAppRequest) GetRelease() string {
@@ -337,7 +1267,7 @@ type DeleteAppResponse struct {
 func (x *DeleteAppResponse) Reset() {
 	*x = DeleteAppResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[7]
+		mi := &file_platform_server_v1_web_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -350,7 +1280,7 @@ func (x *DeleteAppResponse) String() string {
 func (*DeleteAppResponse) ProtoMessage() {}
 
 func (x *DeleteAppResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[7]
+	mi := &file_platform_server_v1_web_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -363,7 +1293,7 @@ func (x *DeleteAppResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAppResponse.ProtoReflect.Descriptor instead.
 func (*DeleteAppResponse) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{7}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{25}
 }
 
 type UpdateAppRequest struct {
@@ -380,7 +1310,7 @@ type UpdateAppRequest struct {
 func (x *UpdateAppRequest) Reset() {
 	*x = UpdateAppRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[8]
+		mi := &file_platform_server_v1_web_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -393,7 +1323,7 @@ func (x *UpdateAppRequest) String() string {
 func (*UpdateAppRequest) ProtoMessage() {}
 
 func (x *UpdateAppRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[8]
+	mi := &file_platform_server_v1_web_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -406,7 +1336,7 @@ func (x *UpdateAppRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAppRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAppRequest) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{8}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *UpdateAppRequest) GetChart() string {
@@ -446,7 +1376,7 @@ type UpdateAppResponse struct {
 func (x *UpdateAppResponse) Reset() {
 	*x = UpdateAppResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[9]
+		mi := &file_platform_server_v1_web_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -459,7 +1389,7 @@ func (x *UpdateAppResponse) String() string {
 func (*UpdateAppResponse) ProtoMessage() {}
 
 func (x *UpdateAppResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[9]
+	mi := &file_platform_server_v1_web_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -472,7 +1402,7 @@ func (x *UpdateAppResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAppResponse.ProtoReflect.Descriptor instead.
 func (*UpdateAppResponse) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{9}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{27}
 }
 
 var File_platform_server_v1_web_proto protoreflect.FileDescriptor
@@ -481,68 +1411,198 @@ var file_platform_server_v1_web_proto_rawDesc = []byte{
 	0x0a, 0x1c, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x65,
 	0x72, 0x2f, 0x76, 0x31, 0x2f, 0x77, 0x65, 0x62, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x12,
 	0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e,
-	0x76, 0x31, 0x22, 0x15, 0x0a, 0x13, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e, 0x48, 0x6f,
-	0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x16, 0x0a, 0x14, 0x53, 0x68, 0x75,
-	0x74, 0x64, 0x6f, 0x77, 0x6e, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x14, 0x0a, 0x12, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x48, 0x6f, 0x73, 0x74,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x15, 0x0a, 0x13, 0x52, 0x65, 0x73, 0x74, 0x61,
-	0x72, 0x74, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x6f,
-	0x0a, 0x11, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c, 0x41, 0x70, 0x70, 0x52, 0x65, 0x71, 0x75,
+	0x76, 0x31, 0x22, 0x16, 0x0a, 0x14, 0x49, 0x73, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65,
+	0x74, 0x75, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x2d, 0x0a, 0x15, 0x49, 0x73,
+	0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65, 0x74, 0x75, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x65, 0x74, 0x75, 0x70, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x05, 0x73, 0x65, 0x74, 0x75, 0x70, 0x22, 0xe0, 0x01, 0x0a, 0x17, 0x49, 0x6e,
+	0x69, 0x74, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
+	0x65, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x1a, 0x0a,
+	0x08, 0x74, 0x69, 0x6d, 0x65, 0x7a, 0x6f, 0x6e, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x08, 0x74, 0x69, 0x6d, 0x65, 0x7a, 0x6f, 0x6e, 0x65, 0x12, 0x28, 0x0a, 0x10, 0x61, 0x75, 0x74,
+	0x6f, 0x5f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x5f, 0x61, 0x70, 0x70, 0x73, 0x18, 0x04, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x0e, 0x61, 0x75, 0x74, 0x6f, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41,
+	0x70, 0x70, 0x73, 0x12, 0x24, 0x0a, 0x0e, 0x61, 0x75, 0x74, 0x6f, 0x5f, 0x75, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x5f, 0x6f, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0c, 0x61, 0x75, 0x74,
+	0x6f, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4f, 0x73, 0x12, 0x21, 0x0a, 0x0c, 0x64, 0x65, 0x66,
+	0x61, 0x75, 0x6c, 0x74, 0x5f, 0x61, 0x70, 0x70, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x0b, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x41, 0x70, 0x70, 0x73, 0x22, 0x30, 0x0a, 0x18,
+	0x49, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x65, 0x74, 0x75,
+	0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x73, 0x65, 0x74, 0x75, 0x70, 0x22, 0x46,
+	0x0a, 0x0c, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a,
+	0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61,
+	0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61,
+	0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x25, 0x0a, 0x0d, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x1c, 0x0a,
+	0x1a, 0x47, 0x65, 0x74, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x53,
+	0x74, 0x61, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x72, 0x0a, 0x1b, 0x47,
+	0x65, 0x74, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x53, 0x74, 0x61,
+	0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x31, 0x0a, 0x04, 0x64, 0x69,
+	0x73, 0x6b, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66,
+	0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x69,
+	0x73, 0x6b, 0x53, 0x74, 0x61, 0x74, 0x73, 0x52, 0x04, 0x64, 0x69, 0x73, 0x6b, 0x12, 0x20, 0x0a,
+	0x0b, 0x74, 0x65, 0x6d, 0x70, 0x65, 0x72, 0x61, 0x74, 0x75, 0x72, 0x65, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x0b, 0x74, 0x65, 0x6d, 0x70, 0x65, 0x72, 0x61, 0x74, 0x75, 0x72, 0x65, 0x22,
+	0x49, 0x0a, 0x09, 0x44, 0x69, 0x73, 0x6b, 0x53, 0x74, 0x61, 0x74, 0x73, 0x12, 0x14, 0x0a, 0x05,
+	0x74, 0x6f, 0x74, 0x61, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05, 0x74, 0x6f, 0x74,
+	0x61, 0x6c, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03,
+	0x52, 0x04, 0x75, 0x73, 0x65, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x72, 0x65, 0x65, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x03, 0x52, 0x04, 0x66, 0x72, 0x65, 0x65, 0x22, 0x19, 0x0a, 0x17, 0x47, 0x65,
+	0x74, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c, 0x65, 0x64, 0x41, 0x70, 0x70, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x4d, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x73, 0x74,
+	0x61, 0x6c, 0x6c, 0x65, 0x64, 0x41, 0x70, 0x70, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x31, 0x0a, 0x04, 0x61, 0x70, 0x70, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x1d, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65,
+	0x72, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x70, 0x70, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x04,
+	0x61, 0x70, 0x70, 0x73, 0x22, 0x51, 0x0a, 0x09, 0x41, 0x70, 0x70, 0x53, 0x74, 0x61, 0x74, 0x75,
+	0x73, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12,
+	0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x17, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x41, 0x70,
+	0x70, 0x73, 0x49, 0x6e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x22, 0x45, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x41, 0x70, 0x70, 0x73, 0x49, 0x6e, 0x53, 0x74, 0x6f,
+	0x72, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x04, 0x61, 0x70,
+	0x70, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66,
+	0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x70,
+	0x70, 0x52, 0x04, 0x61, 0x70, 0x70, 0x73, 0x22, 0x69, 0x0a, 0x03, 0x41, 0x70, 0x70, 0x12, 0x12,
+	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x20, 0x0a, 0x0b,
+	0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x12,
+	0x0a, 0x04, 0x69, 0x63, 0x6f, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x69, 0x63,
+	0x6f, 0x6e, 0x22, 0x1a, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53,
+	0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x5b,
+	0x0a, 0x19, 0x47, 0x65, 0x74, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65, 0x74, 0x74, 0x69,
+	0x6e, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3e, 0x0a, 0x08, 0x73,
+	0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e,
+	0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e,
+	0x76, 0x31, 0x2e, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67,
+	0x73, 0x52, 0x08, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x22, 0x7c, 0x0a, 0x0e, 0x44,
+	0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x1a, 0x0a,
+	0x08, 0x74, 0x69, 0x6d, 0x65, 0x7a, 0x6f, 0x6e, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x08, 0x74, 0x69, 0x6d, 0x65, 0x7a, 0x6f, 0x6e, 0x65, 0x12, 0x28, 0x0a, 0x10, 0x61, 0x75, 0x74,
+	0x6f, 0x5f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x5f, 0x61, 0x70, 0x70, 0x73, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x0e, 0x61, 0x75, 0x74, 0x6f, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41,
+	0x70, 0x70, 0x73, 0x12, 0x24, 0x0a, 0x0e, 0x61, 0x75, 0x74, 0x6f, 0x5f, 0x75, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x5f, 0x6f, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0c, 0x61, 0x75, 0x74,
+	0x6f, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4f, 0x73, 0x22, 0x15, 0x0a, 0x13, 0x53, 0x68, 0x75,
+	0x74, 0x64, 0x6f, 0x77, 0x6e, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x22, 0x16, 0x0a, 0x14, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e, 0x48, 0x6f, 0x73, 0x74,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x14, 0x0a, 0x12, 0x52, 0x65, 0x73, 0x74,
+	0x61, 0x72, 0x74, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x15,
+	0x0a, 0x13, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x6f, 0x0a, 0x11, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c,
+	0x41, 0x70, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x68,
+	0x61, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x63, 0x68, 0x61, 0x72, 0x74,
+	0x12, 0x12, 0x0a, 0x04, 0x72, 0x65, 0x70, 0x6f, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x72, 0x65, 0x70, 0x6f, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x65, 0x6c, 0x65, 0x61, 0x73, 0x65, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x72, 0x65, 0x6c, 0x65, 0x61, 0x73, 0x65, 0x12, 0x16,
+	0x0a, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x22, 0x14, 0x0a, 0x12, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c,
+	0x6c, 0x41, 0x70, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2c, 0x0a, 0x10,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x18, 0x0a, 0x07, 0x72, 0x65, 0x6c, 0x65, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x72, 0x65, 0x6c, 0x65, 0x61, 0x73, 0x65, 0x22, 0x13, 0x0a, 0x11, 0x44, 0x65,
+	0x6c, 0x65, 0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x6e, 0x0a, 0x10, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x71, 0x75,
 	0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x68, 0x61, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x05, 0x63, 0x68, 0x61, 0x72, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x65, 0x70,
 	0x6f, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x72, 0x65, 0x70, 0x6f, 0x12, 0x18, 0x0a,
 	0x07, 0x72, 0x65, 0x6c, 0x65, 0x61, 0x73, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
 	0x72, 0x65, 0x6c, 0x65, 0x61, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65,
 	0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x22,
-	0x14, 0x0a, 0x12, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c, 0x41, 0x70, 0x70, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2c, 0x0a, 0x10, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x41,
-	0x70, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x65, 0x6c,
-	0x65, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x72, 0x65, 0x6c, 0x65,
-	0x61, 0x73, 0x65, 0x22, 0x13, 0x0a, 0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x41, 0x70, 0x70,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x6e, 0x0a, 0x10, 0x55, 0x70, 0x64, 0x61,
-	0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05,
-	0x63, 0x68, 0x61, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x63, 0x68, 0x61,
-	0x72, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x65, 0x70, 0x6f, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x04, 0x72, 0x65, 0x70, 0x6f, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x65, 0x6c, 0x65, 0x61, 0x73,
-	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x72, 0x65, 0x6c, 0x65, 0x61, 0x73, 0x65,
-	0x12, 0x16, 0x0a, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x22, 0x13, 0x0a, 0x11, 0x55, 0x70, 0x64, 0x61,
-	0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xea, 0x03,
-	0x0a, 0x0a, 0x57, 0x65, 0x62, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x63, 0x0a, 0x0c,
-	0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e, 0x48, 0x6f, 0x73, 0x74, 0x12, 0x27, 0x2e, 0x70,
+	0x13, 0x0a, 0x11, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x32, 0xdd, 0x09, 0x0a, 0x0a, 0x57, 0x65, 0x62, 0x53, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x12, 0x63, 0x0a, 0x0c, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e, 0x48,
+	0x6f, 0x73, 0x74, 0x12, 0x27, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73,
+	0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77,
+	0x6e, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x70,
 	0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76,
 	0x31, 0x2e, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d,
-	0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x68, 0x75, 0x74, 0x64,
-	0x6f, 0x77, 0x6e, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x00, 0x12, 0x60, 0x0a, 0x0b, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x48, 0x6f, 0x73, 0x74,
-	0x12, 0x26, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76,
-	0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x48, 0x6f, 0x73,
-	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66,
-	0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65,
-	0x73, 0x74, 0x61, 0x72, 0x74, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x00, 0x12, 0x5d, 0x0a, 0x0a, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c, 0x41, 0x70,
-	0x70, 0x12, 0x25, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72,
-	0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c, 0x41, 0x70,
-	0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x60, 0x0a, 0x0b, 0x52, 0x65, 0x73, 0x74,
+	0x61, 0x72, 0x74, 0x48, 0x6f, 0x73, 0x74, 0x12, 0x26, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f,
+	0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x73,
+	0x74, 0x61, 0x72, 0x74, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x27, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65,
+	0x72, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x48, 0x6f, 0x73, 0x74,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5d, 0x0a, 0x0a, 0x49, 0x6e,
+	0x73, 0x74, 0x61, 0x6c, 0x6c, 0x41, 0x70, 0x70, 0x12, 0x25, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66,
 	0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e,
-	0x73, 0x74, 0x61, 0x6c, 0x6c, 0x41, 0x70, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x22, 0x00, 0x12, 0x5a, 0x0a, 0x09, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x41, 0x70, 0x70, 0x12,
-	0x24, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65,
-	0x72, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d,
-	0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74,
-	0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5a,
-	0x0a, 0x09, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x70, 0x70, 0x12, 0x24, 0x2e, 0x70, 0x6c,
-	0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31,
-	0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x25, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72,
-	0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x70, 0x70,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69,
-	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x68, 0x6f, 0x6d, 0x65, 0x2d, 0x63, 0x6c,
-	0x6f, 0x75, 0x64, 0x2d, 0x69, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f,
-	0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f,
-	0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x74, 0x61, 0x6c, 0x6c, 0x41, 0x70, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x26, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65,
+	0x72, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c, 0x41, 0x70, 0x70, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5a, 0x0a, 0x09, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x41, 0x70, 0x70, 0x12, 0x24, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72,
+	0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x70,
+	0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76,
+	0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5a, 0x0a, 0x09, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41,
+	0x70, 0x70, 0x12, 0x24, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65,
+	0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x41, 0x70,
+	0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66,
+	0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x41, 0x70, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x00, 0x12, 0x66, 0x0a, 0x0d, 0x49, 0x73, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65, 0x74,
+	0x75, 0x70, 0x12, 0x28, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65,
+	0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x73, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65,
+	0x53, 0x65, 0x74, 0x75, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x29, 0x2e, 0x70,
+	0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76,
+	0x31, 0x2e, 0x49, 0x73, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65, 0x74, 0x75, 0x70, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x6f, 0x0a, 0x10, 0x49, 0x6e, 0x69,
+	0x74, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x12, 0x2b, 0x2e,
+	0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e,
+	0x76, 0x31, 0x2e, 0x49, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x44, 0x65, 0x76,
+	0x69, 0x63, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c, 0x2e, 0x70, 0x6c, 0x61,
+	0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e,
+	0x49, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4e, 0x0a, 0x05, 0x4c, 0x6f,
+	0x67, 0x69, 0x6e, 0x12, 0x20, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73,
+	0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d,
+	0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x6f, 0x67, 0x69, 0x6e,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x78, 0x0a, 0x13, 0x47, 0x65,
+	0x74, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x53, 0x74, 0x61, 0x74,
+	0x73, 0x12, 0x2e, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72,
+	0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65,
+	0x55, 0x73, 0x61, 0x67, 0x65, 0x53, 0x74, 0x61, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x2f, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72,
+	0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65,
+	0x55, 0x73, 0x61, 0x67, 0x65, 0x53, 0x74, 0x61, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x12, 0x6f, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x73, 0x74, 0x61,
+	0x6c, 0x6c, 0x65, 0x64, 0x41, 0x70, 0x70, 0x73, 0x12, 0x2b, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66,
+	0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65,
+	0x74, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c, 0x65, 0x64, 0x41, 0x70, 0x70, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d,
+	0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x49, 0x6e,
+	0x73, 0x74, 0x61, 0x6c, 0x6c, 0x65, 0x64, 0x41, 0x70, 0x70, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x69, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x41, 0x70, 0x70, 0x73,
+	0x49, 0x6e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x12, 0x29, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f,
+	0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74,
+	0x41, 0x70, 0x70, 0x73, 0x49, 0x6e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x2a, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65,
+	0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x41, 0x70, 0x70, 0x73, 0x49,
+	0x6e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x12, 0x72, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65, 0x74,
+	0x74, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x2c, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d,
+	0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65,
+	0x76, 0x69, 0x63, 0x65, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x2d, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73,
+	0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x76, 0x69,
+	0x63, 0x65, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
+	0x6f, 0x6d, 0x2f, 0x68, 0x6f, 0x6d, 0x65, 0x2d, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x2d, 0x69, 0x6f,
+	0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f,
+	0x72, 0x6d, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -557,35 +1617,71 @@ func file_platform_server_v1_web_proto_rawDescGZIP() []byte {
 	return file_platform_server_v1_web_proto_rawDescData
 }
 
-var file_platform_server_v1_web_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_platform_server_v1_web_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_platform_server_v1_web_proto_goTypes = []any{
-	(*ShutdownHostRequest)(nil),  // 0: platform.server.v1.ShutdownHostRequest
-	(*ShutdownHostResponse)(nil), // 1: platform.server.v1.ShutdownHostResponse
-	(*RestartHostRequest)(nil),   // 2: platform.server.v1.RestartHostRequest
-	(*RestartHostResponse)(nil),  // 3: platform.server.v1.RestartHostResponse
-	(*InstallAppRequest)(nil),    // 4: platform.server.v1.InstallAppRequest
-	(*InstallAppResponse)(nil),   // 5: platform.server.v1.InstallAppResponse
-	(*DeleteAppRequest)(nil),     // 6: platform.server.v1.DeleteAppRequest
-	(*DeleteAppResponse)(nil),    // 7: platform.server.v1.DeleteAppResponse
-	(*UpdateAppRequest)(nil),     // 8: platform.server.v1.UpdateAppRequest
-	(*UpdateAppResponse)(nil),    // 9: platform.server.v1.UpdateAppResponse
+	(*IsDeviceSetupRequest)(nil),        // 0: platform.server.v1.IsDeviceSetupRequest
+	(*IsDeviceSetupResponse)(nil),       // 1: platform.server.v1.IsDeviceSetupResponse
+	(*InitializeDeviceRequest)(nil),     // 2: platform.server.v1.InitializeDeviceRequest
+	(*InitializeDeviceResponse)(nil),    // 3: platform.server.v1.InitializeDeviceResponse
+	(*LoginRequest)(nil),                // 4: platform.server.v1.LoginRequest
+	(*LoginResponse)(nil),               // 5: platform.server.v1.LoginResponse
+	(*GetDeviceUsageStatsRequest)(nil),  // 6: platform.server.v1.GetDeviceUsageStatsRequest
+	(*GetDeviceUsageStatsResponse)(nil), // 7: platform.server.v1.GetDeviceUsageStatsResponse
+	(*DiskStats)(nil),                   // 8: platform.server.v1.DiskStats
+	(*GetInstalledAppsRequest)(nil),     // 9: platform.server.v1.GetInstalledAppsRequest
+	(*GetInstalledAppsResponse)(nil),    // 10: platform.server.v1.GetInstalledAppsResponse
+	(*AppStatus)(nil),                   // 11: platform.server.v1.AppStatus
+	(*GetAppsInStoreRequest)(nil),       // 12: platform.server.v1.GetAppsInStoreRequest
+	(*GetAppsInStoreResponse)(nil),      // 13: platform.server.v1.GetAppsInStoreResponse
+	(*App)(nil),                         // 14: platform.server.v1.App
+	(*GetDeviceSettingsRequest)(nil),    // 15: platform.server.v1.GetDeviceSettingsRequest
+	(*GetDeviceSettingsResponse)(nil),   // 16: platform.server.v1.GetDeviceSettingsResponse
+	(*DeviceSettings)(nil),              // 17: platform.server.v1.DeviceSettings
+	(*ShutdownHostRequest)(nil),         // 18: platform.server.v1.ShutdownHostRequest
+	(*ShutdownHostResponse)(nil),        // 19: platform.server.v1.ShutdownHostResponse
+	(*RestartHostRequest)(nil),          // 20: platform.server.v1.RestartHostRequest
+	(*RestartHostResponse)(nil),         // 21: platform.server.v1.RestartHostResponse
+	(*InstallAppRequest)(nil),           // 22: platform.server.v1.InstallAppRequest
+	(*InstallAppResponse)(nil),          // 23: platform.server.v1.InstallAppResponse
+	(*DeleteAppRequest)(nil),            // 24: platform.server.v1.DeleteAppRequest
+	(*DeleteAppResponse)(nil),           // 25: platform.server.v1.DeleteAppResponse
+	(*UpdateAppRequest)(nil),            // 26: platform.server.v1.UpdateAppRequest
+	(*UpdateAppResponse)(nil),           // 27: platform.server.v1.UpdateAppResponse
 }
 var file_platform_server_v1_web_proto_depIdxs = []int32{
-	0, // 0: platform.server.v1.WebService.ShutdownHost:input_type -> platform.server.v1.ShutdownHostRequest
-	2, // 1: platform.server.v1.WebService.RestartHost:input_type -> platform.server.v1.RestartHostRequest
-	4, // 2: platform.server.v1.WebService.InstallApp:input_type -> platform.server.v1.InstallAppRequest
-	6, // 3: platform.server.v1.WebService.DeleteApp:input_type -> platform.server.v1.DeleteAppRequest
-	8, // 4: platform.server.v1.WebService.UpdateApp:input_type -> platform.server.v1.UpdateAppRequest
-	1, // 5: platform.server.v1.WebService.ShutdownHost:output_type -> platform.server.v1.ShutdownHostResponse
-	3, // 6: platform.server.v1.WebService.RestartHost:output_type -> platform.server.v1.RestartHostResponse
-	5, // 7: platform.server.v1.WebService.InstallApp:output_type -> platform.server.v1.InstallAppResponse
-	7, // 8: platform.server.v1.WebService.DeleteApp:output_type -> platform.server.v1.DeleteAppResponse
-	9, // 9: platform.server.v1.WebService.UpdateApp:output_type -> platform.server.v1.UpdateAppResponse
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	8,  // 0: platform.server.v1.GetDeviceUsageStatsResponse.disk:type_name -> platform.server.v1.DiskStats
+	11, // 1: platform.server.v1.GetInstalledAppsResponse.apps:type_name -> platform.server.v1.AppStatus
+	14, // 2: platform.server.v1.GetAppsInStoreResponse.apps:type_name -> platform.server.v1.App
+	17, // 3: platform.server.v1.GetDeviceSettingsResponse.settings:type_name -> platform.server.v1.DeviceSettings
+	18, // 4: platform.server.v1.WebService.ShutdownHost:input_type -> platform.server.v1.ShutdownHostRequest
+	20, // 5: platform.server.v1.WebService.RestartHost:input_type -> platform.server.v1.RestartHostRequest
+	22, // 6: platform.server.v1.WebService.InstallApp:input_type -> platform.server.v1.InstallAppRequest
+	24, // 7: platform.server.v1.WebService.DeleteApp:input_type -> platform.server.v1.DeleteAppRequest
+	26, // 8: platform.server.v1.WebService.UpdateApp:input_type -> platform.server.v1.UpdateAppRequest
+	0,  // 9: platform.server.v1.WebService.IsDeviceSetup:input_type -> platform.server.v1.IsDeviceSetupRequest
+	2,  // 10: platform.server.v1.WebService.InitializeDevice:input_type -> platform.server.v1.InitializeDeviceRequest
+	4,  // 11: platform.server.v1.WebService.Login:input_type -> platform.server.v1.LoginRequest
+	6,  // 12: platform.server.v1.WebService.GetDeviceUsageStats:input_type -> platform.server.v1.GetDeviceUsageStatsRequest
+	9,  // 13: platform.server.v1.WebService.GetInstalledApps:input_type -> platform.server.v1.GetInstalledAppsRequest
+	12, // 14: platform.server.v1.WebService.GetAppsInStore:input_type -> platform.server.v1.GetAppsInStoreRequest
+	15, // 15: platform.server.v1.WebService.GetDeviceSettings:input_type -> platform.server.v1.GetDeviceSettingsRequest
+	19, // 16: platform.server.v1.WebService.ShutdownHost:output_type -> platform.server.v1.ShutdownHostResponse
+	21, // 17: platform.server.v1.WebService.RestartHost:output_type -> platform.server.v1.RestartHostResponse
+	23, // 18: platform.server.v1.WebService.InstallApp:output_type -> platform.server.v1.InstallAppResponse
+	25, // 19: platform.server.v1.WebService.DeleteApp:output_type -> platform.server.v1.DeleteAppResponse
+	27, // 20: platform.server.v1.WebService.UpdateApp:output_type -> platform.server.v1.UpdateAppResponse
+	1,  // 21: platform.server.v1.WebService.IsDeviceSetup:output_type -> platform.server.v1.IsDeviceSetupResponse
+	3,  // 22: platform.server.v1.WebService.InitializeDevice:output_type -> platform.server.v1.InitializeDeviceResponse
+	5,  // 23: platform.server.v1.WebService.Login:output_type -> platform.server.v1.LoginResponse
+	7,  // 24: platform.server.v1.WebService.GetDeviceUsageStats:output_type -> platform.server.v1.GetDeviceUsageStatsResponse
+	10, // 25: platform.server.v1.WebService.GetInstalledApps:output_type -> platform.server.v1.GetInstalledAppsResponse
+	13, // 26: platform.server.v1.WebService.GetAppsInStore:output_type -> platform.server.v1.GetAppsInStoreResponse
+	16, // 27: platform.server.v1.WebService.GetDeviceSettings:output_type -> platform.server.v1.GetDeviceSettingsResponse
+	16, // [16:28] is the sub-list for method output_type
+	4,  // [4:16] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_platform_server_v1_web_proto_init() }
@@ -595,7 +1691,7 @@ func file_platform_server_v1_web_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_platform_server_v1_web_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*ShutdownHostRequest); i {
+			switch v := v.(*IsDeviceSetupRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -607,7 +1703,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*ShutdownHostResponse); i {
+			switch v := v.(*IsDeviceSetupResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -619,7 +1715,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*RestartHostRequest); i {
+			switch v := v.(*InitializeDeviceRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -631,7 +1727,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*RestartHostResponse); i {
+			switch v := v.(*InitializeDeviceResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -643,7 +1739,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*InstallAppRequest); i {
+			switch v := v.(*LoginRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -655,7 +1751,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[5].Exporter = func(v any, i int) any {
-			switch v := v.(*InstallAppResponse); i {
+			switch v := v.(*LoginResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -667,7 +1763,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[6].Exporter = func(v any, i int) any {
-			switch v := v.(*DeleteAppRequest); i {
+			switch v := v.(*GetDeviceUsageStatsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -679,7 +1775,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[7].Exporter = func(v any, i int) any {
-			switch v := v.(*DeleteAppResponse); i {
+			switch v := v.(*GetDeviceUsageStatsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -691,7 +1787,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[8].Exporter = func(v any, i int) any {
-			switch v := v.(*UpdateAppRequest); i {
+			switch v := v.(*DiskStats); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -703,6 +1799,222 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[9].Exporter = func(v any, i int) any {
+			switch v := v.(*GetInstalledAppsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[10].Exporter = func(v any, i int) any {
+			switch v := v.(*GetInstalledAppsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[11].Exporter = func(v any, i int) any {
+			switch v := v.(*AppStatus); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[12].Exporter = func(v any, i int) any {
+			switch v := v.(*GetAppsInStoreRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[13].Exporter = func(v any, i int) any {
+			switch v := v.(*GetAppsInStoreResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[14].Exporter = func(v any, i int) any {
+			switch v := v.(*App); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[15].Exporter = func(v any, i int) any {
+			switch v := v.(*GetDeviceSettingsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[16].Exporter = func(v any, i int) any {
+			switch v := v.(*GetDeviceSettingsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[17].Exporter = func(v any, i int) any {
+			switch v := v.(*DeviceSettings); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[18].Exporter = func(v any, i int) any {
+			switch v := v.(*ShutdownHostRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[19].Exporter = func(v any, i int) any {
+			switch v := v.(*ShutdownHostResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[20].Exporter = func(v any, i int) any {
+			switch v := v.(*RestartHostRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[21].Exporter = func(v any, i int) any {
+			switch v := v.(*RestartHostResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[22].Exporter = func(v any, i int) any {
+			switch v := v.(*InstallAppRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[23].Exporter = func(v any, i int) any {
+			switch v := v.(*InstallAppResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[24].Exporter = func(v any, i int) any {
+			switch v := v.(*DeleteAppRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[25].Exporter = func(v any, i int) any {
+			switch v := v.(*DeleteAppResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[26].Exporter = func(v any, i int) any {
+			switch v := v.(*UpdateAppRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[27].Exporter = func(v any, i int) any {
 			switch v := v.(*UpdateAppResponse); i {
 			case 0:
 				return &v.state
@@ -721,7 +2033,7 @@ func file_platform_server_v1_web_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_platform_server_v1_web_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

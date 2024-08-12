@@ -10,6 +10,95 @@ service WebService {
   rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {}
   rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
   rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
+
+  // Check to validate if the device has gone through the onboarding process
+  rpc IsDeviceSetup(IsDeviceSetupRequest) returns (IsDeviceSetupResponse) {}
+  // Initialize the device with the user's credentials and settings
+  rpc InitializeDevice(InitializeDeviceRequest) returns (InitializeDeviceResponse) {}
+  // Login to the device
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  // Get usage statistics for the device
+  rpc GetDeviceUsageStats(GetDeviceUsageStatsRequest) returns (GetDeviceUsageStatsResponse) {}
+  // Get the status of all installed apps
+  rpc GetInstalledApps(GetInstalledAppsRequest) returns (GetInstalledAppsResponse) {}
+  // Get all apps available in the store
+  rpc GetAppsInStore(GetAppsInStoreRequest) returns (GetAppsInStoreResponse) {}
+  // Get the device settings
+  rpc GetDeviceSettings(GetDeviceSettingsRequest) returns (GetDeviceSettingsResponse) {}
+}
+
+message IsDeviceSetupRequest {}
+message IsDeviceSetupResponse {
+  // If false the device is not setup, and the user should be redirected into the onboarding flow
+  bool setup = 1;
+}
+
+message InitializeDeviceRequest {
+  string username = 1;
+  string password = 2;
+  string timezone = 3;
+  bool auto_update_apps = 4;
+  bool auto_update_os = 5;
+  repeated string default_apps = 6;
+}
+
+message InitializeDeviceResponse {
+  bool setup = 1;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message GetDeviceUsageStatsRequest {}
+message GetDeviceUsageStatsResponse {
+  DiskStats disk = 3;
+  uint32 temperature = 4;
+}
+
+message DiskStats {
+  int64 total = 1;
+  int64 used = 2;
+  int64 free = 3;
+}
+
+message GetInstalledAppsRequest {}
+message GetInstalledAppsResponse {
+  repeated AppStatus apps = 1;
+}
+
+message AppStatus {
+  string name = 1;
+  string version = 2;
+  string status = 3;
+}
+
+message GetAppsInStoreRequest {}
+message GetAppsInStoreResponse {
+  repeated App apps = 1;
+}
+
+message App {
+  string name = 1;
+  string version = 2;
+  string description = 3;
+  string icon = 4;
+}
+
+message GetDeviceSettingsRequest {}
+message GetDeviceSettingsResponse {
+  DeviceSettings settings = 1;
+}
+
+message DeviceSettings {
+  string timezone = 1;
+  bool auto_update_apps = 2;
+  bool auto_update_os = 3;
 }
 
 message ShutdownHostRequest {}
