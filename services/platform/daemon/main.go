@@ -10,12 +10,12 @@ import (
 func main() {
 	var (
 		logger      = zerolog.New()
-		client      = communicate.New(logger)
-		hostHandler = host.New(logger)
+		client      = communicate.NewClient(logger)
+		server = host.NewServer(logger)
 	)
 
 	defer chassis.New(logger).
-		WithRPCHandler(hostHandler).
+		WithRPCHandler(server).
 		WithRunner(client.Listen).
 		Start()
 }
