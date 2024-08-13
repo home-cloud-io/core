@@ -75,13 +75,6 @@ func getOutboundIP() (string, error) {
 }
 
 func setIP(old, new string) error {
-	// write ip to daemon config
-	viper.Set(ipAddressConfigKey, new)
-	err := viper.WriteConfig()
-	if err != nil {
-		return err
-	}
-
 	for _, fileName := range ipFiles {
 		// read file
 		input, err := os.ReadFile(fileName)
@@ -101,6 +94,15 @@ func setIP(old, new string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	// write ip to daemon config
+	// NOTE: we do this at the end since we only want to persist this after we know
+	// that we've successfully updated all files that need the new ip
+	viper.Set(ipAddressConfigKey, new)
+	err := viper.WriteConfig()
+	if err != nil {
+		return err
 	}
 
 	return nil
