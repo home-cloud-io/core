@@ -335,7 +335,7 @@ func shouldUpgrade(app *v1.App) bool {
 	// if the requested version is greater than the installed version
 	// OR
 	// if the current values in the spec are different than those in the status
-	return semver.Compare(requestedVersion, installedVersion) > 0 || app.Spec.Values != app.Status.Values
+	return semver.Compare(requestedVersion, installedVersion) != 0 || app.Spec.Values != app.Status.Values
 }
 
 func repoURL(app *v1.App) string {
