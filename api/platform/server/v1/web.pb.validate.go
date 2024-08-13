@@ -473,6 +473,8 @@ func (m *InstallAppRequest) validate(all bool) error {
 
 	// no validation rules for Values
 
+	// no validation rules for Version
+
 	if len(errors) > 0 {
 		return InstallAppRequestMultiError(errors)
 	}
@@ -888,6 +890,8 @@ func (m *UpdateAppRequest) validate(all bool) error {
 	// no validation rules for Release
 
 	// no validation rules for Values
+
+	// no validation rules for Version
 
 	if len(errors) > 0 {
 		return UpdateAppRequestMultiError(errors)
