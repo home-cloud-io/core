@@ -47,6 +47,7 @@ export const InstallAppRequest = proto3.makeMessageType(
     { no: 2, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "values", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -86,6 +87,7 @@ export const UpdateAppRequest = proto3.makeMessageType(
     { no: 2, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "values", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

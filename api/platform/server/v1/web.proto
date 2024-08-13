@@ -25,6 +25,7 @@ message InstallAppRequest {
   string repo = 2;
   string release = 3;
   string values = 4;
+  string version = 5;
 }
 
 message InstallAppResponse {}
@@ -40,6 +41,7 @@ message UpdateAppRequest {
   string repo = 2;
   string release = 3;
   string values = 4;
+  string version = 5;
 }
 
 message UpdateAppResponse {}
