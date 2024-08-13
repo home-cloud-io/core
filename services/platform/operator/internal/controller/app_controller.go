@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"time"
 
@@ -89,22 +88,16 @@ func (r *AppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		return ctrl.Result{}, r.tryDeletions(ctx, app)
 	}
 
-	// get latest helm version
-	latestVersion, err := getLatestVersion(app)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
 	// if the version isn't set in the status, installation is needed
 	if app.Status.Version == "" {
 		l.Info("Installing App")
-		return ctrl.Result{}, r.install(ctx, app, latestVersion)
+		return ctrl.Result{}, r.install(ctx, app)
 	}
 
 	// upgrade if conditions are met
-	if shouldUpgrade(app, latestVersion) {
+	if shouldUpgrade(app) {
 		l.Info("Upgrading App")
-		return ctrl.Result{}, r.upgrade(ctx, app, latestVersion)
+		return ctrl.Result{}, r.upgrade(ctx, app)
 	}
 
 	// Run on a timer
@@ -118,7 +111,7 @@ func (r *AppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *AppReconciler) install(ctx context.Context, app *v1.App, version string) error {
+func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 	actionConfiguration, err := createHelmAction(app.Namespace)
 	if err != nil {
 		return err
@@ -126,7 +119,7 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App, version string
 
 	// construct helm configuration
 	act := action.NewInstall(actionConfiguration)
-	act.Version = version
+	act.Version = app.Spec.Version
 	act.Namespace = app.Namespace
 	act.RepoURL = repoURL(app)
 	act.ReleaseName = app.Spec.Release
@@ -214,17 +207,17 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App, version string
 		return err
 	}
 
-	return r.updateStatus(ctx, app, version)
+	return r.updateStatus(ctx, app)
 }
 
-func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App, version string) error {
+func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
 	actionConfiguration, err := createHelmAction(app.Namespace)
 	if err != nil {
 		return err
 	}
 
 	act := action.NewUpgrade(actionConfiguration)
-	act.Version = version
+	act.Version = app.Spec.Version
 	act.Namespace = app.Namespace
 	act.RepoURL = repoURL(app)
 
@@ -238,7 +231,7 @@ func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App, version string
 		return err
 	}
 
-	return r.updateStatus(ctx, app, version)
+	return r.updateStatus(ctx, app)
 }
 
 func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
@@ -260,8 +253,8 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 	return nil
 }
 
-func (r *AppReconciler) updateStatus(ctx context.Context, app *v1.App, version string) error {
-	app.Status.Version = version
+func (r *AppReconciler) updateStatus(ctx context.Context, app *v1.App) error {
+	app.Status.Version = app.Spec.Version
 	app.Status.Values = app.Spec.Values
 	return r.Status().Update(ctx, app)
 }
@@ -329,49 +322,20 @@ func getChartAndValues(opt action.ChartPathOptions, app *v1.App) (*chart.Chart, 
 }
 
 // shouldUpgrade determines if the given app needs upgrading based on the version and values.
-func shouldUpgrade(app *v1.App, latestVersion string) bool {
+func shouldUpgrade(app *v1.App) bool {
 	installedVersion := app.Status.Version
 	if installedVersion != "" {
 		installedVersion = "v" + installedVersion
 	}
-	if latestVersion != "" {
-		latestVersion = "v" + latestVersion
+	requestedVersion := app.Spec.Version
+	if requestedVersion != "" {
+		requestedVersion = "v" + requestedVersion
 	}
 	// UPGRADE
-	// if the latest version is greater than the installed version
+	// if the requested version is greater than the installed version
 	// OR
 	// if the current values in the spec are different than those in the status
-	return semver.Compare(latestVersion, installedVersion) > 0 || app.Spec.Values != app.Status.Values
-}
-
-// getLatestVersion finds the latest helm chart version within the registry of the given app.
-func getLatestVersion(app *v1.App) (string, error) {
-	versions := make([]string, 0)
-
-	resp, err := http.Get(repoURL(app) + "/index.yaml")
-	if err != nil {
-		return "", err
-	}
-
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	var index HelmRepositoryIndex
-	err = yaml.Unmarshal(data, &index)
-	if err != nil {
-		return "", err
-	}
-
-	for _, v := range index.Entries[app.Spec.Chart] {
-		versions = append(versions, v.Version)
-	}
-
-	if len(versions) == 0 {
-		return "", fmt.Errorf("no versions found")
-	}
-	return versions[0], nil
+	return semver.Compare(requestedVersion, installedVersion) != 0 || app.Spec.Values != app.Status.Values
 }
 
 func repoURL(app *v1.App) string {

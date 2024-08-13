@@ -27,7 +27,7 @@ type (
 
 func New(logger chassis.Logger) Rpc {
 	return &rpc{
-		logger: logger,
+		logger:    logger,
 		k8sclient: k8sclient.NewClient(logger),
 	}
 }
@@ -59,10 +59,11 @@ func (h *rpc) RestartHost(ctx context.Context, request *connect.Request[v1.Resta
 func (h *rpc) InstallApp(ctx context.Context, request *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("install request")
 	err := h.k8sclient.Install(ctx, opv1.AppSpec{
-		Chart: request.Msg.Chart,
-		Repo: request.Msg.Repo,
+		Chart:   request.Msg.Chart,
+		Repo:    request.Msg.Repo,
 		Release: request.Msg.Release,
-		Values: request.Msg.Values,
+		Values:  request.Msg.Values,
+		Version: request.Msg.Version,
 	})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to install app")
@@ -88,10 +89,11 @@ func (h *rpc) DeleteApp(ctx context.Context, request *connect.Request[v1.DeleteA
 func (h *rpc) UpdateApp(ctx context.Context, request *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("update request")
 	err := h.k8sclient.Update(ctx, opv1.AppSpec{
-		Chart: request.Msg.Chart,
-		Repo: request.Msg.Repo,
+		Chart:   request.Msg.Chart,
+		Repo:    request.Msg.Repo,
 		Release: request.Msg.Release,
-		Values: request.Msg.Values,
+		Values:  request.Msg.Values,
+		Version: request.Msg.Version,
 	})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to update app")

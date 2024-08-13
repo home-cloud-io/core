@@ -22,6 +22,23 @@ const values = new Map([
   ],
 ]);
 
+const versions = new Map([
+  [
+    'hello-world',
+    '0.0.5',
+  ],
+  [
+    'postgres',
+    '0.0.7',
+  ],
+  [
+    'immich',
+    '0.0.12',
+  ],
+]);
+
+
+
 const client = createPromiseClient(WebService, transport);
 
 export function shutdown() {
@@ -41,6 +58,7 @@ export function installApp(app) {
     chart: app,
     release: `${app}`,
     values: values.get(app),
+    version: versions.get(app)
   });
 }
 
@@ -58,5 +76,6 @@ export function updateApp(app) {
     chart: app,
     release: `${app}`,
     values: values.get(app),
+    version: versions.get(app)
   });
 }
