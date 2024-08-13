@@ -37,7 +37,7 @@ var (
 	clientSingleton Client
 )
 
-func New(logger chassis.Logger) Client {
+func NewClient(logger chassis.Logger) Client {
 	clientSingleton = &client{
 		logger: logger,
 	}

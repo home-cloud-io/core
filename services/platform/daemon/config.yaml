@@ -6,4 +6,5 @@ service:
     bind_address: localhost
 
 daemon:
-  server: http://localhost
+  ip_address: HOME_CLOUD_HOST_IP
+  server: http://home-cloud.local

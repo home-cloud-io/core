@@ -12,29 +12,29 @@ import (
 )
 
 type (
-	Rpc interface {
+	Server interface {
 		chassis.RPCRegistrar
 		sdConnect.HostServiceHandler
 	}
 
-	rpc struct {
+	server struct {
 		logger chassis.Logger
 	}
 )
 
-func New(logger chassis.Logger) Rpc {
-	return &rpc{
+func NewServer(logger chassis.Logger) Server {
+	return &server{
 		logger: logger,
 	}
 }
 
 // Implement the `RPCRegistrar` interface of draft so the `grpc` handlers are enabled
-func (h *rpc) RegisterRPC(server chassis.Rpcer) {
+func (h *server) RegisterRPC(server chassis.Rpcer) {
 	pattern, handler := sdConnect.NewHostServiceHandler(h)
 	server.AddHandler(pattern, handler, true)
 }
 
-func (h *rpc) ShutdownAlert(ctx context.Context, _ *connect.Request[v1.ShutdownAlertRequest]) (*connect.Response[v1.ShutdownAlertResponse], error) {
+func (h *server) ShutdownAlert(ctx context.Context, _ *connect.Request[v1.ShutdownAlertRequest]) (*connect.Response[v1.ShutdownAlertResponse], error) {
 	h.logger.Info("shutdown alert")
 	err := communicate.GetClient().Send(&v1.DaemonMessage{
 		Message: &v1.DaemonMessage_ShutdownAlert{},
