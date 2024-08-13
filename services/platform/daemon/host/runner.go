@@ -49,6 +49,11 @@ func (r runner) OnStart() {
 		return
 	}
 
+	if previousIP == "" {
+		r.logger.Warn("previous ip unset")
+		return
+	}
+
 	r.logger.WithField("ip", currentIP).Info("setting new ip")
 	err = setIP(previousIP, currentIP)
 	if err != nil {
