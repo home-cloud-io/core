@@ -1072,3 +1072,344 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpdateAppResponseValidationError{}
+
+// Validate checks the field values on CheckForSystemUpdatesRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CheckForSystemUpdatesRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CheckForSystemUpdatesRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CheckForSystemUpdatesRequestMultiError, or nil if none found.
+func (m *CheckForSystemUpdatesRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CheckForSystemUpdatesRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return CheckForSystemUpdatesRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// CheckForSystemUpdatesRequestMultiError is an error wrapping multiple
+// validation errors returned by CheckForSystemUpdatesRequest.ValidateAll() if
+// the designated constraints aren't met.
+type CheckForSystemUpdatesRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CheckForSystemUpdatesRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CheckForSystemUpdatesRequestMultiError) AllErrors() []error { return m }
+
+// CheckForSystemUpdatesRequestValidationError is the validation error returned
+// by CheckForSystemUpdatesRequest.Validate if the designated constraints
+// aren't met.
+type CheckForSystemUpdatesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CheckForSystemUpdatesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CheckForSystemUpdatesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CheckForSystemUpdatesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CheckForSystemUpdatesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CheckForSystemUpdatesRequestValidationError) ErrorName() string {
+	return "CheckForSystemUpdatesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CheckForSystemUpdatesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCheckForSystemUpdatesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CheckForSystemUpdatesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CheckForSystemUpdatesRequestValidationError{}
+
+// Validate checks the field values on CheckForSystemUpdatesResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CheckForSystemUpdatesResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CheckForSystemUpdatesResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// CheckForSystemUpdatesResponseMultiError, or nil if none found.
+func (m *CheckForSystemUpdatesResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CheckForSystemUpdatesResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetDaemonVersions()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CheckForSystemUpdatesResponseValidationError{
+					field:  "DaemonVersions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CheckForSystemUpdatesResponseValidationError{
+					field:  "DaemonVersions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDaemonVersions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CheckForSystemUpdatesResponseValidationError{
+				field:  "DaemonVersions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for OsDiff
+
+	if len(errors) > 0 {
+		return CheckForSystemUpdatesResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// CheckForSystemUpdatesResponseMultiError is an error wrapping multiple
+// validation errors returned by CheckForSystemUpdatesResponse.ValidateAll()
+// if the designated constraints aren't met.
+type CheckForSystemUpdatesResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CheckForSystemUpdatesResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CheckForSystemUpdatesResponseMultiError) AllErrors() []error { return m }
+
+// CheckForSystemUpdatesResponseValidationError is the validation error
+// returned by CheckForSystemUpdatesResponse.Validate if the designated
+// constraints aren't met.
+type CheckForSystemUpdatesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CheckForSystemUpdatesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CheckForSystemUpdatesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CheckForSystemUpdatesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CheckForSystemUpdatesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CheckForSystemUpdatesResponseValidationError) ErrorName() string {
+	return "CheckForSystemUpdatesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CheckForSystemUpdatesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCheckForSystemUpdatesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CheckForSystemUpdatesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CheckForSystemUpdatesResponseValidationError{}
+
+// Validate checks the field values on DaemonVersions with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *DaemonVersions) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DaemonVersions with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DaemonVersionsMultiError,
+// or nil if none found.
+func (m *DaemonVersions) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DaemonVersions) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Current
+
+	// no validation rules for Latest
+
+	if len(errors) > 0 {
+		return DaemonVersionsMultiError(errors)
+	}
+
+	return nil
+}
+
+// DaemonVersionsMultiError is an error wrapping multiple validation errors
+// returned by DaemonVersions.ValidateAll() if the designated constraints
+// aren't met.
+type DaemonVersionsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DaemonVersionsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DaemonVersionsMultiError) AllErrors() []error { return m }
+
+// DaemonVersionsValidationError is the validation error returned by
+// DaemonVersions.Validate if the designated constraints aren't met.
+type DaemonVersionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DaemonVersionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DaemonVersionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DaemonVersionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DaemonVersionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DaemonVersionsValidationError) ErrorName() string { return "DaemonVersionsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DaemonVersionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDaemonVersions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DaemonVersionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DaemonVersionsValidationError{}

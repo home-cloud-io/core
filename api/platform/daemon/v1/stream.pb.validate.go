@@ -140,6 +140,47 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_OsUpdateDiff:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetOsUpdateDiff()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "OsUpdateDiff",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "OsUpdateDiff",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetOsUpdateDiff()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "OsUpdateDiff",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -362,6 +403,47 @@ func (m *ServerMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
 					field:  "Restart",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_CheckOsUpdateDiff:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetCheckOsUpdateDiff()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "CheckOsUpdateDiff",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "CheckOsUpdateDiff",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetCheckOsUpdateDiff()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "CheckOsUpdateDiff",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -649,22 +731,22 @@ var _ interface {
 	ErrorName() string
 } = ShutdownAlertValidationError{}
 
-// Validate checks the field values on UpgradeAvailableAlert with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *UpgradeAvailableAlert) Validate() error {
+// Validate checks the field values on OSUpdateDiff with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *OSUpdateDiff) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UpgradeAvailableAlert with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// UpgradeAvailableAlertMultiError, or nil if none found.
-func (m *UpgradeAvailableAlert) ValidateAll() error {
+// ValidateAll checks the field values on OSUpdateDiff with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in OSUpdateDiffMultiError, or
+// nil if none found.
+func (m *OSUpdateDiff) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UpgradeAvailableAlert) validate(all bool) error {
+func (m *OSUpdateDiff) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -674,19 +756,18 @@ func (m *UpgradeAvailableAlert) validate(all bool) error {
 	// no validation rules for Description
 
 	if len(errors) > 0 {
-		return UpgradeAvailableAlertMultiError(errors)
+		return OSUpdateDiffMultiError(errors)
 	}
 
 	return nil
 }
 
-// UpgradeAvailableAlertMultiError is an error wrapping multiple validation
-// errors returned by UpgradeAvailableAlert.ValidateAll() if the designated
-// constraints aren't met.
-type UpgradeAvailableAlertMultiError []error
+// OSUpdateDiffMultiError is an error wrapping multiple validation errors
+// returned by OSUpdateDiff.ValidateAll() if the designated constraints aren't met.
+type OSUpdateDiffMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m UpgradeAvailableAlertMultiError) Error() string {
+func (m OSUpdateDiffMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -695,11 +776,11 @@ func (m UpgradeAvailableAlertMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m UpgradeAvailableAlertMultiError) AllErrors() []error { return m }
+func (m OSUpdateDiffMultiError) AllErrors() []error { return m }
 
-// UpgradeAvailableAlertValidationError is the validation error returned by
-// UpgradeAvailableAlert.Validate if the designated constraints aren't met.
-type UpgradeAvailableAlertValidationError struct {
+// OSUpdateDiffValidationError is the validation error returned by
+// OSUpdateDiff.Validate if the designated constraints aren't met.
+type OSUpdateDiffValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -707,24 +788,22 @@ type UpgradeAvailableAlertValidationError struct {
 }
 
 // Field function returns field value.
-func (e UpgradeAvailableAlertValidationError) Field() string { return e.field }
+func (e OSUpdateDiffValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UpgradeAvailableAlertValidationError) Reason() string { return e.reason }
+func (e OSUpdateDiffValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UpgradeAvailableAlertValidationError) Cause() error { return e.cause }
+func (e OSUpdateDiffValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UpgradeAvailableAlertValidationError) Key() bool { return e.key }
+func (e OSUpdateDiffValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UpgradeAvailableAlertValidationError) ErrorName() string {
-	return "UpgradeAvailableAlertValidationError"
-}
+func (e OSUpdateDiffValidationError) ErrorName() string { return "OSUpdateDiffValidationError" }
 
 // Error satisfies the builtin error interface
-func (e UpgradeAvailableAlertValidationError) Error() string {
+func (e OSUpdateDiffValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -736,14 +815,14 @@ func (e UpgradeAvailableAlertValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUpgradeAvailableAlert.%s: %s%s",
+		"invalid %sOSUpdateDiff.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UpgradeAvailableAlertValidationError{}
+var _ error = OSUpdateDiffValidationError{}
 
 var _ interface {
 	Field() string
@@ -751,7 +830,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UpgradeAvailableAlertValidationError{}
+} = OSUpdateDiffValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -953,22 +1032,22 @@ var _ interface {
 	ErrorName() string
 } = RestartCommandValidationError{}
 
-// Validate checks the field values on CheckForUpdatesCommand with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *CheckForUpdatesCommand) Validate() error {
+// Validate checks the field values on CheckOSUpdateDiff with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *CheckOSUpdateDiff) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on CheckForUpdatesCommand with the rules
+// ValidateAll checks the field values on CheckOSUpdateDiff with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// CheckForUpdatesCommandMultiError, or nil if none found.
-func (m *CheckForUpdatesCommand) ValidateAll() error {
+// CheckOSUpdateDiffMultiError, or nil if none found.
+func (m *CheckOSUpdateDiff) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *CheckForUpdatesCommand) validate(all bool) error {
+func (m *CheckOSUpdateDiff) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -976,19 +1055,19 @@ func (m *CheckForUpdatesCommand) validate(all bool) error {
 	var errors []error
 
 	if len(errors) > 0 {
-		return CheckForUpdatesCommandMultiError(errors)
+		return CheckOSUpdateDiffMultiError(errors)
 	}
 
 	return nil
 }
 
-// CheckForUpdatesCommandMultiError is an error wrapping multiple validation
-// errors returned by CheckForUpdatesCommand.ValidateAll() if the designated
-// constraints aren't met.
-type CheckForUpdatesCommandMultiError []error
+// CheckOSUpdateDiffMultiError is an error wrapping multiple validation errors
+// returned by CheckOSUpdateDiff.ValidateAll() if the designated constraints
+// aren't met.
+type CheckOSUpdateDiffMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m CheckForUpdatesCommandMultiError) Error() string {
+func (m CheckOSUpdateDiffMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -997,11 +1076,11 @@ func (m CheckForUpdatesCommandMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m CheckForUpdatesCommandMultiError) AllErrors() []error { return m }
+func (m CheckOSUpdateDiffMultiError) AllErrors() []error { return m }
 
-// CheckForUpdatesCommandValidationError is the validation error returned by
-// CheckForUpdatesCommand.Validate if the designated constraints aren't met.
-type CheckForUpdatesCommandValidationError struct {
+// CheckOSUpdateDiffValidationError is the validation error returned by
+// CheckOSUpdateDiff.Validate if the designated constraints aren't met.
+type CheckOSUpdateDiffValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1009,24 +1088,24 @@ type CheckForUpdatesCommandValidationError struct {
 }
 
 // Field function returns field value.
-func (e CheckForUpdatesCommandValidationError) Field() string { return e.field }
+func (e CheckOSUpdateDiffValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e CheckForUpdatesCommandValidationError) Reason() string { return e.reason }
+func (e CheckOSUpdateDiffValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e CheckForUpdatesCommandValidationError) Cause() error { return e.cause }
+func (e CheckOSUpdateDiffValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e CheckForUpdatesCommandValidationError) Key() bool { return e.key }
+func (e CheckOSUpdateDiffValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e CheckForUpdatesCommandValidationError) ErrorName() string {
-	return "CheckForUpdatesCommandValidationError"
+func (e CheckOSUpdateDiffValidationError) ErrorName() string {
+	return "CheckOSUpdateDiffValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e CheckForUpdatesCommandValidationError) Error() string {
+func (e CheckOSUpdateDiffValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1038,14 +1117,14 @@ func (e CheckForUpdatesCommandValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sCheckForUpdatesCommand.%s: %s%s",
+		"invalid %sCheckOSUpdateDiff.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = CheckForUpdatesCommandValidationError{}
+var _ error = CheckOSUpdateDiffValidationError{}
 
 var _ interface {
 	Field() string
@@ -1053,4 +1132,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = CheckForUpdatesCommandValidationError{}
+} = CheckOSUpdateDiffValidationError{}

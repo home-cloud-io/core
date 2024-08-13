@@ -12,6 +12,7 @@ message DaemonMessage {
   oneof message {
     Heartbeat heartbeat = 1;
     ShutdownAlert shutdown_alert = 2;
+    OSUpdateDiff os_update_diff = 3;
   }
 }
 
@@ -20,6 +21,7 @@ message ServerMessage {
     Heartbeat heartbeat = 1;
     ShutdownCommand shutdown = 2;
     RestartCommand restart = 3;
+    CheckOSUpdateDiff check_os_update_diff = 4;
   }
 }
 
@@ -32,21 +34,18 @@ message Heartbeat { }
 // ShutdownAlert notifies the Server that the host is about to shutdown
 message ShutdownAlert { }
 
-message UpgradeAvailableAlert {
+// OSUpdateDiff is the result of the `nvd diff` command
+message OSUpdateDiff {
   string description = 1;
 }
 
 // Server -> Daemon
 
-// ShutdownCommand tells the daemon to shutdown the host: `shutdown now`
+// ShutdownCommand tells the daemon to shutdown the host
 message ShutdownCommand { }
 
-// RestartCommand tells the daemon to restart the host: `reboot now`
+// RestartCommand tells the daemon to restart the host
 message RestartCommand { }
 
-// CheckForUpdatesCommand tells the daemon to check for updates to the host:
-// - nixos-rebuild build
-// - nvd diff /run/current-system ./result
-// - publish the results of this to the Server using the UpgradeAvailableAlert
-// - rm ./result
-message CheckForUpdatesCommand { }
+// CheckOSUpdateDiff tells the daemon to check for updates to the host and send the update diff back
+message CheckOSUpdateDiff { }

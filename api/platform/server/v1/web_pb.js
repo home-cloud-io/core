@@ -99,3 +99,33 @@ export const UpdateAppResponse = proto3.makeMessageType(
   [],
 );
 
+/**
+ * @generated from message platform.server.v1.CheckForSystemUpdatesRequest
+ */
+export const CheckForSystemUpdatesRequest = proto3.makeMessageType(
+  "platform.server.v1.CheckForSystemUpdatesRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.CheckForSystemUpdatesResponse
+ */
+export const CheckForSystemUpdatesResponse = proto3.makeMessageType(
+  "platform.server.v1.CheckForSystemUpdatesResponse",
+  () => [
+    { no: 1, name: "daemon_versions", kind: "message", T: DaemonVersions },
+    { no: 2, name: "os_diff", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DaemonVersions
+ */
+export const DaemonVersions = proto3.makeMessageType(
+  "platform.server.v1.DaemonVersions",
+  () => [
+    { no: 1, name: "current", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "latest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+

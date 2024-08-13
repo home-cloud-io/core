@@ -25,6 +25,12 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: ShutdownAlert;
     case: "shutdownAlert";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.OSUpdateDiff os_update_diff = 3;
+     */
+    value: OSUpdateDiff;
+    case: "osUpdateDiff";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -37,6 +43,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown_alert", kind: "message", T: ShutdownAlert, oneof: "message" },
+    { no: 3, name: "os_update_diff", kind: "message", T: OSUpdateDiff, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -81,6 +88,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: RestartCommand;
     case: "restart";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.CheckOSUpdateDiff check_os_update_diff = 4;
+     */
+    value: CheckOSUpdateDiff;
+    case: "checkOsUpdateDiff";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -94,6 +107,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown", kind: "message", T: ShutdownCommand, oneof: "message" },
     { no: 3, name: "restart", kind: "message", T: RestartCommand, oneof: "message" },
+    { no: 4, name: "check_os_update_diff", kind: "message", T: CheckOSUpdateDiff, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -178,44 +192,46 @@ export class ShutdownAlert extends Message<ShutdownAlert> {
 }
 
 /**
- * @generated from message platform.daemon.v1.UpgradeAvailableAlert
+ * OSUpdateDiff is the result of the `nvd diff` command
+ *
+ * @generated from message platform.daemon.v1.OSUpdateDiff
  */
-export class UpgradeAvailableAlert extends Message<UpgradeAvailableAlert> {
+export class OSUpdateDiff extends Message<OSUpdateDiff> {
   /**
    * @generated from field: string description = 1;
    */
   description = "";
 
-  constructor(data?: PartialMessage<UpgradeAvailableAlert>) {
+  constructor(data?: PartialMessage<OSUpdateDiff>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.daemon.v1.UpgradeAvailableAlert";
+  static readonly typeName = "platform.daemon.v1.OSUpdateDiff";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpgradeAvailableAlert {
-    return new UpgradeAvailableAlert().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): OSUpdateDiff {
+    return new OSUpdateDiff().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpgradeAvailableAlert {
-    return new UpgradeAvailableAlert().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): OSUpdateDiff {
+    return new OSUpdateDiff().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpgradeAvailableAlert {
-    return new UpgradeAvailableAlert().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): OSUpdateDiff {
+    return new OSUpdateDiff().fromJsonString(jsonString, options);
   }
 
-  static equals(a: UpgradeAvailableAlert | PlainMessage<UpgradeAvailableAlert> | undefined, b: UpgradeAvailableAlert | PlainMessage<UpgradeAvailableAlert> | undefined): boolean {
-    return proto3.util.equals(UpgradeAvailableAlert, a, b);
+  static equals(a: OSUpdateDiff | PlainMessage<OSUpdateDiff> | undefined, b: OSUpdateDiff | PlainMessage<OSUpdateDiff> | undefined): boolean {
+    return proto3.util.equals(OSUpdateDiff, a, b);
   }
 }
 
 /**
- * ShutdownCommand tells the daemon to shutdown the host: `shutdown now`
+ * ShutdownCommand tells the daemon to shutdown the host
  *
  * @generated from message platform.daemon.v1.ShutdownCommand
  */
@@ -248,7 +264,7 @@ export class ShutdownCommand extends Message<ShutdownCommand> {
 }
 
 /**
- * RestartCommand tells the daemon to restart the host: `reboot now`
+ * RestartCommand tells the daemon to restart the host
  *
  * @generated from message platform.daemon.v1.RestartCommand
  */
@@ -281,39 +297,35 @@ export class RestartCommand extends Message<RestartCommand> {
 }
 
 /**
- * CheckForUpdatesCommand tells the daemon to check for updates to the host:
- * - nixos-rebuild build
- * - nvd diff /run/current-system ./result
- * - publish the results of this to the Server using the UpgradeAvailableAlert
- * - rm ./result
+ * CheckOSUpdateDiff tells the daemon to check for updates to the host and send the update diff back
  *
- * @generated from message platform.daemon.v1.CheckForUpdatesCommand
+ * @generated from message platform.daemon.v1.CheckOSUpdateDiff
  */
-export class CheckForUpdatesCommand extends Message<CheckForUpdatesCommand> {
-  constructor(data?: PartialMessage<CheckForUpdatesCommand>) {
+export class CheckOSUpdateDiff extends Message<CheckOSUpdateDiff> {
+  constructor(data?: PartialMessage<CheckOSUpdateDiff>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.daemon.v1.CheckForUpdatesCommand";
+  static readonly typeName = "platform.daemon.v1.CheckOSUpdateDiff";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckForUpdatesCommand {
-    return new CheckForUpdatesCommand().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckOSUpdateDiff {
+    return new CheckOSUpdateDiff().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckForUpdatesCommand {
-    return new CheckForUpdatesCommand().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckOSUpdateDiff {
+    return new CheckOSUpdateDiff().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckForUpdatesCommand {
-    return new CheckForUpdatesCommand().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckOSUpdateDiff {
+    return new CheckOSUpdateDiff().fromJsonString(jsonString, options);
   }
 
-  static equals(a: CheckForUpdatesCommand | PlainMessage<CheckForUpdatesCommand> | undefined, b: CheckForUpdatesCommand | PlainMessage<CheckForUpdatesCommand> | undefined): boolean {
-    return proto3.util.equals(CheckForUpdatesCommand, a, b);
+  static equals(a: CheckOSUpdateDiff | PlainMessage<CheckOSUpdateDiff> | undefined, b: CheckOSUpdateDiff | PlainMessage<CheckOSUpdateDiff> | undefined): boolean {
+    return proto3.util.equals(CheckOSUpdateDiff, a, b);
   }
 }
 

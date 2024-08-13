@@ -13,6 +13,7 @@ export const DaemonMessage = proto3.makeMessageType(
   () => [
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown_alert", kind: "message", T: ShutdownAlert, oneof: "message" },
+    { no: 3, name: "os_update_diff", kind: "message", T: OSUpdateDiff, oneof: "message" },
   ],
 );
 
@@ -25,6 +26,7 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown", kind: "message", T: ShutdownCommand, oneof: "message" },
     { no: 3, name: "restart", kind: "message", T: RestartCommand, oneof: "message" },
+    { no: 4, name: "check_os_update_diff", kind: "message", T: CheckOSUpdateDiff, oneof: "message" },
   ],
 );
 
@@ -47,17 +49,19 @@ export const ShutdownAlert = proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.daemon.v1.UpgradeAvailableAlert
+ * OSUpdateDiff is the result of the `nvd diff` command
+ *
+ * @generated from message platform.daemon.v1.OSUpdateDiff
  */
-export const UpgradeAvailableAlert = proto3.makeMessageType(
-  "platform.daemon.v1.UpgradeAvailableAlert",
+export const OSUpdateDiff = proto3.makeMessageType(
+  "platform.daemon.v1.OSUpdateDiff",
   () => [
     { no: 1, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
 /**
- * ShutdownCommand tells the daemon to shutdown the host: `shutdown now`
+ * ShutdownCommand tells the daemon to shutdown the host
  *
  * @generated from message platform.daemon.v1.ShutdownCommand
  */
@@ -67,7 +71,7 @@ export const ShutdownCommand = proto3.makeMessageType(
 );
 
 /**
- * RestartCommand tells the daemon to restart the host: `reboot now`
+ * RestartCommand tells the daemon to restart the host
  *
  * @generated from message platform.daemon.v1.RestartCommand
  */
@@ -77,16 +81,12 @@ export const RestartCommand = proto3.makeMessageType(
 );
 
 /**
- * CheckForUpdatesCommand tells the daemon to check for updates to the host:
- * - nixos-rebuild build
- * - nvd diff /run/current-system ./result
- * - publish the results of this to the Server using the UpgradeAvailableAlert
- * - rm ./result
+ * CheckOSUpdateDiff tells the daemon to check for updates to the host and send the update diff back
  *
- * @generated from message platform.daemon.v1.CheckForUpdatesCommand
+ * @generated from message platform.daemon.v1.CheckOSUpdateDiff
  */
-export const CheckForUpdatesCommand = proto3.makeMessageType(
-  "platform.daemon.v1.CheckForUpdatesCommand",
+export const CheckOSUpdateDiff = proto3.makeMessageType(
+  "platform.daemon.v1.CheckOSUpdateDiff",
   [],
 );
 

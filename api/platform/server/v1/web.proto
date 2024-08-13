@@ -10,6 +10,7 @@ service WebService {
   rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {}
   rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
   rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
+  rpc CheckForSystemUpdates(CheckForSystemUpdatesRequest) returns (CheckForSystemUpdatesResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -45,3 +46,16 @@ message UpdateAppRequest {
 }
 
 message UpdateAppResponse {}
+
+message CheckForSystemUpdatesRequest {}
+
+message CheckForSystemUpdatesResponse {
+  DaemonVersions daemon_versions = 1;
+  // os_diff is the result of the `nvd diff` command
+  string os_diff = 2;
+}
+
+message DaemonVersions {
+  string current = 1;
+  string latest = 2;
+}
