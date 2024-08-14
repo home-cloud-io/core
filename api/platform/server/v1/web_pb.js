@@ -6,6 +6,18 @@
 import { proto3 } from "@bufbuild/protobuf";
 
 /**
+ * @generated from enum platform.server.v1.AppRunningStatus
+ */
+export const AppRunningStatus = proto3.makeEnum(
+  "platform.server.v1.AppRunningStatus",
+  [
+    {no: 0, name: "APP_RUNNING_STATUS_UNKNOWN", localName: "UNKNOWN"},
+    {no: 1, name: "APP_RUNNING_STATUS_RUNNING", localName: "RUNNING"},
+    {no: 2, name: "APP_RUNNING_STATUS_STOPPED", localName: "STOPPED"},
+  ],
+);
+
+/**
  * @generated from message platform.server.v1.IsDeviceSetupRequest
  */
 export const IsDeviceSetupRequest = proto3.makeMessageType(
@@ -89,18 +101,6 @@ export const GetDeviceUsageStatsResponse = proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.DiskStats
- */
-export const DiskStats = proto3.makeMessageType(
-  "platform.server.v1.DiskStats",
-  () => [
-    { no: 1, name: "total", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "used", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 3, name: "free", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-  ],
-);
-
-/**
  * @generated from message platform.server.v1.GetInstalledAppsRequest
  */
 export const GetInstalledAppsRequest = proto3.makeMessageType(
@@ -115,18 +115,6 @@ export const GetInstalledAppsResponse = proto3.makeMessageType(
   "platform.server.v1.GetInstalledAppsResponse",
   () => [
     { no: 1, name: "apps", kind: "message", T: AppStatus, repeated: true },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.AppStatus
- */
-export const AppStatus = proto3.makeMessageType(
-  "platform.server.v1.AppStatus",
-  () => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -149,19 +137,6 @@ export const GetAppsInStoreResponse = proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.App
- */
-export const App = proto3.makeMessageType(
-  "platform.server.v1.App",
-  () => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
  * @generated from message platform.server.v1.GetDeviceSettingsRequest
  */
 export const GetDeviceSettingsRequest = proto3.makeMessageType(
@@ -180,14 +155,63 @@ export const GetDeviceSettingsResponse = proto3.makeMessageType(
 );
 
 /**
+ * @generated from message platform.server.v1.App
+ */
+export const App = proto3.makeMessageType(
+  "platform.server.v1.App",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.AppStatus
+ */
+export const AppStatus = proto3.makeMessageType(
+  "platform.server.v1.AppStatus",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "status", kind: "enum", T: proto3.getEnumType(AppRunningStatus) },
+  ],
+);
+
+/**
  * @generated from message platform.server.v1.DeviceSettings
  */
 export const DeviceSettings = proto3.makeMessageType(
   "platform.server.v1.DeviceSettings",
   () => [
-    { no: 1, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 3, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 1, name: "admin_user", kind: "message", T: User },
+    { no: 2, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DiskStats
+ */
+export const DiskStats = proto3.makeMessageType(
+  "platform.server.v1.DiskStats",
+  () => [
+    { no: 1, name: "total", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "used", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 3, name: "free", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.User
+ */
+export const User = proto3.makeMessageType(
+  "platform.server.v1.User",
+  () => [
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

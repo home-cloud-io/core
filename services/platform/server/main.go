@@ -19,7 +19,7 @@ func main() {
 	var (
 		logger    = zerolog.New()
 		daemonRPC = daemon.New(logger)
-		webRPC = web.New(logger)
+		webRPC    = web.New(logger)
 	)
 
 	defer chassis.New(logger).

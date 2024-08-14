@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"errors"
 
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
@@ -22,13 +23,16 @@ type (
 	rpc struct {
 		logger    chassis.Logger
 		k8sclient k8sclient.Client
+
+		controller Controller
 	}
 )
 
 func New(logger chassis.Logger) Rpc {
 	return &rpc{
-		logger: logger,
-		k8sclient: k8sclient.NewClient(logger),
+		logger:     logger,
+		k8sclient:  k8sclient.NewClient(logger),
+		controller: NewController(),
 	}
 }
 
@@ -59,10 +63,10 @@ func (h *rpc) RestartHost(ctx context.Context, request *connect.Request[v1.Resta
 func (h *rpc) InstallApp(ctx context.Context, request *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("install request")
 	err := h.k8sclient.Install(ctx, opv1.AppSpec{
-		Chart: request.Msg.Chart,
-		Repo: request.Msg.Repo,
+		Chart:   request.Msg.Chart,
+		Repo:    request.Msg.Repo,
 		Release: request.Msg.Release,
-		Values: request.Msg.Values,
+		Values:  request.Msg.Values,
 	})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to install app")
@@ -88,10 +92,10 @@ func (h *rpc) DeleteApp(ctx context.Context, request *connect.Request[v1.DeleteA
 func (h *rpc) UpdateApp(ctx context.Context, request *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("update request")
 	err := h.k8sclient.Update(ctx, opv1.AppSpec{
-		Chart: request.Msg.Chart,
-		Repo: request.Msg.Repo,
+		Chart:   request.Msg.Chart,
+		Repo:    request.Msg.Repo,
 		Release: request.Msg.Release,
-		Values: request.Msg.Values,
+		Values:  request.Msg.Values,
 	})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to update app")
@@ -99,4 +103,70 @@ func (h *rpc) UpdateApp(ctx context.Context, request *connect.Request[v1.UpdateA
 	}
 	h.logger.Info("finished request")
 	return connect.NewResponse(&v1.UpdateAppResponse{}), nil
+}
+
+// / RC1 WebApp Api Errors
+const (
+	FailedToInitDevice = "failed to initialize device"
+)
+
+/// RC1 WebApp API
+
+// IsDeviceSetup checks if the device is setup. It's also the first request made by the FE when loading. If the device is not setup, the FE will redirect to the setup page.
+// A device is considered setup (or will return true) if the device has a username, password, and the `Settings` object is not empty in `blueprint`.
+func (h *rpc) IsDeviceSetup(ctx context.Context, request *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error) {
+	h.logger.Info("checking if device is setup")
+
+	yes, err := h.controller.IsDeviceSetup(ctx)
+	if err != nil {
+		return nil, errors.New(ErrFailedToGetSettings)
+	}
+
+	return connect.NewResponse(&v1.IsDeviceSetupResponse{Setup: yes}), nil
+}
+
+func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
+	h.logger.Info("setting up device for the first time")
+
+	var (
+		msg = request.Msg
+	)
+
+	// convert the request to the `DeviceSettings` object
+	deviceSettings := &v1.DeviceSettings{
+		AdminUser: &v1.User{
+			Username: msg.GetUsername(),
+			Password: msg.GetPassword(),
+		},
+		Timezone:       msg.GetTimezone(),
+		AutoUpdateApps: msg.GetAutoUpdateApps(),
+		AutoUpdateOs:   msg.GetAutoUpdateOs(),
+	}
+
+	_, err := h.controller.InitializeDevice(ctx, deviceSettings)
+	if err != nil {
+		return nil, errors.New(FailedToInitDevice)
+	}
+
+	return nil, errors.New("not implemented")
+}
+
+func (h *rpc) Login(ctx context.Context, request *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *rpc) GetDeviceUsageStats(ctx context.Context, request *connect.Request[v1.GetDeviceUsageStatsRequest]) (*connect.Response[v1.GetDeviceUsageStatsResponse], error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *rpc) GetInstalledApps(ctx context.Context, request *connect.Request[v1.GetInstalledAppsRequest]) (*connect.Response[v1.GetInstalledAppsResponse], error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *rpc) GetAppsInStore(ctx context.Context, request *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *rpc) GetDeviceSettings(ctx context.Context, request *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error) {
+	return nil, errors.New("not implemented")
 }
