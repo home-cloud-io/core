@@ -107,7 +107,8 @@ func (h *rpc) UpdateApp(ctx context.Context, request *connect.Request[v1.UpdateA
 
 // / RC1 WebApp Api Errors
 const (
-	FailedToInitDevice = "failed to initialize device"
+	ErrFailedToInitDevice = "failed to initialize device"
+	ErrInvalidInputValues = "invalid input values"
 )
 
 /// RC1 WebApp API
@@ -128,9 +129,11 @@ func (h *rpc) IsDeviceSetup(ctx context.Context, request *connect.Request[v1.IsD
 func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
 	h.logger.Info("setting up device for the first time")
 
-	var (
-		msg = request.Msg
-	)
+	var msg = request.Msg
+
+	if err := msg.Validate(); err != nil {
+		return nil, errors.New(ErrInvalidInputValues)
+	}
 
 	// convert the request to the `DeviceSettings` object
 	deviceSettings := &v1.DeviceSettings{
@@ -145,10 +148,10 @@ func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.
 
 	_, err := h.controller.InitializeDevice(ctx, deviceSettings)
 	if err != nil {
-		return nil, errors.New(FailedToInitDevice)
+		return nil, errors.New(ErrFailedToInitDevice)
 	}
 
-	return nil, errors.New("not implemented")
+	return connect.NewResponse(&v1.InitializeDeviceResponse{Setup: true}), nil
 }
 
 func (h *rpc) Login(ctx context.Context, request *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {

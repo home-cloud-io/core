@@ -43,6 +43,8 @@ const (
 	DEFAULT_DEVICE_SETTINGS_KEY = "device"
 )
 
+// IsDeviceSetup checks if the device is already setup by checking if the DEFAULT_DEVICE_SETTINGS_KEY key exists in the key-value store
+// with the default settings model
 func (c *controller) IsDeviceSetup(ctx context.Context) (bool, error) {
 	val, err := c.KeyValueServiceClient.Get(ctx, connect.NewRequest(&kvv1.GetRequest{Key: DEFAULT_DEVICE_SETTINGS_KEY}))
 	if err != nil {
@@ -56,6 +58,9 @@ func (c *controller) IsDeviceSetup(ctx context.Context) (bool, error) {
 	}
 }
 
+// InitializeDevice initializes the device with the given settings. It first checks if the device is already setup
+// Uses the user-provided password to set the password for the "admin" user on the device
+// and save the remaining settings in the key-value store
 func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSettings) (string, error) {
 	yes, err := c.IsDeviceSetup(ctx)
 	if err != nil {
@@ -79,6 +84,7 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 	return id.Msg.Key, nil
 }
 
+// buildSetRequest is a utility function to create a set request for the key-value store
 func buildSetRequest(key string, value proto.Message) (*connect.Request[kvv1.SetRequest], error) {
 	// Create the setting object for the device
 	pb, err := anypb.New(value)
