@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 
 	"github.com/home-cloud-io/core/services/platform/server/daemon"
 	"github.com/home-cloud-io/core/services/platform/server/web"
@@ -21,6 +22,8 @@ func main() {
 		daemonRPC = daemon.New(logger)
 		webRPC    = web.New(logger)
 	)
+
+	fmt.Println("test")
 
 	defer chassis.New(logger).
 		WithClientApplication(files).

@@ -46,12 +46,16 @@ const (
 // IsDeviceSetup checks if the device is already setup by checking if the DEFAULT_DEVICE_SETTINGS_KEY key exists in the key-value store
 // with the default settings model
 func (c *controller) IsDeviceSetup(ctx context.Context) (bool, error) {
-	val, err := c.KeyValueServiceClient.Get(ctx, connect.NewRequest(&kvv1.GetRequest{Key: DEFAULT_DEVICE_SETTINGS_KEY}))
+	pb, _ := anypb.New(&v1.DeviceSettings{})
+
+	// list is used to get all the `DeviceSettings` objects in the key-value store
+	// it will not fail if the key does not exist like `Get` would
+	val, err := c.KeyValueServiceClient.List(ctx, connect.NewRequest(&kvv1.ListRequest{Value: pb}))
 	if err != nil {
 		return false, errors.New(ErrFailedToGetSettings)
 	}
 
-	if val == nil {
+	if len(val.Msg.GetValues()) < 1 {
 		return false, nil
 	} else {
 		return true, nil

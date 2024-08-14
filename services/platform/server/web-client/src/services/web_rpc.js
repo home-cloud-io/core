@@ -8,7 +8,7 @@ let BASE_URL = '';
 if (process.env.NODE_ENV === 'production') {
   BASE_URL = 'http://home-cloud.local';
 } else {
-  BASE_URL = 'http://localhost:8000';
+  BASE_URL = 'http://10.0.0.108:8000';
 }
 
 const web_service_transport = createConnectTransport({
@@ -48,13 +48,22 @@ export const serverRPCService = createApi({
       },
     }),
     // TODO: Add remaining endpoints here
-    isDeviceSetup: builder.query({
+    getIsDeviceSetup: builder.query({
       queryFn: async () => {
-        return client.isDeviceSetup({});
+        const res = await client.isDeviceSetup({})
+        return { data: { isDeviceSetup: res.setup }}
       },
     }),
   }),
 });
+
+export const { 
+  useShutdownHostMutation,
+  useRestartHostMutation,
+  useInstallAppMutation,
+  useDeleteAppMutation,
+  useUpdateAppMutation,
+  useGetIsDeviceSetupQuery } = serverRPCService;
 
 const values = new Map([
   [

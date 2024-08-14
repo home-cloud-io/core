@@ -118,12 +118,12 @@ const (
 func (h *rpc) IsDeviceSetup(ctx context.Context, request *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error) {
 	h.logger.Info("checking if device is setup")
 
-	yes, err := h.controller.IsDeviceSetup(ctx)
+	isSetup, err := h.controller.IsDeviceSetup(ctx)
 	if err != nil {
 		return nil, errors.New(ErrFailedToGetSettings)
 	}
 
-	return connect.NewResponse(&v1.IsDeviceSetupResponse{Setup: yes}), nil
+	return connect.NewResponse(&v1.IsDeviceSetupResponse{Setup: isSetup}), nil
 }
 
 func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
