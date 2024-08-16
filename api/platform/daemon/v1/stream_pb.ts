@@ -31,6 +31,12 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: OSUpdateDiff;
     case: "osUpdateDiff";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.CurrentDaemonVersion current_daemon_version = 4;
+     */
+    value: CurrentDaemonVersion;
+    case: "currentDaemonVersion";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -44,6 +50,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown_alert", kind: "message", T: ShutdownAlert, oneof: "message" },
     { no: 3, name: "os_update_diff", kind: "message", T: OSUpdateDiff, oneof: "message" },
+    { no: 4, name: "current_daemon_version", kind: "message", T: CurrentDaemonVersion, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -90,10 +97,16 @@ export class ServerMessage extends Message<ServerMessage> {
     case: "restart";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.CheckOSUpdateDiff check_os_update_diff = 4;
+     * @generated from field: platform.daemon.v1.RequestOSUpdateDiff request_os_update_diff = 4;
      */
-    value: CheckOSUpdateDiff;
-    case: "checkOsUpdateDiff";
+    value: RequestOSUpdateDiff;
+    case: "requestOsUpdateDiff";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.RequestCurrentDaemonVersion request_current_daemon_version = 5;
+     */
+    value: RequestCurrentDaemonVersion;
+    case: "requestCurrentDaemonVersion";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -107,7 +120,8 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown", kind: "message", T: ShutdownCommand, oneof: "message" },
     { no: 3, name: "restart", kind: "message", T: RestartCommand, oneof: "message" },
-    { no: 4, name: "check_os_update_diff", kind: "message", T: CheckOSUpdateDiff, oneof: "message" },
+    { no: 4, name: "request_os_update_diff", kind: "message", T: RequestOSUpdateDiff, oneof: "message" },
+    { no: 5, name: "request_current_daemon_version", kind: "message", T: RequestCurrentDaemonVersion, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -231,6 +245,45 @@ export class OSUpdateDiff extends Message<OSUpdateDiff> {
 }
 
 /**
+ * CurrentDaemonVersion is the current daemon version
+ *
+ * @generated from message platform.daemon.v1.CurrentDaemonVersion
+ */
+export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
+  /**
+   * @generated from field: string version = 1;
+   */
+  version = "";
+
+  constructor(data?: PartialMessage<CurrentDaemonVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.CurrentDaemonVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CurrentDaemonVersion {
+    return new CurrentDaemonVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CurrentDaemonVersion {
+    return new CurrentDaemonVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CurrentDaemonVersion {
+    return new CurrentDaemonVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CurrentDaemonVersion | PlainMessage<CurrentDaemonVersion> | undefined, b: CurrentDaemonVersion | PlainMessage<CurrentDaemonVersion> | undefined): boolean {
+    return proto3.util.equals(CurrentDaemonVersion, a, b);
+  }
+}
+
+/**
  * ShutdownCommand tells the daemon to shutdown the host
  *
  * @generated from message platform.daemon.v1.ShutdownCommand
@@ -297,35 +350,68 @@ export class RestartCommand extends Message<RestartCommand> {
 }
 
 /**
- * CheckOSUpdateDiff tells the daemon to check for updates to the host and send the update diff back
+ * RequestOSUpdateDiff tells the daemon to check for updates to the host and send the result to the server
  *
- * @generated from message platform.daemon.v1.CheckOSUpdateDiff
+ * @generated from message platform.daemon.v1.RequestOSUpdateDiff
  */
-export class CheckOSUpdateDiff extends Message<CheckOSUpdateDiff> {
-  constructor(data?: PartialMessage<CheckOSUpdateDiff>) {
+export class RequestOSUpdateDiff extends Message<RequestOSUpdateDiff> {
+  constructor(data?: PartialMessage<RequestOSUpdateDiff>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.daemon.v1.CheckOSUpdateDiff";
+  static readonly typeName = "platform.daemon.v1.RequestOSUpdateDiff";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckOSUpdateDiff {
-    return new CheckOSUpdateDiff().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RequestOSUpdateDiff {
+    return new RequestOSUpdateDiff().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckOSUpdateDiff {
-    return new CheckOSUpdateDiff().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RequestOSUpdateDiff {
+    return new RequestOSUpdateDiff().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckOSUpdateDiff {
-    return new CheckOSUpdateDiff().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RequestOSUpdateDiff {
+    return new RequestOSUpdateDiff().fromJsonString(jsonString, options);
   }
 
-  static equals(a: CheckOSUpdateDiff | PlainMessage<CheckOSUpdateDiff> | undefined, b: CheckOSUpdateDiff | PlainMessage<CheckOSUpdateDiff> | undefined): boolean {
-    return proto3.util.equals(CheckOSUpdateDiff, a, b);
+  static equals(a: RequestOSUpdateDiff | PlainMessage<RequestOSUpdateDiff> | undefined, b: RequestOSUpdateDiff | PlainMessage<RequestOSUpdateDiff> | undefined): boolean {
+    return proto3.util.equals(RequestOSUpdateDiff, a, b);
+  }
+}
+
+/**
+ * RequestCurrentDaemonVersion tells the daemon to check the current daemon version and send it to the server
+ *
+ * @generated from message platform.daemon.v1.RequestCurrentDaemonVersion
+ */
+export class RequestCurrentDaemonVersion extends Message<RequestCurrentDaemonVersion> {
+  constructor(data?: PartialMessage<RequestCurrentDaemonVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.RequestCurrentDaemonVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RequestCurrentDaemonVersion {
+    return new RequestCurrentDaemonVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RequestCurrentDaemonVersion {
+    return new RequestCurrentDaemonVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RequestCurrentDaemonVersion {
+    return new RequestCurrentDaemonVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RequestCurrentDaemonVersion | PlainMessage<RequestCurrentDaemonVersion> | undefined, b: RequestCurrentDaemonVersion | PlainMessage<RequestCurrentDaemonVersion> | undefined): boolean {
+    return proto3.util.equals(RequestCurrentDaemonVersion, a, b);
   }
 }
 

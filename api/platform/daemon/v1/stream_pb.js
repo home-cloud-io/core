@@ -14,6 +14,7 @@ export const DaemonMessage = proto3.makeMessageType(
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown_alert", kind: "message", T: ShutdownAlert, oneof: "message" },
     { no: 3, name: "os_update_diff", kind: "message", T: OSUpdateDiff, oneof: "message" },
+    { no: 4, name: "current_daemon_version", kind: "message", T: CurrentDaemonVersion, oneof: "message" },
   ],
 );
 
@@ -26,7 +27,8 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 1, name: "heartbeat", kind: "message", T: Heartbeat, oneof: "message" },
     { no: 2, name: "shutdown", kind: "message", T: ShutdownCommand, oneof: "message" },
     { no: 3, name: "restart", kind: "message", T: RestartCommand, oneof: "message" },
-    { no: 4, name: "check_os_update_diff", kind: "message", T: CheckOSUpdateDiff, oneof: "message" },
+    { no: 4, name: "request_os_update_diff", kind: "message", T: RequestOSUpdateDiff, oneof: "message" },
+    { no: 5, name: "request_current_daemon_version", kind: "message", T: RequestCurrentDaemonVersion, oneof: "message" },
   ],
 );
 
@@ -61,6 +63,18 @@ export const OSUpdateDiff = proto3.makeMessageType(
 );
 
 /**
+ * CurrentDaemonVersion is the current daemon version
+ *
+ * @generated from message platform.daemon.v1.CurrentDaemonVersion
+ */
+export const CurrentDaemonVersion = proto3.makeMessageType(
+  "platform.daemon.v1.CurrentDaemonVersion",
+  () => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
  * ShutdownCommand tells the daemon to shutdown the host
  *
  * @generated from message platform.daemon.v1.ShutdownCommand
@@ -81,12 +95,22 @@ export const RestartCommand = proto3.makeMessageType(
 );
 
 /**
- * CheckOSUpdateDiff tells the daemon to check for updates to the host and send the update diff back
+ * RequestOSUpdateDiff tells the daemon to check for updates to the host and send the result to the server
  *
- * @generated from message platform.daemon.v1.CheckOSUpdateDiff
+ * @generated from message platform.daemon.v1.RequestOSUpdateDiff
  */
-export const CheckOSUpdateDiff = proto3.makeMessageType(
-  "platform.daemon.v1.CheckOSUpdateDiff",
+export const RequestOSUpdateDiff = proto3.makeMessageType(
+  "platform.daemon.v1.RequestOSUpdateDiff",
+  [],
+);
+
+/**
+ * RequestCurrentDaemonVersion tells the daemon to check the current daemon version and send it to the server
+ *
+ * @generated from message platform.daemon.v1.RequestCurrentDaemonVersion
+ */
+export const RequestCurrentDaemonVersion = proto3.makeMessageType(
+  "platform.daemon.v1.RequestCurrentDaemonVersion",
   [],
 );
 
