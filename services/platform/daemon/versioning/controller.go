@@ -15,15 +15,6 @@ import (
 	"golang.org/x/mod/semver"
 )
 
-type (
-	Controller interface {
-		GetDaemonVersion(logger chassis.Logger) (string, error)
-		GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error)
-	}
-
-	controller struct{}
-)
-
 const (
 	daemonNixFile = "/etc/nixos/home-cloud/daemon/default.nix"
 )
@@ -33,11 +24,7 @@ var (
 	semverRegex = regexp.MustCompile(`(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?`)
 )
 
-func NewController() Controller {
-	return controller{}
-}
-
-func (c controller) GetDaemonVersion(logger chassis.Logger) (string, error) {
+func GetDaemonVersion(logger chassis.Logger) (string, error) {
 	f, err := os.Open(daemonNixFile)
 	if err != nil {
 		logger.WithError(err).Error("failed to read daemon nix file")
@@ -67,7 +54,7 @@ func (c controller) GetDaemonVersion(logger chassis.Logger) (string, error) {
 	return version, nil
 }
 
-func (c controller) GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error) {
+func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error) {
 	var (
 		cmd    *exec.Cmd
 		output string

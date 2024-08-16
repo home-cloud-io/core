@@ -25,9 +25,8 @@ type (
 		Send(*v1.DaemonMessage) error
 	}
 	client struct {
-		logger   chassis.Logger
-		stream   *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
-		versions versioning.Controller
+		logger chassis.Logger
+		stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
 	}
 )
 
@@ -41,8 +40,7 @@ var (
 
 func NewClient(logger chassis.Logger) Client {
 	clientSingleton = &client{
-		logger:   logger,
-		versions: versioning.NewController(),
+		logger: logger,
 	}
 	return clientSingleton
 }
@@ -89,55 +87,71 @@ func (c *client) listen(ctx context.Context) error {
 		}
 		switch message.Message.(type) {
 		case *v1.ServerMessage_Restart:
-			c.logger.Info("restart command")
-			_, err := execute.Execute(ctx, exec.Command("reboot", "now"))
-			if err != nil {
-				c.logger.WithError(err).Error("failed to execute restart command")
-				// TODO: send error back to server
-			}
+			go restart(ctx, c.logger)
 		case *v1.ServerMessage_Shutdown:
-			c.logger.Info("shutdown command")
-			_, err := execute.Execute(ctx, exec.Command("shutdown", "now"))
-			if err != nil {
-				c.logger.WithError(err).Error("failed to execute shutdown command")
-				// TODO: send error back to server
-			}
+			go shutdown(ctx, c.logger)
 		case *v1.ServerMessage_Heartbeat:
 			c.logger.Debug("heartbeat received")
 		case *v1.ServerMessage_RequestOsUpdateDiff:
-			osUpdateDiff, err := c.versions.GetOSVersionDiff(ctx, c.logger)
-			if err != nil {
-				c.logger.WithError(err).Error("failed to get os version diff")
-			} else {
-				err := c.stream.Send(&v1.DaemonMessage{
-					Message: &v1.DaemonMessage_OsUpdateDiff{
-						OsUpdateDiff: &v1.OSUpdateDiff{
-							Description: osUpdateDiff,
-						},
-					},
-				})
-				if err != nil {
-					c.logger.WithError(err).Error("failed to send os update diff to server")
-				}
-			}
+			go c.osUpdateDiff(ctx)
 		case *v1.ServerMessage_RequestCurrentDaemonVersion:
-			daemonVersion, err := c.versions.GetDaemonVersion(c.logger)
-			if err != nil {
-				c.logger.WithError(err).Error("failed to get current daemon version")
-			} else {
-				err := c.stream.Send(&v1.DaemonMessage{
-					Message: &v1.DaemonMessage_CurrentDaemonVersion{
-						CurrentDaemonVersion: &v1.CurrentDaemonVersion{
-							Version: daemonVersion,
-						},
-					},
-				})
-				if err != nil {
-					c.logger.WithError(err).Error("failed to send current daemon version to server")
-				}
-			}
+			go c.currentDaemonVersion()
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
+		}
+	}
+}
+
+func restart(ctx context.Context, logger chassis.Logger) {
+	logger.Info("restart command")
+	_, err := execute.Execute(ctx, exec.Command("reboot", "now"))
+	if err != nil {
+		logger.WithError(err).Error("failed to execute restart command")
+		// TODO: send error back to server
+	}
+}
+
+func shutdown(ctx context.Context, logger chassis.Logger) {
+	logger.Info("shutdown command")
+	_, err := execute.Execute(ctx, exec.Command("shutdown", "now"))
+	if err != nil {
+		logger.WithError(err).Error("failed to execute shutdown command")
+		// TODO: send error back to server
+	}
+}
+
+func (c *client) osUpdateDiff(ctx context.Context) {
+	osUpdateDiff, err := versioning.GetOSVersionDiff(ctx, c.logger)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to get os version diff")
+	} else {
+		err := c.stream.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_OsUpdateDiff{
+				OsUpdateDiff: &v1.OSUpdateDiff{
+					Description: osUpdateDiff,
+				},
+			},
+		})
+		if err != nil {
+			c.logger.WithError(err).Error("failed to send os update diff to server")
+		}
+	}
+}
+
+func (c *client) currentDaemonVersion() {
+	daemonVersion, err := versioning.GetDaemonVersion(c.logger)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to get current daemon version")
+	} else {
+		err := c.stream.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_CurrentDaemonVersion{
+				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
+					Version: daemonVersion,
+				},
+			},
+		})
+		if err != nil {
+			c.logger.WithError(err).Error("failed to send current daemon version to server")
 		}
 	}
 }
