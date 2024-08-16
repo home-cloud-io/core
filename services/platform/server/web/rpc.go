@@ -15,7 +15,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
@@ -36,7 +36,7 @@ type (
 )
 
 const (
-	daemonRepoPath = "services/platform/daemon/"
+	daemonTagPath = "refs/tags/services/platform/daemon/"
 )
 
 func New(logger chassis.Logger, messages chan *dv1.DaemonMessage) Rpc {
@@ -198,19 +198,24 @@ func getLatestDaemonVersion() (string, error) {
 	}
 
 	// pull out daemon versions from tags
-	iter, err := repo.TagObjects()
+	iter, err := repo.Tags()
 	if err != nil {
 		return "", err
 	}
 	versions := []string{}
-	err = iter.ForEach(func(tag *object.Tag) error {
-		if strings.HasPrefix(tag.Name, daemonRepoPath) {
-			versions = append(versions, strings.TrimPrefix(tag.Name, daemonRepoPath))
+	err = iter.ForEach(func(tag *plumbing.Reference) error {
+		name := tag.Name().String()
+		if strings.HasPrefix(name, daemonTagPath) {
+			versions = append(versions, strings.TrimPrefix(name, daemonTagPath))
 		}
 		return nil
 	})
 	if err != nil {
 		return "", err
+	}
+
+	if len(versions) == 0 {
+		return "", fmt.Errorf("no versions found")
 	}
 
 	// sort versions by semver
