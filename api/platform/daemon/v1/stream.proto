@@ -13,6 +13,7 @@ message DaemonMessage {
     Heartbeat heartbeat = 1;
     ShutdownAlert shutdown_alert = 2;
     OSUpdateDiff os_update_diff = 3;
+    CurrentDaemonVersion current_daemon_version = 4;
   }
 }
 
@@ -21,7 +22,8 @@ message ServerMessage {
     Heartbeat heartbeat = 1;
     ShutdownCommand shutdown = 2;
     RestartCommand restart = 3;
-    CheckOSUpdateDiff check_os_update_diff = 4;
+    RequestOSUpdateDiff request_os_update_diff = 4;
+    RequestCurrentDaemonVersion request_current_daemon_version = 5;
   }
 }
 
@@ -39,6 +41,11 @@ message OSUpdateDiff {
   string description = 1;
 }
 
+// CurrentDaemonVersion is the current daemon version
+message CurrentDaemonVersion {
+  string version = 1;
+}
+
 // Server -> Daemon
 
 // ShutdownCommand tells the daemon to shutdown the host
@@ -47,5 +54,8 @@ message ShutdownCommand { }
 // RestartCommand tells the daemon to restart the host
 message RestartCommand { }
 
-// CheckOSUpdateDiff tells the daemon to check for updates to the host and send the update diff back
-message CheckOSUpdateDiff { }
+// RequestOSUpdateDiff tells the daemon to check for updates to the host and send the result to the server
+message RequestOSUpdateDiff { }
+
+// RequestCurrentDaemonVersion tells the daemon to check the current daemon version and send it to the server
+message RequestCurrentDaemonVersion { }

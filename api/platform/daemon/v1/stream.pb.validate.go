@@ -181,6 +181,47 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_CurrentDaemonVersion:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetCurrentDaemonVersion()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "CurrentDaemonVersion",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "CurrentDaemonVersion",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetCurrentDaemonVersion()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "CurrentDaemonVersion",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -409,7 +450,7 @@ func (m *ServerMessage) validate(all bool) error {
 			}
 		}
 
-	case *ServerMessage_CheckOsUpdateDiff:
+	case *ServerMessage_RequestOsUpdateDiff:
 		if v == nil {
 			err := ServerMessageValidationError{
 				field:  "Message",
@@ -422,11 +463,11 @@ func (m *ServerMessage) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetCheckOsUpdateDiff()).(type) {
+			switch v := interface{}(m.GetRequestOsUpdateDiff()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, ServerMessageValidationError{
-						field:  "CheckOsUpdateDiff",
+						field:  "RequestOsUpdateDiff",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -434,16 +475,57 @@ func (m *ServerMessage) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, ServerMessageValidationError{
-						field:  "CheckOsUpdateDiff",
+						field:  "RequestOsUpdateDiff",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetCheckOsUpdateDiff()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetRequestOsUpdateDiff()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
-					field:  "CheckOsUpdateDiff",
+					field:  "RequestOsUpdateDiff",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_RequestCurrentDaemonVersion:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRequestCurrentDaemonVersion()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RequestCurrentDaemonVersion",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RequestCurrentDaemonVersion",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRequestCurrentDaemonVersion()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "RequestCurrentDaemonVersion",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -832,6 +914,110 @@ var _ interface {
 	ErrorName() string
 } = OSUpdateDiffValidationError{}
 
+// Validate checks the field values on CurrentDaemonVersion with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CurrentDaemonVersion) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CurrentDaemonVersion with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CurrentDaemonVersionMultiError, or nil if none found.
+func (m *CurrentDaemonVersion) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CurrentDaemonVersion) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return CurrentDaemonVersionMultiError(errors)
+	}
+
+	return nil
+}
+
+// CurrentDaemonVersionMultiError is an error wrapping multiple validation
+// errors returned by CurrentDaemonVersion.ValidateAll() if the designated
+// constraints aren't met.
+type CurrentDaemonVersionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CurrentDaemonVersionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CurrentDaemonVersionMultiError) AllErrors() []error { return m }
+
+// CurrentDaemonVersionValidationError is the validation error returned by
+// CurrentDaemonVersion.Validate if the designated constraints aren't met.
+type CurrentDaemonVersionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CurrentDaemonVersionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CurrentDaemonVersionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CurrentDaemonVersionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CurrentDaemonVersionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CurrentDaemonVersionValidationError) ErrorName() string {
+	return "CurrentDaemonVersionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CurrentDaemonVersionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCurrentDaemonVersion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CurrentDaemonVersionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CurrentDaemonVersionValidationError{}
+
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -1032,22 +1218,22 @@ var _ interface {
 	ErrorName() string
 } = RestartCommandValidationError{}
 
-// Validate checks the field values on CheckOSUpdateDiff with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *CheckOSUpdateDiff) Validate() error {
+// Validate checks the field values on RequestOSUpdateDiff with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RequestOSUpdateDiff) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on CheckOSUpdateDiff with the rules
+// ValidateAll checks the field values on RequestOSUpdateDiff with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// CheckOSUpdateDiffMultiError, or nil if none found.
-func (m *CheckOSUpdateDiff) ValidateAll() error {
+// RequestOSUpdateDiffMultiError, or nil if none found.
+func (m *RequestOSUpdateDiff) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *CheckOSUpdateDiff) validate(all bool) error {
+func (m *RequestOSUpdateDiff) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1055,19 +1241,19 @@ func (m *CheckOSUpdateDiff) validate(all bool) error {
 	var errors []error
 
 	if len(errors) > 0 {
-		return CheckOSUpdateDiffMultiError(errors)
+		return RequestOSUpdateDiffMultiError(errors)
 	}
 
 	return nil
 }
 
-// CheckOSUpdateDiffMultiError is an error wrapping multiple validation errors
-// returned by CheckOSUpdateDiff.ValidateAll() if the designated constraints
-// aren't met.
-type CheckOSUpdateDiffMultiError []error
+// RequestOSUpdateDiffMultiError is an error wrapping multiple validation
+// errors returned by RequestOSUpdateDiff.ValidateAll() if the designated
+// constraints aren't met.
+type RequestOSUpdateDiffMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m CheckOSUpdateDiffMultiError) Error() string {
+func (m RequestOSUpdateDiffMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1076,11 +1262,11 @@ func (m CheckOSUpdateDiffMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m CheckOSUpdateDiffMultiError) AllErrors() []error { return m }
+func (m RequestOSUpdateDiffMultiError) AllErrors() []error { return m }
 
-// CheckOSUpdateDiffValidationError is the validation error returned by
-// CheckOSUpdateDiff.Validate if the designated constraints aren't met.
-type CheckOSUpdateDiffValidationError struct {
+// RequestOSUpdateDiffValidationError is the validation error returned by
+// RequestOSUpdateDiff.Validate if the designated constraints aren't met.
+type RequestOSUpdateDiffValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1088,24 +1274,24 @@ type CheckOSUpdateDiffValidationError struct {
 }
 
 // Field function returns field value.
-func (e CheckOSUpdateDiffValidationError) Field() string { return e.field }
+func (e RequestOSUpdateDiffValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e CheckOSUpdateDiffValidationError) Reason() string { return e.reason }
+func (e RequestOSUpdateDiffValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e CheckOSUpdateDiffValidationError) Cause() error { return e.cause }
+func (e RequestOSUpdateDiffValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e CheckOSUpdateDiffValidationError) Key() bool { return e.key }
+func (e RequestOSUpdateDiffValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e CheckOSUpdateDiffValidationError) ErrorName() string {
-	return "CheckOSUpdateDiffValidationError"
+func (e RequestOSUpdateDiffValidationError) ErrorName() string {
+	return "RequestOSUpdateDiffValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e CheckOSUpdateDiffValidationError) Error() string {
+func (e RequestOSUpdateDiffValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1117,14 +1303,14 @@ func (e CheckOSUpdateDiffValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sCheckOSUpdateDiff.%s: %s%s",
+		"invalid %sRequestOSUpdateDiff.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = CheckOSUpdateDiffValidationError{}
+var _ error = RequestOSUpdateDiffValidationError{}
 
 var _ interface {
 	Field() string
@@ -1132,4 +1318,107 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = CheckOSUpdateDiffValidationError{}
+} = RequestOSUpdateDiffValidationError{}
+
+// Validate checks the field values on RequestCurrentDaemonVersion with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RequestCurrentDaemonVersion) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RequestCurrentDaemonVersion with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RequestCurrentDaemonVersionMultiError, or nil if none found.
+func (m *RequestCurrentDaemonVersion) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RequestCurrentDaemonVersion) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return RequestCurrentDaemonVersionMultiError(errors)
+	}
+
+	return nil
+}
+
+// RequestCurrentDaemonVersionMultiError is an error wrapping multiple
+// validation errors returned by RequestCurrentDaemonVersion.ValidateAll() if
+// the designated constraints aren't met.
+type RequestCurrentDaemonVersionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RequestCurrentDaemonVersionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RequestCurrentDaemonVersionMultiError) AllErrors() []error { return m }
+
+// RequestCurrentDaemonVersionValidationError is the validation error returned
+// by RequestCurrentDaemonVersion.Validate if the designated constraints
+// aren't met.
+type RequestCurrentDaemonVersionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RequestCurrentDaemonVersionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RequestCurrentDaemonVersionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RequestCurrentDaemonVersionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RequestCurrentDaemonVersionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RequestCurrentDaemonVersionValidationError) ErrorName() string {
+	return "RequestCurrentDaemonVersionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RequestCurrentDaemonVersionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRequestCurrentDaemonVersion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RequestCurrentDaemonVersionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RequestCurrentDaemonVersionValidationError{}
