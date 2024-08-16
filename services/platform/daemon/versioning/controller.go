@@ -74,8 +74,6 @@ func (c controller) GetOSVersionDiff(ctx context.Context, logger chassis.Logger)
 		err    error
 	)
 
-	return "hello world", nil
-
 	cmd = exec.Command("nix-channel", "--update")
 	_, err = execute.Execute(ctx, cmd)
 	if err != nil {
