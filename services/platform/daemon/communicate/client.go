@@ -11,6 +11,7 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	"github.com/home-cloud-io/core/services/platform/daemon/execute"
+	"github.com/home-cloud-io/core/services/platform/daemon/versioning"
 
 	"connectrpc.com/connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -24,8 +25,9 @@ type (
 		Send(*v1.DaemonMessage) error
 	}
 	client struct {
-		logger chassis.Logger
-		stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
+		logger   chassis.Logger
+		stream   *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
+		versions versioning.Controller
 	}
 )
 
@@ -39,7 +41,8 @@ var (
 
 func NewClient(logger chassis.Logger) Client {
 	clientSingleton = &client{
-		logger: logger,
+		logger:   logger,
+		versions: versioning.NewController(),
 	}
 	return clientSingleton
 }
@@ -101,6 +104,38 @@ func (c *client) listen(ctx context.Context) error {
 			}
 		case *v1.ServerMessage_Heartbeat:
 			c.logger.Debug("heartbeat received")
+		case *v1.ServerMessage_RequestOsUpdateDiff:
+			osUpdateDiff, err := c.versions.GetOSVersionDiff(ctx, c.logger)
+			if err != nil {
+				c.logger.WithError(err).Error("failed to get os version diff")
+			} else {
+				err := c.stream.Send(&v1.DaemonMessage{
+					Message: &v1.DaemonMessage_OsUpdateDiff{
+						OsUpdateDiff: &v1.OSUpdateDiff{
+							Description: osUpdateDiff,
+						},
+					},
+				})
+				if err != nil {
+					c.logger.WithError(err).Error("failed to send os update diff to server")
+				}
+			}
+		case *v1.ServerMessage_RequestCurrentDaemonVersion:
+			daemonVersion, err := c.versions.GetDaemonVersion(c.logger)
+			if err != nil {
+				c.logger.WithError(err).Error("failed to get current daemon version")
+			} else {
+				err := c.stream.Send(&v1.DaemonMessage{
+					Message: &v1.DaemonMessage_CurrentDaemonVersion{
+						CurrentDaemonVersion: &v1.CurrentDaemonVersion{
+							Version: daemonVersion,
+						},
+					},
+				})
+				if err != nil {
+					c.logger.WithError(err).Error("failed to send current daemon version to server")
+				}
+			}
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
