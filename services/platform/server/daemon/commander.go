@@ -14,6 +14,8 @@ type (
 
 		ShutdownHost() error
 		RestartHost() error
+		RequestOSUpdateDiff() error
+		RequestCurrentDaemonVersion() error
 	}
 
 	commander struct {
@@ -55,5 +57,17 @@ func (c *commander) ShutdownHost() error {
 func (c *commander) RestartHost() error {
 	return c.stream.Send(&v1.ServerMessage{
 		Message: &v1.ServerMessage_Restart{},
+	})
+}
+
+func (c *commander) RequestOSUpdateDiff() error {
+	return c.stream.Send(&v1.ServerMessage{
+		Message: &v1.ServerMessage_RequestOsUpdateDiff{},
+	})
+}
+
+func (c *commander) RequestCurrentDaemonVersion() error {
+	return c.stream.Send(&v1.ServerMessage{
+		Message: &v1.ServerMessage_RequestCurrentDaemonVersion{},
 	})
 }

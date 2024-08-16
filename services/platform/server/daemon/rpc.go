@@ -19,13 +19,15 @@ type (
 	rpc struct {
 		logger    chassis.Logger
 		commander Commander
+		messages  chan *v1.DaemonMessage
 	}
 )
 
-func New(logger chassis.Logger) Rpc {
+func New(logger chassis.Logger, messages chan *v1.DaemonMessage) Rpc {
 	return &rpc{
 		logger:    logger,
 		commander: NewCommander(),
+		messages:  messages,
 	}
 }
 
@@ -52,6 +54,10 @@ func (h *rpc) Communicate(ctx context.Context, stream *connect.BidiStream[v1.Dae
 			h.logger.Info("shutdown alert")
 		case *v1.DaemonMessage_Heartbeat:
 			h.logger.Debug("heartbeat received")
+		case *v1.DaemonMessage_OsUpdateDiff:
+			h.messages <- message
+		case *v1.DaemonMessage_CurrentDaemonVersion:
+			h.messages <- message
 		default:
 			h.logger.WithField("message", message).Warn("unknown message type received")
 		}

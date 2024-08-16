@@ -2,7 +2,11 @@ package web
 
 import (
 	"context"
+	"fmt"
+	"strings"
+	"sync"
 
+	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
@@ -10,7 +14,11 @@ import (
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 
 	"connectrpc.com/connect"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/steady-bytes/draft/pkg/chassis"
+	"golang.org/x/mod/semver"
 )
 
 type (
@@ -20,15 +28,23 @@ type (
 	}
 
 	rpc struct {
-		logger    chassis.Logger
-		k8sclient k8sclient.Client
+		logger           chassis.Logger
+		k8sclient        k8sclient.Client
+		messages         chan *dv1.DaemonMessage
+		systemUpdateLock sync.Mutex
 	}
 )
 
-func New(logger chassis.Logger) Rpc {
+const (
+	daemonRepoPath = "services/platform/daemon/"
+)
+
+func New(logger chassis.Logger, messages chan *dv1.DaemonMessage) Rpc {
 	return &rpc{
-		logger:    logger,
-		k8sclient: k8sclient.NewClient(logger),
+		logger:           logger,
+		k8sclient:        k8sclient.NewClient(logger),
+		messages:         messages,
+		systemUpdateLock: sync.Mutex{},
 	}
 }
 
@@ -101,4 +117,105 @@ func (h *rpc) UpdateApp(ctx context.Context, request *connect.Request[v1.UpdateA
 	}
 	h.logger.Info("finished request")
 	return connect.NewResponse(&v1.UpdateAppResponse{}), nil
+}
+
+func (h *rpc) CheckForSystemUpdates(ctx context.Context, request *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error) {
+	h.logger.Info("check for system updates request")
+	if !h.systemUpdateLock.TryLock() {
+		h.logger.Warn("call to check for system updates while another check is already in progress")
+		return nil, fmt.Errorf("system update check already in progress")
+	}
+	defer h.systemUpdateLock.Unlock()
+
+	var (
+		response = &v1.CheckForSystemUpdatesResponse{}
+	)
+
+	// get the os update diff from the daemon
+	commander := daemon.GetCommander()
+	err := commander.RequestOSUpdateDiff()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		msg := <-h.messages
+		switch msg.Message.(type) {
+		case *dv1.DaemonMessage_OsUpdateDiff:
+			m := msg.Message.(*dv1.DaemonMessage_OsUpdateDiff)
+			response.OsDiff = m.OsUpdateDiff.Description
+		default:
+			h.logger.WithField("message", msg).Warn("unrequested message type received")
+		}
+		if response.OsDiff != "" {
+			break
+		}
+	}
+
+	// get the current daemon version from the daemon
+	err = commander.RequestCurrentDaemonVersion()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		msg := <-h.messages
+		switch msg.Message.(type) {
+		case *dv1.DaemonMessage_CurrentDaemonVersion:
+			m := msg.Message.(*dv1.DaemonMessage_CurrentDaemonVersion)
+			response.DaemonVersions = &v1.DaemonVersions{
+				Current: m.CurrentDaemonVersion.Version,
+			}
+		default:
+			h.logger.WithField("message", msg).Warn("unrequested message type received")
+		}
+		if response.DaemonVersions != nil {
+			break
+		}
+	}
+
+	// get latest available daemon version
+	latest, err := getLatestDaemonVersion()
+	if err != nil {
+		return nil, err
+	}
+	response.DaemonVersions.Latest = latest
+
+	return connect.NewResponse(response), nil
+}
+
+// helpers
+
+func getLatestDaemonVersion() (string, error) {
+	// clone repo
+	repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
+		URL:           "https://github.com/home-cloud-io/core",
+		ReferenceName: "main",
+		SingleBranch:  true,
+		Depth:         1,
+		Tags:          git.AllTags,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	// pull out daemon versions from tags
+	iter, err := repo.TagObjects()
+	if err != nil {
+		return "", err
+	}
+	versions := []string{}
+	err = iter.ForEach(func(tag *object.Tag) error {
+		if strings.HasPrefix(tag.Name, daemonRepoPath) {
+			versions = append(versions, strings.TrimPrefix(tag.Name, daemonRepoPath))
+		}
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	// sort versions by semver
+	semver.Sort(versions)
+
+	// grab latest
+	return versions[len(versions)-1], nil
 }
