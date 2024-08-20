@@ -3,7 +3,6 @@ package web
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
@@ -14,11 +13,7 @@ import (
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 
 	"connectrpc.com/connect"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/steady-bytes/draft/pkg/chassis"
-	"golang.org/x/mod/semver"
 )
 
 type (
@@ -182,45 +177,20 @@ func (h *rpc) CheckForSystemUpdates(ctx context.Context, request *connect.Reques
 	return connect.NewResponse(response), nil
 }
 
-// helpers
-
-func getLatestDaemonVersion() (string, error) {
-	// clone repo
-	repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
-		URL:           "https://github.com/home-cloud-io/core",
-		ReferenceName: "main",
-		SingleBranch:  true,
-		Depth:         1,
-		Tags:          git.AllTags,
-	})
+func (h *rpc) CheckForContainerUpdates(ctx context.Context, request *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error) {
+	images, err := h.k8sclient.CurrentContainerVersions(ctx)
 	if err != nil {
-		return "", err
+		h.logger.WithError(err).Error("failed to get current container versions")
+		return nil, err
 	}
 
-	// pull out daemon versions from tags
-	iter, err := repo.Tags()
+	images, err = getLatestImageTags(ctx, images)
 	if err != nil {
-		return "", err
-	}
-	versions := []string{}
-	err = iter.ForEach(func(tag *plumbing.Reference) error {
-		name := tag.Name().String()
-		if strings.HasPrefix(name, daemonTagPath) {
-			versions = append(versions, strings.TrimPrefix(name, daemonTagPath))
-		}
-		return nil
-	})
-	if err != nil {
-		return "", err
+		h.logger.WithError(err).Error("failed to get latest image versions")
+		return nil, err
 	}
 
-	if len(versions) == 0 {
-		return "", fmt.Errorf("no versions found")
-	}
-
-	// sort versions by semver
-	semver.Sort(versions)
-
-	// grab latest
-	return versions[len(versions)-1], nil
+	return connect.NewResponse(&v1.CheckForContainerUpdatesResponse{
+		ImageVersions: images,
+	}), err
 }
