@@ -501,3 +501,120 @@ export class DaemonVersions extends Message<DaemonVersions> {
   }
 }
 
+/**
+ * @generated from message platform.server.v1.CheckForContainerUpdatesRequest
+ */
+export class CheckForContainerUpdatesRequest extends Message<CheckForContainerUpdatesRequest> {
+  constructor(data?: PartialMessage<CheckForContainerUpdatesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.CheckForContainerUpdatesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckForContainerUpdatesRequest {
+    return new CheckForContainerUpdatesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckForContainerUpdatesRequest {
+    return new CheckForContainerUpdatesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckForContainerUpdatesRequest {
+    return new CheckForContainerUpdatesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CheckForContainerUpdatesRequest | PlainMessage<CheckForContainerUpdatesRequest> | undefined, b: CheckForContainerUpdatesRequest | PlainMessage<CheckForContainerUpdatesRequest> | undefined): boolean {
+    return proto3.util.equals(CheckForContainerUpdatesRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.CheckForContainerUpdatesResponse
+ */
+export class CheckForContainerUpdatesResponse extends Message<CheckForContainerUpdatesResponse> {
+  /**
+   * @generated from field: repeated platform.server.v1.ImageVersion image_versions = 1;
+   */
+  imageVersions: ImageVersion[] = [];
+
+  constructor(data?: PartialMessage<CheckForContainerUpdatesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.CheckForContainerUpdatesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "image_versions", kind: "message", T: ImageVersion, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckForContainerUpdatesResponse {
+    return new CheckForContainerUpdatesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CheckForContainerUpdatesResponse {
+    return new CheckForContainerUpdatesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CheckForContainerUpdatesResponse {
+    return new CheckForContainerUpdatesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CheckForContainerUpdatesResponse | PlainMessage<CheckForContainerUpdatesResponse> | undefined, b: CheckForContainerUpdatesResponse | PlainMessage<CheckForContainerUpdatesResponse> | undefined): boolean {
+    return proto3.util.equals(CheckForContainerUpdatesResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.ImageVersion
+ */
+export class ImageVersion extends Message<ImageVersion> {
+  /**
+   * @generated from field: string image = 1;
+   */
+  image = "";
+
+  /**
+   * @generated from field: string current = 2;
+   */
+  current = "";
+
+  /**
+   * @generated from field: string latest = 3;
+   */
+  latest = "";
+
+  constructor(data?: PartialMessage<ImageVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.ImageVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "current", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "latest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ImageVersion {
+    return new ImageVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ImageVersion {
+    return new ImageVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ImageVersion {
+    return new ImageVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ImageVersion | PlainMessage<ImageVersion> | undefined, b: ImageVersion | PlainMessage<ImageVersion> | undefined): boolean {
+    return proto3.util.equals(ImageVersion, a, b);
+  }
+}
+

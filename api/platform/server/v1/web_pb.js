@@ -129,3 +129,33 @@ export const DaemonVersions = proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.server.v1.CheckForContainerUpdatesRequest
+ */
+export const CheckForContainerUpdatesRequest = proto3.makeMessageType(
+  "platform.server.v1.CheckForContainerUpdatesRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.CheckForContainerUpdatesResponse
+ */
+export const CheckForContainerUpdatesResponse = proto3.makeMessageType(
+  "platform.server.v1.CheckForContainerUpdatesResponse",
+  () => [
+    { no: 1, name: "image_versions", kind: "message", T: ImageVersion, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.ImageVersion
+ */
+export const ImageVersion = proto3.makeMessageType(
+  "platform.server.v1.ImageVersion",
+  () => [
+    { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "current", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "latest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+

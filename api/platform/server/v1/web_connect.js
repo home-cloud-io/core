@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -64,6 +64,15 @@ export const WebService = {
       name: "CheckForSystemUpdates",
       I: CheckForSystemUpdatesRequest,
       O: CheckForSystemUpdatesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc platform.server.v1.WebService.CheckForContainerUpdates
+     */
+    checkForContainerUpdates: {
+      name: "CheckForContainerUpdates",
+      I: CheckForContainerUpdatesRequest,
+      O: CheckForContainerUpdatesResponse,
       kind: MethodKind.Unary,
     },
   }

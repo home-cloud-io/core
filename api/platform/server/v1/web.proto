@@ -11,6 +11,7 @@ service WebService {
   rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
   rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
   rpc CheckForSystemUpdates(CheckForSystemUpdatesRequest) returns (CheckForSystemUpdatesResponse) {}
+  rpc CheckForContainerUpdates(CheckForContainerUpdatesRequest) returns (CheckForContainerUpdatesResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -58,4 +59,16 @@ message CheckForSystemUpdatesResponse {
 message DaemonVersions {
   string current = 1;
   string latest = 2;
+}
+
+message CheckForContainerUpdatesRequest {}
+
+message CheckForContainerUpdatesResponse {
+  repeated ImageVersion image_versions = 1;
+}
+
+message ImageVersion {
+  string image = 1;
+  string current = 2;
+  string latest = 3;
 }
