@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
  * @generated from rpc platform.server.v1.WebService.ShutdownHost
@@ -85,6 +85,20 @@ export const checkForSystemUpdates = {
   kind: MethodKind.Unary,
   I: CheckForSystemUpdatesRequest,
   O: CheckForSystemUpdatesResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * @generated from rpc platform.server.v1.WebService.CheckForContainerUpdates
+ */
+export const checkForContainerUpdates = {
+  localName: "checkForContainerUpdates",
+  name: "CheckForContainerUpdates",
+  kind: MethodKind.Unary,
+  I: CheckForContainerUpdatesRequest,
+  O: CheckForContainerUpdatesResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

@@ -1413,3 +1413,350 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DaemonVersionsValidationError{}
+
+// Validate checks the field values on CheckForContainerUpdatesRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CheckForContainerUpdatesRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CheckForContainerUpdatesRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// CheckForContainerUpdatesRequestMultiError, or nil if none found.
+func (m *CheckForContainerUpdatesRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CheckForContainerUpdatesRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return CheckForContainerUpdatesRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// CheckForContainerUpdatesRequestMultiError is an error wrapping multiple
+// validation errors returned by CheckForContainerUpdatesRequest.ValidateAll()
+// if the designated constraints aren't met.
+type CheckForContainerUpdatesRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CheckForContainerUpdatesRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CheckForContainerUpdatesRequestMultiError) AllErrors() []error { return m }
+
+// CheckForContainerUpdatesRequestValidationError is the validation error
+// returned by CheckForContainerUpdatesRequest.Validate if the designated
+// constraints aren't met.
+type CheckForContainerUpdatesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CheckForContainerUpdatesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CheckForContainerUpdatesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CheckForContainerUpdatesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CheckForContainerUpdatesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CheckForContainerUpdatesRequestValidationError) ErrorName() string {
+	return "CheckForContainerUpdatesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CheckForContainerUpdatesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCheckForContainerUpdatesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CheckForContainerUpdatesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CheckForContainerUpdatesRequestValidationError{}
+
+// Validate checks the field values on CheckForContainerUpdatesResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *CheckForContainerUpdatesResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CheckForContainerUpdatesResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// CheckForContainerUpdatesResponseMultiError, or nil if none found.
+func (m *CheckForContainerUpdatesResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CheckForContainerUpdatesResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetImageVersions() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, CheckForContainerUpdatesResponseValidationError{
+						field:  fmt.Sprintf("ImageVersions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, CheckForContainerUpdatesResponseValidationError{
+						field:  fmt.Sprintf("ImageVersions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CheckForContainerUpdatesResponseValidationError{
+					field:  fmt.Sprintf("ImageVersions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return CheckForContainerUpdatesResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// CheckForContainerUpdatesResponseMultiError is an error wrapping multiple
+// validation errors returned by
+// CheckForContainerUpdatesResponse.ValidateAll() if the designated
+// constraints aren't met.
+type CheckForContainerUpdatesResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CheckForContainerUpdatesResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CheckForContainerUpdatesResponseMultiError) AllErrors() []error { return m }
+
+// CheckForContainerUpdatesResponseValidationError is the validation error
+// returned by CheckForContainerUpdatesResponse.Validate if the designated
+// constraints aren't met.
+type CheckForContainerUpdatesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CheckForContainerUpdatesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CheckForContainerUpdatesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CheckForContainerUpdatesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CheckForContainerUpdatesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CheckForContainerUpdatesResponseValidationError) ErrorName() string {
+	return "CheckForContainerUpdatesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CheckForContainerUpdatesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCheckForContainerUpdatesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CheckForContainerUpdatesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CheckForContainerUpdatesResponseValidationError{}
+
+// Validate checks the field values on ImageVersion with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ImageVersion) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ImageVersion with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ImageVersionMultiError, or
+// nil if none found.
+func (m *ImageVersion) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ImageVersion) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Image
+
+	// no validation rules for Current
+
+	// no validation rules for Latest
+
+	if len(errors) > 0 {
+		return ImageVersionMultiError(errors)
+	}
+
+	return nil
+}
+
+// ImageVersionMultiError is an error wrapping multiple validation errors
+// returned by ImageVersion.ValidateAll() if the designated constraints aren't met.
+type ImageVersionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ImageVersionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ImageVersionMultiError) AllErrors() []error { return m }
+
+// ImageVersionValidationError is the validation error returned by
+// ImageVersion.Validate if the designated constraints aren't met.
+type ImageVersionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ImageVersionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ImageVersionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ImageVersionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ImageVersionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ImageVersionValidationError) ErrorName() string { return "ImageVersionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ImageVersionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sImageVersion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ImageVersionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ImageVersionValidationError{}
