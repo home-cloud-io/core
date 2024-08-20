@@ -1,6 +1,6 @@
 module github.com/home-cloud-io/core/services/platform/daemon
 
-go 1.22.3
+go 1.22.5
 
 // replace github.com/home-cloud-io/core/api => ../../../api
 
@@ -8,10 +8,11 @@ go 1.22.3
 
 require (
 	connectrpc.com/connect v1.16.2
-	github.com/home-cloud-io/core/api v0.2.1
+	github.com/home-cloud-io/core/api v0.3.3
 	github.com/spf13/viper v1.18.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0
 	github.com/steady-bytes/draft/pkg/loggers v0.1.0
+	golang.org/x/mod v0.13.0
 	golang.org/x/net v0.25.0
 	golang.org/x/sync v0.7.0
 )
