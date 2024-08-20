@@ -21,6 +21,7 @@ type (
 
 		IsDeviceSetup(ctx context.Context) (bool, error)
 		InitializeDevice(ctx context.Context, settings *v1.DeviceSettings) (string, error)
+		Login(ctx context.Context, username, password string) (string, error)
 	}
 
 	controller struct {
@@ -102,4 +103,47 @@ func buildSetRequest(key string, value proto.Message) (*connect.Request[kvv1.Set
 	}
 
 	return connect.NewRequest(set), nil
+}
+
+func buildGetRequest(key string, value proto.Message) (*connect.Request[kvv1.GetRequest], error) {
+	pb, err := anypb.New(value)
+	if err != nil {
+		return nil, errors.New(ErrFailedToCreateSettings)
+	}
+
+	get := &kvv1.GetRequest{
+		Key:   key,
+		Value: pb,
+	}
+
+	return connect.NewRequest(get), nil
+}
+
+func (c *controller) Login(ctx context.Context, username, password string) (string, error) {
+	settings := &v1.DeviceSettings{}
+	req, err := buildGetRequest(DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	val, err := c.KeyValueServiceClient.Get(ctx, req)
+	if err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	if val.Msg.GetValue() == nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	if err := val.Msg.GetValue().UnmarshalTo(settings); err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	if settings.AdminUser.Password != password || settings.AdminUser.Username != username {
+		return "", errors.New("invalid username or password")
+	}
+
+	// TODO: forge token
+
+	return "JWT_TOKEN", nil
 }

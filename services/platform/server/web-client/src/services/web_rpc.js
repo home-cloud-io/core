@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { createConnectTransport } from '@connectrpc/connect-web';
 import { createPromiseClient } from '@connectrpc/connect';
 import { WebService } from 'api/platform/server/v1/web_connect';
+import { setUserSettings } from './user_slice';
 
 let BASE_URL = '';
 
@@ -23,27 +24,27 @@ export const serverRPCService = createApi({
   endpoints: (builder) => ({
     // TODO: Update the main page to use these function instead of the direct calls
     shutdownHost: builder.mutation({
-      mutation: async () => {
+      queryFn: async () => {
         return client.shutdownHost({});
       },
     }),
     restartHost: builder.mutation({
-      mutation: async () => {
+      queryFn: async () => {
         return client.restartHost({});
       },
     }),
     installApp: builder.mutation({
-      mutation: async (req) => {
+      queryFn: async (req) => {
         return client.installApp(req);
       },
     }),
     deleteApp: builder.mutation({
-      mutation: async (req) => {
+      queryFn: async (req) => {
         return client.deleteApp(req);
       },
     }),
     updateApp: builder.mutation({
-      mutation: async (req) => {
+      queryFn: async (req) => {
         return client.updateApp(req);
       },
     }),
@@ -54,6 +55,41 @@ export const serverRPCService = createApi({
         return { data: { isDeviceSetup: res.setup }}
       },
     }),
+    initDevice: builder.mutation({
+      queryFn: async (req, store) => {
+        let request = {
+          username: store.getState().server.username,
+          password: store.getState().server.password,
+          timezone: store.getState().server.timezone,
+        }
+
+        if (store.getState().server.autoUpdateApps === "true") {
+          request.auto_update_apps = true;
+        } else {
+          request.auto_update_apps = false;
+        }
+
+        if (store.getState().server.autoUpdateOs === "true") {
+          request.auto_update_os = true;
+        } else {
+          request.auto_update_os = false;
+        }
+
+        const response = await client.initializeDevice(request);
+
+        return { data: { isDeviceSetup: response.setup }};
+      },
+    }),
+    login: builder.mutation({
+      queryFn: async (req, store) => {
+        
+        const response = await client.login(req);
+
+        store.dispatch(setUserSettings({ username: req.username, token: response.token }));
+      
+        return { data: { loggedIn: true }};
+      }
+    }),
   }),
 });
 
@@ -63,7 +99,10 @@ export const {
   useInstallAppMutation,
   useDeleteAppMutation,
   useUpdateAppMutation,
-  useGetIsDeviceSetupQuery } = serverRPCService;
+  useGetIsDeviceSetupQuery,
+  useInitDeviceMutation,
+  useLoginMutation
+} = serverRPCService;
 
 const values = new Map([
   [

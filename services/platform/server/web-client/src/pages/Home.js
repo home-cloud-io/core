@@ -7,7 +7,19 @@ import {
   updateApp,
 } from '../services/web_rpc';
 
+import { useSelector } from "react-redux";
+
+import Login from "./Login";
+import { useNavigate } from 'react-router-dom';
+
 export default function Home() {
+  const userSettings = useSelector((state) => state.user_settings);
+  const navigate = useNavigate();
+  
+  if (userSettings.token === "") {
+    navigate('/login');
+  }
+
   return (
     <>
       <nav className="py-2 bg-body-tertiary border-bottom">

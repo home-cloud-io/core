@@ -155,7 +155,20 @@ func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.
 }
 
 func (h *rpc) Login(ctx context.Context, request *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
-	return nil, errors.New("not implemented")
+	h.logger.Info("login request")
+
+	var msg = request.Msg
+
+	if err := msg.Validate(); err != nil {
+		return nil, errors.New(ErrInvalidInputValues)
+	}
+
+	res, err := h.controller.Login(ctx, msg.GetUsername(), msg.GetPassword())
+	if err != nil {
+		return nil, errors.New("failed to login")
+	}
+
+	return connect.NewResponse(&v1.LoginResponse{Token: res}), nil
 }
 
 func (h *rpc) GetDeviceUsageStats(ctx context.Context, request *connect.Request[v1.GetDeviceUsageStatsRequest]) (*connect.Response[v1.GetDeviceUsageStatsResponse], error) {
