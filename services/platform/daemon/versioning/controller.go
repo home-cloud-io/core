@@ -61,7 +61,7 @@ func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error
 		err    error
 	)
 
-	cmd = exec.Command("touch", "hello-world.txt")
+	cmd = exec.Command("cat", "/etc/nixos/home-cloud/daemon/default.nix")
 	_ = execute.ExecuteCommand(ctx, cmd)
 
 	logger.Info("updating nix channel")
