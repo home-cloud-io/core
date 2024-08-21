@@ -61,26 +61,32 @@ func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error
 		err    error
 	)
 
+	logger.Info("updating nix channel")
 	cmd = exec.Command("/run/current-system/sw/bin/nix-channel", "--update")
 	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nix-channel --update`")
 		return "", err
 	}
+	logger.Info("updating nix channel: DONE")
 
+	logger.Info("building updated nixos")
 	cmd = exec.Command("/run/current-system/sw/bin/nixos-rebuild", "build")
 	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nixos-rebuild build`")
 		return "", err
 	}
+	logger.Info("building updated nixos: DONE")
 
+	logger.Info("calculating system diff")
 	cmd = exec.Command("/run/current-system/sw/bin/nvd", "diff", "/run/current-system", "./result")
 	output, err = execute.ExecuteCommandReturnStdout(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nvd diff /run/current-system ./result`")
 		return "", err
 	}
+	logger.Info("calculating system diff: DONE")
 
 	return output, nil
 }
