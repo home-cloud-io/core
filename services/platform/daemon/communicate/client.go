@@ -3,6 +3,7 @@ package communicate
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"net"
 	"net/http"
 	"os/exec"
@@ -104,7 +105,7 @@ func (c *client) listen(ctx context.Context) error {
 
 func restart(ctx context.Context, logger chassis.Logger) {
 	logger.Info("restart command")
-	_, err := execute.Execute(ctx, exec.Command("reboot", "now"))
+	err := execute.ExecuteCommand(ctx, exec.Command("reboot", "now"))
 	if err != nil {
 		logger.WithError(err).Error("failed to execute restart command")
 		// TODO: send error back to server
@@ -113,7 +114,7 @@ func restart(ctx context.Context, logger chassis.Logger) {
 
 func shutdown(ctx context.Context, logger chassis.Logger) {
 	logger.Info("shutdown command")
-	_, err := execute.Execute(ctx, exec.Command("shutdown", "now"))
+	err := execute.ExecuteCommand(ctx, exec.Command("shutdown", "now"))
 	if err != nil {
 		logger.WithError(err).Error("failed to execute shutdown command")
 		// TODO: send error back to server
@@ -134,6 +135,13 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 		})
 		if err != nil {
 			c.logger.WithError(err).Error("failed to send os update diff to server")
+			c.stream.Send(&v1.DaemonMessage{
+				Message: &v1.DaemonMessage_OsUpdateDiff{
+					OsUpdateDiff: &v1.OSUpdateDiff{
+						Description: fmt.Sprintf("failed with error: %s", err.Error()),
+					},
+				},
+			})
 		}
 	}
 }
@@ -152,6 +160,13 @@ func (c *client) currentDaemonVersion() {
 		})
 		if err != nil {
 			c.logger.WithError(err).Error("failed to send current daemon version to server")
+			c.stream.Send(&v1.DaemonMessage{
+				Message: &v1.DaemonMessage_CurrentDaemonVersion{
+					CurrentDaemonVersion: &v1.CurrentDaemonVersion{
+						Version: fmt.Sprintf("failed with error: %s", err.Error()),
+					},
+				},
+			})
 		}
 	}
 }
