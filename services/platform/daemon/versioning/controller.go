@@ -84,7 +84,7 @@ func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error
 
 	logger.Info("calculating system diff")
 	cmd = exec.Command("/run/current-system/sw/bin/nvd", "diff", "/run/current-system", "./result")
-	output, err = execute.ExecuteCommandReturnStdout(ctx, cmd)
+	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nvd diff /run/current-system ./result`")
 		return "", err
