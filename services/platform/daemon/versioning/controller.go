@@ -61,6 +61,9 @@ func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error
 		err    error
 	)
 
+	cmd = exec.Command("touch", "hello-world.txt")
+	_ = execute.ExecuteCommand(ctx, cmd)
+
 	logger.Info("updating nix channel")
 	cmd = exec.Command("/run/current-system/sw/bin/nix-channel", "--update")
 	err = execute.ExecuteCommand(ctx, cmd)
