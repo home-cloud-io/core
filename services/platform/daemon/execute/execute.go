@@ -33,7 +33,7 @@ func ExecuteCommand(ctx context.Context, cmd *exec.Cmd) error {
 	scannerErr := bufio.NewScanner(cmdErrReader)
 	go func() {
 		for scannerErr.Scan() {
-			fmt.Println(scanner.Text())
+			fmt.Println(scannerErr.Text())
 		}
 	}()
 
