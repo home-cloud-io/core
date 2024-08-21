@@ -125,6 +125,13 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 	osUpdateDiff, err := versioning.GetOSVersionDiff(ctx, c.logger)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to get os version diff")
+		c.stream.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_OsUpdateDiff{
+				OsUpdateDiff: &v1.OSUpdateDiff{
+					Description: fmt.Sprintf("failed with error: %s", err.Error()),
+				},
+			},
+		})
 	} else {
 		err := c.stream.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_OsUpdateDiff{
@@ -135,13 +142,6 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 		})
 		if err != nil {
 			c.logger.WithError(err).Error("failed to send os update diff to server")
-			c.stream.Send(&v1.DaemonMessage{
-				Message: &v1.DaemonMessage_OsUpdateDiff{
-					OsUpdateDiff: &v1.OSUpdateDiff{
-						Description: fmt.Sprintf("failed with error: %s", err.Error()),
-					},
-				},
-			})
 		}
 	}
 }
@@ -150,6 +150,13 @@ func (c *client) currentDaemonVersion() {
 	daemonVersion, err := versioning.GetDaemonVersion(c.logger)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to get current daemon version")
+		c.stream.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_CurrentDaemonVersion{
+				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
+					Version: fmt.Sprintf("failed with error: %s", err.Error()),
+				},
+			},
+		})
 	} else {
 		err := c.stream.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_CurrentDaemonVersion{
@@ -160,13 +167,6 @@ func (c *client) currentDaemonVersion() {
 		})
 		if err != nil {
 			c.logger.WithError(err).Error("failed to send current daemon version to server")
-			c.stream.Send(&v1.DaemonMessage{
-				Message: &v1.DaemonMessage_CurrentDaemonVersion{
-					CurrentDaemonVersion: &v1.CurrentDaemonVersion{
-						Version: fmt.Sprintf("failed with error: %s", err.Error()),
-					},
-				},
-			})
 		}
 	}
 }
