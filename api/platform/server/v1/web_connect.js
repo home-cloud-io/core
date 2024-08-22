@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -73,6 +73,24 @@ export const WebService = {
       name: "CheckForContainerUpdates",
       I: CheckForContainerUpdatesRequest,
       O: CheckForContainerUpdatesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc platform.server.v1.WebService.ChangeDaemonVersion
+     */
+    changeDaemonVersion: {
+      name: "ChangeDaemonVersion",
+      I: ChangeDaemonVersionRequest,
+      O: ChangeDaemonVersionResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc platform.server.v1.WebService.InstallOSUpdate
+     */
+    installOSUpdate: {
+      name: "InstallOSUpdate",
+      I: InstallOSUpdateRequest,
+      O: InstallOSUpdateResponse,
       kind: MethodKind.Unary,
     },
   }

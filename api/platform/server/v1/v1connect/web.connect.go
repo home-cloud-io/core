@@ -49,6 +49,12 @@ const (
 	// WebServiceCheckForContainerUpdatesProcedure is the fully-qualified name of the WebService's
 	// CheckForContainerUpdates RPC.
 	WebServiceCheckForContainerUpdatesProcedure = "/platform.server.v1.WebService/CheckForContainerUpdates"
+	// WebServiceChangeDaemonVersionProcedure is the fully-qualified name of the WebService's
+	// ChangeDaemonVersion RPC.
+	WebServiceChangeDaemonVersionProcedure = "/platform.server.v1.WebService/ChangeDaemonVersion"
+	// WebServiceInstallOSUpdateProcedure is the fully-qualified name of the WebService's
+	// InstallOSUpdate RPC.
+	WebServiceInstallOSUpdateProcedure = "/platform.server.v1.WebService/InstallOSUpdate"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -61,6 +67,8 @@ var (
 	webServiceUpdateAppMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("UpdateApp")
 	webServiceCheckForSystemUpdatesMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("CheckForSystemUpdates")
 	webServiceCheckForContainerUpdatesMethodDescriptor = webServiceServiceDescriptor.Methods().ByName("CheckForContainerUpdates")
+	webServiceChangeDaemonVersionMethodDescriptor      = webServiceServiceDescriptor.Methods().ByName("ChangeDaemonVersion")
+	webServiceInstallOSUpdateMethodDescriptor          = webServiceServiceDescriptor.Methods().ByName("InstallOSUpdate")
 )
 
 // WebServiceClient is a client for the platform.server.v1.WebService service.
@@ -72,6 +80,8 @@ type WebServiceClient interface {
 	UpdateApp(context.Context, *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error)
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
+	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
+	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
 }
 
 // NewWebServiceClient constructs a client for the platform.server.v1.WebService service. By
@@ -126,6 +136,18 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceCheckForContainerUpdatesMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		changeDaemonVersion: connect.NewClient[v1.ChangeDaemonVersionRequest, v1.ChangeDaemonVersionResponse](
+			httpClient,
+			baseURL+WebServiceChangeDaemonVersionProcedure,
+			connect.WithSchema(webServiceChangeDaemonVersionMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		installOSUpdate: connect.NewClient[v1.InstallOSUpdateRequest, v1.InstallOSUpdateResponse](
+			httpClient,
+			baseURL+WebServiceInstallOSUpdateProcedure,
+			connect.WithSchema(webServiceInstallOSUpdateMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -138,6 +160,8 @@ type webServiceClient struct {
 	updateApp                *connect.Client[v1.UpdateAppRequest, v1.UpdateAppResponse]
 	checkForSystemUpdates    *connect.Client[v1.CheckForSystemUpdatesRequest, v1.CheckForSystemUpdatesResponse]
 	checkForContainerUpdates *connect.Client[v1.CheckForContainerUpdatesRequest, v1.CheckForContainerUpdatesResponse]
+	changeDaemonVersion      *connect.Client[v1.ChangeDaemonVersionRequest, v1.ChangeDaemonVersionResponse]
+	installOSUpdate          *connect.Client[v1.InstallOSUpdateRequest, v1.InstallOSUpdateResponse]
 }
 
 // ShutdownHost calls platform.server.v1.WebService.ShutdownHost.
@@ -175,6 +199,16 @@ func (c *webServiceClient) CheckForContainerUpdates(ctx context.Context, req *co
 	return c.checkForContainerUpdates.CallUnary(ctx, req)
 }
 
+// ChangeDaemonVersion calls platform.server.v1.WebService.ChangeDaemonVersion.
+func (c *webServiceClient) ChangeDaemonVersion(ctx context.Context, req *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
+	return c.changeDaemonVersion.CallUnary(ctx, req)
+}
+
+// InstallOSUpdate calls platform.server.v1.WebService.InstallOSUpdate.
+func (c *webServiceClient) InstallOSUpdate(ctx context.Context, req *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
+	return c.installOSUpdate.CallUnary(ctx, req)
+}
+
 // WebServiceHandler is an implementation of the platform.server.v1.WebService service.
 type WebServiceHandler interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
@@ -184,6 +218,8 @@ type WebServiceHandler interface {
 	UpdateApp(context.Context, *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error)
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
+	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
+	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
 }
 
 // NewWebServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -234,6 +270,18 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceCheckForContainerUpdatesMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceChangeDaemonVersionHandler := connect.NewUnaryHandler(
+		WebServiceChangeDaemonVersionProcedure,
+		svc.ChangeDaemonVersion,
+		connect.WithSchema(webServiceChangeDaemonVersionMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	webServiceInstallOSUpdateHandler := connect.NewUnaryHandler(
+		WebServiceInstallOSUpdateProcedure,
+		svc.InstallOSUpdate,
+		connect.WithSchema(webServiceInstallOSUpdateMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.server.v1.WebService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case WebServiceShutdownHostProcedure:
@@ -250,6 +298,10 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceCheckForSystemUpdatesHandler.ServeHTTP(w, r)
 		case WebServiceCheckForContainerUpdatesProcedure:
 			webServiceCheckForContainerUpdatesHandler.ServeHTTP(w, r)
+		case WebServiceChangeDaemonVersionProcedure:
+			webServiceChangeDaemonVersionHandler.ServeHTTP(w, r)
+		case WebServiceInstallOSUpdateProcedure:
+			webServiceInstallOSUpdateHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -285,4 +337,12 @@ func (UnimplementedWebServiceHandler) CheckForSystemUpdates(context.Context, *co
 
 func (UnimplementedWebServiceHandler) CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.CheckForContainerUpdates is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.ChangeDaemonVersion is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.InstallOSUpdate is not implemented"))
 }

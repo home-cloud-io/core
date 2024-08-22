@@ -141,6 +141,8 @@ type ServerMessage struct {
 	//	*ServerMessage_Restart
 	//	*ServerMessage_RequestOsUpdateDiff
 	//	*ServerMessage_RequestCurrentDaemonVersion
+	//	*ServerMessage_ChangeDaemonVersionCommand
+	//	*ServerMessage_InstallOsUpdateCommand
 	Message isServerMessage_Message `protobuf_oneof:"message"`
 }
 
@@ -218,6 +220,20 @@ func (x *ServerMessage) GetRequestCurrentDaemonVersion() *RequestCurrentDaemonVe
 	return nil
 }
 
+func (x *ServerMessage) GetChangeDaemonVersionCommand() *ChangeDaemonVersionCommand {
+	if x, ok := x.GetMessage().(*ServerMessage_ChangeDaemonVersionCommand); ok {
+		return x.ChangeDaemonVersionCommand
+	}
+	return nil
+}
+
+func (x *ServerMessage) GetInstallOsUpdateCommand() *InstallOSUpdateCommand {
+	if x, ok := x.GetMessage().(*ServerMessage_InstallOsUpdateCommand); ok {
+		return x.InstallOsUpdateCommand
+	}
+	return nil
+}
+
 type isServerMessage_Message interface {
 	isServerMessage_Message()
 }
@@ -242,6 +258,14 @@ type ServerMessage_RequestCurrentDaemonVersion struct {
 	RequestCurrentDaemonVersion *RequestCurrentDaemonVersion `protobuf:"bytes,5,opt,name=request_current_daemon_version,json=requestCurrentDaemonVersion,proto3,oneof" bun:"request_current_daemon_version" csv:"request_current_daemon_version" json:"request_current_daemon_version" pg:"request_current_daemon_version" yaml:"request_current_daemon_version"`
 }
 
+type ServerMessage_ChangeDaemonVersionCommand struct {
+	ChangeDaemonVersionCommand *ChangeDaemonVersionCommand `protobuf:"bytes,6,opt,name=change_daemon_version_command,json=changeDaemonVersionCommand,proto3,oneof" bun:"change_daemon_version_command" csv:"change_daemon_version_command" json:"change_daemon_version_command" pg:"change_daemon_version_command" yaml:"change_daemon_version_command"`
+}
+
+type ServerMessage_InstallOsUpdateCommand struct {
+	InstallOsUpdateCommand *InstallOSUpdateCommand `protobuf:"bytes,7,opt,name=install_os_update_command,json=installOsUpdateCommand,proto3,oneof" bun:"install_os_update_command" csv:"install_os_update_command" json:"install_os_update_command" pg:"install_os_update_command" yaml:"install_os_update_command"`
+}
+
 func (*ServerMessage_Heartbeat) isServerMessage_Message() {}
 
 func (*ServerMessage_Shutdown) isServerMessage_Message() {}
@@ -251,6 +275,10 @@ func (*ServerMessage_Restart) isServerMessage_Message() {}
 func (*ServerMessage_RequestOsUpdateDiff) isServerMessage_Message() {}
 
 func (*ServerMessage_RequestCurrentDaemonVersion) isServerMessage_Message() {}
+
+func (*ServerMessage_ChangeDaemonVersionCommand) isServerMessage_Message() {}
+
+func (*ServerMessage_InstallOsUpdateCommand) isServerMessage_Message() {}
 
 type Heartbeat struct {
 	state         protoimpl.MessageState
@@ -335,7 +363,8 @@ type OSUpdateDiff struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description" bun:"description" csv:"description" pg:"description" yaml:"description"`
+	Description string       `protobuf:"bytes,1,opt,name=description,proto3" json:"description" bun:"description" csv:"description" pg:"description" yaml:"description"`
+	Error       *DaemonError `protobuf:"bytes,16,opt,name=error,proto3" json:"error" bun:"error" csv:"error" pg:"error" yaml:"error"`
 }
 
 func (x *OSUpdateDiff) Reset() {
@@ -377,13 +406,21 @@ func (x *OSUpdateDiff) GetDescription() string {
 	return ""
 }
 
+func (x *OSUpdateDiff) GetError() *DaemonError {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
 // CurrentDaemonVersion is the current daemon version
 type CurrentDaemonVersion struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Version string `protobuf:"bytes,1,opt,name=version,proto3" json:"version" bun:"version" csv:"version" pg:"version" yaml:"version"`
+	Version string       `protobuf:"bytes,1,opt,name=version,proto3" json:"version" bun:"version" csv:"version" pg:"version" yaml:"version"`
+	Error   *DaemonError `protobuf:"bytes,16,opt,name=error,proto3" json:"error" bun:"error" csv:"error" pg:"error" yaml:"error"`
 }
 
 func (x *CurrentDaemonVersion) Reset() {
@@ -425,6 +462,60 @@ func (x *CurrentDaemonVersion) GetVersion() string {
 	return ""
 }
 
+func (x *CurrentDaemonVersion) GetError() *DaemonError {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type DaemonError struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Error string `protobuf:"bytes,1,opt,name=error,proto3" json:"error" bun:"error" csv:"error" pg:"error" yaml:"error"`
+}
+
+func (x *DaemonError) Reset() {
+	*x = DaemonError{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_daemon_v1_stream_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DaemonError) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DaemonError) ProtoMessage() {}
+
+func (x *DaemonError) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_daemon_v1_stream_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DaemonError.ProtoReflect.Descriptor instead.
+func (*DaemonError) Descriptor() ([]byte, []int) {
+	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *DaemonError) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
 // ShutdownCommand tells the daemon to shutdown the host
 type ShutdownCommand struct {
 	state         protoimpl.MessageState
@@ -435,7 +526,7 @@ type ShutdownCommand struct {
 func (x *ShutdownCommand) Reset() {
 	*x = ShutdownCommand{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_daemon_v1_stream_proto_msgTypes[6]
+		mi := &file_platform_daemon_v1_stream_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -448,7 +539,7 @@ func (x *ShutdownCommand) String() string {
 func (*ShutdownCommand) ProtoMessage() {}
 
 func (x *ShutdownCommand) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_daemon_v1_stream_proto_msgTypes[6]
+	mi := &file_platform_daemon_v1_stream_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -461,7 +552,7 @@ func (x *ShutdownCommand) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShutdownCommand.ProtoReflect.Descriptor instead.
 func (*ShutdownCommand) Descriptor() ([]byte, []int) {
-	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{6}
+	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{7}
 }
 
 // RestartCommand tells the daemon to restart the host
@@ -474,7 +565,7 @@ type RestartCommand struct {
 func (x *RestartCommand) Reset() {
 	*x = RestartCommand{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_daemon_v1_stream_proto_msgTypes[7]
+		mi := &file_platform_daemon_v1_stream_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -487,7 +578,7 @@ func (x *RestartCommand) String() string {
 func (*RestartCommand) ProtoMessage() {}
 
 func (x *RestartCommand) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_daemon_v1_stream_proto_msgTypes[7]
+	mi := &file_platform_daemon_v1_stream_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -500,7 +591,7 @@ func (x *RestartCommand) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestartCommand.ProtoReflect.Descriptor instead.
 func (*RestartCommand) Descriptor() ([]byte, []int) {
-	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{7}
+	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{8}
 }
 
 // RequestOSUpdateDiff tells the daemon to check for updates to the host and send the result to the server
@@ -513,7 +604,7 @@ type RequestOSUpdateDiff struct {
 func (x *RequestOSUpdateDiff) Reset() {
 	*x = RequestOSUpdateDiff{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_daemon_v1_stream_proto_msgTypes[8]
+		mi := &file_platform_daemon_v1_stream_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -526,7 +617,7 @@ func (x *RequestOSUpdateDiff) String() string {
 func (*RequestOSUpdateDiff) ProtoMessage() {}
 
 func (x *RequestOSUpdateDiff) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_daemon_v1_stream_proto_msgTypes[8]
+	mi := &file_platform_daemon_v1_stream_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -539,7 +630,7 @@ func (x *RequestOSUpdateDiff) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestOSUpdateDiff.ProtoReflect.Descriptor instead.
 func (*RequestOSUpdateDiff) Descriptor() ([]byte, []int) {
-	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{8}
+	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{9}
 }
 
 // RequestCurrentDaemonVersion tells the daemon to check the current daemon version and send it to the server
@@ -552,7 +643,7 @@ type RequestCurrentDaemonVersion struct {
 func (x *RequestCurrentDaemonVersion) Reset() {
 	*x = RequestCurrentDaemonVersion{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_daemon_v1_stream_proto_msgTypes[9]
+		mi := &file_platform_daemon_v1_stream_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -565,7 +656,7 @@ func (x *RequestCurrentDaemonVersion) String() string {
 func (*RequestCurrentDaemonVersion) ProtoMessage() {}
 
 func (x *RequestCurrentDaemonVersion) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_daemon_v1_stream_proto_msgTypes[9]
+	mi := &file_platform_daemon_v1_stream_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -578,7 +669,108 @@ func (x *RequestCurrentDaemonVersion) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestCurrentDaemonVersion.ProtoReflect.Descriptor instead.
 func (*RequestCurrentDaemonVersion) Descriptor() ([]byte, []int) {
-	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{9}
+	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{10}
+}
+
+type ChangeDaemonVersionCommand struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Version    string `protobuf:"bytes,1,opt,name=version,proto3" json:"version" bun:"version" csv:"version" pg:"version" yaml:"version"`
+	VendorHash string `protobuf:"bytes,2,opt,name=vendor_hash,json=vendorHash,proto3" json:"vendor_hash" bun:"vendor_hash" csv:"vendor_hash" pg:"vendor_hash" yaml:"vendor_hash"`
+	SrcHash    string `protobuf:"bytes,3,opt,name=src_hash,json=srcHash,proto3" json:"src_hash" bun:"src_hash" csv:"src_hash" pg:"src_hash" yaml:"src_hash"`
+}
+
+func (x *ChangeDaemonVersionCommand) Reset() {
+	*x = ChangeDaemonVersionCommand{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_daemon_v1_stream_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChangeDaemonVersionCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangeDaemonVersionCommand) ProtoMessage() {}
+
+func (x *ChangeDaemonVersionCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_daemon_v1_stream_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangeDaemonVersionCommand.ProtoReflect.Descriptor instead.
+func (*ChangeDaemonVersionCommand) Descriptor() ([]byte, []int) {
+	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ChangeDaemonVersionCommand) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *ChangeDaemonVersionCommand) GetVendorHash() string {
+	if x != nil {
+		return x.VendorHash
+	}
+	return ""
+}
+
+func (x *ChangeDaemonVersionCommand) GetSrcHash() string {
+	if x != nil {
+		return x.SrcHash
+	}
+	return ""
+}
+
+type InstallOSUpdateCommand struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *InstallOSUpdateCommand) Reset() {
+	*x = InstallOSUpdateCommand{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_daemon_v1_stream_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *InstallOSUpdateCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InstallOSUpdateCommand) ProtoMessage() {}
+
+func (x *InstallOSUpdateCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_daemon_v1_stream_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InstallOSUpdateCommand.ProtoReflect.Descriptor instead.
+func (*InstallOSUpdateCommand) Descriptor() ([]byte, []int) {
+	return file_platform_daemon_v1_stream_proto_rawDescGZIP(), []int{12}
 }
 
 var File_platform_daemon_v1_stream_proto protoreflect.FileDescriptor
@@ -608,7 +800,7 @@ var file_platform_daemon_v1_stream_proto_rawDesc = []byte{
 	0x31, 0x2e, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56,
 	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x48, 0x00, 0x52, 0x14, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e,
 	0x74, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x09,
-	0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0xb4, 0x03, 0x0a, 0x0d, 0x53, 0x65,
+	0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x92, 0x05, 0x0a, 0x0d, 0x53, 0x65,
 	0x72, 0x76, 0x65, 0x72, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x3d, 0x0a, 0x09, 0x68,
 	0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d,
 	0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e,
@@ -635,32 +827,64 @@ var file_platform_daemon_v1_stream_proto_rawDesc = []byte{
 	0x73, 0x74, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56,
 	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x48, 0x00, 0x52, 0x1b, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56, 0x65,
-	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x09, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
-	0x22, 0x0b, 0x0a, 0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x22, 0x0f, 0x0a,
-	0x0d, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e, 0x41, 0x6c, 0x65, 0x72, 0x74, 0x22, 0x30,
-	0x0a, 0x0c, 0x4f, 0x53, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x44, 0x69, 0x66, 0x66, 0x12, 0x20,
-	0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e,
-	0x22, 0x30, 0x0a, 0x14, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x65, 0x6d, 0x6f,
-	0x6e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73,
-	0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69,
-	0x6f, 0x6e, 0x22, 0x11, 0x0a, 0x0f, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e, 0x43, 0x6f,
-	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x22, 0x10, 0x0a, 0x0e, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74,
-	0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x22, 0x15, 0x0a, 0x13, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x4f, 0x53, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x44, 0x69, 0x66, 0x66, 0x22, 0x1d,
-	0x0a, 0x1b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74,
-	0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x32, 0x70, 0x0a,
-	0x13, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x53, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x12, 0x59, 0x0a, 0x0b, 0x43, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63,
-	0x61, 0x74, 0x65, 0x12, 0x21, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x64,
-	0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x4d,
-	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x1a, 0x21, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72,
-	0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x72, 0x76,
-	0x65, 0x72, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x42,
-	0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x68, 0x6f,
-	0x6d, 0x65, 0x2d, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x2d, 0x69, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2f, 0x64, 0x61,
-	0x65, 0x6d, 0x6f, 0x6e, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x73, 0x0a, 0x1d, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x5f,
+	0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x63,
+	0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2e, 0x2e, 0x70,
+	0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76,
+	0x31, 0x2e, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x48, 0x00, 0x52, 0x1a,
+	0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x12, 0x67, 0x0a, 0x19, 0x69, 0x6e,
+	0x73, 0x74, 0x61, 0x6c, 0x6c, 0x5f, 0x6f, 0x73, 0x5f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x5f,
+	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2a, 0x2e,
+	0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e,
+	0x76, 0x31, 0x2e, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c, 0x4f, 0x53, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x48, 0x00, 0x52, 0x16, 0x69, 0x6e, 0x73,
+	0x74, 0x61, 0x6c, 0x6c, 0x4f, 0x73, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d,
+	0x61, 0x6e, 0x64, 0x42, 0x09, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x0b,
+	0x0a, 0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x22, 0x0f, 0x0a, 0x0d, 0x53,
+	0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e, 0x41, 0x6c, 0x65, 0x72, 0x74, 0x22, 0x67, 0x0a, 0x0c,
+	0x4f, 0x53, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x44, 0x69, 0x66, 0x66, 0x12, 0x20, 0x0a, 0x0b,
+	0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x35,
+	0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x18, 0x10, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e,
+	0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e,
+	0x76, 0x31, 0x2e, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x52, 0x05,
+	0x65, 0x72, 0x72, 0x6f, 0x72, 0x22, 0x67, 0x0a, 0x14, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74,
+	0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x18, 0x0a,
+	0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x35, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72,
+	0x18, 0x10, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72,
+	0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x61, 0x65, 0x6d,
+	0x6f, 0x6e, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x22, 0x23,
+	0x0a, 0x0b, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x12, 0x14, 0x0a,
+	0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x72,
+	0x72, 0x6f, 0x72, 0x22, 0x11, 0x0a, 0x0f, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e, 0x43,
+	0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x22, 0x10, 0x0a, 0x0e, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72,
+	0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x22, 0x15, 0x0a, 0x13, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x4f, 0x53, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x44, 0x69, 0x66, 0x66, 0x22,
+	0x1d, 0x0a, 0x1b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e,
+	0x74, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x72,
+	0x0a, 0x1a, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x56, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x12, 0x18, 0x0a, 0x07,
+	0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76,
+	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1f, 0x0a, 0x0b, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72,
+	0x5f, 0x68, 0x61, 0x73, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x76, 0x65, 0x6e,
+	0x64, 0x6f, 0x72, 0x48, 0x61, 0x73, 0x68, 0x12, 0x19, 0x0a, 0x08, 0x73, 0x72, 0x63, 0x5f, 0x68,
+	0x61, 0x73, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x73, 0x72, 0x63, 0x48, 0x61,
+	0x73, 0x68, 0x22, 0x18, 0x0a, 0x16, 0x49, 0x6e, 0x73, 0x74, 0x61, 0x6c, 0x6c, 0x4f, 0x53, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x32, 0x70, 0x0a, 0x13,
+	0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x53, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x12, 0x59, 0x0a, 0x0b, 0x43, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61,
+	0x74, 0x65, 0x12, 0x21, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x64, 0x61,
+	0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x4d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x1a, 0x21, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d,
+	0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x65,
+	0x72, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x42, 0x36,
+	0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x68, 0x6f, 0x6d,
+	0x65, 0x2d, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x2d, 0x69, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f,
+	0x61, 0x70, 0x69, 0x2f, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2f, 0x64, 0x61, 0x65,
+	0x6d, 0x6f, 0x6e, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -675,7 +899,7 @@ func file_platform_daemon_v1_stream_proto_rawDescGZIP() []byte {
 	return file_platform_daemon_v1_stream_proto_rawDescData
 }
 
-var file_platform_daemon_v1_stream_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_platform_daemon_v1_stream_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_platform_daemon_v1_stream_proto_goTypes = []any{
 	(*DaemonMessage)(nil),               // 0: platform.daemon.v1.DaemonMessage
 	(*ServerMessage)(nil),               // 1: platform.daemon.v1.ServerMessage
@@ -683,10 +907,13 @@ var file_platform_daemon_v1_stream_proto_goTypes = []any{
 	(*ShutdownAlert)(nil),               // 3: platform.daemon.v1.ShutdownAlert
 	(*OSUpdateDiff)(nil),                // 4: platform.daemon.v1.OSUpdateDiff
 	(*CurrentDaemonVersion)(nil),        // 5: platform.daemon.v1.CurrentDaemonVersion
-	(*ShutdownCommand)(nil),             // 6: platform.daemon.v1.ShutdownCommand
-	(*RestartCommand)(nil),              // 7: platform.daemon.v1.RestartCommand
-	(*RequestOSUpdateDiff)(nil),         // 8: platform.daemon.v1.RequestOSUpdateDiff
-	(*RequestCurrentDaemonVersion)(nil), // 9: platform.daemon.v1.RequestCurrentDaemonVersion
+	(*DaemonError)(nil),                 // 6: platform.daemon.v1.DaemonError
+	(*ShutdownCommand)(nil),             // 7: platform.daemon.v1.ShutdownCommand
+	(*RestartCommand)(nil),              // 8: platform.daemon.v1.RestartCommand
+	(*RequestOSUpdateDiff)(nil),         // 9: platform.daemon.v1.RequestOSUpdateDiff
+	(*RequestCurrentDaemonVersion)(nil), // 10: platform.daemon.v1.RequestCurrentDaemonVersion
+	(*ChangeDaemonVersionCommand)(nil),  // 11: platform.daemon.v1.ChangeDaemonVersionCommand
+	(*InstallOSUpdateCommand)(nil),      // 12: platform.daemon.v1.InstallOSUpdateCommand
 }
 var file_platform_daemon_v1_stream_proto_depIdxs = []int32{
 	2,  // 0: platform.daemon.v1.DaemonMessage.heartbeat:type_name -> platform.daemon.v1.Heartbeat
@@ -694,17 +921,21 @@ var file_platform_daemon_v1_stream_proto_depIdxs = []int32{
 	4,  // 2: platform.daemon.v1.DaemonMessage.os_update_diff:type_name -> platform.daemon.v1.OSUpdateDiff
 	5,  // 3: platform.daemon.v1.DaemonMessage.current_daemon_version:type_name -> platform.daemon.v1.CurrentDaemonVersion
 	2,  // 4: platform.daemon.v1.ServerMessage.heartbeat:type_name -> platform.daemon.v1.Heartbeat
-	6,  // 5: platform.daemon.v1.ServerMessage.shutdown:type_name -> platform.daemon.v1.ShutdownCommand
-	7,  // 6: platform.daemon.v1.ServerMessage.restart:type_name -> platform.daemon.v1.RestartCommand
-	8,  // 7: platform.daemon.v1.ServerMessage.request_os_update_diff:type_name -> platform.daemon.v1.RequestOSUpdateDiff
-	9,  // 8: platform.daemon.v1.ServerMessage.request_current_daemon_version:type_name -> platform.daemon.v1.RequestCurrentDaemonVersion
-	0,  // 9: platform.daemon.v1.DaemonStreamService.Communicate:input_type -> platform.daemon.v1.DaemonMessage
-	1,  // 10: platform.daemon.v1.DaemonStreamService.Communicate:output_type -> platform.daemon.v1.ServerMessage
-	10, // [10:11] is the sub-list for method output_type
-	9,  // [9:10] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	7,  // 5: platform.daemon.v1.ServerMessage.shutdown:type_name -> platform.daemon.v1.ShutdownCommand
+	8,  // 6: platform.daemon.v1.ServerMessage.restart:type_name -> platform.daemon.v1.RestartCommand
+	9,  // 7: platform.daemon.v1.ServerMessage.request_os_update_diff:type_name -> platform.daemon.v1.RequestOSUpdateDiff
+	10, // 8: platform.daemon.v1.ServerMessage.request_current_daemon_version:type_name -> platform.daemon.v1.RequestCurrentDaemonVersion
+	11, // 9: platform.daemon.v1.ServerMessage.change_daemon_version_command:type_name -> platform.daemon.v1.ChangeDaemonVersionCommand
+	12, // 10: platform.daemon.v1.ServerMessage.install_os_update_command:type_name -> platform.daemon.v1.InstallOSUpdateCommand
+	6,  // 11: platform.daemon.v1.OSUpdateDiff.error:type_name -> platform.daemon.v1.DaemonError
+	6,  // 12: platform.daemon.v1.CurrentDaemonVersion.error:type_name -> platform.daemon.v1.DaemonError
+	0,  // 13: platform.daemon.v1.DaemonStreamService.Communicate:input_type -> platform.daemon.v1.DaemonMessage
+	1,  // 14: platform.daemon.v1.DaemonStreamService.Communicate:output_type -> platform.daemon.v1.ServerMessage
+	14, // [14:15] is the sub-list for method output_type
+	13, // [13:14] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_platform_daemon_v1_stream_proto_init() }
@@ -786,7 +1017,7 @@ func file_platform_daemon_v1_stream_proto_init() {
 			}
 		}
 		file_platform_daemon_v1_stream_proto_msgTypes[6].Exporter = func(v any, i int) any {
-			switch v := v.(*ShutdownCommand); i {
+			switch v := v.(*DaemonError); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -798,7 +1029,7 @@ func file_platform_daemon_v1_stream_proto_init() {
 			}
 		}
 		file_platform_daemon_v1_stream_proto_msgTypes[7].Exporter = func(v any, i int) any {
-			switch v := v.(*RestartCommand); i {
+			switch v := v.(*ShutdownCommand); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -810,7 +1041,7 @@ func file_platform_daemon_v1_stream_proto_init() {
 			}
 		}
 		file_platform_daemon_v1_stream_proto_msgTypes[8].Exporter = func(v any, i int) any {
-			switch v := v.(*RequestOSUpdateDiff); i {
+			switch v := v.(*RestartCommand); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -822,7 +1053,43 @@ func file_platform_daemon_v1_stream_proto_init() {
 			}
 		}
 		file_platform_daemon_v1_stream_proto_msgTypes[9].Exporter = func(v any, i int) any {
+			switch v := v.(*RequestOSUpdateDiff); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_daemon_v1_stream_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*RequestCurrentDaemonVersion); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_daemon_v1_stream_proto_msgTypes[11].Exporter = func(v any, i int) any {
+			switch v := v.(*ChangeDaemonVersionCommand); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_daemon_v1_stream_proto_msgTypes[12].Exporter = func(v any, i int) any {
+			switch v := v.(*InstallOSUpdateCommand); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -846,6 +1113,8 @@ func file_platform_daemon_v1_stream_proto_init() {
 		(*ServerMessage_Restart)(nil),
 		(*ServerMessage_RequestOsUpdateDiff)(nil),
 		(*ServerMessage_RequestCurrentDaemonVersion)(nil),
+		(*ServerMessage_ChangeDaemonVersionCommand)(nil),
+		(*ServerMessage_InstallOsUpdateCommand)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -853,7 +1122,7 @@ func file_platform_daemon_v1_stream_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_platform_daemon_v1_stream_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

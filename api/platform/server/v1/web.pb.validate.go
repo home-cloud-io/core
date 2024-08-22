@@ -1760,3 +1760,418 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ImageVersionValidationError{}
+
+// Validate checks the field values on ChangeDaemonVersionRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ChangeDaemonVersionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ChangeDaemonVersionRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ChangeDaemonVersionRequestMultiError, or nil if none found.
+func (m *ChangeDaemonVersionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ChangeDaemonVersionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Version
+
+	// no validation rules for VendorHash
+
+	// no validation rules for SrcHash
+
+	if len(errors) > 0 {
+		return ChangeDaemonVersionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ChangeDaemonVersionRequestMultiError is an error wrapping multiple
+// validation errors returned by ChangeDaemonVersionRequest.ValidateAll() if
+// the designated constraints aren't met.
+type ChangeDaemonVersionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ChangeDaemonVersionRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ChangeDaemonVersionRequestMultiError) AllErrors() []error { return m }
+
+// ChangeDaemonVersionRequestValidationError is the validation error returned
+// by ChangeDaemonVersionRequest.Validate if the designated constraints aren't met.
+type ChangeDaemonVersionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ChangeDaemonVersionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ChangeDaemonVersionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ChangeDaemonVersionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ChangeDaemonVersionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ChangeDaemonVersionRequestValidationError) ErrorName() string {
+	return "ChangeDaemonVersionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ChangeDaemonVersionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sChangeDaemonVersionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ChangeDaemonVersionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ChangeDaemonVersionRequestValidationError{}
+
+// Validate checks the field values on ChangeDaemonVersionResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ChangeDaemonVersionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ChangeDaemonVersionResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ChangeDaemonVersionResponseMultiError, or nil if none found.
+func (m *ChangeDaemonVersionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ChangeDaemonVersionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return ChangeDaemonVersionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ChangeDaemonVersionResponseMultiError is an error wrapping multiple
+// validation errors returned by ChangeDaemonVersionResponse.ValidateAll() if
+// the designated constraints aren't met.
+type ChangeDaemonVersionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ChangeDaemonVersionResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ChangeDaemonVersionResponseMultiError) AllErrors() []error { return m }
+
+// ChangeDaemonVersionResponseValidationError is the validation error returned
+// by ChangeDaemonVersionResponse.Validate if the designated constraints
+// aren't met.
+type ChangeDaemonVersionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ChangeDaemonVersionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ChangeDaemonVersionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ChangeDaemonVersionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ChangeDaemonVersionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ChangeDaemonVersionResponseValidationError) ErrorName() string {
+	return "ChangeDaemonVersionResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ChangeDaemonVersionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sChangeDaemonVersionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ChangeDaemonVersionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ChangeDaemonVersionResponseValidationError{}
+
+// Validate checks the field values on InstallOSUpdateRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *InstallOSUpdateRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InstallOSUpdateRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// InstallOSUpdateRequestMultiError, or nil if none found.
+func (m *InstallOSUpdateRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InstallOSUpdateRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return InstallOSUpdateRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// InstallOSUpdateRequestMultiError is an error wrapping multiple validation
+// errors returned by InstallOSUpdateRequest.ValidateAll() if the designated
+// constraints aren't met.
+type InstallOSUpdateRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InstallOSUpdateRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InstallOSUpdateRequestMultiError) AllErrors() []error { return m }
+
+// InstallOSUpdateRequestValidationError is the validation error returned by
+// InstallOSUpdateRequest.Validate if the designated constraints aren't met.
+type InstallOSUpdateRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InstallOSUpdateRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InstallOSUpdateRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InstallOSUpdateRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InstallOSUpdateRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InstallOSUpdateRequestValidationError) ErrorName() string {
+	return "InstallOSUpdateRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e InstallOSUpdateRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInstallOSUpdateRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InstallOSUpdateRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InstallOSUpdateRequestValidationError{}
+
+// Validate checks the field values on InstallOSUpdateResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *InstallOSUpdateResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InstallOSUpdateResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// InstallOSUpdateResponseMultiError, or nil if none found.
+func (m *InstallOSUpdateResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InstallOSUpdateResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return InstallOSUpdateResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// InstallOSUpdateResponseMultiError is an error wrapping multiple validation
+// errors returned by InstallOSUpdateResponse.ValidateAll() if the designated
+// constraints aren't met.
+type InstallOSUpdateResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InstallOSUpdateResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InstallOSUpdateResponseMultiError) AllErrors() []error { return m }
+
+// InstallOSUpdateResponseValidationError is the validation error returned by
+// InstallOSUpdateResponse.Validate if the designated constraints aren't met.
+type InstallOSUpdateResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InstallOSUpdateResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InstallOSUpdateResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InstallOSUpdateResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InstallOSUpdateResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InstallOSUpdateResponseValidationError) ErrorName() string {
+	return "InstallOSUpdateResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e InstallOSUpdateResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInstallOSUpdateResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InstallOSUpdateResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InstallOSUpdateResponseValidationError{}
