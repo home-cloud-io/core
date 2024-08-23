@@ -107,6 +107,18 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: RequestCurrentDaemonVersion;
     case: "requestCurrentDaemonVersion";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.ChangeDaemonVersionCommand change_daemon_version_command = 6;
+     */
+    value: ChangeDaemonVersionCommand;
+    case: "changeDaemonVersionCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.InstallOSUpdateCommand install_os_update_command = 7;
+     */
+    value: InstallOSUpdateCommand;
+    case: "installOsUpdateCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -122,6 +134,8 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 3, name: "restart", kind: "message", T: RestartCommand, oneof: "message" },
     { no: 4, name: "request_os_update_diff", kind: "message", T: RequestOSUpdateDiff, oneof: "message" },
     { no: 5, name: "request_current_daemon_version", kind: "message", T: RequestCurrentDaemonVersion, oneof: "message" },
+    { no: 6, name: "change_daemon_version_command", kind: "message", T: ChangeDaemonVersionCommand, oneof: "message" },
+    { no: 7, name: "install_os_update_command", kind: "message", T: InstallOSUpdateCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -216,6 +230,11 @@ export class OSUpdateDiff extends Message<OSUpdateDiff> {
    */
   description = "";
 
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
   constructor(data?: PartialMessage<OSUpdateDiff>) {
     super();
     proto3.util.initPartial(data, this);
@@ -225,6 +244,7 @@ export class OSUpdateDiff extends Message<OSUpdateDiff> {
   static readonly typeName = "platform.daemon.v1.OSUpdateDiff";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "message", T: DaemonError },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): OSUpdateDiff {
@@ -255,6 +275,11 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
    */
   version = "";
 
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
   constructor(data?: PartialMessage<CurrentDaemonVersion>) {
     super();
     proto3.util.initPartial(data, this);
@@ -264,6 +289,7 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
   static readonly typeName = "platform.daemon.v1.CurrentDaemonVersion";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "message", T: DaemonError },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CurrentDaemonVersion {
@@ -280,6 +306,43 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
 
   static equals(a: CurrentDaemonVersion | PlainMessage<CurrentDaemonVersion> | undefined, b: CurrentDaemonVersion | PlainMessage<CurrentDaemonVersion> | undefined): boolean {
     return proto3.util.equals(CurrentDaemonVersion, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.DaemonError
+ */
+export class DaemonError extends Message<DaemonError> {
+  /**
+   * @generated from field: string error = 1;
+   */
+  error = "";
+
+  constructor(data?: PartialMessage<DaemonError>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.DaemonError";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonError {
+    return new DaemonError().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DaemonError {
+    return new DaemonError().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DaemonError {
+    return new DaemonError().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DaemonError | PlainMessage<DaemonError> | undefined, b: DaemonError | PlainMessage<DaemonError> | undefined): boolean {
+    return proto3.util.equals(DaemonError, a, b);
   }
 }
 
@@ -412,6 +475,86 @@ export class RequestCurrentDaemonVersion extends Message<RequestCurrentDaemonVer
 
   static equals(a: RequestCurrentDaemonVersion | PlainMessage<RequestCurrentDaemonVersion> | undefined, b: RequestCurrentDaemonVersion | PlainMessage<RequestCurrentDaemonVersion> | undefined): boolean {
     return proto3.util.equals(RequestCurrentDaemonVersion, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.ChangeDaemonVersionCommand
+ */
+export class ChangeDaemonVersionCommand extends Message<ChangeDaemonVersionCommand> {
+  /**
+   * @generated from field: string version = 1;
+   */
+  version = "";
+
+  /**
+   * @generated from field: string vendor_hash = 2;
+   */
+  vendorHash = "";
+
+  /**
+   * @generated from field: string src_hash = 3;
+   */
+  srcHash = "";
+
+  constructor(data?: PartialMessage<ChangeDaemonVersionCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.ChangeDaemonVersionCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ChangeDaemonVersionCommand {
+    return new ChangeDaemonVersionCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ChangeDaemonVersionCommand {
+    return new ChangeDaemonVersionCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ChangeDaemonVersionCommand {
+    return new ChangeDaemonVersionCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ChangeDaemonVersionCommand | PlainMessage<ChangeDaemonVersionCommand> | undefined, b: ChangeDaemonVersionCommand | PlainMessage<ChangeDaemonVersionCommand> | undefined): boolean {
+    return proto3.util.equals(ChangeDaemonVersionCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.InstallOSUpdateCommand
+ */
+export class InstallOSUpdateCommand extends Message<InstallOSUpdateCommand> {
+  constructor(data?: PartialMessage<InstallOSUpdateCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.InstallOSUpdateCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InstallOSUpdateCommand {
+    return new InstallOSUpdateCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InstallOSUpdateCommand {
+    return new InstallOSUpdateCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InstallOSUpdateCommand {
+    return new InstallOSUpdateCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: InstallOSUpdateCommand | PlainMessage<InstallOSUpdateCommand> | undefined, b: InstallOSUpdateCommand | PlainMessage<InstallOSUpdateCommand> | undefined): boolean {
+    return proto3.util.equals(InstallOSUpdateCommand, a, b);
   }
 }
 

@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
  * @generated from rpc platform.server.v1.WebService.ShutdownHost
@@ -99,6 +99,34 @@ export const checkForContainerUpdates = {
   kind: MethodKind.Unary,
   I: CheckForContainerUpdatesRequest,
   O: CheckForContainerUpdatesResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * @generated from rpc platform.server.v1.WebService.ChangeDaemonVersion
+ */
+export const changeDaemonVersion = {
+  localName: "changeDaemonVersion",
+  name: "ChangeDaemonVersion",
+  kind: MethodKind.Unary,
+  I: ChangeDaemonVersionRequest,
+  O: ChangeDaemonVersionResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * @generated from rpc platform.server.v1.WebService.InstallOSUpdate
+ */
+export const installOSUpdate = {
+  localName: "installOSUpdate",
+  name: "InstallOSUpdate",
+  kind: MethodKind.Unary,
+  I: InstallOSUpdateRequest,
+  O: InstallOSUpdateResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

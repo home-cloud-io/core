@@ -24,6 +24,8 @@ message ServerMessage {
     RestartCommand restart = 3;
     RequestOSUpdateDiff request_os_update_diff = 4;
     RequestCurrentDaemonVersion request_current_daemon_version = 5;
+    ChangeDaemonVersionCommand change_daemon_version_command = 6;
+    InstallOSUpdateCommand install_os_update_command = 7;
   }
 }
 
@@ -39,11 +41,19 @@ message ShutdownAlert { }
 // OSUpdateDiff is the result of the `nvd diff` command
 message OSUpdateDiff {
   string description = 1;
+
+  DaemonError error = 16;
 }
 
 // CurrentDaemonVersion is the current daemon version
 message CurrentDaemonVersion {
   string version = 1;
+
+  DaemonError error = 16;
+}
+
+message DaemonError {
+  string error = 1;
 }
 
 // Server -> Daemon
@@ -59,3 +69,11 @@ message RequestOSUpdateDiff { }
 
 // RequestCurrentDaemonVersion tells the daemon to check the current daemon version and send it to the server
 message RequestCurrentDaemonVersion { }
+
+message ChangeDaemonVersionCommand {
+  string version = 1;
+  string vendor_hash = 2;
+  string src_hash = 3;
+}
+
+message InstallOSUpdateCommand { }

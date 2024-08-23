@@ -29,6 +29,8 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 3, name: "restart", kind: "message", T: RestartCommand, oneof: "message" },
     { no: 4, name: "request_os_update_diff", kind: "message", T: RequestOSUpdateDiff, oneof: "message" },
     { no: 5, name: "request_current_daemon_version", kind: "message", T: RequestCurrentDaemonVersion, oneof: "message" },
+    { no: 6, name: "change_daemon_version_command", kind: "message", T: ChangeDaemonVersionCommand, oneof: "message" },
+    { no: 7, name: "install_os_update_command", kind: "message", T: InstallOSUpdateCommand, oneof: "message" },
   ],
 );
 
@@ -59,6 +61,7 @@ export const OSUpdateDiff = proto3.makeMessageType(
   "platform.daemon.v1.OSUpdateDiff",
   () => [
     { no: 1, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "message", T: DaemonError },
   ],
 );
 
@@ -71,6 +74,17 @@ export const CurrentDaemonVersion = proto3.makeMessageType(
   "platform.daemon.v1.CurrentDaemonVersion",
   () => [
     { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.DaemonError
+ */
+export const DaemonError = proto3.makeMessageType(
+  "platform.daemon.v1.DaemonError",
+  () => [
+    { no: 1, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -111,6 +125,26 @@ export const RequestOSUpdateDiff = proto3.makeMessageType(
  */
 export const RequestCurrentDaemonVersion = proto3.makeMessageType(
   "platform.daemon.v1.RequestCurrentDaemonVersion",
+  [],
+);
+
+/**
+ * @generated from message platform.daemon.v1.ChangeDaemonVersionCommand
+ */
+export const ChangeDaemonVersionCommand = proto3.makeMessageType(
+  "platform.daemon.v1.ChangeDaemonVersionCommand",
+  () => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.InstallOSUpdateCommand
+ */
+export const InstallOSUpdateCommand = proto3.makeMessageType(
+  "platform.daemon.v1.InstallOSUpdateCommand",
   [],
 );
 

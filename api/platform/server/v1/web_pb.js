@@ -159,3 +159,39 @@ export const ImageVersion = proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.server.v1.ChangeDaemonVersionRequest
+ */
+export const ChangeDaemonVersionRequest = proto3.makeMessageType(
+  "platform.server.v1.ChangeDaemonVersionRequest",
+  () => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.ChangeDaemonVersionResponse
+ */
+export const ChangeDaemonVersionResponse = proto3.makeMessageType(
+  "platform.server.v1.ChangeDaemonVersionResponse",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.InstallOSUpdateRequest
+ */
+export const InstallOSUpdateRequest = proto3.makeMessageType(
+  "platform.server.v1.InstallOSUpdateRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.InstallOSUpdateResponse
+ */
+export const InstallOSUpdateResponse = proto3.makeMessageType(
+  "platform.server.v1.InstallOSUpdateResponse",
+  [],
+);
+
