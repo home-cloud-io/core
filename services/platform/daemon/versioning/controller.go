@@ -126,13 +126,13 @@ func lineByLineReplace(r io.Reader, w io.Writer, def *v1.ChangeDaemonVersionComm
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.Contains(line, "version =") {
-			line = fmt.Sprintf("  version = %s;", def.Version)
+			line = fmt.Sprintf("  version = \"%s\";", def.Version)
 		}
 		if strings.Contains(line, "vendorHash =") {
-			line = fmt.Sprintf("  vendorHash = %s;", def.VendorHash)
+			line = fmt.Sprintf("  vendorHash = \"%s\";", def.VendorHash)
 		}
 		if strings.Contains(line, "hash =") {
-			line = fmt.Sprintf("    hash = %s;", def.SrcHash)
+			line = fmt.Sprintf("    hash = \"%s\";", def.SrcHash)
 		}
 		_, err := io.WriteString(w, line+"\n")
 		if err != nil {
