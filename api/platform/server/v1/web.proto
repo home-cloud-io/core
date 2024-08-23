@@ -12,6 +12,8 @@ service WebService {
   rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
   rpc CheckForSystemUpdates(CheckForSystemUpdatesRequest) returns (CheckForSystemUpdatesResponse) {}
   rpc CheckForContainerUpdates(CheckForContainerUpdatesRequest) returns (CheckForContainerUpdatesResponse) {}
+  rpc ChangeDaemonVersion(ChangeDaemonVersionRequest) returns (ChangeDaemonVersionResponse) {}
+  rpc InstallOSUpdate(InstallOSUpdateRequest) returns (InstallOSUpdateResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -72,3 +74,15 @@ message ImageVersion {
   string current = 2;
   string latest = 3;
 }
+
+message ChangeDaemonVersionRequest {
+  string version = 1;
+  string vendor_hash = 2;
+  string src_hash = 3;
+}
+
+message ChangeDaemonVersionResponse {}
+
+message InstallOSUpdateRequest {}
+
+message InstallOSUpdateResponse {}

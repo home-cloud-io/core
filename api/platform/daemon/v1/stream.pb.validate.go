@@ -532,6 +532,88 @@ func (m *ServerMessage) validate(all bool) error {
 			}
 		}
 
+	case *ServerMessage_ChangeDaemonVersionCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetChangeDaemonVersionCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "ChangeDaemonVersionCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "ChangeDaemonVersionCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetChangeDaemonVersionCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "ChangeDaemonVersionCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_InstallOsUpdateCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetInstallOsUpdateCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "InstallOsUpdateCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "InstallOsUpdateCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetInstallOsUpdateCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "InstallOsUpdateCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -837,6 +919,35 @@ func (m *OSUpdateDiff) validate(all bool) error {
 
 	// no validation rules for Description
 
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, OSUpdateDiffValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, OSUpdateDiffValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OSUpdateDiffValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return OSUpdateDiffMultiError(errors)
 	}
@@ -938,6 +1049,35 @@ func (m *CurrentDaemonVersion) validate(all bool) error {
 
 	// no validation rules for Version
 
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CurrentDaemonVersionValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CurrentDaemonVersionValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CurrentDaemonVersionValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return CurrentDaemonVersionMultiError(errors)
 	}
@@ -1017,6 +1157,107 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CurrentDaemonVersionValidationError{}
+
+// Validate checks the field values on DaemonError with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *DaemonError) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DaemonError with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DaemonErrorMultiError, or
+// nil if none found.
+func (m *DaemonError) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DaemonError) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Error
+
+	if len(errors) > 0 {
+		return DaemonErrorMultiError(errors)
+	}
+
+	return nil
+}
+
+// DaemonErrorMultiError is an error wrapping multiple validation errors
+// returned by DaemonError.ValidateAll() if the designated constraints aren't met.
+type DaemonErrorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DaemonErrorMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DaemonErrorMultiError) AllErrors() []error { return m }
+
+// DaemonErrorValidationError is the validation error returned by
+// DaemonError.Validate if the designated constraints aren't met.
+type DaemonErrorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DaemonErrorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DaemonErrorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DaemonErrorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DaemonErrorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DaemonErrorValidationError) ErrorName() string { return "DaemonErrorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DaemonErrorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDaemonError.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DaemonErrorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DaemonErrorValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -1422,3 +1663,213 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RequestCurrentDaemonVersionValidationError{}
+
+// Validate checks the field values on ChangeDaemonVersionCommand with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ChangeDaemonVersionCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ChangeDaemonVersionCommand with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ChangeDaemonVersionCommandMultiError, or nil if none found.
+func (m *ChangeDaemonVersionCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ChangeDaemonVersionCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Version
+
+	// no validation rules for VendorHash
+
+	// no validation rules for SrcHash
+
+	if len(errors) > 0 {
+		return ChangeDaemonVersionCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// ChangeDaemonVersionCommandMultiError is an error wrapping multiple
+// validation errors returned by ChangeDaemonVersionCommand.ValidateAll() if
+// the designated constraints aren't met.
+type ChangeDaemonVersionCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ChangeDaemonVersionCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ChangeDaemonVersionCommandMultiError) AllErrors() []error { return m }
+
+// ChangeDaemonVersionCommandValidationError is the validation error returned
+// by ChangeDaemonVersionCommand.Validate if the designated constraints aren't met.
+type ChangeDaemonVersionCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ChangeDaemonVersionCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ChangeDaemonVersionCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ChangeDaemonVersionCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ChangeDaemonVersionCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ChangeDaemonVersionCommandValidationError) ErrorName() string {
+	return "ChangeDaemonVersionCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ChangeDaemonVersionCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sChangeDaemonVersionCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ChangeDaemonVersionCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ChangeDaemonVersionCommandValidationError{}
+
+// Validate checks the field values on InstallOSUpdateCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *InstallOSUpdateCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InstallOSUpdateCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// InstallOSUpdateCommandMultiError, or nil if none found.
+func (m *InstallOSUpdateCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InstallOSUpdateCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return InstallOSUpdateCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// InstallOSUpdateCommandMultiError is an error wrapping multiple validation
+// errors returned by InstallOSUpdateCommand.ValidateAll() if the designated
+// constraints aren't met.
+type InstallOSUpdateCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InstallOSUpdateCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InstallOSUpdateCommandMultiError) AllErrors() []error { return m }
+
+// InstallOSUpdateCommandValidationError is the validation error returned by
+// InstallOSUpdateCommand.Validate if the designated constraints aren't met.
+type InstallOSUpdateCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InstallOSUpdateCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InstallOSUpdateCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InstallOSUpdateCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InstallOSUpdateCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InstallOSUpdateCommandValidationError) ErrorName() string {
+	return "InstallOSUpdateCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e InstallOSUpdateCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInstallOSUpdateCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InstallOSUpdateCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InstallOSUpdateCommandValidationError{}
