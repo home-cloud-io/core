@@ -3,8 +3,10 @@ package daemon
 import (
 	"fmt"
 
-	"connectrpc.com/connect"
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
+
+	"connectrpc.com/connect"
 )
 
 type (
@@ -16,6 +18,8 @@ type (
 		RestartHost() error
 		RequestOSUpdateDiff() error
 		RequestCurrentDaemonVersion() error
+		ChangeDaemonVersion(request *webv1.ChangeDaemonVersionRequest) error
+		InstallOSUpdate() error
 	}
 
 	commander struct {
@@ -69,5 +73,23 @@ func (c *commander) RequestOSUpdateDiff() error {
 func (c *commander) RequestCurrentDaemonVersion() error {
 	return c.stream.Send(&v1.ServerMessage{
 		Message: &v1.ServerMessage_RequestCurrentDaemonVersion{},
+	})
+}
+
+func (c *commander) ChangeDaemonVersion(request *webv1.ChangeDaemonVersionRequest) error {
+	return c.stream.Send(&v1.ServerMessage{
+		Message: &v1.ServerMessage_ChangeDaemonVersionCommand{
+			ChangeDaemonVersionCommand: &v1.ChangeDaemonVersionCommand{
+				Version:    request.Version,
+				VendorHash: request.VendorHash,
+				SrcHash:    request.SrcHash,
+			},
+		},
+	})
+}
+
+func (c *commander) InstallOSUpdate() error {
+	return c.stream.Send(&v1.ServerMessage{
+		Message: &v1.ServerMessage_InstallOsUpdateCommand{},
 	})
 }
