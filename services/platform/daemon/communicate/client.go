@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"os/exec"
 	"time"
 
@@ -33,6 +34,7 @@ type (
 
 const (
 	heartbeatRate = 5 * time.Second
+	retryLimit    = 25
 )
 
 var (
@@ -54,7 +56,12 @@ func (c *client) Listen() {
 	ctx := context.Background()
 	config := chassis.GetConfig()
 	c.logger.Info("starting")
+	retries := 0
 	for {
+		if retries > 25 {
+			c.logger.Fatal("exhausted retries connecting to server - exiting")
+			os.Exit(1)
+		}
 		client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), config.GetString("daemon.server"))
 		c.stream = client.Communicate(ctx)
 
@@ -73,6 +80,7 @@ func (c *client) Listen() {
 		}
 
 		time.Sleep(1 * time.Second)
+		retries++
 	}
 }
 
