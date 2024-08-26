@@ -214,3 +214,13 @@ func (h *rpc) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.I
 	}
 	return connect.NewResponse(&v1.InstallOSUpdateResponse{}), nil
 }
+
+func (h *rpc) SetSystemImage(ctx context.Context, request *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
+	commander := daemon.GetCommander()
+	err := commander.SetSystemImage(request.Msg)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to set system image")
+		return nil, err
+	}
+	return connect.NewResponse(&v1.SetSystemImageResponse{}), nil
+}

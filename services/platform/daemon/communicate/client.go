@@ -101,6 +101,8 @@ func (c *client) listen(ctx context.Context) error {
 			go changeDaemonVersion(ctx, c.logger, message.GetChangeDaemonVersionCommand())
 		case *v1.ServerMessage_InstallOsUpdateCommand:
 			go installOsUpdate(ctx, c.logger)
+		case *v1.ServerMessage_SetSystemImageCommand:
+			go setSystemImage(ctx, c.logger, message.GetSetSystemImageCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -187,6 +189,14 @@ func installOsUpdate(ctx context.Context, logger chassis.Logger) {
 	err := versioning.InstallOSUpdate(ctx, logger)
 	if err != nil {
 		logger.WithError(err).Error("failed to install os update")
+		// TODO: return error to the server?
+	}
+}
+
+func setSystemImage(ctx context.Context, logger chassis.Logger, def *v1.SetSystemImageCommand) {
+	err := versioning.SetSystemImage(ctx, logger, def)
+	if err != nil {
+		logger.WithError(err).Error("failed to set system image")
 		// TODO: return error to the server?
 	}
 }
