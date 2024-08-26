@@ -20,6 +20,7 @@ type (
 		RequestCurrentDaemonVersion() error
 		ChangeDaemonVersion(request *webv1.ChangeDaemonVersionRequest) error
 		InstallOSUpdate() error
+		SetSystemImage(request *webv1.SetSystemImageRequest) error
 	}
 
 	commander struct {
@@ -91,5 +92,16 @@ func (c *commander) ChangeDaemonVersion(request *webv1.ChangeDaemonVersionReques
 func (c *commander) InstallOSUpdate() error {
 	return c.stream.Send(&v1.ServerMessage{
 		Message: &v1.ServerMessage_InstallOsUpdateCommand{},
+	})
+}
+
+func (c *commander) SetSystemImage(request *webv1.SetSystemImageRequest) error {
+	return c.stream.Send(&v1.ServerMessage{
+		Message: &v1.ServerMessage_SetSystemImageCommand{
+			SetSystemImageCommand: &v1.SetSystemImageCommand{
+				CurrentImage:   request.CurrentImage,
+				RequestedImage: request.RequestedImage,
+			},
+		},
 	})
 }
