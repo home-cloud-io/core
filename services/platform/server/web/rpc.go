@@ -194,3 +194,23 @@ func (h *rpc) CheckForContainerUpdates(ctx context.Context, request *connect.Req
 		ImageVersions: images,
 	}), err
 }
+
+func (h *rpc) ChangeDaemonVersion(ctx context.Context, request *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
+	commander := daemon.GetCommander()
+	err := commander.ChangeDaemonVersion(request.Msg)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to change daemon version")
+		return nil, err
+	}
+	return connect.NewResponse(&v1.ChangeDaemonVersionResponse{}), nil
+}
+
+func (h *rpc) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
+	commander := daemon.GetCommander()
+	err := commander.InstallOSUpdate()
+	if err != nil {
+		h.logger.WithError(err).Error("failed to change install os update")
+		return nil, err
+	}
+	return connect.NewResponse(&v1.InstallOSUpdateResponse{}), nil
+}

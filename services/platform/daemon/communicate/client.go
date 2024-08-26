@@ -87,16 +87,20 @@ func (c *client) listen(ctx context.Context) error {
 			return err
 		}
 		switch message.Message.(type) {
+		case *v1.ServerMessage_Heartbeat:
+			c.logger.Debug("heartbeat received")
 		case *v1.ServerMessage_Restart:
 			go restart(ctx, c.logger)
 		case *v1.ServerMessage_Shutdown:
 			go shutdown(ctx, c.logger)
-		case *v1.ServerMessage_Heartbeat:
-			c.logger.Debug("heartbeat received")
 		case *v1.ServerMessage_RequestOsUpdateDiff:
 			go c.osUpdateDiff(ctx)
 		case *v1.ServerMessage_RequestCurrentDaemonVersion:
 			go c.currentDaemonVersion()
+		case *v1.ServerMessage_ChangeDaemonVersionCommand:
+			go changeDaemonVersion(ctx, c.logger, message.GetChangeDaemonVersionCommand())
+		case *v1.ServerMessage_InstallOsUpdateCommand:
+			go installOsUpdate(ctx, c.logger)
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -168,6 +172,22 @@ func (c *client) currentDaemonVersion() {
 		if err != nil {
 			c.logger.WithError(err).Error("failed to send current daemon version to server")
 		}
+	}
+}
+
+func changeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.ChangeDaemonVersionCommand) {
+	err := versioning.ChangeDaemonVersion(ctx, logger, def)
+	if err != nil {
+		logger.WithError(err).Error("failed to change daemon version")
+		// TODO: return error to the server?
+	}
+}
+
+func installOsUpdate(ctx context.Context, logger chassis.Logger) {
+	err := versioning.InstallOSUpdate(ctx, logger)
+	if err != nil {
+		logger.WithError(err).Error("failed to install os update")
+		// TODO: return error to the server?
 	}
 }
 
