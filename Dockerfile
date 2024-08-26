@@ -28,10 +28,6 @@ RUN apk add --no-cache git upx
 
 ARG DOMAIN
 ARG SERVICE
-ARG GITHUB_TOKEN
-
-ENV GOPRIVATE=github.com/home-cloud-io/core
-RUN git config --global url.https://${GITHUB_TOKEN}@github.com/.insteadOf https://github.com/
 
 # We want to populate the module cache based on the go.{mod,sum} files.
 COPY ./services/${DOMAIN}/${SERVICE}/go.mod ./go.mod
