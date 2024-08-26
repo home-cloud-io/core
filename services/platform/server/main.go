@@ -23,7 +23,9 @@ func main() {
 	)
 
 	// Create the app store cache
-	web.NewStoreCache(logger)
+	if err := web.NewStoreCache(logger); err != nil {
+		logger.Error("failed to create app store cache")
+	}
 
 	defer chassis.New(logger).
 		WithClientApplication(files).

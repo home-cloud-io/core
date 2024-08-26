@@ -807,9 +807,9 @@ export class InstalledApp extends Message<InstalledApp> {
  * A backround thread in the server will fetch the file and update the
  * store first when it starts and then every 24 hours
  *
- * @generated from message platform.server.v1.AppStoreResponse
+ * @generated from message platform.server.v1.AppStoreEntries
  */
-export class AppStoreResponse extends Message<AppStoreResponse> {
+export class AppStoreEntries extends Message<AppStoreEntries> {
   /**
    * @generated from field: string api_version = 1;
    */
@@ -825,33 +825,33 @@ export class AppStoreResponse extends Message<AppStoreResponse> {
    */
   entries: { [key: string]: Entries } = {};
 
-  constructor(data?: PartialMessage<AppStoreResponse>) {
+  constructor(data?: PartialMessage<AppStoreEntries>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.AppStoreResponse";
+  static readonly typeName = "platform.server.v1.AppStoreEntries";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "api_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "generated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Entries} },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppStoreResponse {
-    return new AppStoreResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppStoreEntries {
+    return new AppStoreEntries().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppStoreResponse {
-    return new AppStoreResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppStoreEntries {
+    return new AppStoreEntries().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppStoreResponse {
-    return new AppStoreResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppStoreEntries {
+    return new AppStoreEntries().fromJsonString(jsonString, options);
   }
 
-  static equals(a: AppStoreResponse | PlainMessage<AppStoreResponse> | undefined, b: AppStoreResponse | PlainMessage<AppStoreResponse> | undefined): boolean {
-    return proto3.util.equals(AppStoreResponse, a, b);
+  static equals(a: AppStoreEntries | PlainMessage<AppStoreEntries> | undefined, b: AppStoreEntries | PlainMessage<AppStoreEntries> | undefined): boolean {
+    return proto3.util.equals(AppStoreEntries, a, b);
   }
 }
 

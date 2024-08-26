@@ -2115,22 +2115,22 @@ var _ interface {
 	ErrorName() string
 } = InstalledAppValidationError{}
 
-// Validate checks the field values on AppStoreResponse with the rules defined
+// Validate checks the field values on AppStoreEntries with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
-func (m *AppStoreResponse) Validate() error {
+func (m *AppStoreEntries) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AppStoreResponse with the rules
+// ValidateAll checks the field values on AppStoreEntries with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// AppStoreResponseMultiError, or nil if none found.
-func (m *AppStoreResponse) ValidateAll() error {
+// AppStoreEntriesMultiError, or nil if none found.
+func (m *AppStoreEntries) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AppStoreResponse) validate(all bool) error {
+func (m *AppStoreEntries) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -2159,7 +2159,7 @@ func (m *AppStoreResponse) validate(all bool) error {
 				switch v := interface{}(val).(type) {
 				case interface{ ValidateAll() error }:
 					if err := v.ValidateAll(); err != nil {
-						errors = append(errors, AppStoreResponseValidationError{
+						errors = append(errors, AppStoreEntriesValidationError{
 							field:  fmt.Sprintf("Entries[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
@@ -2167,7 +2167,7 @@ func (m *AppStoreResponse) validate(all bool) error {
 					}
 				case interface{ Validate() error }:
 					if err := v.Validate(); err != nil {
-						errors = append(errors, AppStoreResponseValidationError{
+						errors = append(errors, AppStoreEntriesValidationError{
 							field:  fmt.Sprintf("Entries[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
@@ -2176,7 +2176,7 @@ func (m *AppStoreResponse) validate(all bool) error {
 				}
 			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
 				if err := v.Validate(); err != nil {
-					return AppStoreResponseValidationError{
+					return AppStoreEntriesValidationError{
 						field:  fmt.Sprintf("Entries[%v]", key),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -2188,19 +2188,19 @@ func (m *AppStoreResponse) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AppStoreResponseMultiError(errors)
+		return AppStoreEntriesMultiError(errors)
 	}
 
 	return nil
 }
 
-// AppStoreResponseMultiError is an error wrapping multiple validation errors
-// returned by AppStoreResponse.ValidateAll() if the designated constraints
+// AppStoreEntriesMultiError is an error wrapping multiple validation errors
+// returned by AppStoreEntries.ValidateAll() if the designated constraints
 // aren't met.
-type AppStoreResponseMultiError []error
+type AppStoreEntriesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AppStoreResponseMultiError) Error() string {
+func (m AppStoreEntriesMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2209,11 +2209,11 @@ func (m AppStoreResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AppStoreResponseMultiError) AllErrors() []error { return m }
+func (m AppStoreEntriesMultiError) AllErrors() []error { return m }
 
-// AppStoreResponseValidationError is the validation error returned by
-// AppStoreResponse.Validate if the designated constraints aren't met.
-type AppStoreResponseValidationError struct {
+// AppStoreEntriesValidationError is the validation error returned by
+// AppStoreEntries.Validate if the designated constraints aren't met.
+type AppStoreEntriesValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2221,22 +2221,22 @@ type AppStoreResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e AppStoreResponseValidationError) Field() string { return e.field }
+func (e AppStoreEntriesValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AppStoreResponseValidationError) Reason() string { return e.reason }
+func (e AppStoreEntriesValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AppStoreResponseValidationError) Cause() error { return e.cause }
+func (e AppStoreEntriesValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AppStoreResponseValidationError) Key() bool { return e.key }
+func (e AppStoreEntriesValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AppStoreResponseValidationError) ErrorName() string { return "AppStoreResponseValidationError" }
+func (e AppStoreEntriesValidationError) ErrorName() string { return "AppStoreEntriesValidationError" }
 
 // Error satisfies the builtin error interface
-func (e AppStoreResponseValidationError) Error() string {
+func (e AppStoreEntriesValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2248,14 +2248,14 @@ func (e AppStoreResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAppStoreResponse.%s: %s%s",
+		"invalid %sAppStoreEntries.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AppStoreResponseValidationError{}
+var _ error = AppStoreEntriesValidationError{}
 
 var _ interface {
 	Field() string
@@ -2263,7 +2263,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AppStoreResponseValidationError{}
+} = AppStoreEntriesValidationError{}
 
 // Validate checks the field values on DeviceSettings with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

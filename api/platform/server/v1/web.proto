@@ -4,6 +4,8 @@ package platform.server.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 
+import "tagger/tagger.proto";
+
 service WebService {
   rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
   rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
@@ -124,8 +126,8 @@ message InstalledApp {
 // (https://home-cloud-io.github.io/store/index.yaml)
 // A backround thread in the server will fetch the file and update the
 // store first when it starts and then every 24 hours
-message AppStoreResponse {
-  string api_version = 1;
+message AppStoreEntries {
+  string api_version = 1 [(tagger.tags) = "yaml:\"apiVersion\""];
   string generated = 2;
   map<string, Entries> entries = 3;
 }

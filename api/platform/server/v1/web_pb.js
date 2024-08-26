@@ -219,10 +219,10 @@ export const InstalledApp = proto3.makeMessageType(
  * A backround thread in the server will fetch the file and update the
  * store first when it starts and then every 24 hours
  *
- * @generated from message platform.server.v1.AppStoreResponse
+ * @generated from message platform.server.v1.AppStoreEntries
  */
-export const AppStoreResponse = proto3.makeMessageType(
-  "platform.server.v1.AppStoreResponse",
+export const AppStoreEntries = proto3.makeMessageType(
+  "platform.server.v1.AppStoreEntries",
   () => [
     { no: 1, name: "api_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "generated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
