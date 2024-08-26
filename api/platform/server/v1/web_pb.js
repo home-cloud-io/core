@@ -195,3 +195,22 @@ export const InstallOSUpdateResponse = proto3.makeMessageType(
   [],
 );
 
+/**
+ * @generated from message platform.server.v1.SetSystemImageRequest
+ */
+export const SetSystemImageRequest = proto3.makeMessageType(
+  "platform.server.v1.SetSystemImageRequest",
+  () => [
+    { no: 1, name: "current_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "requested_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.SetSystemImageResponse
+ */
+export const SetSystemImageResponse = proto3.makeMessageType(
+  "platform.server.v1.SetSystemImageResponse",
+  [],
+);
+

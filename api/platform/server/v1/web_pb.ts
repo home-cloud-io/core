@@ -760,3 +760,77 @@ export class InstallOSUpdateResponse extends Message<InstallOSUpdateResponse> {
   }
 }
 
+/**
+ * @generated from message platform.server.v1.SetSystemImageRequest
+ */
+export class SetSystemImageRequest extends Message<SetSystemImageRequest> {
+  /**
+   * @generated from field: string current_image = 1;
+   */
+  currentImage = "";
+
+  /**
+   * @generated from field: string requested_image = 2;
+   */
+  requestedImage = "";
+
+  constructor(data?: PartialMessage<SetSystemImageRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.SetSystemImageRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "current_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "requested_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetSystemImageRequest {
+    return new SetSystemImageRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetSystemImageRequest {
+    return new SetSystemImageRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetSystemImageRequest {
+    return new SetSystemImageRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetSystemImageRequest | PlainMessage<SetSystemImageRequest> | undefined, b: SetSystemImageRequest | PlainMessage<SetSystemImageRequest> | undefined): boolean {
+    return proto3.util.equals(SetSystemImageRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.SetSystemImageResponse
+ */
+export class SetSystemImageResponse extends Message<SetSystemImageResponse> {
+  constructor(data?: PartialMessage<SetSystemImageResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.SetSystemImageResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetSystemImageResponse {
+    return new SetSystemImageResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetSystemImageResponse {
+    return new SetSystemImageResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetSystemImageResponse {
+    return new SetSystemImageResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetSystemImageResponse | PlainMessage<SetSystemImageResponse> | undefined, b: SetSystemImageResponse | PlainMessage<SetSystemImageResponse> | undefined): boolean {
+    return proto3.util.equals(SetSystemImageResponse, a, b);
+  }
+}
+

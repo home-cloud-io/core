@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RestartHostRequest, RestartHostResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -91,6 +91,15 @@ export const WebService = {
       name: "InstallOSUpdate",
       I: InstallOSUpdateRequest,
       O: InstallOSUpdateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc platform.server.v1.WebService.SetSystemImage
+     */
+    setSystemImage: {
+      name: "SetSystemImage",
+      I: SetSystemImageRequest,
+      O: SetSystemImageResponse,
       kind: MethodKind.Unary,
     },
   }

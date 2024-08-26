@@ -119,6 +119,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: InstallOSUpdateCommand;
     case: "installOsUpdateCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.SetSystemImageCommand set_system_image_command = 8;
+     */
+    value: SetSystemImageCommand;
+    case: "setSystemImageCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -136,6 +142,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 5, name: "request_current_daemon_version", kind: "message", T: RequestCurrentDaemonVersion, oneof: "message" },
     { no: 6, name: "change_daemon_version_command", kind: "message", T: ChangeDaemonVersionCommand, oneof: "message" },
     { no: 7, name: "install_os_update_command", kind: "message", T: InstallOSUpdateCommand, oneof: "message" },
+    { no: 8, name: "set_system_image_command", kind: "message", T: SetSystemImageCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -555,6 +562,49 @@ export class InstallOSUpdateCommand extends Message<InstallOSUpdateCommand> {
 
   static equals(a: InstallOSUpdateCommand | PlainMessage<InstallOSUpdateCommand> | undefined, b: InstallOSUpdateCommand | PlainMessage<InstallOSUpdateCommand> | undefined): boolean {
     return proto3.util.equals(InstallOSUpdateCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.SetSystemImageCommand
+ */
+export class SetSystemImageCommand extends Message<SetSystemImageCommand> {
+  /**
+   * @generated from field: string current_image = 1;
+   */
+  currentImage = "";
+
+  /**
+   * @generated from field: string requested_image = 2;
+   */
+  requestedImage = "";
+
+  constructor(data?: PartialMessage<SetSystemImageCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.SetSystemImageCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "current_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "requested_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetSystemImageCommand {
+    return new SetSystemImageCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetSystemImageCommand {
+    return new SetSystemImageCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetSystemImageCommand {
+    return new SetSystemImageCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetSystemImageCommand | PlainMessage<SetSystemImageCommand> | undefined, b: SetSystemImageCommand | PlainMessage<SetSystemImageCommand> | undefined): boolean {
+    return proto3.util.equals(SetSystemImageCommand, a, b);
   }
 }
 

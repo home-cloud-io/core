@@ -26,6 +26,7 @@ message ServerMessage {
     RequestCurrentDaemonVersion request_current_daemon_version = 5;
     ChangeDaemonVersionCommand change_daemon_version_command = 6;
     InstallOSUpdateCommand install_os_update_command = 7;
+    SetSystemImageCommand set_system_image_command = 8;
   }
 }
 
@@ -77,3 +78,8 @@ message ChangeDaemonVersionCommand {
 }
 
 message InstallOSUpdateCommand { }
+
+message SetSystemImageCommand {
+  string current_image = 1;
+  string requested_image = 2;
+}
