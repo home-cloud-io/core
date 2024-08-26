@@ -31,6 +31,7 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 5, name: "request_current_daemon_version", kind: "message", T: RequestCurrentDaemonVersion, oneof: "message" },
     { no: 6, name: "change_daemon_version_command", kind: "message", T: ChangeDaemonVersionCommand, oneof: "message" },
     { no: 7, name: "install_os_update_command", kind: "message", T: InstallOSUpdateCommand, oneof: "message" },
+    { no: 8, name: "set_system_image_command", kind: "message", T: SetSystemImageCommand, oneof: "message" },
   ],
 );
 
@@ -146,5 +147,16 @@ export const ChangeDaemonVersionCommand = proto3.makeMessageType(
 export const InstallOSUpdateCommand = proto3.makeMessageType(
   "platform.daemon.v1.InstallOSUpdateCommand",
   [],
+);
+
+/**
+ * @generated from message platform.daemon.v1.SetSystemImageCommand
+ */
+export const SetSystemImageCommand = proto3.makeMessageType(
+  "platform.daemon.v1.SetSystemImageCommand",
+  () => [
+    { no: 1, name: "current_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "requested_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
 );
 

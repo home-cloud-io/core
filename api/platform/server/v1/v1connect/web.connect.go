@@ -55,6 +55,9 @@ const (
 	// WebServiceInstallOSUpdateProcedure is the fully-qualified name of the WebService's
 	// InstallOSUpdate RPC.
 	WebServiceInstallOSUpdateProcedure = "/platform.server.v1.WebService/InstallOSUpdate"
+	// WebServiceSetSystemImageProcedure is the fully-qualified name of the WebService's SetSystemImage
+	// RPC.
+	WebServiceSetSystemImageProcedure = "/platform.server.v1.WebService/SetSystemImage"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -69,6 +72,7 @@ var (
 	webServiceCheckForContainerUpdatesMethodDescriptor = webServiceServiceDescriptor.Methods().ByName("CheckForContainerUpdates")
 	webServiceChangeDaemonVersionMethodDescriptor      = webServiceServiceDescriptor.Methods().ByName("ChangeDaemonVersion")
 	webServiceInstallOSUpdateMethodDescriptor          = webServiceServiceDescriptor.Methods().ByName("InstallOSUpdate")
+	webServiceSetSystemImageMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("SetSystemImage")
 )
 
 // WebServiceClient is a client for the platform.server.v1.WebService service.
@@ -82,6 +86,7 @@ type WebServiceClient interface {
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
 	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
 	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
+	SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error)
 }
 
 // NewWebServiceClient constructs a client for the platform.server.v1.WebService service. By
@@ -148,6 +153,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceInstallOSUpdateMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		setSystemImage: connect.NewClient[v1.SetSystemImageRequest, v1.SetSystemImageResponse](
+			httpClient,
+			baseURL+WebServiceSetSystemImageProcedure,
+			connect.WithSchema(webServiceSetSystemImageMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -162,6 +173,7 @@ type webServiceClient struct {
 	checkForContainerUpdates *connect.Client[v1.CheckForContainerUpdatesRequest, v1.CheckForContainerUpdatesResponse]
 	changeDaemonVersion      *connect.Client[v1.ChangeDaemonVersionRequest, v1.ChangeDaemonVersionResponse]
 	installOSUpdate          *connect.Client[v1.InstallOSUpdateRequest, v1.InstallOSUpdateResponse]
+	setSystemImage           *connect.Client[v1.SetSystemImageRequest, v1.SetSystemImageResponse]
 }
 
 // ShutdownHost calls platform.server.v1.WebService.ShutdownHost.
@@ -209,6 +221,11 @@ func (c *webServiceClient) InstallOSUpdate(ctx context.Context, req *connect.Req
 	return c.installOSUpdate.CallUnary(ctx, req)
 }
 
+// SetSystemImage calls platform.server.v1.WebService.SetSystemImage.
+func (c *webServiceClient) SetSystemImage(ctx context.Context, req *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
+	return c.setSystemImage.CallUnary(ctx, req)
+}
+
 // WebServiceHandler is an implementation of the platform.server.v1.WebService service.
 type WebServiceHandler interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
@@ -220,6 +237,7 @@ type WebServiceHandler interface {
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
 	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
 	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
+	SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error)
 }
 
 // NewWebServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -282,6 +300,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceInstallOSUpdateMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceSetSystemImageHandler := connect.NewUnaryHandler(
+		WebServiceSetSystemImageProcedure,
+		svc.SetSystemImage,
+		connect.WithSchema(webServiceSetSystemImageMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.server.v1.WebService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case WebServiceShutdownHostProcedure:
@@ -302,6 +326,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceChangeDaemonVersionHandler.ServeHTTP(w, r)
 		case WebServiceInstallOSUpdateProcedure:
 			webServiceInstallOSUpdateHandler.ServeHTTP(w, r)
+		case WebServiceSetSystemImageProcedure:
+			webServiceSetSystemImageHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -345,4 +371,8 @@ func (UnimplementedWebServiceHandler) ChangeDaemonVersion(context.Context, *conn
 
 func (UnimplementedWebServiceHandler) InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.InstallOSUpdate is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.SetSystemImage is not implemented"))
 }

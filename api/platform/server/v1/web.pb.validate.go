@@ -2175,3 +2175,211 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = InstallOSUpdateResponseValidationError{}
+
+// Validate checks the field values on SetSystemImageRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetSystemImageRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetSystemImageRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetSystemImageRequestMultiError, or nil if none found.
+func (m *SetSystemImageRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetSystemImageRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for CurrentImage
+
+	// no validation rules for RequestedImage
+
+	if len(errors) > 0 {
+		return SetSystemImageRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetSystemImageRequestMultiError is an error wrapping multiple validation
+// errors returned by SetSystemImageRequest.ValidateAll() if the designated
+// constraints aren't met.
+type SetSystemImageRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetSystemImageRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetSystemImageRequestMultiError) AllErrors() []error { return m }
+
+// SetSystemImageRequestValidationError is the validation error returned by
+// SetSystemImageRequest.Validate if the designated constraints aren't met.
+type SetSystemImageRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetSystemImageRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetSystemImageRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetSystemImageRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetSystemImageRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetSystemImageRequestValidationError) ErrorName() string {
+	return "SetSystemImageRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetSystemImageRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetSystemImageRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetSystemImageRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetSystemImageRequestValidationError{}
+
+// Validate checks the field values on SetSystemImageResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetSystemImageResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetSystemImageResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetSystemImageResponseMultiError, or nil if none found.
+func (m *SetSystemImageResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetSystemImageResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SetSystemImageResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetSystemImageResponseMultiError is an error wrapping multiple validation
+// errors returned by SetSystemImageResponse.ValidateAll() if the designated
+// constraints aren't met.
+type SetSystemImageResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetSystemImageResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetSystemImageResponseMultiError) AllErrors() []error { return m }
+
+// SetSystemImageResponseValidationError is the validation error returned by
+// SetSystemImageResponse.Validate if the designated constraints aren't met.
+type SetSystemImageResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetSystemImageResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetSystemImageResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetSystemImageResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetSystemImageResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetSystemImageResponseValidationError) ErrorName() string {
+	return "SetSystemImageResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetSystemImageResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetSystemImageResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetSystemImageResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetSystemImageResponseValidationError{}

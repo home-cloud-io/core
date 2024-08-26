@@ -14,6 +14,7 @@ service WebService {
   rpc CheckForContainerUpdates(CheckForContainerUpdatesRequest) returns (CheckForContainerUpdatesResponse) {}
   rpc ChangeDaemonVersion(ChangeDaemonVersionRequest) returns (ChangeDaemonVersionResponse) {}
   rpc InstallOSUpdate(InstallOSUpdateRequest) returns (InstallOSUpdateResponse) {}
+  rpc SetSystemImage(SetSystemImageRequest) returns (SetSystemImageResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -86,3 +87,10 @@ message ChangeDaemonVersionResponse {}
 message InstallOSUpdateRequest {}
 
 message InstallOSUpdateResponse {}
+
+message SetSystemImageRequest {
+  string current_image = 1;
+  string requested_image = 2;
+}
+
+message SetSystemImageResponse {}
