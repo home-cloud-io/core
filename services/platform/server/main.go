@@ -2,7 +2,6 @@ package main
 
 import (
 	"embed"
-	"fmt"
 
 	"github.com/home-cloud-io/core/services/platform/server/daemon"
 	"github.com/home-cloud-io/core/services/platform/server/web"
@@ -23,7 +22,8 @@ func main() {
 		webRPC    = web.New(logger)
 	)
 
-	fmt.Println("test")
+	// Create the app store cache
+	web.NewStoreCache(logger)
 
 	defer chassis.New(logger).
 		WithClientApplication(files).

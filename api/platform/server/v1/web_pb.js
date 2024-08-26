@@ -12,8 +12,11 @@ export const AppRunningStatus = proto3.makeEnum(
   "platform.server.v1.AppRunningStatus",
   [
     {no: 0, name: "APP_RUNNING_STATUS_UNKNOWN", localName: "UNKNOWN"},
-    {no: 1, name: "APP_RUNNING_STATUS_RUNNING", localName: "RUNNING"},
-    {no: 2, name: "APP_RUNNING_STATUS_STOPPED", localName: "STOPPED"},
+    {no: 1, name: "APP_RUNNING_STATUS_DOWNLOADING", localName: "DOWNLOADING"},
+    {no: 2, name: "APP_RUNNING_STATUS_INSTALLING", localName: "INSTALLING"},
+    {no: 3, name: "APP_RUNNING_STATUS_RUNNING", localName: "RUNNING"},
+    {no: 4, name: "APP_RUNNING_STATUS_FAILING", localName: "FAILING"},
+    {no: 5, name: "APP_RUNNING_STATUS_STOPPED", localName: "STOPPED"},
   ],
 );
 
@@ -155,6 +158,8 @@ export const GetDeviceSettingsResponse = proto3.makeMessageType(
 );
 
 /**
+ * Model used for the store, and installed apps
+ *
  * @generated from message platform.server.v1.App
  */
 export const App = proto3.makeMessageType(
@@ -162,8 +167,13 @@ export const App = proto3.makeMessageType(
   () => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "app_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "created_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "digest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "urls", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ],
 );
 
@@ -176,6 +186,47 @@ export const AppStatus = proto3.makeMessageType(
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "status", kind: "enum", T: proto3.getEnumType(AppRunningStatus) },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.Entries
+ */
+export const Entries = proto3.makeMessageType(
+  "platform.server.v1.Entries",
+  () => [
+    { no: 1, name: "apps", kind: "message", T: App, repeated: true },
+  ],
+);
+
+/**
+ * Aggregate model for the installed apps saved in blueprint
+ *
+ * @generated from message platform.server.v1.InstalledApp
+ */
+export const InstalledApp = proto3.makeMessageType(
+  "platform.server.v1.InstalledApp",
+  () => [
+    { no: 1, name: "application", kind: "message", T: App },
+    { no: 2, name: "status", kind: "message", T: AppStatus },
+  ],
+);
+
+/**
+ * Model to parse the yaml file for the app's available in the store
+ * currently they are stored in a public repo and fetched from there
+ * (https://home-cloud-io.github.io/store/index.yaml)
+ * A backround thread in the server will fetch the file and update the
+ * store first when it starts and then every 24 hours
+ *
+ * @generated from message platform.server.v1.AppStoreResponse
+ */
+export const AppStoreResponse = proto3.makeMessageType(
+  "platform.server.v1.AppStoreResponse",
+  () => [
+    { no: 1, name: "api_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "generated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Entries} },
   ],
 );
 

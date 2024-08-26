@@ -1632,9 +1632,17 @@ func (m *App) validate(all bool) error {
 
 	// no validation rules for Version
 
+	// no validation rules for AppVersion
+
 	// no validation rules for Description
 
 	// no validation rules for Icon
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for Digest
+
+	// no validation rules for Type
 
 	if len(errors) > 0 {
 		return AppMultiError(errors)
@@ -1817,6 +1825,445 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AppStatusValidationError{}
+
+// Validate checks the field values on Entries with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Entries) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Entries with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in EntriesMultiError, or nil if none found.
+func (m *Entries) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Entries) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetApps() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, EntriesValidationError{
+						field:  fmt.Sprintf("Apps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, EntriesValidationError{
+						field:  fmt.Sprintf("Apps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return EntriesValidationError{
+					field:  fmt.Sprintf("Apps[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return EntriesMultiError(errors)
+	}
+
+	return nil
+}
+
+// EntriesMultiError is an error wrapping multiple validation errors returned
+// by Entries.ValidateAll() if the designated constraints aren't met.
+type EntriesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m EntriesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m EntriesMultiError) AllErrors() []error { return m }
+
+// EntriesValidationError is the validation error returned by Entries.Validate
+// if the designated constraints aren't met.
+type EntriesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EntriesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EntriesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EntriesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EntriesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EntriesValidationError) ErrorName() string { return "EntriesValidationError" }
+
+// Error satisfies the builtin error interface
+func (e EntriesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEntries.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EntriesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EntriesValidationError{}
+
+// Validate checks the field values on InstalledApp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *InstalledApp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InstalledApp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in InstalledAppMultiError, or
+// nil if none found.
+func (m *InstalledApp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InstalledApp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetApplication()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, InstalledAppValidationError{
+					field:  "Application",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, InstalledAppValidationError{
+					field:  "Application",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetApplication()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return InstalledAppValidationError{
+				field:  "Application",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetStatus()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, InstalledAppValidationError{
+					field:  "Status",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, InstalledAppValidationError{
+					field:  "Status",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStatus()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return InstalledAppValidationError{
+				field:  "Status",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return InstalledAppMultiError(errors)
+	}
+
+	return nil
+}
+
+// InstalledAppMultiError is an error wrapping multiple validation errors
+// returned by InstalledApp.ValidateAll() if the designated constraints aren't met.
+type InstalledAppMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InstalledAppMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InstalledAppMultiError) AllErrors() []error { return m }
+
+// InstalledAppValidationError is the validation error returned by
+// InstalledApp.Validate if the designated constraints aren't met.
+type InstalledAppValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InstalledAppValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InstalledAppValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InstalledAppValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InstalledAppValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InstalledAppValidationError) ErrorName() string { return "InstalledAppValidationError" }
+
+// Error satisfies the builtin error interface
+func (e InstalledAppValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInstalledApp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InstalledAppValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InstalledAppValidationError{}
+
+// Validate checks the field values on AppStoreResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *AppStoreResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppStoreResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AppStoreResponseMultiError, or nil if none found.
+func (m *AppStoreResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppStoreResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ApiVersion
+
+	// no validation rules for Generated
+
+	{
+		sorted_keys := make([]string, len(m.GetEntries()))
+		i := 0
+		for key := range m.GetEntries() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetEntries()[key]
+			_ = val
+
+			// no validation rules for Entries[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, AppStoreResponseValidationError{
+							field:  fmt.Sprintf("Entries[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, AppStoreResponseValidationError{
+							field:  fmt.Sprintf("Entries[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return AppStoreResponseValidationError{
+						field:  fmt.Sprintf("Entries[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return AppStoreResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppStoreResponseMultiError is an error wrapping multiple validation errors
+// returned by AppStoreResponse.ValidateAll() if the designated constraints
+// aren't met.
+type AppStoreResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppStoreResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppStoreResponseMultiError) AllErrors() []error { return m }
+
+// AppStoreResponseValidationError is the validation error returned by
+// AppStoreResponse.Validate if the designated constraints aren't met.
+type AppStoreResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppStoreResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppStoreResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppStoreResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppStoreResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppStoreResponseValidationError) ErrorName() string { return "AppStoreResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AppStoreResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppStoreResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppStoreResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppStoreResponseValidationError{}
 
 // Validate checks the field values on DeviceSettings with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

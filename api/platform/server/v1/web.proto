@@ -80,11 +80,17 @@ message GetDeviceSettingsResponse {
 // MODELS
 /////////
 
+// Model used for the store, and installed apps
 message App {
   string name = 1;
   string version = 2;
-  string description = 3;
-  string icon = 4;
+  string app_version = 3;
+  string description = 4;
+  string icon = 5;
+  string created_at = 6;
+  string digest = 7;
+  string type = 8;
+  repeated string urls = 9;
 }
 
 message AppStatus {
@@ -95,9 +101,36 @@ message AppStatus {
 
 enum AppRunningStatus {
   APP_RUNNING_STATUS_UNKNOWN = 0;
-  APP_RUNNING_STATUS_RUNNING = 1;
-  APP_RUNNING_STATUS_STOPPED = 2;
+  APP_RUNNING_STATUS_DOWNLOADING = 1;
+  APP_RUNNING_STATUS_INSTALLING = 2;
+  APP_RUNNING_STATUS_RUNNING = 3;
+  APP_RUNNING_STATUS_FAILING = 4;
+  APP_RUNNING_STATUS_STOPPED = 5;
 }
+
+message Entries {
+  repeated App apps = 1;
+}
+
+// Aggregate model for the installed apps saved in blueprint
+message InstalledApp {
+  App application = 1;
+  AppStatus status = 2;
+}
+
+
+// Model to parse the yaml file for the app's available in the store
+// currently they are stored in a public repo and fetched from there
+// (https://home-cloud-io.github.io/store/index.yaml)
+// A backround thread in the server will fetch the file and update the
+// store first when it starts and then every 24 hours
+message AppStoreResponse {
+  string api_version = 1;
+  string generated = 2;
+  map<string, Entries> entries = 3;
+}
+
+// User settings for the device
 
 message DeviceSettings {
   User admin_user = 1;
