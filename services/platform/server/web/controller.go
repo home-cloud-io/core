@@ -84,31 +84,13 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 	// TODO: set the password for the "admin" user on the device (call to daemon)
 
 	// TODO: Get seed salt value from `blue_print`
-	var seedVal *kvv1.Value
-	seedLookup, err := buildGetRequest(SEED_KEY, seedVal)
+	seed, err := getSaltValue(ctx, c.KeyValueServiceClient)
 	if err != nil {
 		return "", errors.New(ErrFailedToGetSettings)
+	} else {
+		// salt & hash the meat before you put in on the grill
+		settings.AdminUser.Password = hashPassword(settings.AdminUser.Password, []byte(seed))
 	}
-
-	getRes, err := c.KeyValueServiceClient.Get(ctx, seedLookup)
-	if err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
-	}
-
-	if err := getRes.Msg.GetValue().UnmarshalTo(seedVal); err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
-	}
-
-	// a little salt & hash before saving the password
-	var (
-		pwBytes        = []byte(settings.GetAdminUser().GetPassword())
-		sha512Hasher   = sha512.New()
-		hashedPassword = sha512Hasher.Sum(nil)
-	)
-
-	pwBytes = append(pwBytes, []byte(seedVal.GetData())...)
-	sha512Hasher.Write(pwBytes)
-	settings.AdminUser.Password = hex.EncodeToString(hashedPassword)
 
 	msg, err := buildSetRequest(DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
@@ -121,6 +103,39 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 	}
 
 	return id.Msg.Key, nil
+}
+
+func getSaltValue(ctx context.Context, c kvv1Connect.KeyValueServiceClient) (string, error) {
+	var seedVal *kvv1.Value
+	seedLookup, err := buildGetRequest(SEED_KEY, seedVal)
+	if err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	getRes, err := c.Get(ctx, seedLookup)
+	if err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	if err := getRes.Msg.GetValue().UnmarshalTo(seedVal); err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	return seedVal.GetData(), nil
+}
+
+func hashPassword(password string, salt []byte) string {
+	// a little salt & hash before saving the password
+	var (
+		pwBytes        = []byte(password)
+		sha512Hasher   = sha512.New()
+		hashedPassword = sha512Hasher.Sum(nil)
+	)
+
+	pwBytes = append(pwBytes, []byte(salt)...)
+	sha512Hasher.Write(pwBytes)
+
+	return hex.EncodeToString(hashedPassword)
 }
 
 func (c *controller) Login(ctx context.Context, username, password string) (string, error) {
@@ -143,7 +158,13 @@ func (c *controller) Login(ctx context.Context, username, password string) (stri
 		return "", errors.New(ErrFailedToGetSettings)
 	}
 
-	if settings.AdminUser.Password != password || settings.AdminUser.Username != username {
+	salt, err := getSaltValue(ctx, c.KeyValueServiceClient)
+	if err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	// Check if the password is correct. If not, return an error
+	if hashPassword(password, []byte(salt)) != settings.AdminUser.Password {
 		return "", errors.New("invalid username or password")
 	}
 
