@@ -2,6 +2,8 @@ package web
 
 import (
 	"context"
+	"crypto/sha512"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
@@ -80,6 +82,33 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 	}
 
 	// TODO: set the password for the "admin" user on the device (call to daemon)
+
+	// TODO: Get seed salt value from `blue_print`
+	var seedVal *kvv1.Value
+	seedLookup, err := buildGetRequest(SEED_KEY, seedVal)
+	if err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	getRes, err := c.KeyValueServiceClient.Get(ctx, seedLookup)
+	if err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	if err := getRes.Msg.GetValue().UnmarshalTo(seedVal); err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	// a little salt & hash before saving the password
+	var (
+		pwBytes        = []byte(settings.GetAdminUser().GetPassword())
+		sha512Hasher   = sha512.New()
+		hashedPassword = sha512Hasher.Sum(nil)
+	)
+
+	pwBytes = append(pwBytes, []byte(seedVal.GetData())...)
+	sha512Hasher.Write(pwBytes)
+	settings.AdminUser.Password = hex.EncodeToString(hashedPassword)
 
 	msg, err := buildSetRequest(DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
