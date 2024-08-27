@@ -28,29 +28,39 @@ var (
 
 func NewSecretSeed(logger chassis.Logger) error {
 	var (
-		log      = logger.WithField("setup seed", "secret")
-		kvClient = kvv1Connect.NewKeyValueServiceClient(http.DefaultClient, chassis.GetConfig().Entrypoint())
+		log       = logger.WithField("setup seed", "secret")
+		kvClient  = kvv1Connect.NewKeyValueServiceClient(http.DefaultClient, chassis.GetConfig().Entrypoint())
+		err       error
+		seedValue *v1.Value
 	)
 
-	// generate a random secret seed and save it to the key-value store
-	seed := randStringRunes(RANDOM_BYTES_LENGTH)
-
-	// store the seed in the key-value store
-	seedValue := &v1.Value{
-		Data: seed,
-	}
-	req, err := buildSetRequest(SEED_KEY, seedValue)
+	_, err = buildGetRequest(SEED_KEY, seedValue)
 	if err != nil {
-		log.WithError(err).Error(ErrFailedToStoreSeed)
-		return err
-	}
+		log.WithError(err).Error("failed to find seed making a new one")
 
-	_, err = kvClient.Set(context.Background(), req)
-	if err != nil {
-		log.WithError(err).Error(ErrFailedToStoreSeed)
-	}
+		// generate a random secret seed and save it to the key-value store
+		seed := randStringRunes(RANDOM_BYTES_LENGTH)
 
-	return nil
+		// store the seed in the key-value store
+		seedValue := &v1.Value{
+			Data: seed,
+		}
+		req, err := buildSetRequest(SEED_KEY, seedValue)
+		if err != nil {
+			log.WithError(err).Error(ErrFailedToStoreSeed)
+			return err
+		}
+
+		_, err = kvClient.Set(context.Background(), req)
+		if err != nil {
+			log.WithError(err).Error(ErrFailedToStoreSeed)
+		}
+
+		return nil
+	} else {
+		log.Info("seed already exists do nothing")
+		return nil
+	}
 }
 
 func randStringRunes(n int) string {

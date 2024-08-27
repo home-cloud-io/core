@@ -106,7 +106,7 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 }
 
 func getSaltValue(ctx context.Context, c kvv1Connect.KeyValueServiceClient) (string, error) {
-	var seedVal *kvv1.Value
+	seedVal := &kvv1.Value{}
 	seedLookup, err := buildGetRequest(SEED_KEY, seedVal)
 	if err != nil {
 		return "", errors.New(ErrFailedToGetSettings)
@@ -117,7 +117,8 @@ func getSaltValue(ctx context.Context, c kvv1Connect.KeyValueServiceClient) (str
 		return "", errors.New(ErrFailedToGetSettings)
 	}
 
-	if err := getRes.Msg.GetValue().UnmarshalTo(seedVal); err != nil {
+	anypb := getRes.Msg.GetValue()
+	if err := anypb.UnmarshalTo(seedVal); err != nil {
 		return "", errors.New(ErrFailedToGetSettings)
 	}
 
