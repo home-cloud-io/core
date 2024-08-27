@@ -48,6 +48,10 @@ const (
 	ErrFailedToGetSettings    = "failed to get settings"
 	ErrFailedToGetApps        = "failed to get apps"
 
+	ErrFailedToBuildSeedGetRequest = "failed to build get request for seed"
+	ErrFailedToGetSeedValue        = "failed to get seed value"
+	ErrFailedToUnmarshalSeedValue  = "failed to unmarshal seed value"
+
 	DEFAULT_DEVICE_SETTINGS_KEY = "device"
 )
 
@@ -109,17 +113,17 @@ func getSaltValue(ctx context.Context, c kvv1Connect.KeyValueServiceClient) (str
 	seedVal := &kvv1.Value{}
 	seedLookup, err := buildGetRequest(SEED_KEY, seedVal)
 	if err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
+		return "", errors.New(ErrFailedToBuildSeedGetRequest)
 	}
 
 	getRes, err := c.Get(ctx, seedLookup)
 	if err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
+		return "", errors.New(ErrFailedToGetSeedValue)
 	}
 
 	anypb := getRes.Msg.GetValue()
 	if err := anypb.UnmarshalTo(seedVal); err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
+		return "", errors.New(ErrFailedToUnmarshalSeedValue)
 	}
 
 	return seedVal.GetData(), nil
