@@ -12,10 +12,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-type ()
-
 const (
-	APP_STORE_URL = "https://home-cloud-io.github.io/store/index.yaml"
+	APP_STORE_URL         = "https://home-cloud-io.github.io/store/index.yaml"
+	APP_STORE_ENTRIES_KEY = "app_store_entries"
 
 	ErrFailedToPopulateAppStore = "failed to populate app store"
 )
@@ -59,12 +58,13 @@ func NewStoreCache(logger chassis.Logger) error {
 	// Insert the app store response into the key-value store so it can be used later
 
 	// marshal to any pb
-	setReq, err := buildSetRequest("app_store_entries", storeApps)
+	setReq, err := buildSetRequest(APP_STORE_ENTRIES_KEY, storeApps)
 	if err != nil {
 		logger.Error("failed to marshal app store entries")
 		return errors.New(ErrFailedToPopulateAppStore)
 	}
 
+	// store in blueprint
 	val, err := kvClient.Set(context.Background(), setReq)
 	if err != nil {
 		logger.Error("failed to save app store entries")

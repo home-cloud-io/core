@@ -32,7 +32,7 @@ func New(logger chassis.Logger) Rpc {
 	return &rpc{
 		logger:     logger,
 		k8sclient:  k8sclient.NewClient(logger),
-		controller: NewController(),
+		controller: NewController(logger),
 	}
 }
 
@@ -180,7 +180,14 @@ func (h *rpc) GetInstalledApps(ctx context.Context, request *connect.Request[v1.
 }
 
 func (h *rpc) GetAppsInStore(ctx context.Context, request *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error) {
-	return nil, errors.New("not implemented")
+	h.logger.Info("getting apps in store")
+
+	apps, err := h.controller.GetAppsInStore(ctx)
+	if err != nil {
+		return nil, errors.New(ErrFailedToGetApps)
+	}
+
+	return connect.NewResponse(&v1.GetAppsInStoreResponse{Apps: apps}), nil
 }
 
 func (h *rpc) GetDeviceSettings(ctx context.Context, request *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error) {

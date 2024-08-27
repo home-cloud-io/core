@@ -12,11 +12,10 @@ export const AppRunningStatus = proto3.makeEnum(
   "platform.server.v1.AppRunningStatus",
   [
     {no: 0, name: "APP_RUNNING_STATUS_UNKNOWN", localName: "UNKNOWN"},
-    {no: 1, name: "APP_RUNNING_STATUS_DOWNLOADING", localName: "DOWNLOADING"},
-    {no: 2, name: "APP_RUNNING_STATUS_INSTALLING", localName: "INSTALLING"},
-    {no: 3, name: "APP_RUNNING_STATUS_RUNNING", localName: "RUNNING"},
-    {no: 4, name: "APP_RUNNING_STATUS_FAILING", localName: "FAILING"},
-    {no: 5, name: "APP_RUNNING_STATUS_STOPPED", localName: "STOPPED"},
+    {no: 1, name: "APP_RUNNING_STATUS_INSTALLING", localName: "INSTALLING"},
+    {no: 2, name: "APP_RUNNING_STATUS_RUNNING", localName: "RUNNING"},
+    {no: 3, name: "APP_RUNNING_STATUS_FAILING", localName: "FAILING"},
+    {no: 4, name: "APP_RUNNING_STATUS_STOPPED", localName: "STOPPED"},
   ],
 );
 
@@ -158,6 +157,98 @@ export const GetDeviceSettingsResponse = proto3.makeMessageType(
 );
 
 /**
+ * @generated from message platform.server.v1.ShutdownHostRequest
+ */
+export const ShutdownHostRequest = proto3.makeMessageType(
+  "platform.server.v1.ShutdownHostRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.ShutdownHostResponse
+ */
+export const ShutdownHostResponse = proto3.makeMessageType(
+  "platform.server.v1.ShutdownHostResponse",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.RestartHostRequest
+ */
+export const RestartHostRequest = proto3.makeMessageType(
+  "platform.server.v1.RestartHostRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.RestartHostResponse
+ */
+export const RestartHostResponse = proto3.makeMessageType(
+  "platform.server.v1.RestartHostResponse",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.InstallAppRequest
+ */
+export const InstallAppRequest = proto3.makeMessageType(
+  "platform.server.v1.InstallAppRequest",
+  () => [
+    { no: 1, name: "chart", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "values", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.InstallAppResponse
+ */
+export const InstallAppResponse = proto3.makeMessageType(
+  "platform.server.v1.InstallAppResponse",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.DeleteAppRequest
+ */
+export const DeleteAppRequest = proto3.makeMessageType(
+  "platform.server.v1.DeleteAppRequest",
+  () => [
+    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DeleteAppResponse
+ */
+export const DeleteAppResponse = proto3.makeMessageType(
+  "platform.server.v1.DeleteAppResponse",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.UpdateAppRequest
+ */
+export const UpdateAppRequest = proto3.makeMessageType(
+  "platform.server.v1.UpdateAppRequest",
+  () => [
+    { no: 1, name: "chart", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "values", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.UpdateAppResponse
+ */
+export const UpdateAppResponse = proto3.makeMessageType(
+  "platform.server.v1.UpdateAppResponse",
+  [],
+);
+
+/**
  * Model used for the store, and installed apps
  *
  * @generated from message platform.server.v1.App
@@ -264,97 +355,5 @@ export const User = proto3.makeMessageType(
     { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
-);
-
-/**
- * @generated from message platform.server.v1.ShutdownHostRequest
- */
-export const ShutdownHostRequest = proto3.makeMessageType(
-  "platform.server.v1.ShutdownHostRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.ShutdownHostResponse
- */
-export const ShutdownHostResponse = proto3.makeMessageType(
-  "platform.server.v1.ShutdownHostResponse",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.RestartHostRequest
- */
-export const RestartHostRequest = proto3.makeMessageType(
-  "platform.server.v1.RestartHostRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.RestartHostResponse
- */
-export const RestartHostResponse = proto3.makeMessageType(
-  "platform.server.v1.RestartHostResponse",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.InstallAppRequest
- */
-export const InstallAppRequest = proto3.makeMessageType(
-  "platform.server.v1.InstallAppRequest",
-  () => [
-    { no: 1, name: "chart", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "values", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.InstallAppResponse
- */
-export const InstallAppResponse = proto3.makeMessageType(
-  "platform.server.v1.InstallAppResponse",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.DeleteAppRequest
- */
-export const DeleteAppRequest = proto3.makeMessageType(
-  "platform.server.v1.DeleteAppRequest",
-  () => [
-    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.DeleteAppResponse
- */
-export const DeleteAppResponse = proto3.makeMessageType(
-  "platform.server.v1.DeleteAppResponse",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.UpdateAppRequest
- */
-export const UpdateAppRequest = proto3.makeMessageType(
-  "platform.server.v1.UpdateAppRequest",
-  () => [
-    { no: 1, name: "chart", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "values", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.UpdateAppResponse
- */
-export const UpdateAppResponse = proto3.makeMessageType(
-  "platform.server.v1.UpdateAppResponse",
-  [],
 );
 

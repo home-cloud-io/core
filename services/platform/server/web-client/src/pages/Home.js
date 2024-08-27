@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { Routes, Route, redirect } from "react-router-dom";
 import {
   deleteApp,
   installApp,
@@ -91,7 +92,7 @@ export default function Home() {
             </div>
 
             <div>
-            <button 
+              <button 
                 id="navbarSideCollapse"
                 className="navbar-toggler p-0 border-0"
                 type="button"
@@ -99,32 +100,31 @@ export default function Home() {
                 onClick={onClickNavCollapseBtn}>
                   <span className="navbar-toggler-icon"></span>
               </button>
-            <div className={`navbar-collapse offcanvas-collapse ${isNavCollapsed ? '' : 'open'}`} id="navbarsExampleDefault">
-              <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                {/* <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">Home</a>
-                </li> */}
-                {/* <li className="nav-item">
-                  <a className="nav-link" href="#">Device Details</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">Profile</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#">Switch account</a>
-                </li> */}
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Settings</a>
-                  <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" href="#">Settings</a></li>
-                    <li><a className="dropdown-item" href="#">Logout</a></li>
-                    <li><a className="dropdown-item" href="#">Shutdown</a></li>
-                    <li><a className="dropdown-item" href="#">Restart</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-
+              <div className={`navbar-collapse offcanvas-collapse ${isNavCollapsed ? '' : 'open'}`} id="navbarsExampleDefault">
+                <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                  {/* <li className="nav-item">
+                    <a className="nav-link active" aria-current="page" href="#">Home</a>
+                  </li> */}
+                  {/* <li className="nav-item">
+                    <a className="nav-link" href="#">Device Details</a>
+                  </li>
+                  <li className="nav-item">
+                    <a className="nav-link" href="#">Profile</a>
+                  </li>
+                  <li className="nav-item">
+                    <a className="nav-link" href="#">Switch account</a>
+                  </li> */}
+                  <li className="nav-item dropdown">
+                    <a className="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Settings</a>
+                    <ul className="dropdown-menu">
+                      <li><a className="dropdown-item" href="#">Settings</a></li>
+                      <li><a className="dropdown-item" href="#">Logout</a></li>
+                      <li><a className="dropdown-item" href="#">Shutdown</a></li>
+                      <li><a className="dropdown-item" href="#">Restart</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
             </div>
         </div>
       </nav>
@@ -133,10 +133,8 @@ export default function Home() {
 
       <main className="container">
         {isAlertVisible && <Alert />}
-
-        <DeviceDetails />
         <InstalledApplicationsList />
-
+        <DeviceDetails />
       </main>
 
       {/* <div>
@@ -246,7 +244,7 @@ function Application() {
             <p
               className="pb-3 mb-0 small lh-sm"
               id="deviceStatusIndicatorLabel">
-              <strong className="d-block text-gray-dark">Online</strong>
+              <strong className="d-block text-gray-dark"></strong>
             </p>
           </div>
 
@@ -264,7 +262,7 @@ function DeviceDetails() {
   return (
     <div className="my-3 p-3 bg-body rounded shadow-sm">
       <div className="border-bottom">
-      <h6 className="pb-2 mb-0">Device Details</h6>
+      <h6 className="pb-2 mb-0">Server Status</h6>
 
       <div className="d-flex text-body-secondary pt-3" style={styles}>
         <svg

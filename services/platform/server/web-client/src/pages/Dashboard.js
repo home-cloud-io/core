@@ -40,7 +40,10 @@ export default function Dashboard() {
   return (
     <>
       <Routes>
-        <Route index element={<Home/>} />
+        <Route path="/" element={<Home/>} >
+          
+        </Route>
+
         <Route path="getting-started" element={<DeviceOnboardPage/>} />
         <Route path="login" element={<Login/>} />
       </Routes>

@@ -96,7 +96,7 @@ function DeviceSettings({ navigate, setDeviceSettings }) {
 
   return (
     <div className="tab-pane fade show active">
-      <p>Configure the device settings.</p>
+      <p>Configure the server</p>
 
       <form className="row g-3">
         <div className="col-12"> 
@@ -131,7 +131,7 @@ function DeviceSettings({ navigate, setDeviceSettings }) {
               role="switch"
               value="true"
               onChange={e => setAutoUpdateOs(e.target.value)} />
-            <label className="form-check-label">Automatically update operating system?</label>
+            <label className="form-check-label">Automatically update server</label>
           </div>
         </div>
 

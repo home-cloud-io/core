@@ -23,8 +23,13 @@ func main() {
 	)
 
 	// Create the app store cache
+	// TODO: Put this in a goroutine and do it on a timer every 24 hours
 	if err := web.NewStoreCache(logger); err != nil {
-		logger.Error("failed to create app store cache")
+		logger.WithError(err).Error("failed to create app store cache")
+	}
+
+	if err := web.NewSecretSeed(logger); err != nil {
+		logger.WithError(err).Error("failed to create secret seed")
 	}
 
 	defer chassis.New(logger).
