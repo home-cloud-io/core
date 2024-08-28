@@ -90,6 +90,13 @@ export const serverRPCService = createApi({
         return { data: { loggedIn: true }};
       }
     }),
+    getAppStoreEntities: builder.query({
+      queryFn: async () => {
+        const res = await client.getAppsInStore({});
+
+        return { data: res.data };
+      },
+    }),
   }),
 });
 
@@ -101,7 +108,8 @@ export const {
   useUpdateAppMutation,
   useGetIsDeviceSetupQuery,
   useInitDeviceMutation,
-  useLoginMutation
+  useLoginMutation,
+  useGetAppStoreEntitiesQuery
 } = serverRPCService;
 
 const values = new Map([

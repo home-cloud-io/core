@@ -5,7 +5,6 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"net/http"
 
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
@@ -188,7 +187,7 @@ func (c *controller) GetAppsInStore(ctx context.Context) ([]*v1.App, error) {
 
 	logger.Info("getting apps in store")
 
-	req, err := buildGetRequest(APP_STORE_ENTRIES_KEY, &v1.App{})
+	req, err := buildGetRequest(APP_STORE_ENTRIES_KEY, appStore)
 	if err != nil {
 		logger.Error("failed to build get request")
 		return nil, errors.New(ErrFailedToGetApps)
@@ -210,10 +209,12 @@ func (c *controller) GetAppsInStore(ctx context.Context) ([]*v1.App, error) {
 		return nil, errors.New(ErrFailedToGetApps)
 	}
 
-	// map to the `App` type
-
-	for k, v := range appStore.Entries {
-		fmt.Println("key: %s", "value: %s", k, v)
+	for _, v := range appStore.Entries {
+		// TODO: get the latest, right now this assumes the `app` slice is already sorted by version
+		// append the first app of the app store entry to to the `apps` slice
+		if len(v.Apps) > 0 {
+			apps = append(apps, v.Apps[0])
+		}
 	}
 
 	return apps, nil

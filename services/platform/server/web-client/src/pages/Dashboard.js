@@ -3,10 +3,13 @@ import { Routes, Route, redirect } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import Login from "./Login";
-import Home from "./Home";
+import DefaultLayout from "./DefaultLayout";
 import DeviceOnboardPage from "./Device/Onboard";
+import AppStore from "./AppStore/AppStore";
 
 import {useGetIsDeviceSetupQuery} from "../services/web_rpc";
+
+import { HomePage } from "./Home/Home";
 
 export default function Dashboard() {
   const userSettings = useSelector((state) => state.user_settings);
@@ -40,8 +43,9 @@ export default function Dashboard() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home/>} >
-          
+        <Route path="/" element={<DefaultLayout />} >
+          <Route path="home" element={<HomePage />} />
+          <Route path="store" element={<AppStore />} />
         </Route>
 
         <Route path="getting-started" element={<DeviceOnboardPage/>} />
