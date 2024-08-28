@@ -1,53 +1,52 @@
 import * as React from 'react';
 
-import "./AppStore.css";
-
-import { useGetAppStoreEntitiesQuery } from '../../services/web_rpc';
+import { 
+  useInstallAppMutation,
+  useGetAppStoreEntitiesQuery
+} from '../../services/web_rpc';
 
 export default function AppStore() {
-  const { apps, error, isLoading } = useGetAppStoreEntitiesQuery(); 
+  const { data, error, isLoading } = useGetAppStoreEntitiesQuery(); 
+
+  const ListEntries = () => {
+    return (
+      <div className="my-3 p-3 bg-body rounded shadow-sm">
+        <h6 className="border-bottom pb-2 mb-0">Applications</h6>
+        {data.map(app => {
+          return (
+            <StoreEntry app={app} key={app.digest}/>
+          )
+        })}
+      </div>
+    )
+  }
 
   return (
     <>
-      <SearchAppEntries />
-        {
-          isLoading ? (
-            <div>Loading...</div>
-          ) : error ? (
-            <div>Error: {error.message}</div>
-          ) : (
-            <div>
-              <AppStoreEntries apps={apps}/>
-            </div>
-          )
-        }
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>Error: {error.message}</p>
+      ) : (
+        <ListEntries />
+      )}
     </>
   );
 }
 
-export function AppStoreEntries({apps}) {
-  return (
-    <div>
+function StoreEntry({app}) {
+  const [installApp, result] = useInstallAppMutation();
 
-      <div className="my-3 p-3 bg-body rounded shadow-sm">
-        <div className="">
-          {apps.map((app) => (
-            <StoreEntry details={app} />
-          ))}
+  const rowStyles = {
+    paddingLeft: "2rem",
+  }
 
-          {/* <StoreEntry />
-          <StoreEntry />
-          <StoreEntry /> */}
-        </div>
+  const btnStyles = {
+    marginTop: "-2.5rem",
+  }
 
-      </div>
-    </div>
-  )
-}
-
-function StoreEntry({details}) {
-  const styles = {
-    marginTop: ".25rem",
+  const descriptionStyles = {
+    marginTop: ".50rem",
   }
 
   const onAppClick = (app) => {
@@ -59,49 +58,26 @@ function StoreEntry({details}) {
   }
 
   return (
-    <div className="d-flex text-body-secondary pt-3"
-      onClick={() => onAppClick("immich")}
-      onMouseOver={() => onMouseOver("immitch")}>
-      <svg
-        className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-        width="64"
-        height="64"
-        xmlns="http://www.w3.org/2000/svg"
-        role="img"
-        aria-label="Placeholder: 32x32"
-        preserveAspectRatio="xMidYMid slice"
-        focusable="false">
-          <title>Placeholder</title>
-          <rect width="100%" height="100%" fill="#6528e0"/><text x="50%" y="50%" fill="#6528e0" dy=".3em">32x32</text>
-        </svg>
+    <div className="d-flex text-body-secondary pt-3">
 
-        <div className="pb-3 mb-0 small lh-sm border-bottom w-100 position-relative">
+        <img src={app.icon} width={48} height={48}/>
+
+        <div className="pb-3 mb-0 small lh-sm border-bottom w-100 position-relative" style={rowStyles}>
           <div className="d-flex justify-content-between">
-            <strong className="text-gray-dark">Immich</strong>
+            <strong className="text-gray-dark">{app.name}</strong>
           </div>
 
-          <span className="float-end app-version">Version: 1.0.1</span>
-
-          <div className="d-flex text-body-secondary pt-3 float-end position-absolute top-25 end-0" style={styles}>
-            <svg
-              className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-              width="16"
-              height="16"
-              xmlns="http://www.w3.org/2000/svg"
-              role="img"
-              aria-label="Placeholder: 32x32"
-              preserveAspectRatio="xMidYMid slice"
-              focusable="false">
-                <title>Placeholder</title>
-                <rect width="100%" height="100%" fill="#28e053"/><text x="50%" y="50%" fill="#28e053" dy=".3em">32x32</text>
-            </svg>
-            <p
-              className="pb-3 mb-0 small lh-sm"
-              id="deviceStatusIndicatorLabel">
-              <strong className="d-block text-gray-dark"></strong>
-            </p>
+          <div style={descriptionStyles}>
+            <p>{app.description}</p>
           </div>
 
+          <button 
+            className="btn btn-outline-primary float-end btn-sm"
+            style={btnStyles}
+            onClick={() => installApp(app.name)}>
+              Install
+          </button>
+          
         </div>
     </div>
   )

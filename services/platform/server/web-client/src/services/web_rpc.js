@@ -34,8 +34,20 @@ export const serverRPCService = createApi({
       },
     }),
     installApp: builder.mutation({
-      queryFn: async (req) => {
-        return client.installApp(req);
+      queryFn: async (app) => {
+        try {
+          const res = await client.installApp({
+            repo: 'home-cloud-io.github.io/store',
+            chart: app,
+            release: `${app}`,
+            values: values.get(app),
+          });
+
+          return { data: res };
+        } catch (error) {
+          console.log(error);
+          return { error };
+        }
       },
     }),
     deleteApp: builder.mutation({
@@ -82,19 +94,24 @@ export const serverRPCService = createApi({
     }),
     login: builder.mutation({
       queryFn: async (req, store) => {
-        
-        const response = await client.login(req);
-
-        store.dispatch(setUserSettings({ username: req.username, token: response.token }));
-      
-        return { data: { loggedIn: true }};
+        try {
+          const response = await client.login(req);
+          // dispatch a redux action to set the user settings
+          store.dispatch(setUserSettings({ username: req.username, token: response.token }));
+          return { data: { loggedIn: true }};
+        } catch (error) {
+          return { error };
+        }  
       }
     }),
     getAppStoreEntities: builder.query({
       queryFn: async () => {
-        const res = await client.getAppsInStore({});
-
-        return { data: res.data };
+        try {
+          const res = await client.getAppsInStore({});
+          return { data: res.toJson().apps};
+        } catch (error) {
+          return { error };
+        }
       },
     }),
   }),
@@ -109,7 +126,7 @@ export const {
   useGetIsDeviceSetupQuery,
   useInitDeviceMutation,
   useLoginMutation,
-  useGetAppStoreEntitiesQuery
+  useGetAppStoreEntitiesQuery,
 } = serverRPCService;
 
 const values = new Map([
