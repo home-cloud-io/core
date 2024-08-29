@@ -2384,6 +2384,347 @@ var _ interface {
 	ErrorName() string
 } = SetSystemImageResponseValidationError{}
 
+// Validate checks the field values on AppsHealthCheckRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AppsHealthCheckRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppsHealthCheckRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AppsHealthCheckRequestMultiError, or nil if none found.
+func (m *AppsHealthCheckRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppsHealthCheckRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return AppsHealthCheckRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppsHealthCheckRequestMultiError is an error wrapping multiple validation
+// errors returned by AppsHealthCheckRequest.ValidateAll() if the designated
+// constraints aren't met.
+type AppsHealthCheckRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppsHealthCheckRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppsHealthCheckRequestMultiError) AllErrors() []error { return m }
+
+// AppsHealthCheckRequestValidationError is the validation error returned by
+// AppsHealthCheckRequest.Validate if the designated constraints aren't met.
+type AppsHealthCheckRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppsHealthCheckRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppsHealthCheckRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppsHealthCheckRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppsHealthCheckRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppsHealthCheckRequestValidationError) ErrorName() string {
+	return "AppsHealthCheckRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AppsHealthCheckRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppsHealthCheckRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppsHealthCheckRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppsHealthCheckRequestValidationError{}
+
+// Validate checks the field values on AppsHealthCheckResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AppsHealthCheckResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppsHealthCheckResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AppsHealthCheckResponseMultiError, or nil if none found.
+func (m *AppsHealthCheckResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppsHealthCheckResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetChecks() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AppsHealthCheckResponseValidationError{
+						field:  fmt.Sprintf("Checks[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AppsHealthCheckResponseValidationError{
+						field:  fmt.Sprintf("Checks[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AppsHealthCheckResponseValidationError{
+					field:  fmt.Sprintf("Checks[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return AppsHealthCheckResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppsHealthCheckResponseMultiError is an error wrapping multiple validation
+// errors returned by AppsHealthCheckResponse.ValidateAll() if the designated
+// constraints aren't met.
+type AppsHealthCheckResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppsHealthCheckResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppsHealthCheckResponseMultiError) AllErrors() []error { return m }
+
+// AppsHealthCheckResponseValidationError is the validation error returned by
+// AppsHealthCheckResponse.Validate if the designated constraints aren't met.
+type AppsHealthCheckResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppsHealthCheckResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppsHealthCheckResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppsHealthCheckResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppsHealthCheckResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppsHealthCheckResponseValidationError) ErrorName() string {
+	return "AppsHealthCheckResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AppsHealthCheckResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppsHealthCheckResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppsHealthCheckResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppsHealthCheckResponseValidationError{}
+
+// Validate checks the field values on AppHealth with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AppHealth) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppHealth with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AppHealthMultiError, or nil
+// if none found.
+func (m *AppHealth) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppHealth) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	// no validation rules for Status
+
+	if len(errors) > 0 {
+		return AppHealthMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppHealthMultiError is an error wrapping multiple validation errors returned
+// by AppHealth.ValidateAll() if the designated constraints aren't met.
+type AppHealthMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppHealthMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppHealthMultiError) AllErrors() []error { return m }
+
+// AppHealthValidationError is the validation error returned by
+// AppHealth.Validate if the designated constraints aren't met.
+type AppHealthValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppHealthValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppHealthValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppHealthValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppHealthValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppHealthValidationError) ErrorName() string { return "AppHealthValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AppHealthValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppHealth.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppHealthValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppHealthValidationError{}
+
 // Validate checks the field values on GetSystemStatsRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

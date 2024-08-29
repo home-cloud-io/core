@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -100,6 +100,15 @@ export const WebService = {
       name: "SetSystemImage",
       I: SetSystemImageRequest,
       O: SetSystemImageResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc platform.server.v1.WebService.AppsHealthCheck
+     */
+    appsHealthCheck: {
+      name: "AppsHealthCheck",
+      I: AppsHealthCheckRequest,
+      O: AppsHealthCheckResponse,
       kind: MethodKind.Unary,
     },
     /**
