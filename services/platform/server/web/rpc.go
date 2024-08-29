@@ -236,3 +236,15 @@ func (h *rpc) AppsHealthCheck(ctx context.Context, request *connect.Request[v1.A
 		Checks: checks,
 	}), nil
 }
+
+func (h *rpc) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
+
+	stats := daemon.CurrentSystemStats
+	if stats == nil {
+		return nil, fmt.Errorf("no system stats available")
+	}
+
+	return connect.NewResponse(&v1.GetSystemStatsResponse{
+		Stats: stats,
+	}), nil
+}
