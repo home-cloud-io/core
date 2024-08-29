@@ -11,9 +11,9 @@ import { Message, proto3 } from "@bufbuild/protobuf";
  */
 export enum AppStatus {
   /**
-   * @generated from enum value: APP_STATUS_UNKNOWN = 0;
+   * @generated from enum value: APP_STATUS_UNSPECIFIED = 0;
    */
-  UNKNOWN = 0,
+  UNSPECIFIED = 0,
 
   /**
    * @generated from enum value: APP_STATUS_HEALTHY = 1;
@@ -27,7 +27,7 @@ export enum AppStatus {
 }
 // Retrieve enum metadata with: proto3.getEnumType(AppStatus)
 proto3.util.setEnumType(AppStatus, "platform.server.v1.AppStatus", [
-  { no: 0, name: "APP_STATUS_UNKNOWN" },
+  { no: 0, name: "APP_STATUS_UNSPECIFIED" },
   { no: 1, name: "APP_STATUS_HEALTHY" },
   { no: 2, name: "APP_STATUS_UNHEALTHY" },
 ]);
@@ -940,7 +940,7 @@ export class AppHealth extends Message<AppHealth> {
   /**
    * @generated from field: platform.server.v1.AppStatus status = 2;
    */
-  status = AppStatus.UNKNOWN;
+  status = AppStatus.UNSPECIFIED;
 
   constructor(data?: PartialMessage<AppHealth>) {
     super();
