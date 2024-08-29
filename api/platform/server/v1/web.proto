@@ -15,6 +15,7 @@ service WebService {
   rpc ChangeDaemonVersion(ChangeDaemonVersionRequest) returns (ChangeDaemonVersionResponse) {}
   rpc InstallOSUpdate(InstallOSUpdateRequest) returns (InstallOSUpdateResponse) {}
   rpc SetSystemImage(SetSystemImageRequest) returns (SetSystemImageResponse) {}
+  rpc AppsHealthCheck(AppsHealthCheckRequest) returns (AppsHealthCheckResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -94,3 +95,20 @@ message SetSystemImageRequest {
 }
 
 message SetSystemImageResponse {}
+
+message AppsHealthCheckRequest {}
+
+message AppsHealthCheckResponse {
+  repeated AppHealth checks = 1;
+}
+
+message AppHealth {
+  string name = 1;
+  AppStatus status = 2;
+}
+
+enum AppStatus {
+  APP_STATUS_UNKNOWN = 0;
+  APP_STATUS_HEALTHY = 1;
+  APP_STATUS_UNHEALTHY = 2;
+}

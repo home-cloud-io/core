@@ -6,6 +6,18 @@
 import { proto3 } from "@bufbuild/protobuf";
 
 /**
+ * @generated from enum platform.server.v1.AppStatus
+ */
+export const AppStatus = proto3.makeEnum(
+  "platform.server.v1.AppStatus",
+  [
+    {no: 0, name: "APP_STATUS_UNKNOWN", localName: "UNKNOWN"},
+    {no: 1, name: "APP_STATUS_HEALTHY", localName: "HEALTHY"},
+    {no: 2, name: "APP_STATUS_UNHEALTHY", localName: "UNHEALTHY"},
+  ],
+);
+
+/**
  * @generated from message platform.server.v1.ShutdownHostRequest
  */
 export const ShutdownHostRequest = proto3.makeMessageType(
@@ -212,5 +224,34 @@ export const SetSystemImageRequest = proto3.makeMessageType(
 export const SetSystemImageResponse = proto3.makeMessageType(
   "platform.server.v1.SetSystemImageResponse",
   [],
+);
+
+/**
+ * @generated from message platform.server.v1.AppsHealthCheckRequest
+ */
+export const AppsHealthCheckRequest = proto3.makeMessageType(
+  "platform.server.v1.AppsHealthCheckRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.AppsHealthCheckResponse
+ */
+export const AppsHealthCheckResponse = proto3.makeMessageType(
+  "platform.server.v1.AppsHealthCheckResponse",
+  () => [
+    { no: 1, name: "checks", kind: "message", T: AppHealth, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.AppHealth
+ */
+export const AppHealth = proto3.makeMessageType(
+  "platform.server.v1.AppHealth",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(AppStatus) },
+  ],
 );
 
