@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { proto3 } from "@bufbuild/protobuf";
+import { SystemStats } from "./system_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -15,6 +16,7 @@ export const DaemonMessage = proto3.makeMessageType(
     { no: 2, name: "shutdown_alert", kind: "message", T: ShutdownAlert, oneof: "message" },
     { no: 3, name: "os_update_diff", kind: "message", T: OSUpdateDiff, oneof: "message" },
     { no: 4, name: "current_daemon_version", kind: "message", T: CurrentDaemonVersion, oneof: "message" },
+    { no: 5, name: "system_stats", kind: "message", T: SystemStats, oneof: "message" },
   ],
 );
 

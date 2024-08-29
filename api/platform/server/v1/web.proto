@@ -4,6 +4,8 @@ package platform.server.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 
+import "platform/daemon/v1/system.proto";
+
 service WebService {
   rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
   rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
@@ -15,6 +17,7 @@ service WebService {
   rpc ChangeDaemonVersion(ChangeDaemonVersionRequest) returns (ChangeDaemonVersionResponse) {}
   rpc InstallOSUpdate(InstallOSUpdateRequest) returns (InstallOSUpdateResponse) {}
   rpc SetSystemImage(SetSystemImageRequest) returns (SetSystemImageResponse) {}
+  rpc GetSystemStats(GetSystemStatsRequest) returns (GetSystemStatsResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -94,3 +97,9 @@ message SetSystemImageRequest {
 }
 
 message SetSystemImageResponse {}
+
+message GetSystemStatsRequest {}
+
+message GetSystemStatsResponse {
+  platform.daemon.v1.SystemStats stats = 1;
+}

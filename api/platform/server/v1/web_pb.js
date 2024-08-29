@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { proto3 } from "@bufbuild/protobuf";
+import { SystemStats } from "../../daemon/v1/system_pb.js";
 
 /**
  * @generated from message platform.server.v1.ShutdownHostRequest
@@ -212,5 +213,23 @@ export const SetSystemImageRequest = proto3.makeMessageType(
 export const SetSystemImageResponse = proto3.makeMessageType(
   "platform.server.v1.SetSystemImageResponse",
   [],
+);
+
+/**
+ * @generated from message platform.server.v1.GetSystemStatsRequest
+ */
+export const GetSystemStatsRequest = proto3.makeMessageType(
+  "platform.server.v1.GetSystemStatsRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.GetSystemStatsResponse
+ */
+export const GetSystemStatsResponse = proto3.makeMessageType(
+  "platform.server.v1.GetSystemStatsResponse",
+  () => [
+    { no: 1, name: "stats", kind: "message", T: SystemStats },
+  ],
 );
 
