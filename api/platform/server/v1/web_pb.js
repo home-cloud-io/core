@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { proto3 } from "@bufbuild/protobuf";
+import { SystemStats } from "../../daemon/v1/system_pb.js";
 
 /**
  * @generated from enum platform.server.v1.AppStatus
@@ -252,6 +253,24 @@ export const AppHealth = proto3.makeMessageType(
   () => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(AppStatus) },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GetSystemStatsRequest
+ */
+export const GetSystemStatsRequest = proto3.makeMessageType(
+  "platform.server.v1.GetSystemStatsRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.GetSystemStatsResponse
+ */
+export const GetSystemStatsResponse = proto3.makeMessageType(
+  "platform.server.v1.GetSystemStatsResponse",
+  () => [
+    { no: 1, name: "stats", kind: "message", T: SystemStats },
   ],
 );
 

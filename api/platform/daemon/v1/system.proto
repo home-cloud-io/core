@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package platform.daemon.v1;
+
+option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
+
+import "google/protobuf/timestamp.proto";
+
+message SystemStats {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  ComputeStats compute = 3;
+  MemoryStats memory = 4;
+  repeated DriveStats drives = 5;
+}
+
+message ComputeStats {
+  float user_percent = 1;
+  float system_percent = 2;
+  float idle_percent = 3;
+}
+
+message MemoryStats {
+  uint64 total_bytes = 1;
+  uint64 used_bytes = 2;
+  uint64 cached_bytes = 3;
+  uint64 free_bytes = 4;
+  uint64 available_bytes = 5;
+}
+
+message DriveStats {
+  string mount_point = 1;
+  uint64 total_bytes = 2;
+  uint64 free_bytes = 3;
+}

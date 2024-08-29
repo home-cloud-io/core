@@ -4,6 +4,8 @@ package platform.daemon.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
 
+import "platform/daemon/v1/system.proto";
+
 service DaemonStreamService {
   rpc Communicate(stream DaemonMessage) returns (stream ServerMessage) {}
 }
@@ -14,6 +16,7 @@ message DaemonMessage {
     ShutdownAlert shutdown_alert = 2;
     OSUpdateDiff os_update_diff = 3;
     CurrentDaemonVersion current_daemon_version = 4;
+    SystemStats system_stats = 5;
   }
 }
 

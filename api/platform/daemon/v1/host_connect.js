@@ -7,6 +7,8 @@ import { ShutdownAlertRequest, ShutdownAlertResponse } from "./host_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
+ * NOTE: this is not currently implemented
+ *
  * @generated from service platform.daemon.v1.HostService
  */
 export const HostService = {
