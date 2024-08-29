@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
+import { SystemStats } from "./system_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -37,6 +38,12 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: CurrentDaemonVersion;
     case: "currentDaemonVersion";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.SystemStats system_stats = 5;
+     */
+    value: SystemStats;
+    case: "systemStats";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -51,6 +58,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 2, name: "shutdown_alert", kind: "message", T: ShutdownAlert, oneof: "message" },
     { no: 3, name: "os_update_diff", kind: "message", T: OSUpdateDiff, oneof: "message" },
     { no: 4, name: "current_daemon_version", kind: "message", T: CurrentDaemonVersion, oneof: "message" },
+    { no: 5, name: "system_stats", kind: "message", T: SystemStats, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {

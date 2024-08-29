@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
  * @generated from rpc platform.server.v1.WebService.ShutdownHost
@@ -147,14 +147,14 @@ export const setSystemImage = {
 } as const;
 
 /**
- * @generated from rpc platform.server.v1.WebService.AppsHealthCheck
+ * @generated from rpc platform.server.v1.WebService.GetSystemStats
  */
-export const appsHealthCheck = {
-  localName: "appsHealthCheck",
-  name: "AppsHealthCheck",
+export const getSystemStats = {
+  localName: "getSystemStats",
+  name: "GetSystemStats",
   kind: MethodKind.Unary,
-  I: AppsHealthCheckRequest,
-  O: AppsHealthCheckResponse,
+  I: GetSystemStatsRequest,
+  O: GetSystemStatsResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

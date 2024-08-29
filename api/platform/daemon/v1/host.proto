@@ -4,6 +4,7 @@ package platform.daemon.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
 
+// NOTE: this is not currently implemented
 service HostService {
   rpc ShutdownAlert(ShutdownAlertRequest) returns (ShutdownAlertResponse) {}
 }

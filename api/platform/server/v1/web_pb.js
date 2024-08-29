@@ -4,18 +4,7 @@
 // @ts-nocheck
 
 import { proto3 } from "@bufbuild/protobuf";
-
-/**
- * @generated from enum platform.server.v1.AppStatus
- */
-export const AppStatus = proto3.makeEnum(
-  "platform.server.v1.AppStatus",
-  [
-    {no: 0, name: "APP_STATUS_UNSPECIFIED", localName: "UNSPECIFIED"},
-    {no: 1, name: "APP_STATUS_HEALTHY", localName: "HEALTHY"},
-    {no: 2, name: "APP_STATUS_UNHEALTHY", localName: "UNHEALTHY"},
-  ],
-);
+import { SystemStats } from "../../daemon/v1/system_pb.js";
 
 /**
  * @generated from message platform.server.v1.ShutdownHostRequest
@@ -227,31 +216,20 @@ export const SetSystemImageResponse = proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.AppsHealthCheckRequest
+ * @generated from message platform.server.v1.GetSystemStatsRequest
  */
-export const AppsHealthCheckRequest = proto3.makeMessageType(
-  "platform.server.v1.AppsHealthCheckRequest",
+export const GetSystemStatsRequest = proto3.makeMessageType(
+  "platform.server.v1.GetSystemStatsRequest",
   [],
 );
 
 /**
- * @generated from message platform.server.v1.AppsHealthCheckResponse
+ * @generated from message platform.server.v1.GetSystemStatsResponse
  */
-export const AppsHealthCheckResponse = proto3.makeMessageType(
-  "platform.server.v1.AppsHealthCheckResponse",
+export const GetSystemStatsResponse = proto3.makeMessageType(
+  "platform.server.v1.GetSystemStatsResponse",
   () => [
-    { no: 1, name: "checks", kind: "message", T: AppHealth, repeated: true },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.AppHealth
- */
-export const AppHealth = proto3.makeMessageType(
-  "platform.server.v1.AppHealth",
-  () => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(AppStatus) },
+    { no: 1, name: "stats", kind: "message", T: SystemStats },
   ],
 );
 
