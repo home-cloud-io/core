@@ -108,7 +108,7 @@ message AppHealth {
 }
 
 enum AppStatus {
-  APP_STATUS_UNKNOWN = 0;
+  APP_STATUS_UNSPECIFIED = 0;
   APP_STATUS_HEALTHY = 1;
   APP_STATUS_UNHEALTHY = 2;
 }
