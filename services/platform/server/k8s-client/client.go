@@ -2,6 +2,7 @@ package k8sclient
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
@@ -22,6 +23,7 @@ type (
 		Update(ctx context.Context, spec opv1.AppSpec) error
 
 		CurrentContainerVersions(ctx context.Context) ([]*webv1.ImageVersion, error)
+		CheckAppsHealth(ctx context.Context) ([]*webv1.AppHealth, error)
 	}
 
 	client struct {
@@ -117,6 +119,48 @@ func (c *client) CurrentContainerVersions(ctx context.Context) ([]*webv1.ImageVe
 	}
 
 	return imagesSlice, nil
+}
+
+func (c *client) CheckAppsHealth(ctx context.Context) ([]*webv1.AppHealth, error) {
+
+	// get all installed apps
+	apps := &opv1.AppList{}
+	err := c.client.List(ctx, apps, &crclient.ListOptions{
+		Namespace: homeCloudNamespace,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// process each app and check all app pods for status
+	checks := make([]*webv1.AppHealth, len(apps.Items))
+	for index, app := range apps.Items {
+		fmt.Printf("App: %s\n", app.Name)
+		checks[index] = &webv1.AppHealth{
+			Name:   app.Name,
+			Status: webv1.AppStatus_APP_STATUS_HEALTHY,
+		}
+
+		// get all pods in app namespace
+		pods := &corev1.PodList{}
+		err := c.client.List(ctx, pods, &crclient.ListOptions{
+			Namespace: app.Name,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, pod := range pods.Items {
+			fmt.Printf("Pod: %s - Health: %v\n", pod.Name, pod.Status.Phase)
+			// if any pod isn't in running status mark app as unhealthy and break
+			if pod.Status.Phase != corev1.PodRunning {
+				checks[index].Status = webv1.AppStatus_APP_STATUS_UNHEALTHY
+				break
+			}
+		}
+	}
+
+	return checks, nil
 }
 
 func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, images map[string]*webv1.ImageVersion) error {
