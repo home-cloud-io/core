@@ -2,7 +2,7 @@ module github.com/home-cloud-io/core/services/platform/server
 
 go 1.22.5
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
 // replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 
@@ -12,7 +12,7 @@ require (
 	connectrpc.com/connect v1.16.2
 	github.com/containers/image/v5 v5.32.2
 	github.com/go-git/go-git/v5 v5.12.0
-	github.com/home-cloud-io/core/api v0.3.6
+	github.com/home-cloud-io/core/api v0.3.8
 	github.com/home-cloud-io/core/services/platform/operator v0.0.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0
 	github.com/steady-bytes/draft/pkg/loggers v0.1.0
