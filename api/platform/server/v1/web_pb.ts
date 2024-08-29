@@ -7,6 +7,32 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3 } from "@bufbuild/protobuf";
 
 /**
+ * @generated from enum platform.server.v1.AppStatus
+ */
+export enum AppStatus {
+  /**
+   * @generated from enum value: APP_STATUS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: APP_STATUS_HEALTHY = 1;
+   */
+  HEALTHY = 1,
+
+  /**
+   * @generated from enum value: APP_STATUS_UNHEALTHY = 2;
+   */
+  UNHEALTHY = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(AppStatus)
+proto3.util.setEnumType(AppStatus, "platform.server.v1.AppStatus", [
+  { no: 0, name: "APP_STATUS_UNSPECIFIED" },
+  { no: 1, name: "APP_STATUS_HEALTHY" },
+  { no: 2, name: "APP_STATUS_UNHEALTHY" },
+]);
+
+/**
  * @generated from message platform.server.v1.ShutdownHostRequest
  */
 export class ShutdownHostRequest extends Message<ShutdownHostRequest> {
@@ -831,6 +857,117 @@ export class SetSystemImageResponse extends Message<SetSystemImageResponse> {
 
   static equals(a: SetSystemImageResponse | PlainMessage<SetSystemImageResponse> | undefined, b: SetSystemImageResponse | PlainMessage<SetSystemImageResponse> | undefined): boolean {
     return proto3.util.equals(SetSystemImageResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.AppsHealthCheckRequest
+ */
+export class AppsHealthCheckRequest extends Message<AppsHealthCheckRequest> {
+  constructor(data?: PartialMessage<AppsHealthCheckRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppsHealthCheckRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppsHealthCheckRequest {
+    return new AppsHealthCheckRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppsHealthCheckRequest {
+    return new AppsHealthCheckRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppsHealthCheckRequest {
+    return new AppsHealthCheckRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppsHealthCheckRequest | PlainMessage<AppsHealthCheckRequest> | undefined, b: AppsHealthCheckRequest | PlainMessage<AppsHealthCheckRequest> | undefined): boolean {
+    return proto3.util.equals(AppsHealthCheckRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.AppsHealthCheckResponse
+ */
+export class AppsHealthCheckResponse extends Message<AppsHealthCheckResponse> {
+  /**
+   * @generated from field: repeated platform.server.v1.AppHealth checks = 1;
+   */
+  checks: AppHealth[] = [];
+
+  constructor(data?: PartialMessage<AppsHealthCheckResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppsHealthCheckResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "checks", kind: "message", T: AppHealth, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppsHealthCheckResponse {
+    return new AppsHealthCheckResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppsHealthCheckResponse {
+    return new AppsHealthCheckResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppsHealthCheckResponse {
+    return new AppsHealthCheckResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppsHealthCheckResponse | PlainMessage<AppsHealthCheckResponse> | undefined, b: AppsHealthCheckResponse | PlainMessage<AppsHealthCheckResponse> | undefined): boolean {
+    return proto3.util.equals(AppsHealthCheckResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.AppHealth
+ */
+export class AppHealth extends Message<AppHealth> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: platform.server.v1.AppStatus status = 2;
+   */
+  status = AppStatus.UNSPECIFIED;
+
+  constructor(data?: PartialMessage<AppHealth>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppHealth";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(AppStatus) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppHealth {
+    return new AppHealth().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppHealth {
+    return new AppHealth().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppHealth {
+    return new AppHealth().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppHealth | PlainMessage<AppHealth> | undefined, b: AppHealth | PlainMessage<AppHealth> | undefined): boolean {
+    return proto3.util.equals(AppHealth, a, b);
   }
 }
 
