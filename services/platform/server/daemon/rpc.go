@@ -23,6 +23,8 @@ type (
 	}
 )
 
+var CurrentSystemStats *v1.SystemStats
+
 func New(logger chassis.Logger, messages chan *v1.DaemonMessage) Rpc {
 	return &rpc{
 		logger:    logger,
@@ -54,15 +56,20 @@ func (h *rpc) Communicate(ctx context.Context, stream *connect.BidiStream[v1.Dae
 			h.logger.Info("shutdown alert")
 		case *v1.DaemonMessage_Heartbeat:
 			h.logger.Debug("heartbeat received")
+			err = stream.Send(&v1.ServerMessage{
+				Message: &v1.ServerMessage_Heartbeat{},
+			})
+			if err != nil {
+				h.logger.WithError(err).Error("failed to send heartbeat")
+			}
 		case *v1.DaemonMessage_OsUpdateDiff:
 			h.messages <- message
 		case *v1.DaemonMessage_CurrentDaemonVersion:
 			h.messages <- message
+		case *v1.DaemonMessage_SystemStats:
+			CurrentSystemStats = message.GetSystemStats()
 		default:
 			h.logger.WithField("message", message).Warn("unknown message type received")
 		}
-		stream.Send(&v1.ServerMessage{
-			Message: &v1.ServerMessage_Heartbeat{},
-		})
 	}
 }
