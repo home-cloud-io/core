@@ -225,6 +225,18 @@ func (h *rpc) SetSystemImage(ctx context.Context, request *connect.Request[v1.Se
 	return connect.NewResponse(&v1.SetSystemImageResponse{}), nil
 }
 
+func (h *rpc) AppsHealthCheck(ctx context.Context, request *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error) {
+
+	checks, err := h.k8sclient.CheckAppsHealth(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&v1.AppsHealthCheckResponse{
+		Checks: checks,
+	}), nil
+}
+
 func (h *rpc) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
 
 	stats := daemon.CurrentSystemStats
