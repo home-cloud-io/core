@@ -2,7 +2,6 @@ package k8sclient
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
@@ -135,7 +134,6 @@ func (c *client) CheckAppsHealth(ctx context.Context) ([]*webv1.AppHealth, error
 	// process each app and check all app pods for status
 	checks := make([]*webv1.AppHealth, len(apps.Items))
 	for index, app := range apps.Items {
-		fmt.Printf("App: %s\n", app.Name)
 		checks[index] = &webv1.AppHealth{
 			Name:   app.Name,
 			Status: webv1.AppStatus_APP_STATUS_HEALTHY,
@@ -151,7 +149,6 @@ func (c *client) CheckAppsHealth(ctx context.Context) ([]*webv1.AppHealth, error
 		}
 
 		for _, pod := range pods.Items {
-			fmt.Printf("Pod: %s - Health: %v\n", pod.Name, pod.Status.Phase)
 			// if any pod isn't in running status mark app as unhealthy and break
 			if pod.Status.Phase != corev1.PodRunning {
 				checks[index].Status = webv1.AppStatus_APP_STATUS_UNHEALTHY
