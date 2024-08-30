@@ -28,6 +28,7 @@ type (
 		k8sclient        k8sclient.Client
 		messages         chan *dv1.DaemonMessage
 		systemUpdateLock sync.Mutex
+		controller       Controller
 	}
 )
 
@@ -41,6 +42,7 @@ func New(logger chassis.Logger, messages chan *dv1.DaemonMessage) Rpc {
 		k8sclient:        k8sclient.NewClient(logger),
 		messages:         messages,
 		systemUpdateLock: sync.Mutex{},
+		controller:       NewController(logger),
 	}
 }
 
