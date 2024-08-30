@@ -9,7 +9,7 @@ let BASE_URL = '';
 if (process.env.NODE_ENV === 'production') {
   BASE_URL = 'http://home-cloud.local';
 } else {
-  BASE_URL = 'http://10.0.0.108:8000';
+  BASE_URL = 'http://localhost:8000';
 }
 
 const web_service_transport = createConnectTransport({

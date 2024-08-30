@@ -12,8 +12,7 @@ import (
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
 )
 
-//go:embed web-client/dist/index.html
-//go:embed web-client/dist/main.js
+//go:embed web-client/dist/*
 var files embed.FS
 
 func main() {

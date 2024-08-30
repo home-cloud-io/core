@@ -10,7 +10,7 @@
   },
   "author": "Home Cloud",
   "license": "Apache-2.0",
-  "proxy": "http://10.0.0.108:8000",
+  "proxy": "http://localhost:8000",
   "dependencies": {
     "@blueprintjs/core": "^5.8.2",
     "@blueprintjs/icons": "^5.7.0",

@@ -12,10 +12,10 @@ require (
 	connectrpc.com/connect v1.16.2
 	github.com/containers/image/v5 v5.32.2
 	github.com/go-git/go-git/v5 v5.12.0
-	github.com/home-cloud-io/core/api v0.4.0
+	github.com/home-cloud-io/core/api v0.4.1
 	github.com/home-cloud-io/core/services/platform/operator v0.0.2
 	github.com/steady-bytes/draft/api v0.3.2
-	github.com/steady-bytes/draft/pkg/chassis v0.3.0
+	github.com/steady-bytes/draft/pkg/chassis v0.3.3
 	github.com/steady-bytes/draft/pkg/loggers v0.1.0
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/mod v0.18.0
