@@ -137,6 +137,10 @@ message GetSystemStatsResponse {
   platform.daemon.v1.SystemStats stats = 1;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 18c5c51 (stage)
 message IsDeviceSetupRequest {}
 message IsDeviceSetupResponse {
   // If false the device is not setup, and the user should be redirected into the onboarding flow
@@ -204,10 +208,25 @@ message App {
   repeated string urls = 9;
 }
 
+<<<<<<< HEAD
 message AppRunningStatus {
   string name = 1;
   string version = 2;
   AppStatus status = 3;
+=======
+message AppStatus {
+  string name = 1;
+  string version = 2;
+  AppRunningStatus status = 3;
+}
+
+enum AppRunningStatus {
+  APP_RUNNING_STATUS_UNKNOWN = 0;
+  APP_RUNNING_STATUS_INSTALLING = 1;
+  APP_RUNNING_STATUS_RUNNING = 2;
+  APP_RUNNING_STATUS_FAILING = 3;
+  APP_RUNNING_STATUS_STOPPED = 4;
+>>>>>>> 18c5c51 (stage)
 }
 
 message Entries {
@@ -217,7 +236,11 @@ message Entries {
 // Aggregate model for the installed apps saved in blueprint
 message InstalledApp {
   App application = 1;
+<<<<<<< HEAD
   AppRunningStatus status = 2;
+=======
+  AppStatus status = 2;
+>>>>>>> 18c5c51 (stage)
 }
 
 // Model to parse the yaml file for the app's available in the store

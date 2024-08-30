@@ -1,0 +1,108 @@
+body {
+    background-color: #cfcbcb;
+  }
+  /* nav */
+  .card {
+    max-width: 40rem;
+    padding: 0;
+    border: none;
+    border-radius: 0.5rem;
+    margin-top: 3rem;
+  }
+
+  a.active {
+    border-bottom: 2px solid #6655c5;
+  }
+
+  .nav-link {
+    color: rgb(110, 110, 110);
+    font-weight: 500;
+  }
+  .nav-link:hover {
+    color: #6655c5;
+  }
+
+  .nav-pills .nav-link.active {
+    color: black;
+    background-color: white;
+    border-radius: 0.5rem 0.5rem 0 0;
+    font-weight: 600;
+  }
+
+  .tab-content {
+    padding: 2.3rem;
+  }
+
+  .form-control {
+    background-color: rgb(241, 243, 247);
+    border: none;
+  }
+
+  /* 3nd card */
+  span {
+    margin-left: 0.5rem;
+    padding: 1px 10px;
+    color: white;
+    background-color: rgb(143, 143, 143);
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .third {
+    padding: 0 1.5rem 0 1.5rem;
+  }
+
+  label {
+    font-weight: 500;
+    color: rgb(104, 104, 104);
+  }
+
+  .btn-success {
+    float: right;
+  }
+
+  .form-control:focus {
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 7px rgba(0, 0, 0, 0.2);
+  }
+
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: "";
+  }
+
+  /* 1st card */
+
+  ul {
+    list-style: none;
+    margin-top: 1rem;
+    padding-inline-start: 0;
+  }
+
+  .search {
+    padding: 0 1rem 0 1rem;
+  }
+
+  .ccontent li .wrapp {
+    padding: 0.3rem 1rem 0.001rem 1rem;
+  }
+
+  .ccontent li .wrapp div {
+    font-weight: 600;
+  }
+
+  .ccontent li .wrapp p {
+    font-weight: 360;
+  } 
+
+  .ccontent li:hover {
+    background-color: rgb(117, 93, 255);
+    color: white;
+  }
+
+  /* 2nd card */
+
+  .addinfo {
+    padding: 0 1rem;
+  }

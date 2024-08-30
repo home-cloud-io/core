@@ -5,9 +5,9 @@ import {
   restart,
   shutdown,
   updateApp,
-} from '../services/web_rpc';
+} from '../../services/web_rpc';
 
-export default function Home() {
+export default function HomePage() {
   return (
     <>
       <nav class="py-2 bg-body-tertiary border-bottom">
