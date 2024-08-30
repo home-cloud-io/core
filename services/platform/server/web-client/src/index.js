@@ -2,6 +2,11 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
+import { Provider } from "react-redux";
+
+// client side application state
+import { store } from "./store";
+// client side pages
 
 import '../public/globals.css';
 
@@ -10,8 +15,10 @@ const root = createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
+    <Provider store={store}>
       <BrowserRouter>
         <Dashboard />
       </BrowserRouter>
+    </Provider>
   </React.StrictMode>
 );
