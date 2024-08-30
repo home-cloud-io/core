@@ -6,10 +6,10 @@ import { setUserSettings } from './user_slice';
 
 let BASE_URL = '';
 
-if (process.env.NODE_ENV === 'production') {
-  BASE_URL = 'http://home-cloud.local';
-} else {
+if (process.env.NODE_ENV === 'local') {
   BASE_URL = 'http://localhost:8000';
+} else {
+  BASE_URL = 'http://home-cloud.local';
 }
 
 const web_service_transport = createConnectTransport({
