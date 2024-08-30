@@ -26,10 +26,6 @@ service WebService {
   rpc InitializeDevice(InitializeDeviceRequest) returns (InitializeDeviceResponse) {}
   // Login to the device
   rpc Login(LoginRequest) returns (LoginResponse) {}
-  // Get usage statistics for the device
-  rpc GetDeviceUsageStats(GetDeviceUsageStatsRequest) returns (GetDeviceUsageStatsResponse) {}
-  // Get the status of all installed apps
-  rpc GetInstalledApps(GetInstalledAppsRequest) returns (GetInstalledAppsResponse) {}
   // Get all apps available in the store
   rpc GetAppsInStore(GetAppsInStoreRequest) returns (GetAppsInStoreResponse) {}
   // Get the device settings
@@ -163,17 +159,6 @@ message LoginRequest {
 
 message LoginResponse {
   string token = 1;
-}
-
-message GetDeviceUsageStatsRequest {}
-message GetDeviceUsageStatsResponse {
-  DiskStats disk = 3;
-  uint32 temperature = 4;
-}
-
-message GetInstalledAppsRequest {}
-message GetInstalledAppsResponse {
-  repeated AppStatus apps = 1;
 }
 
 message GetAppsInStoreRequest {}
