@@ -8,17 +8,29 @@ import "tagger/tagger.proto";
 import "platform/daemon/v1/system.proto";
 
 service WebService {
+  // Shutdown the host machine running Home Cloud
   rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
+  // Restart the host machine running Home Cloud
   rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
+  // Install a Home Cloud application
   rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {}
+  // Delete a Home Cloud application
   rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
+  // Update a Home Cloud application
   rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
+  // Check for available NixOS and Daemon updates
   rpc CheckForSystemUpdates(CheckForSystemUpdatesRequest) returns (CheckForSystemUpdatesResponse) {}
+  // Check for available system (draft and home cloud) container updates
   rpc CheckForContainerUpdates(CheckForContainerUpdatesRequest) returns (CheckForContainerUpdatesResponse) {}
+  // Change the currently installed Daemon version
   rpc ChangeDaemonVersion(ChangeDaemonVersionRequest) returns (ChangeDaemonVersionResponse) {}
+  // Install available NixOS updates (call after calling CheckForSystemUpdates)
   rpc InstallOSUpdate(InstallOSUpdateRequest) returns (InstallOSUpdateResponse) {}
+  // Set a system (draft and home cloud) container image (used for updating images)
   rpc SetSystemImage(SetSystemImageRequest) returns (SetSystemImageResponse) {}
+  // Check the current health of all installed Home Cloud applications
   rpc AppsHealthCheck(AppsHealthCheckRequest) returns (AppsHealthCheckResponse) {}
+  // Get the current host machine stats (cpu, memory, drives)
   rpc GetSystemStats(GetSystemStatsRequest) returns (GetSystemStatsResponse) {}
   // Check to validate if the device has gone through the onboarding process
   rpc IsDeviceSetup(IsDeviceSetupRequest) returns (IsDeviceSetupResponse) {}
