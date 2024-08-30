@@ -318,14 +318,6 @@ func (h *rpc) Login(ctx context.Context, request *connect.Request[v1.LoginReques
 	return connect.NewResponse(&v1.LoginResponse{Token: res}), nil
 }
 
-func (h *rpc) GetDeviceUsageStats(ctx context.Context, request *connect.Request[v1.GetDeviceUsageStatsRequest]) (*connect.Response[v1.GetDeviceUsageStatsResponse], error) {
-	return nil, errors.New("not implemented")
-}
-
-func (h *rpc) GetInstalledApps(ctx context.Context, request *connect.Request[v1.GetInstalledAppsRequest]) (*connect.Response[v1.GetInstalledAppsResponse], error) {
-	return nil, errors.New("not implemented")
-}
-
 func (h *rpc) GetAppsInStore(ctx context.Context, request *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error) {
 	h.logger.Info("getting apps in store")
 
