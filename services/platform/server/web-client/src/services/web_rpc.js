@@ -6,8 +6,8 @@ import { setUserSettings } from './user_slice';
 
 let BASE_URL = '';
 
-if (process.env.NODE_ENV === 'local') {
-  BASE_URL = 'http://localhost:8000';
+if (process.env.NODE_ENV === 'local' || process.env.NODE_ENV === 'development') {
+  BASE_URL = 'http://10.0.0.108:8000';
 } else {
   BASE_URL = 'http://home-cloud.local';
 }
@@ -104,6 +104,16 @@ export const serverRPCService = createApi({
         }
       },
     }),
+    getAppsHealthCheck: builder.query({
+      queryFn: async () => {
+        try {
+          const res = await client.appsHealthCheck({});
+          return { data: res.toJson()};
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
+      }
+    }),
   }),
 });
 
@@ -117,6 +127,7 @@ export const {
   useInitDeviceMutation,
   useLoginMutation,
   useGetAppStoreEntitiesQuery,
+  useGetAppsHealthCheckQuery,
 } = serverRPCService;
 
 const values = new Map([

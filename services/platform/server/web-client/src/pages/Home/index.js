@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useState } from 'react';
+import { useGetAppsHealthCheckQuery, useGetAppStoreEntitiesQuery } from '../../services/web_rpc';
 
 export default function HomePage() {
   return (
@@ -10,17 +12,34 @@ export default function HomePage() {
 }
 
 export function InstalledApplicationsList() {
+  const { data, error, isLoading } = useGetAppsHealthCheckQuery();
+
+  const ListEntries = () => {
+    return (
+      <div>
+        {data.checks.map(app => {
+          return (
+            <Application app={app} key={app.name}/>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <div>
 
       <div className="my-3 p-3 bg-body rounded shadow-sm">
-        <h6 className="border-bottom pb-2 mb-0">Applications</h6>
+        <h6 className="border-bottom pb-2 mb-0">Installed Applications</h6>
 
-        <div className="">
-          <Application />
-          <Application />
-          <Application />
-        </div>
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p>Error: {error.message}</p>
+          ) : (
+            <ListEntries />
+          )}
+
 
         <small className="d-block text-end mt-3">
           <a href="#">All Applications</a>
@@ -30,7 +49,7 @@ export function InstalledApplicationsList() {
   )
 }
 
-function Application() {
+function Application({app}) {
   const styles = {
     marginTop: ".25rem",
   }
@@ -44,9 +63,7 @@ function Application() {
   }
 
   return (
-    <div className="d-flex text-body-secondary pt-3"
-      onClick={() => onAppClick("immich")}
-      onMouseOver={() => onMouseOver("immitch")}>
+    <div className="d-flex text-body-secondary pt-3">
       <svg
         className="bd-placeholder-img flex-shrink-0 me-2 rounded"
         width="64"
@@ -62,31 +79,8 @@ function Application() {
 
         <div className="pb-3 mb-0 small lh-sm border-bottom w-100 position-relative">
           <div className="d-flex justify-content-between">
-            <strong className="text-gray-dark">Immich</strong>
+            <strong className="text-gray-dark">{app.name}</strong>
           </div>
-
-          <span className="float-end app-version">Version: 1.0.1</span>
-
-          <div className="d-flex text-body-secondary pt-3 float-end position-absolute top-25 end-0" style={styles}>
-            <svg
-              className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-              width="16"
-              height="16"
-              xmlns="http://www.w3.org/2000/svg"
-              role="img"
-              aria-label="Placeholder: 32x32"
-              preserveAspectRatio="xMidYMid slice"
-              focusable="false">
-                <title>Placeholder</title>
-                <rect width="100%" height="100%" fill="#28e053"/><text x="50%" y="50%" fill="#28e053" dy=".3em">32x32</text>
-            </svg>
-            <p
-              className="pb-3 mb-0 small lh-sm"
-              id="deviceStatusIndicatorLabel">
-              <strong className="d-block text-gray-dark"></strong>
-            </p>
-          </div>
-
         </div>
     </div>
   )
