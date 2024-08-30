@@ -72,12 +72,6 @@ const (
 	WebServiceInitializeDeviceProcedure = "/platform.server.v1.WebService/InitializeDevice"
 	// WebServiceLoginProcedure is the fully-qualified name of the WebService's Login RPC.
 	WebServiceLoginProcedure = "/platform.server.v1.WebService/Login"
-	// WebServiceGetDeviceUsageStatsProcedure is the fully-qualified name of the WebService's
-	// GetDeviceUsageStats RPC.
-	WebServiceGetDeviceUsageStatsProcedure = "/platform.server.v1.WebService/GetDeviceUsageStats"
-	// WebServiceGetInstalledAppsProcedure is the fully-qualified name of the WebService's
-	// GetInstalledApps RPC.
-	WebServiceGetInstalledAppsProcedure = "/platform.server.v1.WebService/GetInstalledApps"
 	// WebServiceGetAppsInStoreProcedure is the fully-qualified name of the WebService's GetAppsInStore
 	// RPC.
 	WebServiceGetAppsInStoreProcedure = "/platform.server.v1.WebService/GetAppsInStore"
@@ -104,25 +98,35 @@ var (
 	webServiceIsDeviceSetupMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("IsDeviceSetup")
 	webServiceInitializeDeviceMethodDescriptor         = webServiceServiceDescriptor.Methods().ByName("InitializeDevice")
 	webServiceLoginMethodDescriptor                    = webServiceServiceDescriptor.Methods().ByName("Login")
-	webServiceGetDeviceUsageStatsMethodDescriptor      = webServiceServiceDescriptor.Methods().ByName("GetDeviceUsageStats")
-	webServiceGetInstalledAppsMethodDescriptor         = webServiceServiceDescriptor.Methods().ByName("GetInstalledApps")
 	webServiceGetAppsInStoreMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("GetAppsInStore")
 	webServiceGetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("GetDeviceSettings")
 )
 
 // WebServiceClient is a client for the platform.server.v1.WebService service.
 type WebServiceClient interface {
+	// Shutdown the host machine running Home Cloud
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
+	// Restart the host machine running Home Cloud
 	RestartHost(context.Context, *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error)
+	// Install a Home Cloud application
 	InstallApp(context.Context, *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error)
+	// Delete a Home Cloud application
 	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
+	// Update a Home Cloud application
 	UpdateApp(context.Context, *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error)
+	// Check for available NixOS and Daemon updates
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
+	// Check for available system (draft and home cloud) container updates
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
+	// Change the currently installed Daemon version
 	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
+	// Install available NixOS updates (call after calling CheckForSystemUpdates)
 	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
+	// Set a system (draft and home cloud) container image (used for updating images)
 	SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error)
+	// Check the current health of all installed Home Cloud applications
 	AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error)
+	// Get the current host machine stats (cpu, memory, drives)
 	GetSystemStats(context.Context, *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error)
 	// Check to validate if the device has gone through the onboarding process
 	IsDeviceSetup(context.Context, *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error)
@@ -130,10 +134,6 @@ type WebServiceClient interface {
 	InitializeDevice(context.Context, *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error)
 	// Login to the device
 	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
-	// Get usage statistics for the device
-	GetDeviceUsageStats(context.Context, *connect.Request[v1.GetDeviceUsageStatsRequest]) (*connect.Response[v1.GetDeviceUsageStatsResponse], error)
-	// Get the status of all installed apps
-	GetInstalledApps(context.Context, *connect.Request[v1.GetInstalledAppsRequest]) (*connect.Response[v1.GetInstalledAppsResponse], error)
 	// Get all apps available in the store
 	GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error)
 	// Get the device settings
@@ -240,18 +240,6 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceLoginMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		getDeviceUsageStats: connect.NewClient[v1.GetDeviceUsageStatsRequest, v1.GetDeviceUsageStatsResponse](
-			httpClient,
-			baseURL+WebServiceGetDeviceUsageStatsProcedure,
-			connect.WithSchema(webServiceGetDeviceUsageStatsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getInstalledApps: connect.NewClient[v1.GetInstalledAppsRequest, v1.GetInstalledAppsResponse](
-			httpClient,
-			baseURL+WebServiceGetInstalledAppsProcedure,
-			connect.WithSchema(webServiceGetInstalledAppsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 		getAppsInStore: connect.NewClient[v1.GetAppsInStoreRequest, v1.GetAppsInStoreResponse](
 			httpClient,
 			baseURL+WebServiceGetAppsInStoreProcedure,
@@ -284,8 +272,6 @@ type webServiceClient struct {
 	isDeviceSetup            *connect.Client[v1.IsDeviceSetupRequest, v1.IsDeviceSetupResponse]
 	initializeDevice         *connect.Client[v1.InitializeDeviceRequest, v1.InitializeDeviceResponse]
 	login                    *connect.Client[v1.LoginRequest, v1.LoginResponse]
-	getDeviceUsageStats      *connect.Client[v1.GetDeviceUsageStatsRequest, v1.GetDeviceUsageStatsResponse]
-	getInstalledApps         *connect.Client[v1.GetInstalledAppsRequest, v1.GetInstalledAppsResponse]
 	getAppsInStore           *connect.Client[v1.GetAppsInStoreRequest, v1.GetAppsInStoreResponse]
 	getDeviceSettings        *connect.Client[v1.GetDeviceSettingsRequest, v1.GetDeviceSettingsResponse]
 }
@@ -365,16 +351,6 @@ func (c *webServiceClient) Login(ctx context.Context, req *connect.Request[v1.Lo
 	return c.login.CallUnary(ctx, req)
 }
 
-// GetDeviceUsageStats calls platform.server.v1.WebService.GetDeviceUsageStats.
-func (c *webServiceClient) GetDeviceUsageStats(ctx context.Context, req *connect.Request[v1.GetDeviceUsageStatsRequest]) (*connect.Response[v1.GetDeviceUsageStatsResponse], error) {
-	return c.getDeviceUsageStats.CallUnary(ctx, req)
-}
-
-// GetInstalledApps calls platform.server.v1.WebService.GetInstalledApps.
-func (c *webServiceClient) GetInstalledApps(ctx context.Context, req *connect.Request[v1.GetInstalledAppsRequest]) (*connect.Response[v1.GetInstalledAppsResponse], error) {
-	return c.getInstalledApps.CallUnary(ctx, req)
-}
-
 // GetAppsInStore calls platform.server.v1.WebService.GetAppsInStore.
 func (c *webServiceClient) GetAppsInStore(ctx context.Context, req *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error) {
 	return c.getAppsInStore.CallUnary(ctx, req)
@@ -387,17 +363,29 @@ func (c *webServiceClient) GetDeviceSettings(ctx context.Context, req *connect.R
 
 // WebServiceHandler is an implementation of the platform.server.v1.WebService service.
 type WebServiceHandler interface {
+	// Shutdown the host machine running Home Cloud
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
+	// Restart the host machine running Home Cloud
 	RestartHost(context.Context, *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error)
+	// Install a Home Cloud application
 	InstallApp(context.Context, *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error)
+	// Delete a Home Cloud application
 	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
+	// Update a Home Cloud application
 	UpdateApp(context.Context, *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error)
+	// Check for available NixOS and Daemon updates
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
+	// Check for available system (draft and home cloud) container updates
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
+	// Change the currently installed Daemon version
 	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
+	// Install available NixOS updates (call after calling CheckForSystemUpdates)
 	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
+	// Set a system (draft and home cloud) container image (used for updating images)
 	SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error)
+	// Check the current health of all installed Home Cloud applications
 	AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error)
+	// Get the current host machine stats (cpu, memory, drives)
 	GetSystemStats(context.Context, *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error)
 	// Check to validate if the device has gone through the onboarding process
 	IsDeviceSetup(context.Context, *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error)
@@ -405,10 +393,6 @@ type WebServiceHandler interface {
 	InitializeDevice(context.Context, *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error)
 	// Login to the device
 	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
-	// Get usage statistics for the device
-	GetDeviceUsageStats(context.Context, *connect.Request[v1.GetDeviceUsageStatsRequest]) (*connect.Response[v1.GetDeviceUsageStatsResponse], error)
-	// Get the status of all installed apps
-	GetInstalledApps(context.Context, *connect.Request[v1.GetInstalledAppsRequest]) (*connect.Response[v1.GetInstalledAppsResponse], error)
 	// Get all apps available in the store
 	GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error)
 	// Get the device settings
@@ -511,18 +495,6 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceLoginMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	webServiceGetDeviceUsageStatsHandler := connect.NewUnaryHandler(
-		WebServiceGetDeviceUsageStatsProcedure,
-		svc.GetDeviceUsageStats,
-		connect.WithSchema(webServiceGetDeviceUsageStatsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	webServiceGetInstalledAppsHandler := connect.NewUnaryHandler(
-		WebServiceGetInstalledAppsProcedure,
-		svc.GetInstalledApps,
-		connect.WithSchema(webServiceGetInstalledAppsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	webServiceGetAppsInStoreHandler := connect.NewUnaryHandler(
 		WebServiceGetAppsInStoreProcedure,
 		svc.GetAppsInStore,
@@ -567,10 +539,6 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceInitializeDeviceHandler.ServeHTTP(w, r)
 		case WebServiceLoginProcedure:
 			webServiceLoginHandler.ServeHTTP(w, r)
-		case WebServiceGetDeviceUsageStatsProcedure:
-			webServiceGetDeviceUsageStatsHandler.ServeHTTP(w, r)
-		case WebServiceGetInstalledAppsProcedure:
-			webServiceGetInstalledAppsHandler.ServeHTTP(w, r)
 		case WebServiceGetAppsInStoreProcedure:
 			webServiceGetAppsInStoreHandler.ServeHTTP(w, r)
 		case WebServiceGetDeviceSettingsProcedure:
@@ -642,14 +610,6 @@ func (UnimplementedWebServiceHandler) InitializeDevice(context.Context, *connect
 
 func (UnimplementedWebServiceHandler) Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.Login is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) GetDeviceUsageStats(context.Context, *connect.Request[v1.GetDeviceUsageStatsRequest]) (*connect.Response[v1.GetDeviceUsageStatsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetDeviceUsageStats is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) GetInstalledApps(context.Context, *connect.Request[v1.GetInstalledAppsRequest]) (*connect.Response[v1.GetInstalledAppsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetInstalledApps is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error) {
