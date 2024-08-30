@@ -274,3 +274,249 @@ export const GetSystemStatsResponse = proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.server.v1.IsDeviceSetupRequest
+ */
+export const IsDeviceSetupRequest = proto3.makeMessageType(
+  "platform.server.v1.IsDeviceSetupRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.IsDeviceSetupResponse
+ */
+export const IsDeviceSetupResponse = proto3.makeMessageType(
+  "platform.server.v1.IsDeviceSetupResponse",
+  () => [
+    { no: 1, name: "setup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.InitializeDeviceRequest
+ */
+export const InitializeDeviceRequest = proto3.makeMessageType(
+  "platform.server.v1.InitializeDeviceRequest",
+  () => [
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "default_apps", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.InitializeDeviceResponse
+ */
+export const InitializeDeviceResponse = proto3.makeMessageType(
+  "platform.server.v1.InitializeDeviceResponse",
+  () => [
+    { no: 1, name: "setup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.LoginRequest
+ */
+export const LoginRequest = proto3.makeMessageType(
+  "platform.server.v1.LoginRequest",
+  () => [
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.LoginResponse
+ */
+export const LoginResponse = proto3.makeMessageType(
+  "platform.server.v1.LoginResponse",
+  () => [
+    { no: 1, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GetDeviceUsageStatsRequest
+ */
+export const GetDeviceUsageStatsRequest = proto3.makeMessageType(
+  "platform.server.v1.GetDeviceUsageStatsRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.GetDeviceUsageStatsResponse
+ */
+export const GetDeviceUsageStatsResponse = proto3.makeMessageType(
+  "platform.server.v1.GetDeviceUsageStatsResponse",
+  () => [
+    { no: 3, name: "disk", kind: "message", T: DiskStats },
+    { no: 4, name: "temperature", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GetInstalledAppsRequest
+ */
+export const GetInstalledAppsRequest = proto3.makeMessageType(
+  "platform.server.v1.GetInstalledAppsRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.GetInstalledAppsResponse
+ */
+export const GetInstalledAppsResponse = proto3.makeMessageType(
+  "platform.server.v1.GetInstalledAppsResponse",
+  () => [
+    { no: 1, name: "apps", kind: "enum", T: proto3.getEnumType(AppStatus), repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GetAppsInStoreRequest
+ */
+export const GetAppsInStoreRequest = proto3.makeMessageType(
+  "platform.server.v1.GetAppsInStoreRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.GetAppsInStoreResponse
+ */
+export const GetAppsInStoreResponse = proto3.makeMessageType(
+  "platform.server.v1.GetAppsInStoreResponse",
+  () => [
+    { no: 1, name: "apps", kind: "message", T: App, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GetDeviceSettingsRequest
+ */
+export const GetDeviceSettingsRequest = proto3.makeMessageType(
+  "platform.server.v1.GetDeviceSettingsRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.GetDeviceSettingsResponse
+ */
+export const GetDeviceSettingsResponse = proto3.makeMessageType(
+  "platform.server.v1.GetDeviceSettingsResponse",
+  () => [
+    { no: 1, name: "settings", kind: "message", T: DeviceSettings },
+  ],
+);
+
+/**
+ * Model used for the store, and installed apps
+ *
+ * @generated from message platform.server.v1.App
+ */
+export const App = proto3.makeMessageType(
+  "platform.server.v1.App",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "app_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "created_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "digest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "urls", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.AppRunningStatus
+ */
+export const AppRunningStatus = proto3.makeMessageType(
+  "platform.server.v1.AppRunningStatus",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "status", kind: "enum", T: proto3.getEnumType(AppStatus) },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.Entries
+ */
+export const Entries = proto3.makeMessageType(
+  "platform.server.v1.Entries",
+  () => [
+    { no: 1, name: "apps", kind: "message", T: App, repeated: true },
+  ],
+);
+
+/**
+ * Aggregate model for the installed apps saved in blueprint
+ *
+ * @generated from message platform.server.v1.InstalledApp
+ */
+export const InstalledApp = proto3.makeMessageType(
+  "platform.server.v1.InstalledApp",
+  () => [
+    { no: 1, name: "application", kind: "message", T: App },
+    { no: 2, name: "status", kind: "message", T: AppRunningStatus },
+  ],
+);
+
+/**
+ * Model to parse the yaml file for the app's available in the store
+ * currently they are stored in a public repo and fetched from there
+ * (https://home-cloud-io.github.io/store/index.yaml)
+ * A backround thread in the server will fetch the file and update the
+ * store first when it starts and then every 24 hours
+ *
+ * @generated from message platform.server.v1.AppStoreEntries
+ */
+export const AppStoreEntries = proto3.makeMessageType(
+  "platform.server.v1.AppStoreEntries",
+  () => [
+    { no: 1, name: "api_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "generated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Entries} },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DeviceSettings
+ */
+export const DeviceSettings = proto3.makeMessageType(
+  "platform.server.v1.DeviceSettings",
+  () => [
+    { no: 1, name: "admin_user", kind: "message", T: User },
+    { no: 2, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DiskStats
+ */
+export const DiskStats = proto3.makeMessageType(
+  "platform.server.v1.DiskStats",
+  () => [
+    { no: 1, name: "total", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "used", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 3, name: "free", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.User
+ */
+export const User = proto3.makeMessageType(
+  "platform.server.v1.User",
+  () => [
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+

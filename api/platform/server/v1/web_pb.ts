@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
+import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 import { SystemStats } from "../../daemon/v1/system_pb.js";
 
 /**
@@ -1037,6 +1037,958 @@ export class GetSystemStatsResponse extends Message<GetSystemStatsResponse> {
 
   static equals(a: GetSystemStatsResponse | PlainMessage<GetSystemStatsResponse> | undefined, b: GetSystemStatsResponse | PlainMessage<GetSystemStatsResponse> | undefined): boolean {
     return proto3.util.equals(GetSystemStatsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.IsDeviceSetupRequest
+ */
+export class IsDeviceSetupRequest extends Message<IsDeviceSetupRequest> {
+  constructor(data?: PartialMessage<IsDeviceSetupRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.IsDeviceSetupRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IsDeviceSetupRequest {
+    return new IsDeviceSetupRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): IsDeviceSetupRequest {
+    return new IsDeviceSetupRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): IsDeviceSetupRequest {
+    return new IsDeviceSetupRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: IsDeviceSetupRequest | PlainMessage<IsDeviceSetupRequest> | undefined, b: IsDeviceSetupRequest | PlainMessage<IsDeviceSetupRequest> | undefined): boolean {
+    return proto3.util.equals(IsDeviceSetupRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.IsDeviceSetupResponse
+ */
+export class IsDeviceSetupResponse extends Message<IsDeviceSetupResponse> {
+  /**
+   * If false the device is not setup, and the user should be redirected into the onboarding flow
+   *
+   * @generated from field: bool setup = 1;
+   */
+  setup = false;
+
+  constructor(data?: PartialMessage<IsDeviceSetupResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.IsDeviceSetupResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "setup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IsDeviceSetupResponse {
+    return new IsDeviceSetupResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): IsDeviceSetupResponse {
+    return new IsDeviceSetupResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): IsDeviceSetupResponse {
+    return new IsDeviceSetupResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: IsDeviceSetupResponse | PlainMessage<IsDeviceSetupResponse> | undefined, b: IsDeviceSetupResponse | PlainMessage<IsDeviceSetupResponse> | undefined): boolean {
+    return proto3.util.equals(IsDeviceSetupResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.InitializeDeviceRequest
+ */
+export class InitializeDeviceRequest extends Message<InitializeDeviceRequest> {
+  /**
+   * @generated from field: string username = 1;
+   */
+  username = "";
+
+  /**
+   * @generated from field: string password = 2;
+   */
+  password = "";
+
+  /**
+   * @generated from field: string timezone = 3;
+   */
+  timezone = "";
+
+  /**
+   * @generated from field: bool auto_update_apps = 4;
+   */
+  autoUpdateApps = false;
+
+  /**
+   * @generated from field: bool auto_update_os = 5;
+   */
+  autoUpdateOs = false;
+
+  /**
+   * @generated from field: repeated string default_apps = 6;
+   */
+  defaultApps: string[] = [];
+
+  constructor(data?: PartialMessage<InitializeDeviceRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.InitializeDeviceRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "default_apps", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InitializeDeviceRequest {
+    return new InitializeDeviceRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InitializeDeviceRequest {
+    return new InitializeDeviceRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InitializeDeviceRequest {
+    return new InitializeDeviceRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: InitializeDeviceRequest | PlainMessage<InitializeDeviceRequest> | undefined, b: InitializeDeviceRequest | PlainMessage<InitializeDeviceRequest> | undefined): boolean {
+    return proto3.util.equals(InitializeDeviceRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.InitializeDeviceResponse
+ */
+export class InitializeDeviceResponse extends Message<InitializeDeviceResponse> {
+  /**
+   * @generated from field: bool setup = 1;
+   */
+  setup = false;
+
+  constructor(data?: PartialMessage<InitializeDeviceResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.InitializeDeviceResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "setup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InitializeDeviceResponse {
+    return new InitializeDeviceResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InitializeDeviceResponse {
+    return new InitializeDeviceResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InitializeDeviceResponse {
+    return new InitializeDeviceResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: InitializeDeviceResponse | PlainMessage<InitializeDeviceResponse> | undefined, b: InitializeDeviceResponse | PlainMessage<InitializeDeviceResponse> | undefined): boolean {
+    return proto3.util.equals(InitializeDeviceResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.LoginRequest
+ */
+export class LoginRequest extends Message<LoginRequest> {
+  /**
+   * @generated from field: string username = 1;
+   */
+  username = "";
+
+  /**
+   * @generated from field: string password = 2;
+   */
+  password = "";
+
+  constructor(data?: PartialMessage<LoginRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.LoginRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LoginRequest {
+    return new LoginRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LoginRequest {
+    return new LoginRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LoginRequest {
+    return new LoginRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LoginRequest | PlainMessage<LoginRequest> | undefined, b: LoginRequest | PlainMessage<LoginRequest> | undefined): boolean {
+    return proto3.util.equals(LoginRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.LoginResponse
+ */
+export class LoginResponse extends Message<LoginResponse> {
+  /**
+   * @generated from field: string token = 1;
+   */
+  token = "";
+
+  constructor(data?: PartialMessage<LoginResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.LoginResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LoginResponse {
+    return new LoginResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LoginResponse {
+    return new LoginResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LoginResponse {
+    return new LoginResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LoginResponse | PlainMessage<LoginResponse> | undefined, b: LoginResponse | PlainMessage<LoginResponse> | undefined): boolean {
+    return proto3.util.equals(LoginResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetDeviceUsageStatsRequest
+ */
+export class GetDeviceUsageStatsRequest extends Message<GetDeviceUsageStatsRequest> {
+  constructor(data?: PartialMessage<GetDeviceUsageStatsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetDeviceUsageStatsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDeviceUsageStatsRequest {
+    return new GetDeviceUsageStatsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDeviceUsageStatsRequest {
+    return new GetDeviceUsageStatsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDeviceUsageStatsRequest {
+    return new GetDeviceUsageStatsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetDeviceUsageStatsRequest | PlainMessage<GetDeviceUsageStatsRequest> | undefined, b: GetDeviceUsageStatsRequest | PlainMessage<GetDeviceUsageStatsRequest> | undefined): boolean {
+    return proto3.util.equals(GetDeviceUsageStatsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetDeviceUsageStatsResponse
+ */
+export class GetDeviceUsageStatsResponse extends Message<GetDeviceUsageStatsResponse> {
+  /**
+   * @generated from field: platform.server.v1.DiskStats disk = 3;
+   */
+  disk?: DiskStats;
+
+  /**
+   * @generated from field: uint32 temperature = 4;
+   */
+  temperature = 0;
+
+  constructor(data?: PartialMessage<GetDeviceUsageStatsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetDeviceUsageStatsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 3, name: "disk", kind: "message", T: DiskStats },
+    { no: 4, name: "temperature", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDeviceUsageStatsResponse {
+    return new GetDeviceUsageStatsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDeviceUsageStatsResponse {
+    return new GetDeviceUsageStatsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDeviceUsageStatsResponse {
+    return new GetDeviceUsageStatsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetDeviceUsageStatsResponse | PlainMessage<GetDeviceUsageStatsResponse> | undefined, b: GetDeviceUsageStatsResponse | PlainMessage<GetDeviceUsageStatsResponse> | undefined): boolean {
+    return proto3.util.equals(GetDeviceUsageStatsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetInstalledAppsRequest
+ */
+export class GetInstalledAppsRequest extends Message<GetInstalledAppsRequest> {
+  constructor(data?: PartialMessage<GetInstalledAppsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetInstalledAppsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetInstalledAppsRequest {
+    return new GetInstalledAppsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetInstalledAppsRequest {
+    return new GetInstalledAppsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetInstalledAppsRequest {
+    return new GetInstalledAppsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetInstalledAppsRequest | PlainMessage<GetInstalledAppsRequest> | undefined, b: GetInstalledAppsRequest | PlainMessage<GetInstalledAppsRequest> | undefined): boolean {
+    return proto3.util.equals(GetInstalledAppsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetInstalledAppsResponse
+ */
+export class GetInstalledAppsResponse extends Message<GetInstalledAppsResponse> {
+  /**
+   * @generated from field: repeated platform.server.v1.AppStatus apps = 1;
+   */
+  apps: AppStatus[] = [];
+
+  constructor(data?: PartialMessage<GetInstalledAppsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetInstalledAppsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "apps", kind: "enum", T: proto3.getEnumType(AppStatus), repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetInstalledAppsResponse {
+    return new GetInstalledAppsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetInstalledAppsResponse {
+    return new GetInstalledAppsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetInstalledAppsResponse {
+    return new GetInstalledAppsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetInstalledAppsResponse | PlainMessage<GetInstalledAppsResponse> | undefined, b: GetInstalledAppsResponse | PlainMessage<GetInstalledAppsResponse> | undefined): boolean {
+    return proto3.util.equals(GetInstalledAppsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetAppsInStoreRequest
+ */
+export class GetAppsInStoreRequest extends Message<GetAppsInStoreRequest> {
+  constructor(data?: PartialMessage<GetAppsInStoreRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetAppsInStoreRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAppsInStoreRequest {
+    return new GetAppsInStoreRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAppsInStoreRequest {
+    return new GetAppsInStoreRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAppsInStoreRequest {
+    return new GetAppsInStoreRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetAppsInStoreRequest | PlainMessage<GetAppsInStoreRequest> | undefined, b: GetAppsInStoreRequest | PlainMessage<GetAppsInStoreRequest> | undefined): boolean {
+    return proto3.util.equals(GetAppsInStoreRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetAppsInStoreResponse
+ */
+export class GetAppsInStoreResponse extends Message<GetAppsInStoreResponse> {
+  /**
+   * @generated from field: repeated platform.server.v1.App apps = 1;
+   */
+  apps: App[] = [];
+
+  constructor(data?: PartialMessage<GetAppsInStoreResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetAppsInStoreResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "apps", kind: "message", T: App, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAppsInStoreResponse {
+    return new GetAppsInStoreResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAppsInStoreResponse {
+    return new GetAppsInStoreResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAppsInStoreResponse {
+    return new GetAppsInStoreResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetAppsInStoreResponse | PlainMessage<GetAppsInStoreResponse> | undefined, b: GetAppsInStoreResponse | PlainMessage<GetAppsInStoreResponse> | undefined): boolean {
+    return proto3.util.equals(GetAppsInStoreResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetDeviceSettingsRequest
+ */
+export class GetDeviceSettingsRequest extends Message<GetDeviceSettingsRequest> {
+  constructor(data?: PartialMessage<GetDeviceSettingsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetDeviceSettingsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDeviceSettingsRequest {
+    return new GetDeviceSettingsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDeviceSettingsRequest {
+    return new GetDeviceSettingsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDeviceSettingsRequest {
+    return new GetDeviceSettingsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetDeviceSettingsRequest | PlainMessage<GetDeviceSettingsRequest> | undefined, b: GetDeviceSettingsRequest | PlainMessage<GetDeviceSettingsRequest> | undefined): boolean {
+    return proto3.util.equals(GetDeviceSettingsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetDeviceSettingsResponse
+ */
+export class GetDeviceSettingsResponse extends Message<GetDeviceSettingsResponse> {
+  /**
+   * @generated from field: platform.server.v1.DeviceSettings settings = 1;
+   */
+  settings?: DeviceSettings;
+
+  constructor(data?: PartialMessage<GetDeviceSettingsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetDeviceSettingsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "settings", kind: "message", T: DeviceSettings },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDeviceSettingsResponse {
+    return new GetDeviceSettingsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDeviceSettingsResponse {
+    return new GetDeviceSettingsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDeviceSettingsResponse {
+    return new GetDeviceSettingsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetDeviceSettingsResponse | PlainMessage<GetDeviceSettingsResponse> | undefined, b: GetDeviceSettingsResponse | PlainMessage<GetDeviceSettingsResponse> | undefined): boolean {
+    return proto3.util.equals(GetDeviceSettingsResponse, a, b);
+  }
+}
+
+/**
+ * Model used for the store, and installed apps
+ *
+ * @generated from message platform.server.v1.App
+ */
+export class App extends Message<App> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string version = 2;
+   */
+  version = "";
+
+  /**
+   * @generated from field: string app_version = 3;
+   */
+  appVersion = "";
+
+  /**
+   * @generated from field: string description = 4;
+   */
+  description = "";
+
+  /**
+   * @generated from field: string icon = 5;
+   */
+  icon = "";
+
+  /**
+   * @generated from field: string created_at = 6;
+   */
+  createdAt = "";
+
+  /**
+   * @generated from field: string digest = 7;
+   */
+  digest = "";
+
+  /**
+   * @generated from field: string type = 8;
+   */
+  type = "";
+
+  /**
+   * @generated from field: repeated string urls = 9;
+   */
+  urls: string[] = [];
+
+  constructor(data?: PartialMessage<App>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.App";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "app_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "created_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "digest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "urls", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): App {
+    return new App().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): App {
+    return new App().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): App {
+    return new App().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: App | PlainMessage<App> | undefined, b: App | PlainMessage<App> | undefined): boolean {
+    return proto3.util.equals(App, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.AppRunningStatus
+ */
+export class AppRunningStatus extends Message<AppRunningStatus> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string version = 2;
+   */
+  version = "";
+
+  /**
+   * @generated from field: platform.server.v1.AppStatus status = 3;
+   */
+  status = AppStatus.UNSPECIFIED;
+
+  constructor(data?: PartialMessage<AppRunningStatus>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppRunningStatus";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "status", kind: "enum", T: proto3.getEnumType(AppStatus) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppRunningStatus {
+    return new AppRunningStatus().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppRunningStatus {
+    return new AppRunningStatus().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppRunningStatus {
+    return new AppRunningStatus().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppRunningStatus | PlainMessage<AppRunningStatus> | undefined, b: AppRunningStatus | PlainMessage<AppRunningStatus> | undefined): boolean {
+    return proto3.util.equals(AppRunningStatus, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.Entries
+ */
+export class Entries extends Message<Entries> {
+  /**
+   * @generated from field: repeated platform.server.v1.App apps = 1;
+   */
+  apps: App[] = [];
+
+  constructor(data?: PartialMessage<Entries>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.Entries";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "apps", kind: "message", T: App, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Entries {
+    return new Entries().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Entries {
+    return new Entries().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Entries {
+    return new Entries().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Entries | PlainMessage<Entries> | undefined, b: Entries | PlainMessage<Entries> | undefined): boolean {
+    return proto3.util.equals(Entries, a, b);
+  }
+}
+
+/**
+ * Aggregate model for the installed apps saved in blueprint
+ *
+ * @generated from message platform.server.v1.InstalledApp
+ */
+export class InstalledApp extends Message<InstalledApp> {
+  /**
+   * @generated from field: platform.server.v1.App application = 1;
+   */
+  application?: App;
+
+  /**
+   * @generated from field: platform.server.v1.AppRunningStatus status = 2;
+   */
+  status?: AppRunningStatus;
+
+  constructor(data?: PartialMessage<InstalledApp>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.InstalledApp";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "application", kind: "message", T: App },
+    { no: 2, name: "status", kind: "message", T: AppRunningStatus },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InstalledApp {
+    return new InstalledApp().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InstalledApp {
+    return new InstalledApp().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InstalledApp {
+    return new InstalledApp().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: InstalledApp | PlainMessage<InstalledApp> | undefined, b: InstalledApp | PlainMessage<InstalledApp> | undefined): boolean {
+    return proto3.util.equals(InstalledApp, a, b);
+  }
+}
+
+/**
+ * Model to parse the yaml file for the app's available in the store
+ * currently they are stored in a public repo and fetched from there
+ * (https://home-cloud-io.github.io/store/index.yaml)
+ * A backround thread in the server will fetch the file and update the
+ * store first when it starts and then every 24 hours
+ *
+ * @generated from message platform.server.v1.AppStoreEntries
+ */
+export class AppStoreEntries extends Message<AppStoreEntries> {
+  /**
+   * @generated from field: string api_version = 1;
+   */
+  apiVersion = "";
+
+  /**
+   * @generated from field: string generated = 2;
+   */
+  generated = "";
+
+  /**
+   * @generated from field: map<string, platform.server.v1.Entries> entries = 3;
+   */
+  entries: { [key: string]: Entries } = {};
+
+  constructor(data?: PartialMessage<AppStoreEntries>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppStoreEntries";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "api_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "generated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Entries} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppStoreEntries {
+    return new AppStoreEntries().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppStoreEntries {
+    return new AppStoreEntries().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppStoreEntries {
+    return new AppStoreEntries().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppStoreEntries | PlainMessage<AppStoreEntries> | undefined, b: AppStoreEntries | PlainMessage<AppStoreEntries> | undefined): boolean {
+    return proto3.util.equals(AppStoreEntries, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DeviceSettings
+ */
+export class DeviceSettings extends Message<DeviceSettings> {
+  /**
+   * @generated from field: platform.server.v1.User admin_user = 1;
+   */
+  adminUser?: User;
+
+  /**
+   * @generated from field: string timezone = 2;
+   */
+  timezone = "";
+
+  /**
+   * @generated from field: bool auto_update_apps = 3;
+   */
+  autoUpdateApps = false;
+
+  /**
+   * @generated from field: bool auto_update_os = 4;
+   */
+  autoUpdateOs = false;
+
+  constructor(data?: PartialMessage<DeviceSettings>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DeviceSettings";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "admin_user", kind: "message", T: User },
+    { no: 2, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeviceSettings {
+    return new DeviceSettings().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeviceSettings {
+    return new DeviceSettings().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeviceSettings {
+    return new DeviceSettings().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeviceSettings | PlainMessage<DeviceSettings> | undefined, b: DeviceSettings | PlainMessage<DeviceSettings> | undefined): boolean {
+    return proto3.util.equals(DeviceSettings, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DiskStats
+ */
+export class DiskStats extends Message<DiskStats> {
+  /**
+   * @generated from field: int64 total = 1;
+   */
+  total = protoInt64.zero;
+
+  /**
+   * @generated from field: int64 used = 2;
+   */
+  used = protoInt64.zero;
+
+  /**
+   * @generated from field: int64 free = 3;
+   */
+  free = protoInt64.zero;
+
+  constructor(data?: PartialMessage<DiskStats>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DiskStats";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "total", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "used", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 3, name: "free", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DiskStats {
+    return new DiskStats().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DiskStats {
+    return new DiskStats().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DiskStats {
+    return new DiskStats().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DiskStats | PlainMessage<DiskStats> | undefined, b: DiskStats | PlainMessage<DiskStats> | undefined): boolean {
+    return proto3.util.equals(DiskStats, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.User
+ */
+export class User extends Message<User> {
+  /**
+   * @generated from field: string username = 1;
+   */
+  username = "";
+
+  /**
+   * @generated from field: string password = 2;
+   */
+  password = "";
+
+  constructor(data?: PartialMessage<User>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.User";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): User {
+    return new User().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): User {
+    return new User().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): User {
+    return new User().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: User | PlainMessage<User> | undefined, b: User | PlainMessage<User> | undefined): boolean {
+    return proto3.util.equals(User, a, b);
   }
 }
 

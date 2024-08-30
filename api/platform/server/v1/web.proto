@@ -4,6 +4,7 @@ package platform.server.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 
+import "tagger/tagger.proto";
 import "platform/daemon/v1/system.proto";
 
 service WebService {
@@ -19,6 +20,20 @@ service WebService {
   rpc SetSystemImage(SetSystemImageRequest) returns (SetSystemImageResponse) {}
   rpc AppsHealthCheck(AppsHealthCheckRequest) returns (AppsHealthCheckResponse) {}
   rpc GetSystemStats(GetSystemStatsRequest) returns (GetSystemStatsResponse) {}
+  // Check to validate if the device has gone through the onboarding process
+  rpc IsDeviceSetup(IsDeviceSetupRequest) returns (IsDeviceSetupResponse) {}
+  // Initialize the device with the user's credentials and settings
+  rpc InitializeDevice(InitializeDeviceRequest) returns (InitializeDeviceResponse) {}
+  // Login to the device
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  // Get usage statistics for the device
+  rpc GetDeviceUsageStats(GetDeviceUsageStatsRequest) returns (GetDeviceUsageStatsResponse) {}
+  // Get the status of all installed apps
+  rpc GetInstalledApps(GetInstalledAppsRequest) returns (GetInstalledAppsResponse) {}
+  // Get all apps available in the store
+  rpc GetAppsInStore(GetAppsInStoreRequest) returns (GetAppsInStoreResponse) {}
+  // Get the device settings
+  rpc GetDeviceSettings(GetDeviceSettingsRequest) returns (GetDeviceSettingsResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -120,4 +135,118 @@ message GetSystemStatsRequest {}
 
 message GetSystemStatsResponse {
   platform.daemon.v1.SystemStats stats = 1;
+}
+
+message IsDeviceSetupRequest {}
+message IsDeviceSetupResponse {
+  // If false the device is not setup, and the user should be redirected into the onboarding flow
+  bool setup = 1;
+}
+
+message InitializeDeviceRequest {
+  string username = 1;
+  string password = 2;
+  string timezone = 3;
+  bool auto_update_apps = 4;
+  bool auto_update_os = 5;
+  repeated string default_apps = 6;
+}
+
+message InitializeDeviceResponse {
+  bool setup = 1;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message GetDeviceUsageStatsRequest {}
+message GetDeviceUsageStatsResponse {
+  DiskStats disk = 3;
+  uint32 temperature = 4;
+}
+
+message GetInstalledAppsRequest {}
+message GetInstalledAppsResponse {
+  repeated AppStatus apps = 1;
+}
+
+message GetAppsInStoreRequest {}
+message GetAppsInStoreResponse {
+  repeated App apps = 1;
+}
+
+message GetDeviceSettingsRequest {}
+message GetDeviceSettingsResponse {
+  DeviceSettings settings = 1;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// MODELS
+// All the structs used in the service and that are stored in the database
+//////////////////////////////////////////////////////////////////////////
+
+// Model used for the store, and installed apps
+message App {
+  string name = 1;
+  string version = 2;
+  string app_version = 3;
+  string description = 4;
+  string icon = 5;
+  string created_at = 6;
+  string digest = 7;
+  string type = 8;
+  repeated string urls = 9;
+}
+
+message AppRunningStatus {
+  string name = 1;
+  string version = 2;
+  AppStatus status = 3;
+}
+
+message Entries {
+  repeated App apps = 1;
+}
+
+// Aggregate model for the installed apps saved in blueprint
+message InstalledApp {
+  App application = 1;
+  AppRunningStatus status = 2;
+}
+
+// Model to parse the yaml file for the app's available in the store
+// currently they are stored in a public repo and fetched from there
+// (https://home-cloud-io.github.io/store/index.yaml)
+// A backround thread in the server will fetch the file and update the
+// store first when it starts and then every 24 hours
+message AppStoreEntries {
+  string api_version = 1 [(tagger.tags) = "yaml:\"apiVersion\""];
+  string generated = 2;
+  map<string, Entries> entries = 3;
+}
+
+// User settings for the device
+
+message DeviceSettings {
+  User admin_user = 1;
+  string timezone = 2;
+  bool auto_update_apps = 3;
+  bool auto_update_os = 4;
+}
+
+message DiskStats {
+  int64 total = 1;
+  int64 used = 2;
+  int64 free = 3;
+}
+
+message User {
+  string username = 1;
+  string password = 2;
 }

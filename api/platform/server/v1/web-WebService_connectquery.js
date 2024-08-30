@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetDeviceUsageStatsRequest, GetDeviceUsageStatsResponse, GetInstalledAppsRequest, GetInstalledAppsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
  * @generated from rpc platform.server.v1.WebService.ShutdownHost
@@ -169,6 +169,118 @@ export const getSystemStats = {
   kind: MethodKind.Unary,
   I: GetSystemStatsRequest,
   O: GetSystemStatsResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * Check to validate if the device has gone through the onboarding process
+ *
+ * @generated from rpc platform.server.v1.WebService.IsDeviceSetup
+ */
+export const isDeviceSetup = {
+  localName: "isDeviceSetup",
+  name: "IsDeviceSetup",
+  kind: MethodKind.Unary,
+  I: IsDeviceSetupRequest,
+  O: IsDeviceSetupResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * Initialize the device with the user's credentials and settings
+ *
+ * @generated from rpc platform.server.v1.WebService.InitializeDevice
+ */
+export const initializeDevice = {
+  localName: "initializeDevice",
+  name: "InitializeDevice",
+  kind: MethodKind.Unary,
+  I: InitializeDeviceRequest,
+  O: InitializeDeviceResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * Login to the device
+ *
+ * @generated from rpc platform.server.v1.WebService.Login
+ */
+export const login = {
+  localName: "login",
+  name: "Login",
+  kind: MethodKind.Unary,
+  I: LoginRequest,
+  O: LoginResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * Get usage statistics for the device
+ *
+ * @generated from rpc platform.server.v1.WebService.GetDeviceUsageStats
+ */
+export const getDeviceUsageStats = {
+  localName: "getDeviceUsageStats",
+  name: "GetDeviceUsageStats",
+  kind: MethodKind.Unary,
+  I: GetDeviceUsageStatsRequest,
+  O: GetDeviceUsageStatsResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * Get the status of all installed apps
+ *
+ * @generated from rpc platform.server.v1.WebService.GetInstalledApps
+ */
+export const getInstalledApps = {
+  localName: "getInstalledApps",
+  name: "GetInstalledApps",
+  kind: MethodKind.Unary,
+  I: GetInstalledAppsRequest,
+  O: GetInstalledAppsResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * Get all apps available in the store
+ *
+ * @generated from rpc platform.server.v1.WebService.GetAppsInStore
+ */
+export const getAppsInStore = {
+  localName: "getAppsInStore",
+  name: "GetAppsInStore",
+  kind: MethodKind.Unary,
+  I: GetAppsInStoreRequest,
+  O: GetAppsInStoreResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * Get the device settings
+ *
+ * @generated from rpc platform.server.v1.WebService.GetDeviceSettings
+ */
+export const getDeviceSettings = {
+  localName: "getDeviceSettings",
+  name: "GetDeviceSettings",
+  kind: MethodKind.Unary,
+  I: GetDeviceSettingsRequest,
+  O: GetDeviceSettingsResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }
