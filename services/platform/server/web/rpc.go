@@ -295,6 +295,7 @@ func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.
 
 	_, err := h.controller.InitializeDevice(ctx, deviceSettings)
 	if err != nil {
+		h.logger.WithError(err).Error(ErrFailedToInitDevice)
 		return nil, errors.New(ErrFailedToInitDevice)
 	}
 
