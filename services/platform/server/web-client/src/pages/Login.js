@@ -16,7 +16,7 @@ export default function Login() {
     e.preventDefault();    
     login({ username, password });
 
-    navigate('/');
+    navigate('/home');
   }
 
   // TODO: Add a loading spinner

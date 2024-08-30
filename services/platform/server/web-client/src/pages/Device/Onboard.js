@@ -7,7 +7,6 @@ import "./DeviceOnboard.css";
 import {
   setUser,
   setDeviceSettings,
-  setDefaultApps
 } from "../../services/web_slice";
 
 import { useInitDeviceMutation } from "../../services/web_rpc";
@@ -29,9 +28,7 @@ function Welcome({ navigate }) {
   );
 }
 
-function UserSetup({ navigate, setUser }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+function UserSetup({ navigate, setUsername, setPassword, username, password}) {
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
@@ -81,17 +78,10 @@ function UserSetup({ navigate, setUser }) {
   );
 }
 
-function DeviceSettings({ navigate, setDeviceSettings }) {
-  const dispatch = useDispatch();
-
-  const [timezone, setTimezone] = useState("");
-  const [autoUpdateApps, setAutoUpdateApps] = useState(false);
-  const [autoUpdateOs, setAutoUpdateOs] = useState(false);
-
+function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApps, setAutoUpdateOs, timezone, autoUpdateApps, autoUpdateOs }) {
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(setDeviceSettings({ timezone, autoUpdateApps, autoUpdateOs }));
-    navigate(3);
+    useInitDevice();
   }
 
   return (
@@ -118,6 +108,7 @@ function DeviceSettings({ navigate, setDeviceSettings }) {
               type="checkbox"
               role="switch"
               value="true"
+              checked={autoUpdateApps}
               onChange={e => setAutoUpdateApps(e.target.value)}/>
             <label className="form-check-label">Automatically update applications</label>
           </div>
@@ -130,6 +121,7 @@ function DeviceSettings({ navigate, setDeviceSettings }) {
               type="checkbox"
               role="switch"
               value="true"
+              checked={autoUpdateOs}
               onChange={e => setAutoUpdateOs(e.target.value)} />
             <label className="form-check-label">Automatically update server</label>
           </div>
@@ -154,133 +146,54 @@ function DeviceSettings({ navigate, setDeviceSettings }) {
   );
 } 
 
-function DefaultApplications({ navigate, setDefaultApps, useInitDevice }) {
-  const deviceSetup = useSelector((state) => state.server);
-  const dispatch = useDispatch();
-  const [defaultApps, setSelectedApps] = useState([]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(setDefaultApps(defaultApps));
-    dispatch(useInitDevice());
-  }
-
-  const handleClick = (e) => {
-    const { value } = e.target;
-    if (defaultApps.includes(value)) {
-      setSelectedApps(defaultApps.filter(app => app !== value));
-    } else {
-      setSelectedApps([...defaultApps, value]);
-    }
-  }
-
-  return (
-    <div className="tab-pane fade show active">
-      <p>Choose some applications to install while the device is setup.</p>
-
-      <form className="row g-3">
-        <ul className="list-group">
-
-          <li className="list-group-item d-flex justify-content-between align-items-start">
-            <div className="ms-2 me-auto">
-              <div className="fw-bold">Immich</div>
-              Your personal image gallery
-            </div>
-            <input
-              className="form-check-input me-1"
-              type="checkbox"
-              value="immich"
-              id="firstCheckbox"
-              onClick={e => handleClick(e)}></input>
-          </li>
-
-          <li className="list-group-item d-flex justify-content-between align-items-start">
-            <div className="ms-2 me-auto">
-              <div className="fw-bold">Immich</div>
-              Your personal image gallery
-            </div>
-            <input
-              className="form-check-input me-1"
-              type="checkbox"
-              value="app2"
-              id="firstCheckbox"
-              onClick={e => handleClick(e)}></input>
-          </li>
-
-          <li className="list-group-item d-flex justify-content-between align-items-start">
-            <div className="ms-2 me-auto">
-              <div className="fw-bold">Immich</div>
-              Your personal image gallery
-            </div>
-            <input
-              className="form-check-input me-1"
-              type="checkbox"
-              value="app3"
-              id="firstCheckbox"
-              onClick={e => handleClick(e)}></input>
-          </li>
-        </ul>
-
-        <div className="col-12">
-          <button 
-            style={{float:"left"}}
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={() => navigate(2)}>Back</button>
-
-          <button 
-            style={{float:"right"}}
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={e => handleSubmit(e)}>Setup</button>
-        </div>
-
-      </form>
-    </div>
-  );
-}
-
 export default function DeviceOnboardPage() {
-  const [value, setValue] = React.useState(0);
+  const dispatch = useDispatch();
   const [initDevice, result] = useInitDeviceMutation();
 
+  const [pageNum, setValue] = React.useState(0);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [timezone, setTimezone] = useState("");
+  const [autoUpdateApps, setAutoUpdateApps] = useState(true);
+  const [autoUpdateOs, setAutoUpdateOs] = useState(true);
+
   const handleClick = (val) => setValue(val);
+
+  const initServer = () => {
+    dispatch(initDevice({
+      username: username,
+      password: password,
+      timezone: timezone,
+      autoUpdateApps: autoUpdateApps,
+      autoUpdateOs: autoUpdateOs,
+    }));
+
+  }
+
+  if (result.error) {
+    console.log("Error initializing device");
+  }
+
+  if (result.data) {
+    console.log("Device initialized");
+  }
 
   return (
     <>
       <div className="container card shadow d-flex justify-content-center">
-        <ul className="nav nav-pills mb-12 shadow-sm" id="pills-tab" role="tablist">
-          <li className="nav-item">
-            <a 
-              className={`nav-link ${value === 0 ? 'active' : ''}`}
-              id="pills-home-tab"
-              onClick={() => handleClick(0)}>Getting Started</a>
-          </li>
-          <li className="nav-item">
-            <a 
-              className={`nav-link ${value === 1 ? 'active' : ''}`}
-              id="pills-home-tab"
-              onClick={() => handleClick(1)}>User Setup</a>
-          </li>
-          <li className="nav-item">
-            <a 
-              className={`nav-link ${value === 2 ? 'active' : ''}`}
-              id="pills-home-tab"
-              onClick={() => handleClick(2)}>Device Settings</a>
-          </li>
-          <li className="nav-item">
-            <a 
-              className={`nav-link ${value === 3 ? 'active' : ''}`}
-              id="pills-home-tab"
-              onClick={() => handleClick(3)}>Default Applications</a>
-          </li>
-        </ul>
-
         <div className="tab-content" id="pills-tabContent p-3">
-          {value == 0 && <Welcome navigate={handleClick}/>}
-          {value == 1 && <UserSetup navigate={handleClick} setUser={setUser} />}
-          {value == 2 && <DeviceSettings navigate={handleClick} setDeviceSettings={setDeviceSettings}/>}
-          {value == 3 && <DefaultApplications navigate={handleClick} setDefaultApps={setDefaultApps} useInitDevice={initDevice}/>}
+          {pageNum == 0 && <Welcome navigate={handleClick}/>}
+          {pageNum == 1 && <UserSetup navigate={handleClick} setUsername={setUsername} setPassword={setPassword} username={username} password={password} />}
+          {pageNum == 2 && <DeviceSettings
+            navigate={handleClick}
+            useInitDevice={initServer}
+            setTimezone={setTimezone}
+            setAutoUpdateApps={setAutoUpdateApps} 
+            setAutoUpdateOs={setAutoUpdateOs}
+            timezone={timezone}
+            autoUpdateApps={autoUpdateApps}
+            autoUpdateOs={autoUpdateOs} 
+            />}
         </div>
       </div>
     </>

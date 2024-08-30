@@ -1,16 +1,15 @@
 import * as React from "react";
-import { Routes, Route } from "react-router-dom";
 import { Routes, Route, redirect } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import Login from "./Login";
 import DefaultLayout from "./DefaultLayout";
 import DeviceOnboardPage from "./Device/Onboard";
-import AppStore from "./AppStore/AppStore";
+
+import AppStorePage from "./AppStore";
+import HomePage from "./Home";
 
 import {useGetIsDeviceSetupQuery} from "../services/web_rpc";
-
-import { HomePage } from "./Home";
 
 export default function Dashboard() {
   const userSettings = useSelector((state) => state.user_settings);
@@ -44,10 +43,10 @@ export default function Dashboard() {
   return (
     <>
       <Routes>
-        <Route index element={<Home/>} />
+        <Route index element={<HomePage/>} />
         <Route path="/" element={<DefaultLayout />} >
           <Route path="home" element={<HomePage />} />
-          <Route path="store" element={<AppStore />} />
+          <Route path="store" element={<AppStorePage />} />
         </Route>
 
         <Route path="getting-started" element={<DeviceOnboardPage/>} />

@@ -63,33 +63,23 @@ export const serverRPCService = createApi({
     // TODO: Add remaining endpoints here
     getIsDeviceSetup: builder.query({
       queryFn: async () => {
-        const res = await client.isDeviceSetup({})
-        return { data: { isDeviceSetup: res.setup }}
+        try {
+          const res = await client.isDeviceSetup({});
+          return { data: { isDeviceSetup: res.setup }};
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
       },
     }),
     initDevice: builder.mutation({
-      queryFn: async (req, store) => {
-        let request = {
-          username: store.getState().server.username,
-          password: store.getState().server.password,
-          timezone: store.getState().server.timezone,
+      queryFn: async (req) => {
+        try {
+          const res = await client.initializeDevice(req);
+          return { data: { isDeviceSetup: res.setup }};
+        } catch (error) {
+          console.log(error);
+          return { error: error.rawMessage };
         }
-
-        if (store.getState().server.autoUpdateApps === "true") {
-          request.auto_update_apps = true;
-        } else {
-          request.auto_update_apps = false;
-        }
-
-        if (store.getState().server.autoUpdateOs === "true") {
-          request.auto_update_os = true;
-        } else {
-          request.auto_update_os = false;
-        }
-
-        const response = await client.initializeDevice(request);
-
-        return { data: { isDeviceSetup: response.setup }};
       },
     }),
     login: builder.mutation({
@@ -100,7 +90,7 @@ export const serverRPCService = createApi({
           store.dispatch(setUserSettings({ username: req.username, token: response.token }));
           return { data: { loggedIn: true }};
         } catch (error) {
-          return { error };
+          return { error: error.rawMessage };
         }  
       }
     }),

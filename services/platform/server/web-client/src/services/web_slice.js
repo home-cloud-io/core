@@ -25,16 +25,12 @@ export const serverSlice = createSlice({
             state.autoUpdateApps = autoUpdateApps;
             state.autoUpdateOs = autoUpdateOs;
         },
-        setDefaultApps: (state, action) => {
-            state.default_apps = action.payload;
-        }
     }
 });
 
 export const {
     setUser,
     setDeviceSettings,
-    setDefaultApps
 } = serverSlice.actions;
 
   export default serverSlice.reducer;

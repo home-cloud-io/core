@@ -5,7 +5,7 @@ import {
   useGetAppStoreEntitiesQuery
 } from '../../services/web_rpc';
 
-export default function AppStore() {
+export default function AppStorePage() {
   const { data, error, isLoading } = useGetAppStoreEntitiesQuery(); 
 
   const ListEntries = () => {
