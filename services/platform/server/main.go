@@ -30,7 +30,7 @@ func main() {
 	}
 
 	if err := web.NewSecretSeed(logger); err != nil {
-		logger.WithError(err).Error("failed to create secret seed")
+		logger.Error("failed to create secret seed")
 	}
 
 	defer chassis.New(logger).

@@ -1,14 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Outlet } from "react-router-dom";
-import {
-  deleteApp,
-  installApp,
-  restart,
-  shutdown,
-  updateApp,
-} from '../services/web_rpc';
-
 import { useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 
@@ -61,13 +53,6 @@ export default function DefaultLayout() {
                     <a className="nav-link" href="#">App Store</a>
                   </li>
 
-                  {/* <li className="nav-item">
-                    <a className="nav-link" href="#">Profile</a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="#">Switch account</a>
-                  </li> */}
-
                   <li className="nav-item dropdown">
                     <a className="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Settings</a>
                     <ul className="dropdown-menu">
@@ -89,36 +74,6 @@ export default function DefaultLayout() {
         {isAlertVisible && <Alert />}
         <Outlet />
       </main>
-
-      {/* <div>
-        <button onClick={() => shutdown()}>Shutdown Host</button>{' '}
-        <button onClick={() => restart()}>Restart Host</button>
-        <br></br>
-        Hello World
-        <br></br>
-        <button onClick={() => installApp('hello-world')}>Install App</button>
-        {'  '}
-        <button onClick={() => deleteApp('hello-world')}>Delete App</button>
-        {'  '}
-        <button onClick={() => updateApp('hello-world')}>Update App</button>
-        <br></br>
-        Postgres
-        <br></br>
-        <button onClick={() => installApp('postgres')}>Install App</button>
-        {'  '}
-        <button onClick={() => deleteApp('postgres')}>Delete App</button>
-        {'  '}
-        <button onClick={() => updateApp('postgres')}>Update App</button>
-        <br></br>
-        Immich
-        <br></br>
-        <button onClick={() => installApp('immich')}>Install App</button>
-        {'  '}
-        <button onClick={() => deleteApp('immich')}>Delete App</button>
-        {'  '}
-        <button onClick={() => updateApp('immich')}>Update App</button>
-        <br></br>
-      </div> */}
     </>
   );
 }
@@ -159,15 +114,6 @@ function Alert() {
 function OffCanvasNavigation() {
   return (
     <div className="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
-      <button className="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
-              id="bd-theme"
-              type="button"
-              aria-expanded="false"
-              data-bs-toggle="dropdown"
-              aria-label="Toggle theme (auto)">
-        <svg className="bi my-1 theme-icon-active" width="1em" height="1em"><use href="#circle-half"></use></svg>
-        <span className="visually-hidden" id="bd-theme-text">Toggle theme</span>
-      </button>
       <ul className="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
         <li>
           <button type="button" className="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
