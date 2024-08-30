@@ -295,8 +295,12 @@ func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.
 
 	_, err := h.controller.InitializeDevice(ctx, deviceSettings)
 	if err != nil {
-		h.logger.WithError(err).Error(ErrFailedToInitDevice)
-		return nil, errors.New(ErrFailedToInitDevice)
+		if err.Error() == ErrDeviceAlreadySetup {
+			return connect.NewResponse(&v1.InitializeDeviceResponse{Setup: true}), nil
+		}
+
+		h.logger.Error(err.Error())
+		return nil, err
 	}
 
 	return connect.NewResponse(&v1.InitializeDeviceResponse{Setup: true}), nil

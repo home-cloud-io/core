@@ -89,7 +89,7 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 	// TODO: Get seed salt value from `blue_print`
 	seed, err := getSaltValue(ctx, c.KeyValueServiceClient)
 	if err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
+		return "", err
 	} else {
 		// salt & hash the meat before you put in on the grill
 		settings.AdminUser.Password = hashPassword(settings.AdminUser.Password, []byte(seed))

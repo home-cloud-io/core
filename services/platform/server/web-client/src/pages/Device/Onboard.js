@@ -1,15 +1,11 @@
 import * as React from "react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from 'react-router-dom';
+import { setUser } from "../../services/web_slice";
+import { useInitDeviceMutation } from "../../services/web_rpc";
 
 import "./DeviceOnboard.css";
-
-import {
-  setUser,
-  setDeviceSettings,
-} from "../../services/web_slice";
-
-import { useInitDeviceMutation } from "../../services/web_rpc";
 
 function Welcome({ navigate }) {
   return (
@@ -148,6 +144,7 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
 
 export default function DeviceOnboardPage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [initDevice, result] = useInitDeviceMutation();
 
   const [pageNum, setValue] = React.useState(0);
@@ -175,7 +172,7 @@ export default function DeviceOnboardPage() {
   }
 
   if (result.data) {
-    console.log("Device initialized");
+    navigate('/store');
   }
 
   return (
