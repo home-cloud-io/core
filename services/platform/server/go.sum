@@ -179,8 +179,6 @@ github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245 h1:Nyeelmxya
 github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245/go.mod h1:nTakvJ4XYq45UXtn0DbwR4aU9ZdjlnIenpbs6Cd+FM0=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0 h1:fPpQR1iGEVYjZ2OELvUHX600VAK5qmdnDEv3eXOwZUA=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0/go.mod h1:YHukhB04ChJsLHLJEUD6vjFyLX2L3dsX3wPBZcX4tmc=
-github.com/home-cloud-io/core/api v0.4.0 h1:Zi2/7tWCY6ck9nKDr2BjaDGKpaauMSTL5woe0GaJOk0=
-github.com/home-cloud-io/core/api v0.4.0/go.mod h1:Xl7qv+VBG/eJQqdX/Np+u/yLf+4ecOVVWEndZpZa9N0=
 github.com/home-cloud-io/core/services/platform/operator v0.0.2 h1:cJLiFxEBUA7rj3oYAHX9TbLPCgGeGgLyEmIeCrwJuvA=
 github.com/home-cloud-io/core/services/platform/operator v0.0.2/go.mod h1:qhOt6mWdpGCpdWlxTIU3FJS8ybzRy66CoTCF3p5mMpI=
 github.com/imdario/mergo v0.3.13 h1:lFzP57bqS/wsqKssCGmtLAb8A0wKjLGrve2q3PPVcBk=
@@ -323,8 +321,8 @@ github.com/srikrsna/protoc-gen-gotag v1.0.2 h1:4okv8GlbVbvmL678VX0AobxaMkERlBbHv
 github.com/srikrsna/protoc-gen-gotag v1.0.2/go.mod h1:HiXK5kcp/ZRnNPahuJm3tzfGDoD8xzvLNdg5/PYKq7Q=
 github.com/steady-bytes/draft/api v0.3.2 h1:JvRiiKqND27UedJavObspNcVyuGv55sd3j2s1i7akCE=
 github.com/steady-bytes/draft/api v0.3.2/go.mod h1:mlwxjvRiqvwySGdzVmF8voFhMffWq2F7dyd+xt6kENA=
-github.com/steady-bytes/draft/pkg/chassis v0.3.0 h1:9uk+RRuSec2Sl7wy5ZSNv3IcqRqbU6vYiVSLj5Bo9co=
-github.com/steady-bytes/draft/pkg/chassis v0.3.0/go.mod h1:5TQfgltb/008bcuLe6vAQva0Kzrq1zEDCFoCfQjzzLo=
+github.com/steady-bytes/draft/pkg/chassis v0.3.3 h1:5Hflo9qRaQnYj7MszMTvKRXv/dRy7N6ZW0nSOQrUScg=
+github.com/steady-bytes/draft/pkg/chassis v0.3.3/go.mod h1:g7JMbVINwUnvtOGpR/QKOlGK62/3rRIR0qg3++7hZUM=
 github.com/steady-bytes/draft/pkg/loggers v0.1.0 h1:j0G2Gj9XsMYBbuB94v0zKSIEhxNQbz451DfIJyZOYyA=
 github.com/steady-bytes/draft/pkg/loggers v0.1.0/go.mod h1:CAus1VfIti4WimzQZ4YcnlpevWjfOMwAxRcxGu85P4Y=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
