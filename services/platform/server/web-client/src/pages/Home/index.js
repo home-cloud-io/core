@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { useGetAppsHealthCheckQuery, useGetAppStoreEntitiesQuery } from '../../services/web_rpc';
+import { useGetAppsHealthCheckQuery } from '../../services/web_rpc';
 
 export default function HomePage() {
   return (
@@ -50,18 +49,6 @@ export function InstalledApplicationsList() {
 }
 
 function Application({app}) {
-  const styles = {
-    marginTop: ".25rem",
-  }
-
-  const onAppClick = (app) => {
-    console.log(`App clicked: ${app}`);
-  }
-
-  const onMouseOver = (app) => {
-    console.log(`App entered: ${app}`);
-  }
-
   return (
     <div className="d-flex text-body-secondary pt-3">
       <svg
