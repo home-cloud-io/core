@@ -4,9 +4,11 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetDeviceUsageStatsRequest, GetDeviceUsageStatsResponse, GetInstalledAppsRequest, GetInstalledAppsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
+ * Shutdown the host machine running Home Cloud
+ *
  * @generated from rpc platform.server.v1.WebService.ShutdownHost
  */
 export const shutdownHost = {
@@ -21,6 +23,8 @@ export const shutdownHost = {
 };
 
 /**
+ * Restart the host machine running Home Cloud
+ *
  * @generated from rpc platform.server.v1.WebService.RestartHost
  */
 export const restartHost = {
@@ -35,6 +39,8 @@ export const restartHost = {
 };
 
 /**
+ * Install a Home Cloud application
+ *
  * @generated from rpc platform.server.v1.WebService.InstallApp
  */
 export const installApp = {
@@ -49,6 +55,8 @@ export const installApp = {
 };
 
 /**
+ * Delete a Home Cloud application
+ *
  * @generated from rpc platform.server.v1.WebService.DeleteApp
  */
 export const deleteApp = {
@@ -63,6 +71,8 @@ export const deleteApp = {
 };
 
 /**
+ * Update a Home Cloud application
+ *
  * @generated from rpc platform.server.v1.WebService.UpdateApp
  */
 export const updateApp = {
@@ -77,6 +87,8 @@ export const updateApp = {
 };
 
 /**
+ * Check for available NixOS and Daemon updates
+ *
  * @generated from rpc platform.server.v1.WebService.CheckForSystemUpdates
  */
 export const checkForSystemUpdates = {
@@ -91,6 +103,8 @@ export const checkForSystemUpdates = {
 };
 
 /**
+ * Check for available system (draft and home cloud) container updates
+ *
  * @generated from rpc platform.server.v1.WebService.CheckForContainerUpdates
  */
 export const checkForContainerUpdates = {
@@ -105,6 +119,8 @@ export const checkForContainerUpdates = {
 };
 
 /**
+ * Change the currently installed Daemon version
+ *
  * @generated from rpc platform.server.v1.WebService.ChangeDaemonVersion
  */
 export const changeDaemonVersion = {
@@ -119,6 +135,8 @@ export const changeDaemonVersion = {
 };
 
 /**
+ * Install available NixOS updates (call after calling CheckForSystemUpdates)
+ *
  * @generated from rpc platform.server.v1.WebService.InstallOSUpdate
  */
 export const installOSUpdate = {
@@ -133,6 +151,8 @@ export const installOSUpdate = {
 };
 
 /**
+ * Set a system (draft and home cloud) container image (used for updating images)
+ *
  * @generated from rpc platform.server.v1.WebService.SetSystemImage
  */
 export const setSystemImage = {
@@ -147,6 +167,8 @@ export const setSystemImage = {
 };
 
 /**
+ * Check the current health of all installed Home Cloud applications
+ *
  * @generated from rpc platform.server.v1.WebService.AppsHealthCheck
  */
 export const appsHealthCheck = {
@@ -161,6 +183,8 @@ export const appsHealthCheck = {
 };
 
 /**
+ * Get the current host machine stats (cpu, memory, drives)
+ *
  * @generated from rpc platform.server.v1.WebService.GetSystemStats
  */
 export const getSystemStats = {
@@ -217,38 +241,6 @@ export const login = {
   kind: MethodKind.Unary,
   I: LoginRequest,
   O: LoginResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-};
-
-/**
- * Get usage statistics for the device
- *
- * @generated from rpc platform.server.v1.WebService.GetDeviceUsageStats
- */
-export const getDeviceUsageStats = {
-  localName: "getDeviceUsageStats",
-  name: "GetDeviceUsageStats",
-  kind: MethodKind.Unary,
-  I: GetDeviceUsageStatsRequest,
-  O: GetDeviceUsageStatsResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-};
-
-/**
- * Get the status of all installed apps
- *
- * @generated from rpc platform.server.v1.WebService.GetInstalledApps
- */
-export const getInstalledApps = {
-  localName: "getInstalledApps",
-  name: "GetInstalledApps",
-  kind: MethodKind.Unary,
-  I: GetInstalledAppsRequest,
-  O: GetInstalledAppsResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

@@ -339,43 +339,6 @@ export const LoginResponse = proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.GetDeviceUsageStatsRequest
- */
-export const GetDeviceUsageStatsRequest = proto3.makeMessageType(
-  "platform.server.v1.GetDeviceUsageStatsRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.GetDeviceUsageStatsResponse
- */
-export const GetDeviceUsageStatsResponse = proto3.makeMessageType(
-  "platform.server.v1.GetDeviceUsageStatsResponse",
-  () => [
-    { no: 3, name: "disk", kind: "message", T: DiskStats },
-    { no: 4, name: "temperature", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.GetInstalledAppsRequest
- */
-export const GetInstalledAppsRequest = proto3.makeMessageType(
-  "platform.server.v1.GetInstalledAppsRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.GetInstalledAppsResponse
- */
-export const GetInstalledAppsResponse = proto3.makeMessageType(
-  "platform.server.v1.GetInstalledAppsResponse",
-  () => [
-    { no: 1, name: "apps", kind: "enum", T: proto3.getEnumType(AppStatus), repeated: true },
-  ],
-);
-
-/**
  * @generated from message platform.server.v1.GetAppsInStoreRequest
  */
 export const GetAppsInStoreRequest = proto3.makeMessageType(
