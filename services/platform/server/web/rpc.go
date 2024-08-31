@@ -9,7 +9,6 @@ import (
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
-	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/server/daemon"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 
@@ -72,13 +71,7 @@ func (h *rpc) RestartHost(ctx context.Context, request *connect.Request[v1.Resta
 
 func (h *rpc) InstallApp(ctx context.Context, request *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("install request")
-	err := h.k8sclient.Install(ctx, opv1.AppSpec{
-		Chart:   request.Msg.Chart,
-		Repo:    request.Msg.Repo,
-		Release: request.Msg.Release,
-		Values:  request.Msg.Values,
-		Version: request.Msg.Version,
-	})
+	err := h.controller.InstallApp(ctx, h.logger, request.Msg)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to install app")
 		return nil, err
@@ -89,9 +82,7 @@ func (h *rpc) InstallApp(ctx context.Context, request *connect.Request[v1.Instal
 
 func (h *rpc) DeleteApp(ctx context.Context, request *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("delete request")
-	err := h.k8sclient.Delete(ctx, opv1.AppSpec{
-		Release: request.Msg.Release,
-	})
+	err := h.controller.DeleteApp(ctx, h.logger, request.Msg)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to delete app")
 		return nil, err
@@ -102,13 +93,7 @@ func (h *rpc) DeleteApp(ctx context.Context, request *connect.Request[v1.DeleteA
 
 func (h *rpc) UpdateApp(ctx context.Context, request *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("update request")
-	err := h.k8sclient.Update(ctx, opv1.AppSpec{
-		Chart:   request.Msg.Chart,
-		Repo:    request.Msg.Repo,
-		Release: request.Msg.Release,
-		Values:  request.Msg.Values,
-		Version: request.Msg.Version,
-	})
+	err := h.controller.UpdateApp(ctx, h.logger, request.Msg)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to update app")
 		return nil, err
