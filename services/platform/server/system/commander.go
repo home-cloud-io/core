@@ -1,10 +1,9 @@
-package daemon
+package system
 
 import (
 	"fmt"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
 
 	"connectrpc.com/connect"
 )
@@ -18,9 +17,9 @@ type (
 		RestartHost() error
 		RequestOSUpdateDiff() error
 		RequestCurrentDaemonVersion() error
-		ChangeDaemonVersion(request *webv1.ChangeDaemonVersionRequest) error
+		ChangeDaemonVersion(request *v1.ChangeDaemonVersionCommand) error
 		InstallOSUpdate() error
-		SetSystemImage(request *webv1.SetSystemImageRequest) error
+		SetSystemImage(request *v1.SetSystemImageCommand) error
 	}
 
 	commander struct {
@@ -32,13 +31,8 @@ var (
 	commanderSingleton Commander
 )
 
-func NewCommander() Commander {
+func Init()  {
 	commanderSingleton = &commander{}
-	return commanderSingleton
-}
-
-func GetCommander() Commander {
-	return commanderSingleton
 }
 
 func (c *commander) SetStream(stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error {
@@ -77,14 +71,10 @@ func (c *commander) RequestCurrentDaemonVersion() error {
 	})
 }
 
-func (c *commander) ChangeDaemonVersion(request *webv1.ChangeDaemonVersionRequest) error {
+func (c *commander) ChangeDaemonVersion(request *v1.ChangeDaemonVersionCommand) error {
 	return c.stream.Send(&v1.ServerMessage{
 		Message: &v1.ServerMessage_ChangeDaemonVersionCommand{
-			ChangeDaemonVersionCommand: &v1.ChangeDaemonVersionCommand{
-				Version:    request.Version,
-				VendorHash: request.VendorHash,
-				SrcHash:    request.SrcHash,
-			},
+			ChangeDaemonVersionCommand: request,
 		},
 	})
 }
@@ -95,13 +85,10 @@ func (c *commander) InstallOSUpdate() error {
 	})
 }
 
-func (c *commander) SetSystemImage(request *webv1.SetSystemImageRequest) error {
+func (c *commander) SetSystemImage(request *v1.SetSystemImageCommand) error {
 	return c.stream.Send(&v1.ServerMessage{
 		Message: &v1.ServerMessage_SetSystemImageCommand{
-			SetSystemImageCommand: &v1.SetSystemImageCommand{
-				CurrentImage:   request.CurrentImage,
-				RequestedImage: request.RequestedImage,
-			},
+			SetSystemImageCommand: request,
 		},
 	})
 }
