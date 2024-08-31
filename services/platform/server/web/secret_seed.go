@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	v1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
 	kvv1Connect "github.com/steady-bytes/draft/api/core/registry/key_value/v1/v1connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -17,7 +18,6 @@ func init() {
 
 const (
 	RANDOM_BYTES_LENGTH = 16
-	SEED_KEY            = "secret_seed"
 
 	ErrFailedToStoreSeed = "failed to create set request"
 )
@@ -34,7 +34,7 @@ func NewSecretSeed(logger chassis.Logger) error {
 
 	// check if the seed already exists
 	seedValue := &v1.Value{}
-	req, err := buildGetRequest(SEED_KEY, seedValue)
+	req, err := kvclient.BuildGetRequest(kvclient.SEED_KEY, seedValue)
 	if err != nil {
 		log.WithError(err).Error("failed to find seed making a new one")
 		return err
@@ -50,7 +50,7 @@ func NewSecretSeed(logger chassis.Logger) error {
 		// store the seed in the key-value store
 		seedValue.Data = seed
 
-		setSeedReq, err := buildSetRequest(SEED_KEY, seedValue)
+		setSeedReq, err := kvclient.BuildSetRequest(kvclient.SEED_KEY, seedValue)
 		if err != nil {
 			log.WithError(err).Error(ErrFailedToStoreSeed)
 			return err

@@ -1,4 +1,4 @@
-package web
+package system
 
 import (
 	"context"
@@ -9,9 +9,11 @@ import (
 	"strings"
 	"time"
 
+	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
+	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	kvv1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
 	kvv1Connect "github.com/steady-bytes/draft/api/core/registry/key_value/v1/v1connect"
 
@@ -32,20 +34,23 @@ type (
 		InstallApp(ctx context.Context, logger chassis.Logger, request *v1.InstallAppRequest) error
 		DeleteApp(ctx context.Context, logger chassis.Logger, request *v1.DeleteAppRequest) error
 		UpdateApp(ctx context.Context, logger chassis.Logger, request *v1.UpdateAppRequest) error
+		CheckAppsHealth(ctx context.Context) ([]*v1.AppHealth, error)
 	}
 
 	controller struct {
 		kvv1Connect.KeyValueServiceClient
 		chassis.Logger
-		k8sclient k8sclient.Client
+		k8sclient        k8sclient.Client
+		messages         chan *dv1.DaemonMessage
 	}
 )
 
-func NewController(logger chassis.Logger) Controller {
+func NewController(logger chassis.Logger, messages chan *dv1.DaemonMessage) Controller {
 	return &controller{
 		kvv1Connect.NewKeyValueServiceClient(http.DefaultClient, chassis.GetConfig().Entrypoint()),
 		logger,
 		k8sclient.NewClient(logger),
+		messages,
 	}
 }
 
@@ -59,8 +64,6 @@ const (
 	ErrFailedToBuildSeedGetRequest = "failed to build get request for seed"
 	ErrFailedToGetSeedValue        = "failed to get seed value"
 	ErrFailedToUnmarshalSeedValue  = "failed to unmarshal seed value"
-
-	DEFAULT_DEVICE_SETTINGS_KEY = "device"
 )
 
 // IsDeviceSetup checks if the device is already setup by checking if the DEFAULT_DEVICE_SETTINGS_KEY key exists in the key-value store
@@ -104,7 +107,7 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 		settings.AdminUser.Password = hashPassword(settings.AdminUser.Password, []byte(seed))
 	}
 
-	msg, err := buildSetRequest(DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	msg, err := kvclient.BuildSetRequest(kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
 		return "", errors.New(ErrFailedToCreateSettings)
 	}
@@ -119,7 +122,7 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 
 func getSaltValue(ctx context.Context, c kvv1Connect.KeyValueServiceClient) (string, error) {
 	seedVal := &kvv1.Value{}
-	seedLookup, err := buildGetRequest(SEED_KEY, seedVal)
+	seedLookup, err := kvclient.BuildGetRequest(kvclient.SEED_KEY, seedVal)
 	if err != nil {
 		return "", errors.New(ErrFailedToBuildSeedGetRequest)
 	}
@@ -153,7 +156,7 @@ func hashPassword(password string, salt []byte) string {
 
 func (c *controller) Login(ctx context.Context, username, password string) (string, error) {
 	settings := &v1.DeviceSettings{}
-	req, err := buildGetRequest(DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	req, err := kvclient.BuildGetRequest(kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
 		return "", errors.New(ErrFailedToGetSettings)
 	}
@@ -196,7 +199,7 @@ func (c *controller) GetAppsInStore(ctx context.Context) ([]*v1.App, error) {
 
 	logger.Info("getting apps in store")
 
-	req, err := buildGetRequest(APP_STORE_ENTRIES_KEY, appStore)
+	req, err := kvclient.BuildGetRequest(kvclient.APP_STORE_ENTRIES_KEY, appStore)
 	if err != nil {
 		logger.WithError(err).Error("failed to build get request")
 		return nil, errors.New(ErrFailedToGetApps)
@@ -310,6 +313,10 @@ func (c *controller) UpdateApp(ctx context.Context, logger chassis.Logger, reque
 		return err
 	}
 	return nil
+}
+
+func (c *controller) CheckAppsHealth(ctx context.Context) ([]*v1.AppHealth, error) {
+	return c.k8sclient.CheckAppsHealth(ctx)
 }
 
 func (c *controller) waitForInstall(ctx context.Context, logger chassis.Logger, appName string) error {

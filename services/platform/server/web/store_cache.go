@@ -8,6 +8,7 @@ import (
 	"time"
 
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	kvv1Connect "github.com/steady-bytes/draft/api/core/registry/key_value/v1/v1connect"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -35,7 +36,6 @@ type (
 
 const (
 	APP_STORE_URL         = "https://apps.home-cloud.io/index.yaml"
-	APP_STORE_ENTRIES_KEY = "app_store_entries"
 
 	ErrFailedToPopulateAppStore = "failed to populate app store"
 
@@ -101,7 +101,7 @@ func (c *storeCache) refresh() error {
 	}
 
 	// marshal to any pb
-	setReq, err := buildSetRequest(APP_STORE_ENTRIES_KEY, entries)
+	setReq, err := kvclient.BuildSetRequest(kvclient.APP_STORE_ENTRIES_KEY, entries)
 	if err != nil {
 		c.logger.Error("failed to marshal app store entries")
 		return errors.New(ErrFailedToPopulateAppStore)

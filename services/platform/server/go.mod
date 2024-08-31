@@ -14,6 +14,7 @@ require (
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/home-cloud-io/core/api v0.4.2
 	github.com/home-cloud-io/core/services/platform/operator v0.0.2
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/steady-bytes/draft/api v0.3.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.3
 	github.com/steady-bytes/draft/pkg/loggers v0.1.0
