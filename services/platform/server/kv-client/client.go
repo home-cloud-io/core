@@ -13,6 +13,8 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
+// TODO: move this into draft/pkg/repositories as a `blueprint` option
+
 var (
 	clientSingleton kvv1Connect.KeyValueServiceClient
 )
