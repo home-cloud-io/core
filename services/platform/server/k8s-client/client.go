@@ -23,6 +23,7 @@ type (
 
 		CurrentContainerVersions(ctx context.Context) ([]*webv1.ImageVersion, error)
 		CheckAppsHealth(ctx context.Context) ([]*webv1.AppHealth, error)
+		AppInstalled(ctx context.Context, name string) (installed bool, err error)
 	}
 
 	client struct {
@@ -158,6 +159,24 @@ func (c *client) CheckAppsHealth(ctx context.Context) ([]*webv1.AppHealth, error
 	}
 
 	return checks, nil
+}
+
+func (c *client) AppInstalled(ctx context.Context, name string) (installed bool, err error) {
+	apps := &opv1.App{}
+	err = c.client.Get(ctx, types.NamespacedName{
+		Namespace: homeCloudNamespace,
+		Name:      name,
+	}, apps)
+	if err != nil {
+		// if the error is NotFound, then the app is NOT installed
+		if crclient.IgnoreNotFound(err) == nil {
+			return false, nil
+		}
+		// unknown error so return it
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, images map[string]*webv1.ImageVersion) error {
