@@ -14,6 +14,7 @@ RUN npm install
 
 # Build dist
 COPY ./services/${DOMAIN}/${SERVICE}/web-client .
+ENV NODE_ENV=production
 RUN npm run build
 
 # Make sure dist directory exists even if there's no client to build
