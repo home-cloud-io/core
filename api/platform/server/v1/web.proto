@@ -4,7 +4,6 @@ package platform.server.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 
-import "tagger/tagger.proto";
 import "platform/daemon/v1/system.proto";
 
 service WebService {
@@ -188,17 +187,30 @@ message GetDeviceSettingsResponse {
 // All the structs used in the service and that are stored in the database
 //////////////////////////////////////////////////////////////////////////
 
-// Model used for the store, and installed apps
+message Apps {
+  repeated App apps = 1;
+}
+
+// Model used for the store and installed apps
+// NOTE: that this must match the shape of the `entries` from a Helm repo
+// index: e.g. https://apps.home-cloud.io/index.yaml
 message App {
   string name = 1;
   string version = 2;
   string app_version = 3;
   string description = 4;
   string icon = 5;
-  string created_at = 6;
+  string created = 6;
   string digest = 7;
   string type = 8;
   repeated string urls = 9;
+  repeated AppDependency dependencies = 10;
+}
+
+message AppDependency {
+  string name = 1;
+  string version = 2;
+  string repository = 3;
 }
 
 message AppRunningStatus {
@@ -217,15 +229,13 @@ message InstalledApp {
   AppRunningStatus status = 2;
 }
 
-// Model to parse the yaml file for the app's available in the store
-// currently they are stored in a public repo and fetched from there
-// (https://home-cloud-io.github.io/store/index.yaml)
-// A backround thread in the server will fetch the file and update the
-// store first when it starts and then every 24 hours
+// Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
+// A backround thread in the server will fetch the index and update the
+// cache at startup and then every 24 hours
 message AppStoreEntries {
-  string api_version = 1 [(tagger.tags) = "yaml:\"apiVersion\""];
+  string api_version = 1;
   string generated = 2;
-  map<string, Entries> entries = 3;
+  map<string, Apps> entries = 3;
 }
 
 // User settings for the device
