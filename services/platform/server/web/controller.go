@@ -6,8 +6,12 @@ import (
 	"encoding/hex"
 	"errors"
 	"net/http"
+	"strings"
+	"time"
 
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 	kvv1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
 	kvv1Connect "github.com/steady-bytes/draft/api/core/registry/key_value/v1/v1connect"
 
@@ -25,11 +29,15 @@ type (
 		InitializeDevice(ctx context.Context, settings *v1.DeviceSettings) (string, error)
 		Login(ctx context.Context, username, password string) (string, error)
 		GetAppsInStore(ctx context.Context) ([]*v1.App, error)
+		InstallApp(ctx context.Context, logger chassis.Logger, request *v1.InstallAppRequest) error
+		DeleteApp(ctx context.Context, logger chassis.Logger, request *v1.DeleteAppRequest) error
+		UpdateApp(ctx context.Context, logger chassis.Logger, request *v1.UpdateAppRequest) error
 	}
 
 	controller struct {
 		kvv1Connect.KeyValueServiceClient
 		chassis.Logger
+		k8sclient k8sclient.Client
 	}
 )
 
@@ -37,6 +45,7 @@ func NewController(logger chassis.Logger) Controller {
 	return &controller{
 		kvv1Connect.NewKeyValueServiceClient(http.DefaultClient, chassis.GetConfig().Entrypoint()),
 		logger,
+		k8sclient.NewClient(logger),
 	}
 }
 
@@ -189,13 +198,13 @@ func (c *controller) GetAppsInStore(ctx context.Context) ([]*v1.App, error) {
 
 	req, err := buildGetRequest(APP_STORE_ENTRIES_KEY, appStore)
 	if err != nil {
-		logger.Error("failed to build get request")
+		logger.WithError(err).Error("failed to build get request")
 		return nil, errors.New(ErrFailedToGetApps)
 	}
 
 	res, err := c.KeyValueServiceClient.Get(ctx, req)
 	if err != nil {
-		logger.Error("failed to get apps")
+		logger.WithError(err).Error("failed to get apps")
 		return nil, errors.New(ErrFailedToGetApps)
 	}
 
@@ -205,7 +214,7 @@ func (c *controller) GetAppsInStore(ctx context.Context) ([]*v1.App, error) {
 	}
 
 	if err := res.Msg.GetValue().UnmarshalTo(appStore); err != nil {
-		logger.Error("failed to unmarshal apps")
+		logger.WithError(err).Error("failed to unmarshal apps")
 		return nil, errors.New(ErrFailedToGetApps)
 	}
 
@@ -218,4 +227,113 @@ func (c *controller) GetAppsInStore(ctx context.Context) ([]*v1.App, error) {
 	}
 
 	return apps, nil
+}
+
+func (c *controller) InstallApp(ctx context.Context, logger chassis.Logger, request *v1.InstallAppRequest) error {
+	// check dependencies for app from the store and install if needed
+	apps, err := c.GetAppsInStore(ctx)
+	if err != nil {
+		return err
+	}
+	for _, app := range apps {
+		if request.Chart == app.Name {
+			for _, dep := range app.Dependencies {
+				log := logger.WithField("dependency", dep.Name)
+				log.Info("checking dependency")
+				installed, err := c.k8sclient.AppInstalled(ctx, dep.Name)
+				if err != nil {
+					log.WithError(err).Error("failed to check if dependency is installed")
+					return err
+				}
+				if !installed {
+					log.Info("dependency is needed: installing")
+					err := c.k8sclient.Install(ctx, opv1.AppSpec{
+						Chart:   dep.Name,
+						Repo:    strings.TrimPrefix(dep.Repository, "https://"),
+						Release: dep.Name,
+						Version: dep.Version,
+					})
+					if err != nil {
+						log.WithError(err).Error("failed to install app")
+						return err
+					}
+
+					// wait on dependency install
+					timeCtx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+					err = c.waitForInstall(timeCtx, log, dep.Name)
+					cancel()
+					if err != nil {
+						log.WithError(err).Error("failed to wait for install")
+						return err
+					}
+				}
+			}
+		}
+	}
+
+	// install requested app
+	logger.Info("installing requested app")
+	err = c.k8sclient.Install(ctx, opv1.AppSpec{
+		Chart:   request.Chart,
+		Repo:    request.Repo,
+		Release: request.Release,
+		Values:  request.Values,
+		Version: request.Version,
+	})
+	if err != nil {
+		logger.WithError(err).Error("failed to install app")
+		return err
+	}
+
+	return nil
+}
+
+func (c *controller) DeleteApp(ctx context.Context, logger chassis.Logger, request *v1.DeleteAppRequest) error {
+	err := c.k8sclient.Delete(ctx, opv1.AppSpec{
+		Release: request.Release,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *controller) UpdateApp(ctx context.Context, logger chassis.Logger, request *v1.UpdateAppRequest) error {
+	err := c.k8sclient.Update(ctx, opv1.AppSpec{
+		Chart:   request.Chart,
+		Repo:    request.Repo,
+		Release: request.Release,
+		Values:  request.Values,
+		Version: request.Version,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *controller) waitForInstall(ctx context.Context, logger chassis.Logger, appName string) error {
+	for {
+		if ctx.Err() != nil {
+			logger.WithError(ctx.Err()).Error("context is done")
+			return ctx.Err()
+		}
+		appsHealth, err := c.k8sclient.CheckAppsHealth(ctx)
+		if err != nil {
+			logger.WithError(err).Error("failed to check apps health")
+			return err
+		}
+		for _, app := range appsHealth {
+			if app.Name == appName {
+				if app.Status == v1.AppStatus_APP_STATUS_HEALTHY {
+					logger.Info("installation completed")
+					return nil
+				}
+				break
+			}
+		}
+		logger.Info("not yet installed")
+
+		time.Sleep(5 * time.Second)
+	}
 }
