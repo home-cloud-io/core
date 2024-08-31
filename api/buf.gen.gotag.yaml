@@ -7,4 +7,4 @@ plugins:
       - outdir=.
       - paths=source_relative
       - xxx=pg+"-" bun+"-" json+"-" yaml+"-" csv+"-"
-      - auto=pg-as-lower_snake+bun-as-lower_snake+yaml-as-lower_snake+csv-as-lower_snake+json-as-lower_snake
+      - auto=pg-as-lower_snake+bun-as-lower_snake+yaml-as-camel+csv-as-lower_snake+json-as-lower_snake
