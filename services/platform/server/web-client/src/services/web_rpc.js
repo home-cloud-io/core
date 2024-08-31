@@ -6,7 +6,7 @@ import { setUserSettings } from './user_slice';
 
 let BASE_URL = '';
 
-if (process.env.NODE_ENV === 'local' || process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development') {
   BASE_URL = 'http://localhost:8000';
 } else {
   BASE_URL = 'http://home-cloud.local';
