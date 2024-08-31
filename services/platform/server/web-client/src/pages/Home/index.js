@@ -1,5 +1,8 @@
 import * as React from 'react';
-import { useGetAppsHealthCheckQuery } from '../../services/web_rpc';
+import { 
+  useGetAppsHealthCheckQuery, 
+  useGetSystemStatsQuery,
+} from '../../services/web_rpc';
 
 export default function HomePage() {
   return (
@@ -74,6 +77,8 @@ function Application({app}) {
 }
 
 export function DeviceDetails() {
+  const { data, error, isLoading } = useGetSystemStatsQuery();
+
   const styles = {
     float: "right",
     marginTop: "-2.75rem",

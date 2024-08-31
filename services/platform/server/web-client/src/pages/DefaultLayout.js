@@ -15,9 +15,9 @@ export default function DefaultLayout() {
   const navigate = useNavigate();
 
   // TODO: Address warning about calling during `useEffect`
-  if (userSettings.token === "") {
-    navigate('/login');
-  }
+  // if (userSettings.token === "") {
+  //   navigate('/login');
+  // }
 
   const onClickNavCollapseBtn = () => {
     setIsNavCollapsed(!isNavCollapsed);

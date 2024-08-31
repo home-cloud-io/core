@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { useNavigate, redirect } from 'react-router-dom';
 import { setUser } from "../../services/web_slice";
 import { useInitDeviceMutation } from "../../services/web_rpc";
 
@@ -143,7 +143,6 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
 } 
 
 export default function DeviceOnboardPage() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [initDevice, result] = useInitDeviceMutation();
 
@@ -157,22 +156,15 @@ export default function DeviceOnboardPage() {
   const handleClick = (val) => setValue(val);
 
   const initServer = () => {
-    dispatch(initDevice({
+    initDevice({
       username: username,
       password: password,
       timezone: timezone,
       autoUpdateApps: autoUpdateApps,
       autoUpdateOs: autoUpdateOs,
-    }));
-
-  }
-
-  if (result.error) {
-    console.log("Error initializing device");
-  }
-
-  if (result.data) {
-    navigate('/store');
+    }).then((res) => {
+      navigate('/store');
+    });
   }
 
   return (
