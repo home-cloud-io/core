@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 
 import "./DefaultLayout.css";
 
@@ -47,20 +47,15 @@ export default function DefaultLayout() {
               <div className={`navbar-collapse offcanvas-collapse ${isNavCollapsed ? '' : 'open'}`} id="navbarsExampleDefault">
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
-                    <a className="nav-link active" aria-current="page" href="#">Home</a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="#">App Store</a>
+                      <NavLink className="nav-link" to="/home">Home</NavLink>
                   </li>
 
-                  <li className="nav-item dropdown">
-                    <a className="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Settings</a>
-                    <ul className="dropdown-menu">
-                      <li><a className="dropdown-item" href="#">Settings</a></li>
-                      <li><a className="dropdown-item" href="#">Logout</a></li>
-                      <li><a className="dropdown-item" href="#">Shutdown</a></li>
-                      <li><a className="dropdown-item" href="#">Restart</a></li>
-                    </ul>
+                  <li className="nav-item">
+                      <NavLink to="/store" className="nav-link">Store</NavLink>
+                  </li>
+
+                  <li className="nav-item">
+                      <NavLink to="/settings" className="nav-link">Settings</NavLink>
                   </li>
                 </ul>
               </div>

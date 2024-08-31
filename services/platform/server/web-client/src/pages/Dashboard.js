@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Routes, Route, redirect } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import Login from "./Login";
@@ -8,6 +8,7 @@ import DeviceOnboardPage from "./Device/Onboard";
 
 import AppStorePage from "./AppStore";
 import HomePage from "./Home";
+import SettingsPage from "./Settings";
 
 import {useGetIsDeviceSetupQuery} from "../services/web_rpc";
 
@@ -46,6 +47,7 @@ export default function Dashboard() {
         <Route path="/" element={<DefaultLayout />} >
           <Route path="home" element={<HomePage />} />
           <Route path="store" element={<AppStorePage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         <Route path="getting-started" element={<DeviceOnboardPage/>} />
