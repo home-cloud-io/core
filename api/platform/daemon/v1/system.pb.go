@@ -26,8 +26,8 @@ type SystemStats struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	StartTime *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3" json:"start_time" bun:"start_time" csv:"start_time" pg:"start_time" yaml:"start_time"`
-	EndTime   *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time" bun:"end_time" csv:"end_time" pg:"end_time" yaml:"end_time"`
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3" json:"start_time" bun:"start_time" csv:"start_time" pg:"start_time" yaml:"startTime"`
+	EndTime   *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time" bun:"end_time" csv:"end_time" pg:"end_time" yaml:"endTime"`
 	Compute   *ComputeStats          `protobuf:"bytes,3,opt,name=compute,proto3" json:"compute" bun:"compute" csv:"compute" pg:"compute" yaml:"compute"`
 	Memory    *MemoryStats           `protobuf:"bytes,4,opt,name=memory,proto3" json:"memory" bun:"memory" csv:"memory" pg:"memory" yaml:"memory"`
 	Drives    []*DriveStats          `protobuf:"bytes,5,rep,name=drives,proto3" json:"drives" bun:"drives" csv:"drives" pg:"drives" yaml:"drives"`
@@ -105,9 +105,9 @@ type ComputeStats struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserPercent   float32 `protobuf:"fixed32,1,opt,name=user_percent,json=userPercent,proto3" json:"user_percent" bun:"user_percent" csv:"user_percent" pg:"user_percent" yaml:"user_percent"`
-	SystemPercent float32 `protobuf:"fixed32,2,opt,name=system_percent,json=systemPercent,proto3" json:"system_percent" bun:"system_percent" csv:"system_percent" pg:"system_percent" yaml:"system_percent"`
-	IdlePercent   float32 `protobuf:"fixed32,3,opt,name=idle_percent,json=idlePercent,proto3" json:"idle_percent" bun:"idle_percent" csv:"idle_percent" pg:"idle_percent" yaml:"idle_percent"`
+	UserPercent   float32 `protobuf:"fixed32,1,opt,name=user_percent,json=userPercent,proto3" json:"user_percent" bun:"user_percent" csv:"user_percent" pg:"user_percent" yaml:"userPercent"`
+	SystemPercent float32 `protobuf:"fixed32,2,opt,name=system_percent,json=systemPercent,proto3" json:"system_percent" bun:"system_percent" csv:"system_percent" pg:"system_percent" yaml:"systemPercent"`
+	IdlePercent   float32 `protobuf:"fixed32,3,opt,name=idle_percent,json=idlePercent,proto3" json:"idle_percent" bun:"idle_percent" csv:"idle_percent" pg:"idle_percent" yaml:"idlePercent"`
 }
 
 func (x *ComputeStats) Reset() {
@@ -168,11 +168,11 @@ type MemoryStats struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TotalBytes     uint64 `protobuf:"varint,1,opt,name=total_bytes,json=totalBytes,proto3" json:"total_bytes" bun:"total_bytes" csv:"total_bytes" pg:"total_bytes" yaml:"total_bytes"`
-	UsedBytes      uint64 `protobuf:"varint,2,opt,name=used_bytes,json=usedBytes,proto3" json:"used_bytes" bun:"used_bytes" csv:"used_bytes" pg:"used_bytes" yaml:"used_bytes"`
-	CachedBytes    uint64 `protobuf:"varint,3,opt,name=cached_bytes,json=cachedBytes,proto3" json:"cached_bytes" bun:"cached_bytes" csv:"cached_bytes" pg:"cached_bytes" yaml:"cached_bytes"`
-	FreeBytes      uint64 `protobuf:"varint,4,opt,name=free_bytes,json=freeBytes,proto3" json:"free_bytes" bun:"free_bytes" csv:"free_bytes" pg:"free_bytes" yaml:"free_bytes"`
-	AvailableBytes uint64 `protobuf:"varint,5,opt,name=available_bytes,json=availableBytes,proto3" json:"available_bytes" bun:"available_bytes" csv:"available_bytes" pg:"available_bytes" yaml:"available_bytes"`
+	TotalBytes     uint64 `protobuf:"varint,1,opt,name=total_bytes,json=totalBytes,proto3" json:"total_bytes" bun:"total_bytes" csv:"total_bytes" pg:"total_bytes" yaml:"totalBytes"`
+	UsedBytes      uint64 `protobuf:"varint,2,opt,name=used_bytes,json=usedBytes,proto3" json:"used_bytes" bun:"used_bytes" csv:"used_bytes" pg:"used_bytes" yaml:"usedBytes"`
+	CachedBytes    uint64 `protobuf:"varint,3,opt,name=cached_bytes,json=cachedBytes,proto3" json:"cached_bytes" bun:"cached_bytes" csv:"cached_bytes" pg:"cached_bytes" yaml:"cachedBytes"`
+	FreeBytes      uint64 `protobuf:"varint,4,opt,name=free_bytes,json=freeBytes,proto3" json:"free_bytes" bun:"free_bytes" csv:"free_bytes" pg:"free_bytes" yaml:"freeBytes"`
+	AvailableBytes uint64 `protobuf:"varint,5,opt,name=available_bytes,json=availableBytes,proto3" json:"available_bytes" bun:"available_bytes" csv:"available_bytes" pg:"available_bytes" yaml:"availableBytes"`
 }
 
 func (x *MemoryStats) Reset() {
@@ -247,9 +247,9 @@ type DriveStats struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	MountPoint string `protobuf:"bytes,1,opt,name=mount_point,json=mountPoint,proto3" json:"mount_point" bun:"mount_point" csv:"mount_point" pg:"mount_point" yaml:"mount_point"`
-	TotalBytes uint64 `protobuf:"varint,2,opt,name=total_bytes,json=totalBytes,proto3" json:"total_bytes" bun:"total_bytes" csv:"total_bytes" pg:"total_bytes" yaml:"total_bytes"`
-	FreeBytes  uint64 `protobuf:"varint,3,opt,name=free_bytes,json=freeBytes,proto3" json:"free_bytes" bun:"free_bytes" csv:"free_bytes" pg:"free_bytes" yaml:"free_bytes"`
+	MountPoint string `protobuf:"bytes,1,opt,name=mount_point,json=mountPoint,proto3" json:"mount_point" bun:"mount_point" csv:"mount_point" pg:"mount_point" yaml:"mountPoint"`
+	TotalBytes uint64 `protobuf:"varint,2,opt,name=total_bytes,json=totalBytes,proto3" json:"total_bytes" bun:"total_bytes" csv:"total_bytes" pg:"total_bytes" yaml:"totalBytes"`
+	FreeBytes  uint64 `protobuf:"varint,3,opt,name=free_bytes,json=freeBytes,proto3" json:"free_bytes" bun:"free_bytes" csv:"free_bytes" pg:"free_bytes" yaml:"freeBytes"`
 }
 
 func (x *DriveStats) Reset() {

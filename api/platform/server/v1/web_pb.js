@@ -375,7 +375,19 @@ export const GetDeviceSettingsResponse = proto3.makeMessageType(
 );
 
 /**
- * Model used for the store, and installed apps
+ * @generated from message platform.server.v1.Apps
+ */
+export const Apps = proto3.makeMessageType(
+  "platform.server.v1.Apps",
+  () => [
+    { no: 1, name: "apps", kind: "message", T: App, repeated: true },
+  ],
+);
+
+/**
+ * Model used for the store and installed apps
+ * NOTE: that this must match the shape of the `entries` from a Helm repo
+ * index: e.g. https://apps.home-cloud.io/index.yaml
  *
  * @generated from message platform.server.v1.App
  */
@@ -387,10 +399,23 @@ export const App = proto3.makeMessageType(
     { no: 3, name: "app_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "created_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "created", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "digest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 9, name: "urls", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 10, name: "dependencies", kind: "message", T: AppDependency, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.AppDependency
+ */
+export const AppDependency = proto3.makeMessageType(
+  "platform.server.v1.AppDependency",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "repository", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -430,11 +455,9 @@ export const InstalledApp = proto3.makeMessageType(
 );
 
 /**
- * Model to parse the yaml file for the app's available in the store
- * currently they are stored in a public repo and fetched from there
- * (https://home-cloud-io.github.io/store/index.yaml)
- * A backround thread in the server will fetch the file and update the
- * store first when it starts and then every 24 hours
+ * Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
+ * A backround thread in the server will fetch the index and update the
+ * cache at startup and then every 24 hours
  *
  * @generated from message platform.server.v1.AppStoreEntries
  */
@@ -443,7 +466,7 @@ export const AppStoreEntries = proto3.makeMessageType(
   () => [
     { no: 1, name: "api_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "generated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Entries} },
+    { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Apps} },
   ],
 );
 

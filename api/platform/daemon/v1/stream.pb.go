@@ -118,19 +118,19 @@ type DaemonMessage_Heartbeat struct {
 }
 
 type DaemonMessage_ShutdownAlert struct {
-	ShutdownAlert *ShutdownAlert `protobuf:"bytes,2,opt,name=shutdown_alert,json=shutdownAlert,proto3,oneof" bun:"shutdown_alert" csv:"shutdown_alert" json:"shutdown_alert" pg:"shutdown_alert" yaml:"shutdown_alert"`
+	ShutdownAlert *ShutdownAlert `protobuf:"bytes,2,opt,name=shutdown_alert,json=shutdownAlert,proto3,oneof" bun:"shutdown_alert" csv:"shutdown_alert" json:"shutdown_alert" pg:"shutdown_alert" yaml:"shutdownAlert"`
 }
 
 type DaemonMessage_OsUpdateDiff struct {
-	OsUpdateDiff *OSUpdateDiff `protobuf:"bytes,3,opt,name=os_update_diff,json=osUpdateDiff,proto3,oneof" bun:"os_update_diff" csv:"os_update_diff" json:"os_update_diff" pg:"os_update_diff" yaml:"os_update_diff"`
+	OsUpdateDiff *OSUpdateDiff `protobuf:"bytes,3,opt,name=os_update_diff,json=osUpdateDiff,proto3,oneof" bun:"os_update_diff" csv:"os_update_diff" json:"os_update_diff" pg:"os_update_diff" yaml:"osUpdateDiff"`
 }
 
 type DaemonMessage_CurrentDaemonVersion struct {
-	CurrentDaemonVersion *CurrentDaemonVersion `protobuf:"bytes,4,opt,name=current_daemon_version,json=currentDaemonVersion,proto3,oneof" bun:"current_daemon_version" csv:"current_daemon_version" json:"current_daemon_version" pg:"current_daemon_version" yaml:"current_daemon_version"`
+	CurrentDaemonVersion *CurrentDaemonVersion `protobuf:"bytes,4,opt,name=current_daemon_version,json=currentDaemonVersion,proto3,oneof" bun:"current_daemon_version" csv:"current_daemon_version" json:"current_daemon_version" pg:"current_daemon_version" yaml:"currentDaemonVersion"`
 }
 
 type DaemonMessage_SystemStats struct {
-	SystemStats *SystemStats `protobuf:"bytes,5,opt,name=system_stats,json=systemStats,proto3,oneof" bun:"system_stats" csv:"system_stats" json:"system_stats" pg:"system_stats" yaml:"system_stats"`
+	SystemStats *SystemStats `protobuf:"bytes,5,opt,name=system_stats,json=systemStats,proto3,oneof" bun:"system_stats" csv:"system_stats" json:"system_stats" pg:"system_stats" yaml:"systemStats"`
 }
 
 func (*DaemonMessage_Heartbeat) isDaemonMessage_Message() {}
@@ -273,23 +273,23 @@ type ServerMessage_Restart struct {
 }
 
 type ServerMessage_RequestOsUpdateDiff struct {
-	RequestOsUpdateDiff *RequestOSUpdateDiff `protobuf:"bytes,4,opt,name=request_os_update_diff,json=requestOsUpdateDiff,proto3,oneof" bun:"request_os_update_diff" csv:"request_os_update_diff" json:"request_os_update_diff" pg:"request_os_update_diff" yaml:"request_os_update_diff"`
+	RequestOsUpdateDiff *RequestOSUpdateDiff `protobuf:"bytes,4,opt,name=request_os_update_diff,json=requestOsUpdateDiff,proto3,oneof" bun:"request_os_update_diff" csv:"request_os_update_diff" json:"request_os_update_diff" pg:"request_os_update_diff" yaml:"requestOsUpdateDiff"`
 }
 
 type ServerMessage_RequestCurrentDaemonVersion struct {
-	RequestCurrentDaemonVersion *RequestCurrentDaemonVersion `protobuf:"bytes,5,opt,name=request_current_daemon_version,json=requestCurrentDaemonVersion,proto3,oneof" bun:"request_current_daemon_version" csv:"request_current_daemon_version" json:"request_current_daemon_version" pg:"request_current_daemon_version" yaml:"request_current_daemon_version"`
+	RequestCurrentDaemonVersion *RequestCurrentDaemonVersion `protobuf:"bytes,5,opt,name=request_current_daemon_version,json=requestCurrentDaemonVersion,proto3,oneof" bun:"request_current_daemon_version" csv:"request_current_daemon_version" json:"request_current_daemon_version" pg:"request_current_daemon_version" yaml:"requestCurrentDaemonVersion"`
 }
 
 type ServerMessage_ChangeDaemonVersionCommand struct {
-	ChangeDaemonVersionCommand *ChangeDaemonVersionCommand `protobuf:"bytes,6,opt,name=change_daemon_version_command,json=changeDaemonVersionCommand,proto3,oneof" bun:"change_daemon_version_command" csv:"change_daemon_version_command" json:"change_daemon_version_command" pg:"change_daemon_version_command" yaml:"change_daemon_version_command"`
+	ChangeDaemonVersionCommand *ChangeDaemonVersionCommand `protobuf:"bytes,6,opt,name=change_daemon_version_command,json=changeDaemonVersionCommand,proto3,oneof" bun:"change_daemon_version_command" csv:"change_daemon_version_command" json:"change_daemon_version_command" pg:"change_daemon_version_command" yaml:"changeDaemonVersionCommand"`
 }
 
 type ServerMessage_InstallOsUpdateCommand struct {
-	InstallOsUpdateCommand *InstallOSUpdateCommand `protobuf:"bytes,7,opt,name=install_os_update_command,json=installOsUpdateCommand,proto3,oneof" bun:"install_os_update_command" csv:"install_os_update_command" json:"install_os_update_command" pg:"install_os_update_command" yaml:"install_os_update_command"`
+	InstallOsUpdateCommand *InstallOSUpdateCommand `protobuf:"bytes,7,opt,name=install_os_update_command,json=installOsUpdateCommand,proto3,oneof" bun:"install_os_update_command" csv:"install_os_update_command" json:"install_os_update_command" pg:"install_os_update_command" yaml:"installOsUpdateCommand"`
 }
 
 type ServerMessage_SetSystemImageCommand struct {
-	SetSystemImageCommand *SetSystemImageCommand `protobuf:"bytes,8,opt,name=set_system_image_command,json=setSystemImageCommand,proto3,oneof" bun:"set_system_image_command" csv:"set_system_image_command" json:"set_system_image_command" pg:"set_system_image_command" yaml:"set_system_image_command"`
+	SetSystemImageCommand *SetSystemImageCommand `protobuf:"bytes,8,opt,name=set_system_image_command,json=setSystemImageCommand,proto3,oneof" bun:"set_system_image_command" csv:"set_system_image_command" json:"set_system_image_command" pg:"set_system_image_command" yaml:"setSystemImageCommand"`
 }
 
 func (*ServerMessage_Heartbeat) isServerMessage_Message() {}
@@ -706,8 +706,8 @@ type ChangeDaemonVersionCommand struct {
 	unknownFields protoimpl.UnknownFields
 
 	Version    string `protobuf:"bytes,1,opt,name=version,proto3" json:"version" bun:"version" csv:"version" pg:"version" yaml:"version"`
-	VendorHash string `protobuf:"bytes,2,opt,name=vendor_hash,json=vendorHash,proto3" json:"vendor_hash" bun:"vendor_hash" csv:"vendor_hash" pg:"vendor_hash" yaml:"vendor_hash"`
-	SrcHash    string `protobuf:"bytes,3,opt,name=src_hash,json=srcHash,proto3" json:"src_hash" bun:"src_hash" csv:"src_hash" pg:"src_hash" yaml:"src_hash"`
+	VendorHash string `protobuf:"bytes,2,opt,name=vendor_hash,json=vendorHash,proto3" json:"vendor_hash" bun:"vendor_hash" csv:"vendor_hash" pg:"vendor_hash" yaml:"vendorHash"`
+	SrcHash    string `protobuf:"bytes,3,opt,name=src_hash,json=srcHash,proto3" json:"src_hash" bun:"src_hash" csv:"src_hash" pg:"src_hash" yaml:"srcHash"`
 }
 
 func (x *ChangeDaemonVersionCommand) Reset() {
@@ -806,8 +806,8 @@ type SetSystemImageCommand struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CurrentImage   string `protobuf:"bytes,1,opt,name=current_image,json=currentImage,proto3" json:"current_image" bun:"current_image" csv:"current_image" pg:"current_image" yaml:"current_image"`
-	RequestedImage string `protobuf:"bytes,2,opt,name=requested_image,json=requestedImage,proto3" json:"requested_image" bun:"requested_image" csv:"requested_image" pg:"requested_image" yaml:"requested_image"`
+	CurrentImage   string `protobuf:"bytes,1,opt,name=current_image,json=currentImage,proto3" json:"current_image" bun:"current_image" csv:"current_image" pg:"current_image" yaml:"currentImage"`
+	RequestedImage string `protobuf:"bytes,2,opt,name=requested_image,json=requestedImage,proto3" json:"requested_image" bun:"requested_image" csv:"requested_image" pg:"requested_image" yaml:"requestedImage"`
 }
 
 func (x *SetSystemImageCommand) Reset() {

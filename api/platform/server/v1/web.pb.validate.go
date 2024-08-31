@@ -4056,6 +4056,138 @@ var _ interface {
 	ErrorName() string
 } = GetDeviceSettingsResponseValidationError{}
 
+// Validate checks the field values on Apps with the rules defined in the proto
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
+func (m *Apps) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Apps with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in AppsMultiError, or nil if none found.
+func (m *Apps) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Apps) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetApps() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AppsValidationError{
+						field:  fmt.Sprintf("Apps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AppsValidationError{
+						field:  fmt.Sprintf("Apps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AppsValidationError{
+					field:  fmt.Sprintf("Apps[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return AppsMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppsMultiError is an error wrapping multiple validation errors returned by
+// Apps.ValidateAll() if the designated constraints aren't met.
+type AppsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppsMultiError) AllErrors() []error { return m }
+
+// AppsValidationError is the validation error returned by Apps.Validate if the
+// designated constraints aren't met.
+type AppsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppsValidationError) ErrorName() string { return "AppsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AppsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApps.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppsValidationError{}
+
 // Validate checks the field values on App with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
 // encountered is returned, or nil if there are no violations.
@@ -4087,11 +4219,45 @@ func (m *App) validate(all bool) error {
 
 	// no validation rules for Icon
 
-	// no validation rules for CreatedAt
+	// no validation rules for Created
 
 	// no validation rules for Digest
 
 	// no validation rules for Type
+
+	for idx, item := range m.GetDependencies() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AppValidationError{
+						field:  fmt.Sprintf("Dependencies[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AppValidationError{
+						field:  fmt.Sprintf("Dependencies[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AppValidationError{
+					field:  fmt.Sprintf("Dependencies[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if len(errors) > 0 {
 		return AppMultiError(errors)
@@ -4169,6 +4335,112 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AppValidationError{}
+
+// Validate checks the field values on AppDependency with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AppDependency) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppDependency with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AppDependencyMultiError, or
+// nil if none found.
+func (m *AppDependency) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppDependency) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	// no validation rules for Version
+
+	// no validation rules for Repository
+
+	if len(errors) > 0 {
+		return AppDependencyMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppDependencyMultiError is an error wrapping multiple validation errors
+// returned by AppDependency.ValidateAll() if the designated constraints
+// aren't met.
+type AppDependencyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppDependencyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppDependencyMultiError) AllErrors() []error { return m }
+
+// AppDependencyValidationError is the validation error returned by
+// AppDependency.Validate if the designated constraints aren't met.
+type AppDependencyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppDependencyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppDependencyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppDependencyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppDependencyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppDependencyValidationError) ErrorName() string { return "AppDependencyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AppDependencyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppDependency.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppDependencyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppDependencyValidationError{}
 
 // Validate checks the field values on AppRunningStatus with the rules defined
 // in the proto definition for this message. If any rules are violated, the

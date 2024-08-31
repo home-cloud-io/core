@@ -1431,7 +1431,46 @@ export class GetDeviceSettingsResponse extends Message<GetDeviceSettingsResponse
 }
 
 /**
- * Model used for the store, and installed apps
+ * @generated from message platform.server.v1.Apps
+ */
+export class Apps extends Message<Apps> {
+  /**
+   * @generated from field: repeated platform.server.v1.App apps = 1;
+   */
+  apps: App[] = [];
+
+  constructor(data?: PartialMessage<Apps>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.Apps";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "apps", kind: "message", T: App, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Apps {
+    return new Apps().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Apps {
+    return new Apps().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Apps {
+    return new Apps().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Apps | PlainMessage<Apps> | undefined, b: Apps | PlainMessage<Apps> | undefined): boolean {
+    return proto3.util.equals(Apps, a, b);
+  }
+}
+
+/**
+ * Model used for the store and installed apps
+ * NOTE: that this must match the shape of the `entries` from a Helm repo
+ * index: e.g. https://apps.home-cloud.io/index.yaml
  *
  * @generated from message platform.server.v1.App
  */
@@ -1462,9 +1501,9 @@ export class App extends Message<App> {
   icon = "";
 
   /**
-   * @generated from field: string created_at = 6;
+   * @generated from field: string created = 6;
    */
-  createdAt = "";
+  created = "";
 
   /**
    * @generated from field: string digest = 7;
@@ -1481,6 +1520,11 @@ export class App extends Message<App> {
    */
   urls: string[] = [];
 
+  /**
+   * @generated from field: repeated platform.server.v1.AppDependency dependencies = 10;
+   */
+  dependencies: AppDependency[] = [];
+
   constructor(data?: PartialMessage<App>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1494,10 +1538,11 @@ export class App extends Message<App> {
     { no: 3, name: "app_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "created_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "created", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "digest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 9, name: "urls", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 10, name: "dependencies", kind: "message", T: AppDependency, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): App {
@@ -1514,6 +1559,55 @@ export class App extends Message<App> {
 
   static equals(a: App | PlainMessage<App> | undefined, b: App | PlainMessage<App> | undefined): boolean {
     return proto3.util.equals(App, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.AppDependency
+ */
+export class AppDependency extends Message<AppDependency> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string version = 2;
+   */
+  version = "";
+
+  /**
+   * @generated from field: string repository = 3;
+   */
+  repository = "";
+
+  constructor(data?: PartialMessage<AppDependency>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppDependency";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "repository", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppDependency {
+    return new AppDependency().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppDependency {
+    return new AppDependency().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppDependency {
+    return new AppDependency().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppDependency | PlainMessage<AppDependency> | undefined, b: AppDependency | PlainMessage<AppDependency> | undefined): boolean {
+    return proto3.util.equals(AppDependency, a, b);
   }
 }
 
@@ -1649,11 +1743,9 @@ export class InstalledApp extends Message<InstalledApp> {
 }
 
 /**
- * Model to parse the yaml file for the app's available in the store
- * currently they are stored in a public repo and fetched from there
- * (https://home-cloud-io.github.io/store/index.yaml)
- * A backround thread in the server will fetch the file and update the
- * store first when it starts and then every 24 hours
+ * Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
+ * A backround thread in the server will fetch the index and update the
+ * cache at startup and then every 24 hours
  *
  * @generated from message platform.server.v1.AppStoreEntries
  */
@@ -1669,9 +1761,9 @@ export class AppStoreEntries extends Message<AppStoreEntries> {
   generated = "";
 
   /**
-   * @generated from field: map<string, platform.server.v1.Entries> entries = 3;
+   * @generated from field: map<string, platform.server.v1.Apps> entries = 3;
    */
-  entries: { [key: string]: Entries } = {};
+  entries: { [key: string]: Apps } = {};
 
   constructor(data?: PartialMessage<AppStoreEntries>) {
     super();
@@ -1683,7 +1775,7 @@ export class AppStoreEntries extends Message<AppStoreEntries> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "api_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "generated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Entries} },
+    { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Apps} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppStoreEntries {
