@@ -2,12 +2,11 @@ package kvclient
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 
 	"connectrpc.com/connect"
-	kvv1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
+	v1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
 	kvv1Connect "github.com/steady-bytes/draft/api/core/registry/key_value/v1/v1connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"google.golang.org/protobuf/proto"
@@ -29,53 +28,81 @@ func Init() {
 }
 
 func Get(ctx context.Context, key string, value proto.Message) error {
-	req, err := BuildGetRequest(key, value)
+	// convert value to request
+	pb, err := anypb.New(value)
 	if err != nil {
-		return fmt.Errorf("failed to build get request")
+		return err
+	}
+	get := &v1.GetRequest{
+		Key:   key,
+		Value: pb,
 	}
 
-	val, err := clientSingleton.Get(ctx, req)
+	// issue request
+	val, err := clientSingleton.Get(ctx, connect.NewRequest(get))
 	if err != nil {
-		return fmt.Errorf("failed to get value from key value store")
+		return err
 	}
 
+	// convert response to value
 	if val.Msg.GetValue() == nil {
 		return fmt.Errorf("retrieved value is nil")
 	}
-
 	if err := val.Msg.GetValue().UnmarshalTo(value); err != nil {
-		return fmt.Errorf("failed to unmarshal value")
+		return err
 	}
 
 	return nil
 }
 
-// BuildSetRequest is a utility function to create a set request for the key-value store
-func BuildSetRequest(key string, value proto.Message) (*connect.Request[kvv1.SetRequest], error) {
-	// Create the setting object for the device
+// setRequest is a utility function to create a get request for the key-value store
+func getRequest(key string, value proto.Message) (*connect.Request[v1.GetRequest], error) {
 	pb, err := anypb.New(value)
 	if err != nil {
-		return nil, errors.New("failed to build set request")
+		return nil, err
 	}
 
-	set := &kvv1.SetRequest{
-		Key:   key,
-		Value: pb,
-	}
-
-	return connect.NewRequest(set), nil
-}
-
-func BuildGetRequest(key string, value proto.Message) (*connect.Request[kvv1.GetRequest], error) {
-	pb, err := anypb.New(value)
-	if err != nil {
-		return nil, errors.New("failed to build get request")
-	}
-
-	get := &kvv1.GetRequest{
+	get := &v1.GetRequest{
 		Key:   key,
 		Value: pb,
 	}
 
 	return connect.NewRequest(get), nil
+}
+
+func Set(ctx context.Context, key string, value proto.Message) (string, error) {
+	// convert value to request
+	pb, err := anypb.New(value)
+	if err != nil {
+		return "", err
+	}
+	set := &v1.SetRequest{
+		Key:   key,
+		Value: pb,
+	}
+
+	// issue request
+	resp, err := clientSingleton.Set(ctx, connect.NewRequest(set))
+	if err != nil {
+		return "", err
+	}
+
+	return resp.Msg.Key, nil
+}
+
+func List(ctx context.Context, t proto.Message) (map[string]*anypb.Any, error) {
+	// convert value to request
+	pb, err := anypb.New(t)
+	if err != nil {
+		return nil, err
+	}
+	list := &v1.ListRequest{
+		Value: pb,
+	}
+	resp, err := clientSingleton.List(ctx, connect.NewRequest(list))
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Msg.Values, nil
 }

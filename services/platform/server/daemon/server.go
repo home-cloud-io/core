@@ -11,12 +11,12 @@ import (
 )
 
 type (
-	Rpc interface {
+	Server interface {
 		chassis.RPCRegistrar
 		sdConnect.DaemonStreamServiceHandler
 	}
 
-	rpc struct {
+	server struct {
 		logger    chassis.Logger
 		commander Commander
 		messages  chan *v1.DaemonMessage
@@ -25,20 +25,20 @@ type (
 
 var CurrentSystemStats *v1.SystemStats
 
-func New(logger chassis.Logger, messages chan *v1.DaemonMessage) Rpc {
-	return &rpc{
+func New(logger chassis.Logger, messages chan *v1.DaemonMessage) Server {
+	return &server{
 		logger:    logger,
 		commander: NewCommander(),
 		messages:  messages,
 	}
 }
 
-func (h *rpc) RegisterRPC(server chassis.Rpcer) {
+func (h *server) RegisterRPC(server chassis.Rpcer) {
 	pattern, handler := sdConnect.NewDaemonStreamServiceHandler(h)
 	server.AddHandler(pattern, handler, true)
 }
 
-func (h *rpc) Communicate(ctx context.Context, stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error {
+func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error {
 	err := h.commander.SetStream(stream)
 	if err != nil {
 		return err

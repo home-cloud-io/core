@@ -17,14 +17,31 @@ import (
 
 type (
 	Client interface {
+		Apps
+		System
+	}
+	Apps interface {
+		// Install will install the given app
 		Install(ctx context.Context, spec opv1.AppSpec) error
+		// Delete will delete the given app
 		Delete(ctx context.Context, spec opv1.AppSpec) error
+		// Update will update the given app
+		//
+		// NOTE: An empty value on the spec will be applied as empty and will NOT
+		// default to the existing value.
 		Update(ctx context.Context, spec opv1.AppSpec) error
-
-		CurrentContainerVersions(ctx context.Context) ([]*webv1.ImageVersion, error)
-		CheckAppsHealth(ctx context.Context) ([]*webv1.AppHealth, error)
-		AppInstalled(ctx context.Context, name string) (installed bool, err error)
+		// Installed returns whether or not the app with the given name is currently installed
+		Installed(ctx context.Context, name string) (installed bool, err error)
+		// Healthcheck will retrieve the health of all installed apps
+		Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error)
+		// InstalledApps will retrive all installed apps
 		InstalledApps(ctx context.Context) ([]opv1.App, error)
+	}
+	System interface {
+		// CurrentImages will retrieve the current images of all system containers. System
+		// containers are considered to be those in the `home-cloud-system` and `draft-system`
+		// namespaces.
+		CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error)
 	}
 
 	client struct {
@@ -92,7 +109,7 @@ func (c *client) Update(ctx context.Context, spec opv1.AppSpec) error {
 	return c.client.Update(ctx, app)
 }
 
-func (c *client) CurrentContainerVersions(ctx context.Context) ([]*webv1.ImageVersion, error) {
+func (c *client) CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error) {
 	var (
 		// processing as a map keeps from having duplicates
 		images = map[string]*webv1.ImageVersion{}
@@ -122,7 +139,7 @@ func (c *client) CurrentContainerVersions(ctx context.Context) ([]*webv1.ImageVe
 	return imagesSlice, nil
 }
 
-func (c *client) CheckAppsHealth(ctx context.Context) ([]*webv1.AppHealth, error) {
+func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 
 	// get all installed apps
 	apps := &opv1.AppList{}
@@ -162,7 +179,7 @@ func (c *client) CheckAppsHealth(ctx context.Context) ([]*webv1.AppHealth, error
 	return checks, nil
 }
 
-func (c *client) AppInstalled(ctx context.Context, name string) (installed bool, err error) {
+func (c *client) Installed(ctx context.Context, name string) (installed bool, err error) {
 	apps := &opv1.App{}
 	err = c.client.Get(ctx, types.NamespacedName{
 		Namespace: homeCloudNamespace,
