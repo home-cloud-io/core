@@ -43,9 +43,9 @@ export function InstalledApplicationsList() {
           )}
 
 
-        <small className="d-block text-end mt-3">
+        {/* <small className="d-block text-end mt-3">
           <a href="#">All Applications</a>
-        </small>
+        </small> */}
       </div>
     </div>
   )
@@ -182,9 +182,9 @@ export function DeviceDetails() {
 
       </div>
 
-      <small className="d-block text-end mt-3">
+      {/* <small className="d-block text-end mt-3">
         <a href="#">Device Details</a>
-      </small>
+      </small> */}
     </div>
   )
 }
