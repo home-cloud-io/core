@@ -261,5 +261,13 @@ func (h *rpc) Login(ctx context.Context, request *connect.Request[v1.LoginReques
 }
 
 func (h *rpc) GetDeviceSettings(ctx context.Context, request *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error) {
-	return nil, fmt.Errorf("not implemented")
+	h.logger.Info("getting device settings")
+
+	settings, err := h.sctl.GetServerSettings(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(system.ErrFailedToGetSettings)
+		return nil, errors.New(system.ErrFailedToGetSettings)
+	}
+
+	return connect.NewResponse(&v1.GetDeviceSettingsResponse{Settings: settings}), nil
 }
