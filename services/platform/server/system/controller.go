@@ -11,7 +11,6 @@ import (
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	"github.com/home-cloud-io/core/services/platform/server/daemon"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 
@@ -27,20 +26,37 @@ import (
 
 type (
 	Controller interface {
+		Daemon
+		OS
+		Containers
+		Device
+	}
+	Daemon interface {
+		ShutdownHost() error
+		RestartHost() error
+		ChangeDaemonVersion(cmd *dv1.ChangeDaemonVersionCommand) error
+		InstallOSUpdate() error
+		SetSystemImage(cmd *dv1.SetSystemImageCommand) error
+	}
+	OS interface {
+		CheckForOSUpdates(ctx context.Context, logger chassis.Logger) (*v1.CheckForSystemUpdatesResponse, error)
+		AutoUpdateOS(logger chassis.Logger)
+		UpdateOS(ctx context.Context, logger chassis.Logger) error
+	}
+	Containers interface {
+		CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error)
+		AutoUpdateContainers(logger chassis.Logger)
+		UpdateContainers(ctx context.Context, logger chassis.Logger) error
+	}
+	Device interface {
 		GetServerSettings(ctx context.Context) (*v1.DeviceSettings, error)
 		IsDeviceSetup(ctx context.Context) (bool, error)
 		InitializeDevice(ctx context.Context, settings *v1.DeviceSettings) (string, error)
 		Login(ctx context.Context, username, password string) (string, error)
-		CheckForOSUpdates(ctx context.Context, logger chassis.Logger) (*v1.CheckForSystemUpdatesResponse, error)
-		CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error)
-		AutoUpdateOS(logger chassis.Logger)
-		AutoUpdateContainers(logger chassis.Logger)
-		UpdateOS(ctx context.Context, logger chassis.Logger) error
-		UpdateContainers(ctx context.Context, logger chassis.Logger) error
 	}
 
 	controller struct {
-		k8sclient        k8sclient.Client
+		k8sclient        k8sclient.System
 		messages         chan *dv1.DaemonMessage
 		systemUpdateLock sync.Mutex
 	}
@@ -69,6 +85,240 @@ const (
 	osAutoUpdateCron        = "0 1 * * *"
 	containerAutoUpdateCron = "0 2 * * *"
 )
+
+// DAEMON
+
+func (c *controller) ShutdownHost() error {
+	err := commanderSingleton.ShutdownHost()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *controller) RestartHost() error {
+	err := commanderSingleton.RestartHost()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *controller) ChangeDaemonVersion(cmd *dv1.ChangeDaemonVersionCommand) error {
+	err := commanderSingleton.ChangeDaemonVersion(cmd)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *controller) InstallOSUpdate() error {
+	err := commanderSingleton.InstallOSUpdate()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *controller) SetSystemImage(cmd *dv1.SetSystemImageCommand) error {
+	err := commanderSingleton.SetSystemImage(cmd)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// OS
+
+func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logger) (*v1.CheckForSystemUpdatesResponse, error) {
+	if !c.systemUpdateLock.TryLock() {
+		logger.Warn("call to check for system updates while another check is already in progress")
+		return nil, fmt.Errorf("system update check already in progress")
+	}
+	defer c.systemUpdateLock.Unlock()
+
+	var (
+		response = &v1.CheckForSystemUpdatesResponse{}
+	)
+
+	// get the os update diff from the daemon
+	err := commanderSingleton.RequestOSUpdateDiff()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		msg := <-c.messages
+		switch msg.Message.(type) {
+		case *dv1.DaemonMessage_OsUpdateDiff:
+			m := msg.Message.(*dv1.DaemonMessage_OsUpdateDiff)
+			response.OsDiff = m.OsUpdateDiff.Description
+		default:
+			logger.WithField("message", msg).Warn("unrequested message type received")
+		}
+		if response.OsDiff != "" {
+			break
+		}
+	}
+
+	// get the current daemon version from the daemon
+	err = commanderSingleton.RequestCurrentDaemonVersion()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		msg := <-c.messages
+		switch msg.Message.(type) {
+		case *dv1.DaemonMessage_CurrentDaemonVersion:
+			m := msg.Message.(*dv1.DaemonMessage_CurrentDaemonVersion)
+			response.DaemonVersions = &v1.DaemonVersions{
+				Current: m.CurrentDaemonVersion.Version,
+			}
+		default:
+			logger.WithField("message", msg).Warn("unrequested message type received")
+		}
+		if response.DaemonVersions != nil {
+			break
+		}
+	}
+
+	// get latest available daemon version
+	latest, err := getLatestDaemonVersion()
+	if err != nil {
+		return nil, err
+	}
+	response.DaemonVersions.Latest = latest
+
+	return response, nil
+}
+
+func (c *controller) AutoUpdateOS(logger chassis.Logger) {
+	cr := cron.New()
+	f := func() {
+		ctx := context.Background()
+		err := c.UpdateOS(ctx, logger)
+		if err != nil {
+			logger.WithError(err).Error("failed to run auto os update job")
+		}
+	}
+	cr.AddFunc(osAutoUpdateCron, f)
+	go cr.Start()
+}
+
+func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error {
+	settings := &v1.DeviceSettings{}
+	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		logger.WithError(err).Error("failed to get device settings")
+		return err
+	}
+
+	if !settings.AutoUpdateOs {
+		logger.Info("auto update sytem not enabled")
+		return nil
+	}
+
+	updates, err := u.CheckForOSUpdates(ctx, logger)
+	if err != nil {
+		logger.WithError(err).Error("failed to check for system updates")
+		return err
+	}
+
+	// if the daemon needs updating, install it along with the os updates
+	// otherwise just install the os update
+	if updates.DaemonVersions.Current != updates.DaemonVersions.Latest {
+		err = commanderSingleton.ChangeDaemonVersion(&dv1.ChangeDaemonVersionCommand{
+			Version: updates.DaemonVersions.Latest,
+			// TODO: need to get hashes from somewhere
+		})
+	} else {
+		err = commanderSingleton.InstallOSUpdate()
+	}
+	if err != nil {
+		logger.WithError(err).Error("failed to install system update")
+		return err
+	}
+
+	return nil
+}
+
+// CONTAINERS
+
+func (c *controller) CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error) {
+	var (
+		images []*v1.ImageVersion
+	)
+
+	// populate current versions (from k8s)
+	images, err := c.k8sclient.CurrentImages(ctx)
+	if err != nil {
+		logger.WithError(err).Error("failed to get current container versions")
+		return nil, err
+	}
+
+	// populate latest versions (from registry)
+	images, err = getLatestImageTags(ctx, images)
+	if err != nil {
+		logger.WithError(err).Error("failed to get latest image versions")
+		return nil, err
+	}
+
+	return images, err
+}
+
+func (c *controller) AutoUpdateContainers(logger chassis.Logger) {
+	cr := cron.New()
+	f := func() {
+		ctx := context.Background()
+		err := c.UpdateContainers(ctx, logger)
+		if err != nil {
+			logger.WithError(err).Error("failed to run auto container update job")
+		}
+	}
+	cr.AddFunc(osAutoUpdateCron, f)
+	go cr.Start()
+}
+
+func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger) error {
+	settings := &v1.DeviceSettings{}
+	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		logger.WithError(err).Error("failed to get device settings")
+		return err
+	}
+
+	// TODO: should this be a different setting?
+	if !settings.AutoUpdateOs {
+		logger.Info("auto update sytem not enabled")
+		return nil
+	}
+
+	images, err := c.CheckForContainerUpdates(ctx, logger)
+	if err != nil {
+		logger.WithError(err).Error("failed to check for system container updates")
+		return err
+	}
+
+	for _, image := range images {
+		if semver.Compare(image.Latest, image.Current) == 1 {
+			err := commanderSingleton.SetSystemImage(&dv1.SetSystemImageCommand{
+				CurrentImage:   fmt.Sprintf("%s:%s", image.Image, image.Current),
+				RequestedImage: fmt.Sprintf("%s:%s", image.Image, image.Latest),
+			})
+			if err != nil {
+				logger.WithFields(chassis.Fields{
+					"image":           image.Image,
+					"current_version": image.Current,
+					"latest_version":  image.Latest,
+				}).WithError(err).Error("failed to update system container image")
+				// don't return, try to update other containers
+			}
+		}
+	}
+
+	return nil
+}
+
+// DEVICE
 
 func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings, error) {
 	settings := &v1.DeviceSettings{}
@@ -130,6 +380,30 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 	return key, nil
 }
 
+func (c *controller) Login(ctx context.Context, username, password string) (string, error) {
+	settings := &v1.DeviceSettings{}
+	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	salt, err := getSaltValue(ctx)
+	if err != nil {
+		return "", errors.New(ErrFailedToGetSettings)
+	}
+
+	// Check if the password is correct. If not, return an error
+	if hashPassword(password, []byte(salt)) != settings.AdminUser.Password {
+		return "", errors.New("invalid username or password")
+	}
+
+	// TODO: forge token
+
+	return "JWT_TOKEN", nil
+}
+
+// helper functions
+
 func getSaltValue(ctx context.Context) (string, error) {
 	seedVal := &kvv1.Value{}
 	err := kvclient.Get(ctx, kvclient.SEED_KEY, seedVal)
@@ -154,217 +428,7 @@ func hashPassword(password string, salt []byte) string {
 	return hex.EncodeToString(hashedPassword)
 }
 
-func (c *controller) Login(ctx context.Context, username, password string) (string, error) {
-	settings := &v1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
-	}
-
-	salt, err := getSaltValue(ctx)
-	if err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
-	}
-
-	// Check if the password is correct. If not, return an error
-	if hashPassword(password, []byte(salt)) != settings.AdminUser.Password {
-		return "", errors.New("invalid username or password")
-	}
-
-	// TODO: forge token
-
-	return "JWT_TOKEN", nil
-}
-
-func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logger) (*v1.CheckForSystemUpdatesResponse, error) {
-	if !c.systemUpdateLock.TryLock() {
-		logger.Warn("call to check for system updates while another check is already in progress")
-		return nil, fmt.Errorf("system update check already in progress")
-	}
-	defer c.systemUpdateLock.Unlock()
-
-	var (
-		response = &v1.CheckForSystemUpdatesResponse{}
-	)
-
-	// get the os update diff from the daemon
-	commander := daemon.GetCommander()
-	err := commander.RequestOSUpdateDiff()
-	if err != nil {
-		return nil, err
-	}
-	for {
-		msg := <-c.messages
-		switch msg.Message.(type) {
-		case *dv1.DaemonMessage_OsUpdateDiff:
-			m := msg.Message.(*dv1.DaemonMessage_OsUpdateDiff)
-			response.OsDiff = m.OsUpdateDiff.Description
-		default:
-			logger.WithField("message", msg).Warn("unrequested message type received")
-		}
-		if response.OsDiff != "" {
-			break
-		}
-	}
-
-	// get the current daemon version from the daemon
-	err = commander.RequestCurrentDaemonVersion()
-	if err != nil {
-		return nil, err
-	}
-	for {
-		msg := <-c.messages
-		switch msg.Message.(type) {
-		case *dv1.DaemonMessage_CurrentDaemonVersion:
-			m := msg.Message.(*dv1.DaemonMessage_CurrentDaemonVersion)
-			response.DaemonVersions = &v1.DaemonVersions{
-				Current: m.CurrentDaemonVersion.Version,
-			}
-		default:
-			logger.WithField("message", msg).Warn("unrequested message type received")
-		}
-		if response.DaemonVersions != nil {
-			break
-		}
-	}
-
-	// get latest available daemon version
-	latest, err := GetLatestDaemonVersion()
-	if err != nil {
-		return nil, err
-	}
-	response.DaemonVersions.Latest = latest
-
-	return response, nil
-}
-
-func (c *controller) CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error) {
-	var (
-		images []*v1.ImageVersion
-	)
-
-	// populate current versions (from k8s)
-	images, err := c.k8sclient.CurrentImages(ctx)
-	if err != nil {
-		logger.WithError(err).Error("failed to get current container versions")
-		return nil, err
-	}
-
-	// populate latest versions (from registry)
-	images, err = GetLatestImageTags(ctx, images)
-	if err != nil {
-		logger.WithError(err).Error("failed to get latest image versions")
-		return nil, err
-	}
-
-	return images, err
-}
-
-func (c *controller) AutoUpdateOS(logger chassis.Logger) {
-	cr := cron.New()
-	f := func() {
-		ctx := context.Background()
-		err := c.UpdateOS(ctx, logger)
-		if err != nil {
-			logger.WithError(err).Error("failed to run auto os update job")
-		}
-	}
-	cr.AddFunc(osAutoUpdateCron, f)
-	go cr.Start()
-}
-
-func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error {
-	settings := &v1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		logger.WithError(err).Error("failed to get device settings")
-		return err
-	}
-
-	if !settings.AutoUpdateOs {
-		logger.Info("auto update sytem not enabled")
-		return nil
-	}
-
-	updates, err := u.CheckForOSUpdates(ctx, logger)
-	if err != nil {
-		logger.WithError(err).Error("failed to check for system updates")
-		return err
-	}
-
-	// if the daemon needs updating, install it along with the os updates
-	// otherwise just install the os update
-	if updates.DaemonVersions.Current != updates.DaemonVersions.Latest {
-		err = daemon.GetCommander().ChangeDaemonVersion(&dv1.ChangeDaemonVersionCommand{
-			Version: updates.DaemonVersions.Latest,
-			// TODO: need to get hashes from somewhere
-		})
-	} else {
-		err = daemon.GetCommander().InstallOSUpdate()
-	}
-	if err != nil {
-		logger.WithError(err).Error("failed to install system update")
-		return err
-	}
-
-	return nil
-}
-
-func (c *controller) AutoUpdateContainers(logger chassis.Logger) {
-	cr := cron.New()
-	f := func() {
-		ctx := context.Background()
-		err := c.UpdateContainers(ctx, logger)
-		if err != nil {
-			logger.WithError(err).Error("failed to run auto container update job")
-		}
-	}
-	cr.AddFunc(osAutoUpdateCron, f)
-	go cr.Start()
-}
-
-func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger) error {
-	settings := &v1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		logger.WithError(err).Error("failed to get device settings")
-		return err
-	}
-
-	// TODO: should this be a different setting?
-	if !settings.AutoUpdateOs {
-		logger.Info("auto update sytem not enabled")
-		return nil
-	}
-
-	images, err := c.CheckForContainerUpdates(ctx, logger)
-	if err != nil {
-		logger.WithError(err).Error("failed to check for system container updates")
-		return err
-	}
-
-	commander := daemon.GetCommander()
-	for _, image := range images {
-		if semver.Compare(image.Latest, image.Current) == 1 {
-			err := commander.SetSystemImage(&dv1.SetSystemImageCommand{
-				CurrentImage:   fmt.Sprintf("%s:%s", image.Image, image.Current),
-				RequestedImage: fmt.Sprintf("%s:%s", image.Image, image.Latest),
-			})
-			if err != nil {
-				logger.WithFields(chassis.Fields{
-					"image":           image.Image,
-					"current_version": image.Current,
-					"latest_version":  image.Latest,
-				}).WithError(err).Error("failed to update system container image")
-				// don't return, try to update other containers
-			}
-		}
-	}
-
-	return nil
-}
-
-func GetLatestDaemonVersion() (string, error) {
+func getLatestDaemonVersion() (string, error) {
 	// clone repo
 	repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
 		URL:           homeCloudCoreRepo,
@@ -405,7 +469,7 @@ func GetLatestDaemonVersion() (string, error) {
 	return versions[len(versions)-1], nil
 }
 
-func GetLatestImageTags(ctx context.Context, images []*v1.ImageVersion) ([]*v1.ImageVersion, error) {
+func getLatestImageTags(ctx context.Context, images []*v1.ImageVersion) ([]*v1.ImageVersion, error) {
 	for _, image := range images {
 		latest, err := getLatestImageTag(ctx, image.Image)
 		if err != nil {

@@ -5,7 +5,6 @@ import (
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
-	"github.com/home-cloud-io/core/services/platform/server/daemon"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	"github.com/home-cloud-io/core/services/platform/server/system"
 	"github.com/home-cloud-io/core/services/platform/server/web"
@@ -22,7 +21,7 @@ func main() {
 	var (
 		logger    = zerolog.New()
 		messages  = make(chan *dv1.DaemonMessage)
-		daemonRPC = daemon.New(logger, messages)
+		daemonRPC = system.New(logger, messages)
 		actl      = apps.NewController(logger)
 		sctl      = system.NewController(logger, messages)
 		webRPC    = web.New(logger, actl, sctl)

@@ -1,4 +1,4 @@
-package daemon
+package system
 
 import (
 	"context"
@@ -18,17 +18,16 @@ type (
 
 	server struct {
 		logger    chassis.Logger
-		commander Commander
 		messages  chan *v1.DaemonMessage
 	}
 )
 
-var CurrentSystemStats *v1.SystemStats
+var CurrentStats *v1.SystemStats
 
 func New(logger chassis.Logger, messages chan *v1.DaemonMessage) Server {
+	Init()
 	return &server{
 		logger:    logger,
-		commander: NewCommander(),
 		messages:  messages,
 	}
 }
@@ -39,7 +38,7 @@ func (h *server) RegisterRPC(server chassis.Rpcer) {
 }
 
 func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error {
-	err := h.commander.SetStream(stream)
+	err := commanderSingleton.SetStream(stream)
 	if err != nil {
 		return err
 	}
@@ -48,7 +47,7 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 		message, err := stream.Receive()
 		if err != nil {
 			h.logger.WithError(err).Error("failed to recieve message")
-			h.commander.CloseStream()
+			commanderSingleton.CloseStream()
 			return err
 		}
 		switch message.Message.(type) {
@@ -67,7 +66,7 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 		case *v1.DaemonMessage_CurrentDaemonVersion:
 			h.messages <- message
 		case *v1.DaemonMessage_SystemStats:
-			CurrentSystemStats = message.GetSystemStats()
+			CurrentStats = message.GetSystemStats()
 		default:
 			h.logger.WithField("message", message).Warn("unknown message type received")
 		}

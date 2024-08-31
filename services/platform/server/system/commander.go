@@ -1,4 +1,4 @@
-package daemon
+package system
 
 import (
 	"fmt"
@@ -31,13 +31,8 @@ var (
 	commanderSingleton Commander
 )
 
-func NewCommander() Commander {
+func Init()  {
 	commanderSingleton = &commander{}
-	return commanderSingleton
-}
-
-func GetCommander() Commander {
-	return commanderSingleton
 }
 
 func (c *commander) SetStream(stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error {

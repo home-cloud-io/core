@@ -9,7 +9,6 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
-	"github.com/home-cloud-io/core/services/platform/server/daemon"
 	"github.com/home-cloud-io/core/services/platform/server/system"
 
 	"connectrpc.com/connect"
@@ -110,8 +109,7 @@ func (h *rpc) GetAppsInStore(ctx context.Context, request *connect.Request[v1.Ge
 // SYSTEM
 
 func (h *rpc) ShutdownHost(ctx context.Context, request *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error) {
-	commander := daemon.GetCommander()
-	err := commander.ShutdownHost()
+	err := h.sctl.ShutdownHost()
 	if err != nil {
 		return nil, err
 	}
@@ -119,8 +117,7 @@ func (h *rpc) ShutdownHost(ctx context.Context, request *connect.Request[v1.Shut
 }
 
 func (h *rpc) RestartHost(ctx context.Context, request *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error) {
-	commander := daemon.GetCommander()
-	err := commander.RestartHost()
+	err := h.sctl.RestartHost()
 	if err != nil {
 		return nil, err
 	}
@@ -149,8 +146,7 @@ func (h *rpc) CheckForContainerUpdates(ctx context.Context, request *connect.Req
 }
 
 func (h *rpc) ChangeDaemonVersion(ctx context.Context, request *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
-	commander := daemon.GetCommander()
-	err := commander.ChangeDaemonVersion(&dv1.ChangeDaemonVersionCommand{
+	err := h.sctl.ChangeDaemonVersion(&dv1.ChangeDaemonVersionCommand{
 		Version:    request.Msg.Version,
 		SrcHash:    request.Msg.SrcHash,
 		VendorHash: request.Msg.VendorHash,
@@ -163,8 +159,7 @@ func (h *rpc) ChangeDaemonVersion(ctx context.Context, request *connect.Request[
 }
 
 func (h *rpc) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
-	commander := daemon.GetCommander()
-	err := commander.InstallOSUpdate()
+	err := h.sctl.InstallOSUpdate()
 	if err != nil {
 		h.logger.WithError(err).Error("failed to change install os update")
 		return nil, err
@@ -173,8 +168,7 @@ func (h *rpc) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.I
 }
 
 func (h *rpc) SetSystemImage(ctx context.Context, request *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
-	commander := daemon.GetCommander()
-	err := commander.SetSystemImage(&dv1.SetSystemImageCommand{
+	err := h.sctl.SetSystemImage(&dv1.SetSystemImageCommand{
 		CurrentImage:   request.Msg.CurrentImage,
 		RequestedImage: request.Msg.RequestedImage,
 	})
@@ -187,7 +181,7 @@ func (h *rpc) SetSystemImage(ctx context.Context, request *connect.Request[v1.Se
 
 func (h *rpc) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
 	// grab the in-memory cache of current system stats
-	stats := daemon.CurrentSystemStats
+	stats := system.CurrentStats
 	if stats == nil {
 		h.logger.Error("failed to get system stats")
 		return nil, errors.New("failed to get system stats")
