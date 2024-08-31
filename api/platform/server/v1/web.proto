@@ -4,7 +4,6 @@ package platform.server.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 
-import "tagger/tagger.proto";
 import "platform/daemon/v1/system.proto";
 
 service WebService {
