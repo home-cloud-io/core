@@ -33,6 +33,9 @@ type (
 
 const (
 	daemonTagPath = "refs/tags/services/platform/daemon/"
+
+	ErrFailedToInitDevice = "failed to initialize device"
+	ErrInvalidInputValues = "invalid input values"
 )
 
 func New(logger chassis.Logger, messages chan *dv1.DaemonMessage) Rpc {
@@ -217,6 +220,7 @@ func (h *rpc) AppsHealthCheck(ctx context.Context, request *connect.Request[v1.A
 
 	checks, err := h.k8sclient.CheckAppsHealth(ctx)
 	if err != nil {
+		h.logger.WithError(err).Error("failed to check apps health")
 		return nil, err
 	}
 
@@ -226,22 +230,16 @@ func (h *rpc) AppsHealthCheck(ctx context.Context, request *connect.Request[v1.A
 }
 
 func (h *rpc) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
-
 	stats := daemon.CurrentSystemStats
 	if stats == nil {
-		return nil, fmt.Errorf("no system stats available")
+		h.logger.Error("failed to get system stats")
+		return nil, errors.New("failed to get system stats")
 	}
 
 	return connect.NewResponse(&v1.GetSystemStatsResponse{
 		Stats: stats,
 	}), nil
 }
-
-// / RC1 WebApp Api Errors
-const (
-	ErrFailedToInitDevice = "failed to initialize device"
-	ErrInvalidInputValues = "invalid input values"
-)
 
 /// RC1 WebApp API
 
@@ -320,5 +318,12 @@ func (h *rpc) GetAppsInStore(ctx context.Context, request *connect.Request[v1.Ge
 }
 
 func (h *rpc) GetDeviceSettings(ctx context.Context, request *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error) {
-	return nil, errors.New("not implemented")
+	h.logger.Info("getting device settings")
+
+	settings, err := h.controller.GetServerSettings(ctx)
+	if err != nil {
+		return nil, errors.New(ErrFailedToGetSettings)
+	}
+
+	return connect.NewResponse(&v1.GetDeviceSettingsResponse{Settings: settings}), nil
 }
