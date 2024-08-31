@@ -25,12 +25,22 @@ export const serverRPCService = createApi({
     // TODO: Update the main page to use these function instead of the direct calls
     shutdownHost: builder.mutation({
       queryFn: async () => {
-        return client.shutdownHost({});
+        try {
+          const res = await client.shutdownHost({});
+          return { data: res.toJson() };
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
       },
     }),
     restartHost: builder.mutation({
       queryFn: async () => {
-        return client.restartHost({});
+        try {
+          const res = await client.restartHost({});
+          return { data: res.toJson() };
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
       },
     }),
     installApp: builder.mutation({
@@ -43,10 +53,9 @@ export const serverRPCService = createApi({
             values: values.get(app),
           });
 
-          return { data: res };
+          return { data: res.toJson() };
         } catch (error) {
-          console.log(error);
-          return { error };
+          return { error: error.rawMessage };
         }
       },
     }),
@@ -74,10 +83,10 @@ export const serverRPCService = createApi({
     initDevice: builder.mutation({
       queryFn: async (req) => {
         try {
+          console.log(req);
           const res = await client.initializeDevice(req);
-          return { data: { isDeviceSetup: res.setup }};
+          return { data: { isDeviceSetup: res.toJson().setup }};
         } catch (error) {
-          console.log(error);
           return { error: error.rawMessage };
         }
       },
@@ -85,10 +94,9 @@ export const serverRPCService = createApi({
     login: builder.mutation({
       queryFn: async (req, store) => {
         try {
-          const response = await client.login(req);
-          // dispatch a redux action to set the user settings
-          store.dispatch(setUserSettings({ username: req.username, token: response.token }));
-          return { data: { loggedIn: true }};
+          const res = await client.login(req);
+          store.dispatch(setUserSettings({ username: req.username, token: res.token }));
+          return { data: { user: res.toJson() }};
         } catch (error) {
           return { error: error.rawMessage };
         }  
@@ -114,6 +122,26 @@ export const serverRPCService = createApi({
         }
       }
     }),
+    getDeviceSettings: builder.query({
+      queryFn: async () => {
+        try {
+          const res = await client.getDeviceSettings({});
+          return { data: res.toJson().settings };
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
+      }
+    }),
+    getSystemStats: builder.query({
+      queryFn: async () => {
+        try {
+          const res = await client.getSystemStats({});
+          return { data: res.toJson()};
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
+      }
+    }),
   }),
 });
 
@@ -128,6 +156,8 @@ export const {
   useLoginMutation,
   useGetAppStoreEntitiesQuery,
   useGetAppsHealthCheckQuery,
+  useGetDeviceSettingsQuery,
+  useGetSystemStatsQuery,
 } = serverRPCService;
 
 const values = new Map([
@@ -144,26 +174,6 @@ const values = new Map([
     ``,
   ],
 ]);
-
-export function shutdown() {
-  console.log('shutdown called');
-  client.shutdownHost({});
-}
-
-export function restart() {
-  console.log('restart called');
-  client.restartHost({});
-}
-
-export function installApp(app) {
-  console.log(`installing app: ${app}`);
-  client.installApp({
-    repo: 'home-cloud-io.github.io/store',
-    chart: app,
-    release: `${app}`,
-    values: values.get(app),
-  });
-}
 
 export function deleteApp(app) {
   console.log('delete app called');
