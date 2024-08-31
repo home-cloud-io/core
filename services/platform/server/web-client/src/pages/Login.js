@@ -1,12 +1,14 @@
 import * as React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import { useLoginMutation } from "../services/web_rpc";
 import logo from '../../public/assets/home_cloud_logo.png';
 import "./Login.css";
 
 export default function Login() {
+  const dispatch = useDispatch();
   const [login, result] = useLoginMutation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +16,12 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();    
-    login({ username, password });
+
+    try {
+      login({ username, password });
+    } catch (error) {
+      console.error(error);
+    }
 
     navigate('/home');
   }
