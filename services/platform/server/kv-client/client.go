@@ -55,21 +55,6 @@ func Get(ctx context.Context, key string, value proto.Message) error {
 	return nil
 }
 
-// setRequest is a utility function to create a get request for the key-value store
-func getRequest(key string, value proto.Message) (*connect.Request[v1.GetRequest], error) {
-	pb, err := anypb.New(value)
-	if err != nil {
-		return nil, err
-	}
-
-	get := &v1.GetRequest{
-		Key:   key,
-		Value: pb,
-	}
-
-	return connect.NewRequest(get), nil
-}
-
 func Set(ctx context.Context, key string, value proto.Message) (string, error) {
 	// convert value to request
 	pb, err := anypb.New(value)
