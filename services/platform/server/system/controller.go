@@ -27,6 +27,7 @@ import (
 
 type (
 	Controller interface {
+		GetServerSettings(ctx context.Context) (*v1.DeviceSettings, error)
 		IsDeviceSetup(ctx context.Context) (bool, error)
 		InitializeDevice(ctx context.Context, settings *v1.DeviceSettings) (string, error)
 		Login(ctx context.Context, username, password string) (string, error)
@@ -68,6 +69,19 @@ const (
 	osAutoUpdateCron        = "0 1 * * *"
 	containerAutoUpdateCron = "0 2 * * *"
 )
+
+func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings, error) {
+	settings := &v1.DeviceSettings{}
+	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return nil, errors.New(ErrFailedToGetSettings)
+	}
+
+	settings.AdminUser.Password = "" // don't return the password
+	settings.AdminUser.Username = "" // don't return the username
+
+	return settings, nil
+}
 
 // IsDeviceSetup checks if the device is already setup by checking if the DEFAULT_DEVICE_SETTINGS_KEY key exists in the key-value store
 // with the default settings model

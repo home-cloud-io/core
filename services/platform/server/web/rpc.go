@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
@@ -188,7 +189,8 @@ func (h *rpc) GetSystemStats(ctx context.Context, request *connect.Request[v1.Ge
 	// grab the in-memory cache of current system stats
 	stats := daemon.CurrentSystemStats
 	if stats == nil {
-		return nil, fmt.Errorf("no system stats available")
+		h.logger.Error("failed to get system stats")
+		return nil, errors.New("failed to get system stats")
 	}
 	return connect.NewResponse(&v1.GetSystemStatsResponse{
 		Stats: stats,
