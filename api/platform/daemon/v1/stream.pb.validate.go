@@ -696,6 +696,47 @@ func (m *ServerMessage) validate(all bool) error {
 			}
 		}
 
+	case *ServerMessage_SetUserPasswordCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetSetUserPasswordCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "SetUserPasswordCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "SetUserPasswordCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSetUserPasswordCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "SetUserPasswordCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -2061,3 +2102,109 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SetSystemImageCommandValidationError{}
+
+// Validate checks the field values on SetUserPasswordCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetUserPasswordCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetUserPasswordCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetUserPasswordCommandMultiError, or nil if none found.
+func (m *SetUserPasswordCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetUserPasswordCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Username
+
+	// no validation rules for Password
+
+	if len(errors) > 0 {
+		return SetUserPasswordCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetUserPasswordCommandMultiError is an error wrapping multiple validation
+// errors returned by SetUserPasswordCommand.ValidateAll() if the designated
+// constraints aren't met.
+type SetUserPasswordCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetUserPasswordCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetUserPasswordCommandMultiError) AllErrors() []error { return m }
+
+// SetUserPasswordCommandValidationError is the validation error returned by
+// SetUserPasswordCommand.Validate if the designated constraints aren't met.
+type SetUserPasswordCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetUserPasswordCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetUserPasswordCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetUserPasswordCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetUserPasswordCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetUserPasswordCommandValidationError) ErrorName() string {
+	return "SetUserPasswordCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetUserPasswordCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetUserPasswordCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetUserPasswordCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetUserPasswordCommandValidationError{}
