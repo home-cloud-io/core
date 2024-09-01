@@ -1213,6 +1213,10 @@ func (m *CurrentDaemonVersion) validate(all bool) error {
 
 	// no validation rules for Version
 
+	// no validation rules for VendorHash
+
+	// no validation rules for SrcHash
+
 	if all {
 		switch v := interface{}(m.GetError()).(type) {
 		case interface{ ValidateAll() error }:

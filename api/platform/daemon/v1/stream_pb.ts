@@ -305,6 +305,16 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
   version = "";
 
   /**
+   * @generated from field: string vendor_hash = 2;
+   */
+  vendorHash = "";
+
+  /**
+   * @generated from field: string src_hash = 3;
+   */
+  srcHash = "";
+
+  /**
    * @generated from field: platform.daemon.v1.DaemonError error = 16;
    */
   error?: DaemonError;
@@ -318,6 +328,8 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
   static readonly typeName = "platform.daemon.v1.CurrentDaemonVersion";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 16, name: "error", kind: "message", T: DaemonError },
   ]);
 

@@ -137,8 +137,20 @@ export const CheckForSystemUpdatesResponse = proto3.makeMessageType(
 export const DaemonVersions = proto3.makeMessageType(
   "platform.server.v1.DaemonVersions",
   () => [
-    { no: 1, name: "current", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "latest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "current", kind: "message", T: DaemonVersion },
+    { no: 2, name: "latest", kind: "message", T: DaemonVersion },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DaemonVersion
+ */
+export const DaemonVersion = proto3.makeMessageType(
+  "platform.server.v1.DaemonVersion",
+  () => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

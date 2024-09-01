@@ -490,14 +490,14 @@ export class CheckForSystemUpdatesResponse extends Message<CheckForSystemUpdates
  */
 export class DaemonVersions extends Message<DaemonVersions> {
   /**
-   * @generated from field: string current = 1;
+   * @generated from field: platform.server.v1.DaemonVersion current = 1;
    */
-  current = "";
+  current?: DaemonVersion;
 
   /**
-   * @generated from field: string latest = 2;
+   * @generated from field: platform.server.v1.DaemonVersion latest = 2;
    */
-  latest = "";
+  latest?: DaemonVersion;
 
   constructor(data?: PartialMessage<DaemonVersions>) {
     super();
@@ -507,8 +507,8 @@ export class DaemonVersions extends Message<DaemonVersions> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.server.v1.DaemonVersions";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "current", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "latest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "current", kind: "message", T: DaemonVersion },
+    { no: 2, name: "latest", kind: "message", T: DaemonVersion },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonVersions {
@@ -525,6 +525,55 @@ export class DaemonVersions extends Message<DaemonVersions> {
 
   static equals(a: DaemonVersions | PlainMessage<DaemonVersions> | undefined, b: DaemonVersions | PlainMessage<DaemonVersions> | undefined): boolean {
     return proto3.util.equals(DaemonVersions, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DaemonVersion
+ */
+export class DaemonVersion extends Message<DaemonVersion> {
+  /**
+   * @generated from field: string version = 1;
+   */
+  version = "";
+
+  /**
+   * @generated from field: string vendor_hash = 2;
+   */
+  vendorHash = "";
+
+  /**
+   * @generated from field: string src_hash = 3;
+   */
+  srcHash = "";
+
+  constructor(data?: PartialMessage<DaemonVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DaemonVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonVersion {
+    return new DaemonVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DaemonVersion {
+    return new DaemonVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DaemonVersion {
+    return new DaemonVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DaemonVersion | PlainMessage<DaemonVersion> | undefined, b: DaemonVersion | PlainMessage<DaemonVersion> | undefined): boolean {
+    return proto3.util.equals(DaemonVersion, a, b);
   }
 }
 
