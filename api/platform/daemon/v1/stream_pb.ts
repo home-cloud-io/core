@@ -139,6 +139,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: SetUserPasswordCommand;
     case: "setUserPasswordCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.SetTimeZoneCommand set_time_zone_command = 10;
+     */
+    value: SetTimeZoneCommand;
+    case: "setTimeZoneCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -158,6 +164,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 7, name: "install_os_update_command", kind: "message", T: InstallOSUpdateCommand, oneof: "message" },
     { no: 8, name: "set_system_image_command", kind: "message", T: SetSystemImageCommand, oneof: "message" },
     { no: 9, name: "set_user_password_command", kind: "message", T: SetUserPasswordCommand, oneof: "message" },
+    { no: 10, name: "set_time_zone_command", kind: "message", T: SetTimeZoneCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -663,6 +670,45 @@ export class SetUserPasswordCommand extends Message<SetUserPasswordCommand> {
 
   static equals(a: SetUserPasswordCommand | PlainMessage<SetUserPasswordCommand> | undefined, b: SetUserPasswordCommand | PlainMessage<SetUserPasswordCommand> | undefined): boolean {
     return proto3.util.equals(SetUserPasswordCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.SetTimeZoneCommand
+ */
+export class SetTimeZoneCommand extends Message<SetTimeZoneCommand> {
+  /**
+   * time_zone must be a valid TZ identifier from: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+   *
+   * @generated from field: string time_zone = 1;
+   */
+  timeZone = "";
+
+  constructor(data?: PartialMessage<SetTimeZoneCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.SetTimeZoneCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "time_zone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetTimeZoneCommand {
+    return new SetTimeZoneCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetTimeZoneCommand {
+    return new SetTimeZoneCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetTimeZoneCommand {
+    return new SetTimeZoneCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetTimeZoneCommand | PlainMessage<SetTimeZoneCommand> | undefined, b: SetTimeZoneCommand | PlainMessage<SetTimeZoneCommand> | undefined): boolean {
+    return proto3.util.equals(SetTimeZoneCommand, a, b);
   }
 }
 
