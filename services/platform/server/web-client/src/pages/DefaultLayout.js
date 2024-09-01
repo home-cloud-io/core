@@ -1,23 +1,18 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useNavigate, NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, NavLink, useNavigate} from "react-router-dom";
 
 import "./DefaultLayout.css";
 
 export default function DefaultLayout() {
+  const navigate = useNavigate();
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [isSecondaryNavVisible, setSecondaryNavVisibility] = useState(false);
   const [isAlertVisible, setAlertVisibility] = useState(false);
 
-  const userSettings = useSelector((state) => state.user_settings);
-  const navigate = useNavigate();
-
-  // TODO: Address warning about calling during `useEffect`
-  // if (userSettings.token === "") {
-  //   navigate('/login');
-  // }
+  useEffect(() => {
+    navigate('/home');
+  }, []);
 
   const onClickNavCollapseBtn = () => {
     setIsNavCollapsed(!isNavCollapsed);
