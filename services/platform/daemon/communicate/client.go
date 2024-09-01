@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -247,8 +248,8 @@ func (c *client) currentDaemonVersion() {
 
 func (c *client) changeDaemonVersion(ctx context.Context, def *v1.ChangeDaemonVersionCommand) {
 	logger := c.logger.WithFields(chassis.Fields{
-		"version": def.Version,
-		"src_hash": def.SrcHash,
+		"version":     def.Version,
+		"src_hash":    def.SrcHash,
 		"vendor_hash": def.VendorHash,
 	})
 	logger.Info("change daemon version command")
@@ -272,7 +273,7 @@ func (c *client) installOsUpdate(ctx context.Context) {
 
 func (c *client) setSystemImage(ctx context.Context, def *v1.SetSystemImageCommand) {
 	logger := c.logger.WithFields(chassis.Fields{
-		"current_image": def.CurrentImage,
+		"current_image":   def.CurrentImage,
 		"requested_image": def.RequestedImage,
 	})
 	logger.Info("set system image command")
@@ -286,8 +287,21 @@ func (c *client) setSystemImage(ctx context.Context, def *v1.SetSystemImageComma
 
 func (c *client) setUserPassword(ctx context.Context, def *v1.SetUserPasswordCommand) {
 	logger := c.logger.WithField("username", def.Username)
-	cmd := exec.Command("chpasswd", fmt.Sprintf("<<<\"%s:%s\"", def.Username, def.Password))
-	err := execute.ExecuteCommand(ctx, cmd)
+
+	cmd := exec.Command("chpasswd")
+
+	// write the username:password to stdin when the command executes
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		logger.WithError(err).Error("failed to get stdin pipe")
+	}
+	go func() {
+		defer stdin.Close()
+		io.WriteString(stdin, fmt.Sprintf("%s:%s", def.Username, def.Password))
+	}()
+
+	// execute command
+	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to set user password")
 		return
