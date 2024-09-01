@@ -97,7 +97,8 @@ export function DeviceDetails() {
   }
 
   const formatPercentage = (free, total) => {
-    return Math.round((free / total) * 100);
+    
+    return Math.round(((total-free)/ total) * 100);
   }
 
   return (
@@ -147,7 +148,14 @@ export function DeviceDetails() {
           ) : error ? (
             <p>Error: {error}</p>
           ) : (
-            <div className="progress" role="progressbar" aria-label="Segment one" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" style={{width: formatPercentage(data.drives[0].freeBytes, data.drives[0].totalBytes)}}>
+            <div
+              className="progress"
+              role="progressbar"
+              aria-label="Segment one"
+              aria-valuenow="15"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              style={{width: formatPercentage(data.drives[0].freeBytes, data.drives[0].totalBytes)}}>
               <div className="progress-bar bg-warning"></div>
             </div>
           )}
