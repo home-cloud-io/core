@@ -21,6 +21,7 @@ type (
 		InstallOSUpdate() error
 		SetSystemImage(request *v1.SetSystemImageCommand) error
 		SetUserPassword(request *v1.SetUserPasswordCommand) error
+		SetTimeZone(request *v1.SetTimeZoneCommand) error
 	}
 
 	commander struct {
@@ -32,7 +33,7 @@ var (
 	commanderSingleton Commander
 )
 
-func Init()  {
+func Init() {
 	commanderSingleton = &commander{}
 }
 
@@ -98,6 +99,14 @@ func (c *commander) SetUserPassword(request *v1.SetUserPasswordCommand) error {
 	return c.stream.Send(&v1.ServerMessage{
 		Message: &v1.ServerMessage_SetUserPasswordCommand{
 			SetUserPasswordCommand: request,
+		},
+	})
+}
+
+func (c *commander) SetTimeZone(request *v1.SetTimeZoneCommand) error {
+	return c.stream.Send(&v1.ServerMessage{
+		Message: &v1.ServerMessage_SetTimeZoneCommand{
+			SetTimeZoneCommand: request,
 		},
 	})
 }
