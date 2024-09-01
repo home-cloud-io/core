@@ -196,7 +196,11 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 		case *dv1.DaemonMessage_CurrentDaemonVersion:
 			m := msg.Message.(*dv1.DaemonMessage_CurrentDaemonVersion)
 			response.DaemonVersions = &v1.DaemonVersions{
-				Current: m.CurrentDaemonVersion.Version,
+				Current: &v1.DaemonVersion{
+					Version:    m.CurrentDaemonVersion.Version,
+					VendorHash: m.CurrentDaemonVersion.VendorHash,
+					SrcHash:    m.CurrentDaemonVersion.SrcHash,
+				},
 			}
 		default:
 			logger.WithField("message", msg).Warn("unrequested message type received")
@@ -252,8 +256,9 @@ func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error 
 	// otherwise just install the os update
 	if updates.DaemonVersions.Current != updates.DaemonVersions.Latest {
 		err = commanderSingleton.ChangeDaemonVersion(&dv1.ChangeDaemonVersionCommand{
-			Version: updates.DaemonVersions.Latest,
-			// TODO: need to get hashes from somewhere
+			Version:    updates.DaemonVersions.Latest.Version,
+			VendorHash: updates.DaemonVersions.Latest.VendorHash,
+			SrcHash:    updates.DaemonVersions.Latest.SrcHash,
 		})
 	} else {
 		err = commanderSingleton.InstallOSUpdate()
@@ -464,7 +469,11 @@ func hashPassword(password string, salt []byte) string {
 	return hex.EncodeToString(hashedPassword)
 }
 
-func getLatestDaemonVersion() (string, error) {
+func getLatestDaemonVersion() (*v1.DaemonVersion, error) {
+	var (
+		latest = &v1.DaemonVersion{}
+	)
+
 	// clone repo
 	repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
 		URL:           homeCloudCoreRepo,
@@ -474,13 +483,13 @@ func getLatestDaemonVersion() (string, error) {
 		Tags:          git.AllTags,
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// pull out daemon versions from tags
 	iter, err := repo.Tags()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	versions := []string{}
 	err = iter.ForEach(func(tag *plumbing.Reference) error {
@@ -491,18 +500,50 @@ func getLatestDaemonVersion() (string, error) {
 		return nil
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if len(versions) == 0 {
-		return "", fmt.Errorf("no versions found")
+		return nil, fmt.Errorf("no versions found")
 	}
 
 	// sort versions by semver
 	semver.Sort(versions)
+	latest.Version = versions[len(versions)-1]
+
+	// find hashes from tags
+	iter, err = repo.Tags()
+	if err != nil {
+		return nil, err
+	}
+	err = iter.ForEach(func(tag *plumbing.Reference) error {
+		name := tag.Name().String()
+		prefix := fmt.Sprintf("refs/tags/daemon_%s", latest.Version)
+
+		// ignore tag if it doesn't match the hash tag format for the latest version
+		if !strings.HasPrefix(name, prefix) {
+			return nil
+		}
+
+		// check which type of tag it is and save it
+		parts := strings.Split(name, "_")
+		t := parts[2]
+		hash := parts[3]
+		switch t {
+		case "src":
+			latest.SrcHash = hash
+		case "vendor":
+			latest.VendorHash = hash
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	// grab latest
-	return versions[len(versions)-1], nil
+	return latest, nil
 }
 
 func getLatestImageTags(ctx context.Context, images []*v1.ImageVersion) ([]*v1.ImageVersion, error) {
