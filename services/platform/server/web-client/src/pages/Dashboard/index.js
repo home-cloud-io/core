@@ -2,17 +2,17 @@ import * as React from "react";
 import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import Login from "./Login";
-import DefaultLayout from "./DefaultLayout";
-import DeviceOnboardPage from "./Device/Onboard";
+import Login from "../Login";
+import DefaultLayout from "../DefaultLayout";
+import DeviceOnboardPage from "../Device/Onboard";
 
-import AppStorePage from "./AppStore";
-import HomePage from "./Home";
-import SettingsPage from "./Settings";
+import AppStorePage from "../AppStore";
+import HomePage from "../Home";
+import SettingsPage from "../Settings";
 
-import {useGetIsDeviceSetupQuery} from "../services/web_rpc";
+import {useGetIsDeviceSetupQuery} from "../../services/web_rpc";
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const userSettings = useSelector((state) => state.user_settings);
   const { data, error, isLoading } = useGetIsDeviceSetupQuery();
 

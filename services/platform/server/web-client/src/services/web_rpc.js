@@ -136,7 +136,7 @@ export const serverRPCService = createApi({
       queryFn: async () => {
         try {
           const res = await client.getSystemStats({});
-          return { data: res.toJson()};
+          return { data: res.toJson().stats };
         } catch (error) {
           return { error: error.rawMessage };
         }

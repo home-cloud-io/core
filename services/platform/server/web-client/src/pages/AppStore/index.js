@@ -26,7 +26,7 @@ export default function AppStorePage() {
       {isLoading ? (
         <p>Loading...</p>
       ) : error ? (
-        <p>Error: {error.message}</p>
+        <p>Error: {error}</p>
       ) : (
         <ListEntries />
       )}

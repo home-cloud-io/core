@@ -1,8 +1,9 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
 import { Provider } from "react-redux";
+
+import DashboardPage from "./pages/Dashboard";
 
 // client side application state
 import { store } from "./store";
@@ -17,7 +18,7 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <Dashboard />
+        <DashboardPage />
       </BrowserRouter>
     </Provider>
   </React.StrictMode>
