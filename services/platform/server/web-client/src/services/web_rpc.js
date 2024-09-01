@@ -7,7 +7,7 @@ import { setUserSettings } from './user_slice';
 let BASE_URL = '';
 
 if (process.env.NODE_ENV === 'development') {
-  BASE_URL = 'http://localhost:8000';
+  BASE_URL = 'http://10.0.0.108:8000';
 } else {
   BASE_URL = 'http://home-cloud.local';
 }
@@ -136,7 +136,7 @@ export const serverRPCService = createApi({
       queryFn: async () => {
         try {
           const res = await client.getSystemStats({});
-          return { data: res.toJson()};
+          return { data: res.toJson().stats };
         } catch (error) {
           return { error: error.rawMessage };
         }

@@ -3,8 +3,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-import { useLoginMutation } from "../services/web_rpc";
-import logo from '../../public/assets/home_cloud_logo.png';
+import { useLoginMutation } from "../../services/web_rpc";
+import logo from '../../../public/assets/home_cloud_logo.png';
+
 import "./Login.css";
 
 export default function Login() {
