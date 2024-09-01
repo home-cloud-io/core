@@ -20,6 +20,7 @@ type (
 		ChangeDaemonVersion(request *v1.ChangeDaemonVersionCommand) error
 		InstallOSUpdate() error
 		SetSystemImage(request *v1.SetSystemImageCommand) error
+		SetUserPassword(request *v1.SetUserPasswordCommand) error
 	}
 
 	commander struct {
@@ -89,6 +90,14 @@ func (c *commander) SetSystemImage(request *v1.SetSystemImageCommand) error {
 	return c.stream.Send(&v1.ServerMessage{
 		Message: &v1.ServerMessage_SetSystemImageCommand{
 			SetSystemImageCommand: request,
+		},
+	})
+}
+
+func (c *commander) SetUserPassword(request *v1.SetUserPasswordCommand) error {
+	return c.stream.Send(&v1.ServerMessage{
+		Message: &v1.ServerMessage_SetUserPasswordCommand{
+			SetUserPasswordCommand: request,
 		},
 	})
 }

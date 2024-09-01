@@ -381,9 +381,17 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 		return "", errors.New(ErrDeviceAlreadySetup)
 	}
 
-	// TODO: set the password for the "admin" user on the device (call to daemon)
+	// set the password for the "admin" user on the device (call to daemon)
+	err = commanderSingleton.SetUserPassword(&dv1.SetUserPasswordCommand{
+		// TODO: Support multiple users? Right now the username "admin" is hardcoded into NixOS.
+		Username: "admin",
+		Password: settings.AdminUser.Password,
+	})
+	if err != nil {
+		return "", err
+	}
 
-	// TODO: Get seed salt value from `blue_print`
+	// get seed salt value from blueprint
 	seed, err := getSaltValue(ctx)
 	if err != nil {
 		return "", err
