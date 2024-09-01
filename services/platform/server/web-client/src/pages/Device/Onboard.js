@@ -11,7 +11,7 @@ function Welcome({ navigate }) {
   return (
     <div className="tab-pane fade show active">
       <h3>Welcome To Home Cloud</h3>
-      <p>Home Cloud is a personal cloud solution that allows you to store and access your data from anywhere in the world. It is a secure and private cloud solution that is easy to use and provides you with all the features you need to manage your data.</p>
+      <p>The easy-to-use solution that enables you to say goodbye to the high-cost, privacy nightmare of Big Tech services so that you can finally take back control over your digital life!</p>
 
       <div className="col-12">
         <button 
@@ -91,14 +91,16 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
             value={timezone}
             onChange={e => setTimezone(e.target.value)}>
               <option>Select a timezone...</option>
-              <option value="1">GMT</option>
-              <option value="2">CST</option>
-              <option value="3">PST</option>
+              <option value="America/New_York">Eastern (US)</option>
+              <option value="America/Chicago">Central (US)</option>
+              <option value="America/Denver">Mountain (US)</option>
+              <option value="America/Los_Angeles">Pacific (US)</option>
           </select>
         </div> 
 
         <div className="col-12">
-          <div className="form-check form-switch form-check-reverse">
+          {/* TODO: enable this when it's configurable later on */}
+          <div className="form-check form-switch form-check-reverse" hidden="true">
             <input 
               className="form-check-input"
               type="checkbox"
@@ -111,7 +113,8 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
         </div>
 
         <div className="col-12">
-          <div className="form-check form-switch form-check-reverse">
+          {/* TODO: enable this when it's configurable later on */}
+          <div className="form-check form-switch form-check-reverse" hidden="true">
             <input
               className="form-check-input"
               type="checkbox"

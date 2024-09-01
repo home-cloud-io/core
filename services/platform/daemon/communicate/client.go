@@ -131,6 +131,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.setSystemImage(ctx, message.GetSetSystemImageCommand())
 		case *v1.ServerMessage_SetUserPasswordCommand:
 			go c.setUserPassword(ctx, message.GetSetUserPasswordCommand())
+		case *v1.ServerMessage_SetTimeZoneCommand:
+			go c.setTimeZone(ctx, message.GetSetTimeZoneCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -307,4 +309,13 @@ func (c *client) setUserPassword(ctx context.Context, def *v1.SetUserPasswordCom
 		return
 	}
 	logger.Info("user password set successfully")
+}
+
+func (c *client) setTimeZone(ctx context.Context, def *v1.SetTimeZoneCommand) {
+	logger := c.logger.WithField("time_zone", def.TimeZone)
+	err := versioning.SetTimeZone(ctx, logger, def.TimeZone)
+	if err != nil {
+		logger.WithError(err).Error("failed to set time zone")
+	}
+	logger.Info("successfully set time zone")
 }

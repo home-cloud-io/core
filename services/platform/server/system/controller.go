@@ -391,6 +391,14 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 		return "", err
 	}
 
+	// set the time zone on the device
+	err = commanderSingleton.SetTimeZone(&dv1.SetTimeZoneCommand{
+		TimeZone: settings.Timezone,
+	})
+	if err != nil {
+		return "", err
+	}
+
 	// get seed salt value from blueprint
 	seed, err := getSaltValue(ctx)
 	if err != nil {
