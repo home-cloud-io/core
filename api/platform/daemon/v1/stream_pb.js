@@ -79,6 +79,8 @@ export const CurrentDaemonVersion = proto3.makeMessageType(
   "platform.daemon.v1.CurrentDaemonVersion",
   () => [
     { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 16, name: "error", kind: "message", T: DaemonError },
   ],
 );

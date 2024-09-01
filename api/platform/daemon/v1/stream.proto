@@ -54,6 +54,8 @@ message OSUpdateDiff {
 // CurrentDaemonVersion is the current daemon version
 message CurrentDaemonVersion {
   string version = 1;
+  string vendor_hash = 2;
+  string src_hash = 3;
 
   DaemonError error = 16;
 }

@@ -86,8 +86,14 @@ message CheckForSystemUpdatesResponse {
 }
 
 message DaemonVersions {
-  string current = 1;
-  string latest = 2;
+  DaemonVersion current = 1;
+  DaemonVersion latest = 2;
+}
+
+message DaemonVersion {
+  string version = 1;
+  string vendor_hash = 2;
+  string src_hash = 3;
 }
 
 message CheckForContainerUpdatesRequest {}
