@@ -8,7 +8,7 @@ go 1.22.5
 
 require (
 	connectrpc.com/connect v1.16.2
-	github.com/home-cloud-io/core/api v0.4.5
+	github.com/home-cloud-io/core/api v0.4.6
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/spf13/viper v1.18.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0

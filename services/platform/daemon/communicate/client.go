@@ -223,7 +223,7 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 
 func (c *client) currentDaemonVersion() {
 	c.logger.Info("current daemon version command")
-	daemonVersion, err := versioning.GetDaemonVersion(c.logger)
+	current, err := versioning.GetDaemonVersion(c.logger)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to get current daemon version")
 		c.stream.Send(&v1.DaemonMessage{
@@ -236,9 +236,7 @@ func (c *client) currentDaemonVersion() {
 	} else {
 		err := c.stream.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_CurrentDaemonVersion{
-				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
-					Version: daemonVersion,
-				},
+				CurrentDaemonVersion: current,
 			},
 		})
 		if err != nil {
