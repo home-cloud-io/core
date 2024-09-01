@@ -84,9 +84,26 @@ func (c *client) Listen() {
 	}
 }
 
+func newInsecureClient() *http.Client {
+	return &http.Client{
+		Transport: &http2.Transport{
+			AllowHTTP: true,
+			DialTLS: func(network, addr string, _ *tls.Config) (net.Conn, error) {
+				// If you're also using this client for non-h2c traffic, you may want
+				// to delegate to tls.Dial if the network isn't TCP or the addr isn't
+				// in an allowlist.
+				return net.Dial(network, addr)
+			},
+			// Don't forget timeouts!
+		},
+	}
+}
+
 func (c *client) Send(message *v1.DaemonMessage) error {
 	return c.stream.Send(message)
 }
+
+// WORKERS
 
 func (c *client) listen(ctx context.Context) error {
 	for {
@@ -98,114 +115,24 @@ func (c *client) listen(ctx context.Context) error {
 		case *v1.ServerMessage_Heartbeat:
 			c.logger.Debug("heartbeat received")
 		case *v1.ServerMessage_Restart:
-			go restart(ctx, c.logger)
+			go c.restart(ctx)
 		case *v1.ServerMessage_Shutdown:
-			go shutdown(ctx, c.logger)
+			go c.shutdown(ctx)
 		case *v1.ServerMessage_RequestOsUpdateDiff:
 			go c.osUpdateDiff(ctx)
 		case *v1.ServerMessage_RequestCurrentDaemonVersion:
 			go c.currentDaemonVersion()
 		case *v1.ServerMessage_ChangeDaemonVersionCommand:
-			go changeDaemonVersion(ctx, c.logger, message.GetChangeDaemonVersionCommand())
+			go c.changeDaemonVersion(ctx, message.GetChangeDaemonVersionCommand())
 		case *v1.ServerMessage_InstallOsUpdateCommand:
-			go installOsUpdate(ctx, c.logger)
+			go c.installOsUpdate(ctx)
 		case *v1.ServerMessage_SetSystemImageCommand:
-			go setSystemImage(ctx, c.logger, message.GetSetSystemImageCommand())
+			go c.setSystemImage(ctx, message.GetSetSystemImageCommand())
+		case *v1.ServerMessage_SetUserPasswordCommand:
+			go c.setUserPassword(ctx, message.GetSetUserPasswordCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
-	}
-}
-
-func restart(ctx context.Context, logger chassis.Logger) {
-	logger.Info("restart command")
-	err := execute.ExecuteCommand(ctx, exec.Command("reboot", "now"))
-	if err != nil {
-		logger.WithError(err).Error("failed to execute restart command")
-		// TODO: send error back to server
-	}
-}
-
-func shutdown(ctx context.Context, logger chassis.Logger) {
-	logger.Info("shutdown command")
-	err := execute.ExecuteCommand(ctx, exec.Command("shutdown", "now"))
-	if err != nil {
-		logger.WithError(err).Error("failed to execute shutdown command")
-		// TODO: send error back to server
-	}
-}
-
-func (c *client) osUpdateDiff(ctx context.Context) {
-	osUpdateDiff, err := versioning.GetOSVersionDiff(ctx, c.logger)
-	if err != nil {
-		c.logger.WithError(err).Error("failed to get os version diff")
-		c.stream.Send(&v1.DaemonMessage{
-			Message: &v1.DaemonMessage_OsUpdateDiff{
-				OsUpdateDiff: &v1.OSUpdateDiff{
-					Description: fmt.Sprintf("failed with error: %s", err.Error()),
-				},
-			},
-		})
-	} else {
-		err := c.stream.Send(&v1.DaemonMessage{
-			Message: &v1.DaemonMessage_OsUpdateDiff{
-				OsUpdateDiff: &v1.OSUpdateDiff{
-					Description: osUpdateDiff,
-				},
-			},
-		})
-		if err != nil {
-			c.logger.WithError(err).Error("failed to send os update diff to server")
-		}
-	}
-}
-
-func (c *client) currentDaemonVersion() {
-	daemonVersion, err := versioning.GetDaemonVersion(c.logger)
-	if err != nil {
-		c.logger.WithError(err).Error("failed to get current daemon version")
-		c.stream.Send(&v1.DaemonMessage{
-			Message: &v1.DaemonMessage_CurrentDaemonVersion{
-				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
-					Version: fmt.Sprintf("failed with error: %s", err.Error()),
-				},
-			},
-		})
-	} else {
-		err := c.stream.Send(&v1.DaemonMessage{
-			Message: &v1.DaemonMessage_CurrentDaemonVersion{
-				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
-					Version: daemonVersion,
-				},
-			},
-		})
-		if err != nil {
-			c.logger.WithError(err).Error("failed to send current daemon version to server")
-		}
-	}
-}
-
-func changeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.ChangeDaemonVersionCommand) {
-	err := versioning.ChangeDaemonVersion(ctx, logger, def)
-	if err != nil {
-		logger.WithError(err).Error("failed to change daemon version")
-		// TODO: return error to the server?
-	}
-}
-
-func installOsUpdate(ctx context.Context, logger chassis.Logger) {
-	err := versioning.InstallOSUpdate(ctx, logger)
-	if err != nil {
-		logger.WithError(err).Error("failed to install os update")
-		// TODO: return error to the server?
-	}
-}
-
-func setSystemImage(ctx context.Context, logger chassis.Logger, def *v1.SetSystemImageCommand) {
-	err := versioning.SetSystemImage(ctx, logger, def)
-	if err != nil {
-		logger.WithError(err).Error("failed to set system image")
-		// TODO: return error to the server?
 	}
 }
 
@@ -244,17 +171,126 @@ func (c *client) systemStats(ctx context.Context) error {
 	}
 }
 
-func newInsecureClient() *http.Client {
-	return &http.Client{
-		Transport: &http2.Transport{
-			AllowHTTP: true,
-			DialTLS: func(network, addr string, _ *tls.Config) (net.Conn, error) {
-				// If you're also using this client for non-h2c traffic, you may want
-				// to delegate to tls.Dial if the network isn't TCP or the addr isn't
-				// in an allowlist.
-				return net.Dial(network, addr)
-			},
-			// Don't forget timeouts!
-		},
+// COMMAND HANDLERS
+
+func (c *client) restart(ctx context.Context) {
+	c.logger.Info("restart command")
+	err := execute.ExecuteCommand(ctx, exec.Command("reboot", "now"))
+	if err != nil {
+		c.logger.WithError(err).Error("failed to execute restart command")
+		// TODO: send error back to server
 	}
+}
+
+func (c *client) shutdown(ctx context.Context) {
+	c.logger.Info("shutdown command")
+	err := execute.ExecuteCommand(ctx, exec.Command("shutdown", "now"))
+	if err != nil {
+		c.logger.WithError(err).Error("failed to execute shutdown command")
+		// TODO: send error back to server
+	}
+}
+
+func (c *client) osUpdateDiff(ctx context.Context) {
+	c.logger.Info("os update diff command")
+	osUpdateDiff, err := versioning.GetOSVersionDiff(ctx, c.logger)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to get os version diff")
+		c.stream.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_OsUpdateDiff{
+				OsUpdateDiff: &v1.OSUpdateDiff{
+					Description: fmt.Sprintf("failed with error: %s", err.Error()),
+				},
+			},
+		})
+	} else {
+		err := c.stream.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_OsUpdateDiff{
+				OsUpdateDiff: &v1.OSUpdateDiff{
+					Description: osUpdateDiff,
+				},
+			},
+		})
+		if err != nil {
+			c.logger.WithError(err).Error("failed to send os update diff to server")
+		}
+	}
+	c.logger.Info("finished generating os version diff successfully")
+}
+
+func (c *client) currentDaemonVersion() {
+	c.logger.Info("current daemon version command")
+	daemonVersion, err := versioning.GetDaemonVersion(c.logger)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to get current daemon version")
+		c.stream.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_CurrentDaemonVersion{
+				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
+					Version: fmt.Sprintf("failed with error: %s", err.Error()),
+				},
+			},
+		})
+	} else {
+		err := c.stream.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_CurrentDaemonVersion{
+				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
+					Version: daemonVersion,
+				},
+			},
+		})
+		if err != nil {
+			c.logger.WithError(err).Error("failed to send current daemon version to server")
+		}
+	}
+	c.logger.Info("finished getting current daemon version successfully")
+}
+
+func (c *client) changeDaemonVersion(ctx context.Context, def *v1.ChangeDaemonVersionCommand) {
+	logger := c.logger.WithFields(chassis.Fields{
+		"version": def.Version,
+		"src_hash": def.SrcHash,
+		"vendor_hash": def.VendorHash,
+	})
+	logger.Info("change daemon version command")
+	err := versioning.ChangeDaemonVersion(ctx, c.logger, def)
+	if err != nil {
+		logger.WithError(err).Error("failed to change daemon version")
+		// TODO: return error to the server?
+	}
+	logger.Info("daemon version changed successfully")
+}
+
+func (c *client) installOsUpdate(ctx context.Context) {
+	c.logger.Info("install os update command")
+	err := versioning.InstallOSUpdate(ctx, c.logger)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to install os update")
+		// TODO: return error to the server?
+	}
+	c.logger.Info("os update installed successfully")
+}
+
+func (c *client) setSystemImage(ctx context.Context, def *v1.SetSystemImageCommand) {
+	logger := c.logger.WithFields(chassis.Fields{
+		"current_image": def.CurrentImage,
+		"requested_image": def.RequestedImage,
+	})
+	logger.Info("set system image command")
+	err := versioning.SetSystemImage(ctx, c.logger, def)
+	if err != nil {
+		logger.WithError(err).Error("failed to set system image")
+		// TODO: return error to the server?
+	}
+	logger.Info("system image set successfully")
+}
+
+func (c *client) setUserPassword(ctx context.Context, def *v1.SetUserPasswordCommand) {
+	logger := c.logger.WithField("username", def.Username)
+	cmd := exec.Command("chpasswd", fmt.Sprintf("<<<\"%s:%s\"", def.Username, def.Password))
+	err := execute.ExecuteCommand(ctx, cmd)
+	if err != nil {
+		logger.WithError(err).Error("failed to set user password")
+		return
+	}
+	logger.Info("user password set successfully")
 }
