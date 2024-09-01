@@ -35,6 +35,7 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 7, name: "install_os_update_command", kind: "message", T: InstallOSUpdateCommand, oneof: "message" },
     { no: 8, name: "set_system_image_command", kind: "message", T: SetSystemImageCommand, oneof: "message" },
     { no: 9, name: "set_user_password_command", kind: "message", T: SetUserPasswordCommand, oneof: "message" },
+    { no: 10, name: "set_time_zone_command", kind: "message", T: SetTimeZoneCommand, oneof: "message" },
   ],
 );
 
@@ -171,6 +172,16 @@ export const SetUserPasswordCommand = proto3.makeMessageType(
   () => [
     { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.SetTimeZoneCommand
+ */
+export const SetTimeZoneCommand = proto3.makeMessageType(
+  "platform.daemon.v1.SetTimeZoneCommand",
+  () => [
+    { no: 1, name: "time_zone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
