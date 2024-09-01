@@ -34,6 +34,7 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 6, name: "change_daemon_version_command", kind: "message", T: ChangeDaemonVersionCommand, oneof: "message" },
     { no: 7, name: "install_os_update_command", kind: "message", T: InstallOSUpdateCommand, oneof: "message" },
     { no: 8, name: "set_system_image_command", kind: "message", T: SetSystemImageCommand, oneof: "message" },
+    { no: 9, name: "set_user_password_command", kind: "message", T: SetUserPasswordCommand, oneof: "message" },
   ],
 );
 
@@ -159,6 +160,17 @@ export const SetSystemImageCommand = proto3.makeMessageType(
   () => [
     { no: 1, name: "current_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "requested_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.SetUserPasswordCommand
+ */
+export const SetUserPasswordCommand = proto3.makeMessageType(
+  "platform.daemon.v1.SetUserPasswordCommand",
+  () => [
+    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
