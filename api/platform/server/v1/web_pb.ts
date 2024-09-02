@@ -1644,6 +1644,14 @@ export class App extends Message<App> {
    */
   annotations: { [key: string]: string } = {};
 
+  /**
+   * readme is not from the index but is added by the server from
+   * the README.md of the chart.
+   *
+   * @generated from field: string readme = 14;
+   */
+  readme = "";
+
   constructor(data?: PartialMessage<App>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1665,6 +1673,7 @@ export class App extends Message<App> {
     { no: 11, name: "home", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 12, name: "sources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 13, name: "annotations", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 14, name: "readme", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): App {
