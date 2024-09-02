@@ -60,8 +60,15 @@ export const serverRPCService = createApi({
       },
     }),
     deleteApp: builder.mutation({
-      queryFn: async (req) => {
-        return client.deleteApp(req);
+      queryFn: async (name) => {
+        try {
+          const res = await client.deleteApp({
+            release: name,
+          });
+          return { data: res.toJson() };
+        } catch (error) {
+          return { error: error.rawMessage};
+        };  
       },
     }),
     updateApp: builder.mutation({
