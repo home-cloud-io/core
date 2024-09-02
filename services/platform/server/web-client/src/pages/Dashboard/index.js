@@ -31,6 +31,11 @@ export default function DashboardPage() {
     // TODO: refine this to use the react-router-dom redirect if possible
     window.history.pushState({}, '', '/getting-started');
     return <DeviceOnboardPage />; 
+  } 
+
+  if (!isLoading && data.isDeviceSetup === true) {
+    window.history.pushState({}, '', '/home');
+    return <HomePage />;
   }
 
   // if the device is setup and the user is not logged in redirect to the login page
