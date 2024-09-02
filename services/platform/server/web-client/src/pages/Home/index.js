@@ -18,6 +18,10 @@ export function InstalledApplicationsList() {
   const { data, error, isLoading } = useGetAppsHealthCheckQuery();
 
   const ListEntries = () => {
+    if (data.checks.length === 0) {
+      return <p>No applications installed</p>
+    }
+
     return (
       <div>
         {data.checks.map(app => {
