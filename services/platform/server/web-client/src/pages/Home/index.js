@@ -2,6 +2,7 @@ import * as React from 'react';
 import { 
   useGetAppsHealthCheckQuery, 
   useGetSystemStatsQuery,
+  useDeleteAppMutation,
 } from '../../services/web_rpc';
 
 export default function HomePage() {
@@ -52,24 +53,30 @@ export function InstalledApplicationsList() {
 }
 
 function Application({app}) {
+  const [deleteApp, result] = useDeleteAppMutation();
+  const descriptionStyles = {
+    marginTop: ".50rem",
+  }
+
+  const uninstallBtnStyles = {
+    marginTop: "-3rem"
+  }
+
   return (
     <div className="d-flex text-body-secondary pt-3">
-      <svg
-        className="bd-placeholder-img flex-shrink-0 me-2 rounded"
-        width="64"
-        height="64"
-        xmlns="http://www.w3.org/2000/svg"
-        role="img"
-        aria-label="Placeholder: 32x32"
-        preserveAspectRatio="xMidYMid slice"
-        focusable="false">
-          <title>Placeholder</title>
-          <rect width="100%" height="100%" fill="#6528e0"/><text x="50%" y="50%" fill="#6528e0" dy=".3em">32x32</text>
-        </svg>
+        <img src={app.display.iconUrl} width={48} height={48}/>
 
         <div className="pb-3 mb-0 small lh-sm border-bottom w-100 position-relative">
           <div className="d-flex justify-content-between">
             <strong className="text-gray-dark">{app.name}</strong>
+          </div>
+
+          <div style={descriptionStyles}>
+            <p>{app.display.description}</p>
+          </div>
+
+          <div className="float-end" style={uninstallBtnStyles}>
+            <button className="btn btn-warning" onClick={() => deleteApp(app.name)}>Uninstall</button> 
           </div>
         </div>
     </div>
@@ -96,8 +103,7 @@ export function DeviceDetails() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
-  const formatPercentage = (free, total) => {
-    
+  const formatPercentage = (free, total) => { 
     return Math.round(((total-free)/ total) * 100);
   }
 

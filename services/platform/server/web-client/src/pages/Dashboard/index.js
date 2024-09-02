@@ -45,7 +45,7 @@ export default function DashboardPage() {
     <>
       <Routes>
         <Route path="/" element={<DefaultLayout />} >
-          <Route path="home" element={<HomePage />} />
+          <Route index path="home" element={<HomePage />} />
           <Route path="store" element={<AppStorePage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
