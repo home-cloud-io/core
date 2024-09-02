@@ -17,10 +17,6 @@ export default function HomePage() {
 export function InstalledApplicationsList() {
   const { data, error, isLoading } = useGetAppsHealthCheckQuery();
 
-  if (!isLoading) {
-    console.log(data);
-  }
-
   const ListEntries = () => {
     return (
       <div>
