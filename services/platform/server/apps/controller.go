@@ -3,6 +3,9 @@ package apps
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io"
+	"net/http"
 	"strings"
 	"time"
 
@@ -59,7 +62,8 @@ const (
 	ErrFailedToGetSeedValue        = "failed to get seed value"
 	ErrFailedToUnmarshalSeedValue  = "failed to unmarshal seed value"
 
-	autoUpdateCron = "0 3 * * *"
+	autoUpdateCron  = "0 3 * * *"
+	rawChartBaseUrl = "https://raw.githubusercontent.com/home-cloud-io/store"
 )
 
 func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.App, error) {
@@ -82,6 +86,26 @@ func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.Ap
 		if len(v.Apps) > 0 {
 			apps = append(apps, v.Apps[0])
 		}
+	}
+
+	// get the readme for each app
+	for _, app := range apps {
+		resp, err := http.Get(fmt.Sprintf("%s/%s-%s/charts/%s/README.md", rawChartBaseUrl, app.Name, app.Version, app.Name))
+		if err != nil {
+			logger.WithFields(chassis.Fields{
+				"app":         app.Name,
+				"app_version": app.Version,
+			}).WithError(err).Error("failed to get readme for app")
+		}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			logger.WithFields(chassis.Fields{
+				"app":         app.Name,
+				"app_version": app.Version,
+			}).WithError(err).Error("failed to read body of response while getting readme for app")
+		}
+		app.Readme = string(body)
 	}
 
 	return apps, nil
