@@ -225,7 +225,36 @@ func (c *controller) UpdateAll(ctx context.Context, logger chassis.Logger) error
 }
 
 func (c *controller) Healthcheck(ctx context.Context, logger chassis.Logger) ([]*v1.AppHealth, error) {
-	return c.k8sclient.Healthcheck(ctx)
+	// get app health
+	apps, err := c.k8sclient.Healthcheck(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// add in the display info from the store
+	// TODO: should move this to a different method separate from Healthcheck
+	store, err := c.Store(ctx, logger)
+	if err != nil {
+		return nil, err
+	}
+	for _, app := range apps {
+		for _, storeApp := range store {
+			if app.Name == storeApp.Name {
+				name := app.Name
+				displayName, ok := storeApp.Annotations["displayName"]
+				if ok {
+					name = displayName
+				}
+				app.Display = &v1.AppDisplay{
+					Name:        name,
+					IconUrl:     storeApp.Icon,
+					Description: storeApp.Description,
+				}
+			}
+		}
+	}
+
+	return apps, nil
 }
 
 func (c *controller) AutoUpdate(logger chassis.Logger) {
