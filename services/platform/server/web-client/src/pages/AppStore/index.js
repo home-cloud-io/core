@@ -4,6 +4,7 @@ import {
   useInstallAppMutation,
   useGetAppStoreEntitiesQuery
 } from '../../services/web_rpc';
+import { marked } from 'marked';
 
 export default function AppStorePage() {
   const { data, error, isLoading } = useGetAppStoreEntitiesQuery(); 
@@ -63,14 +64,7 @@ function StoreEntry({app}) {
         <img src={app.icon} width={48} height={48}/>
 
         <div className="pb-3 mb-0 small lh-sm border-bottom w-100 position-relative" style={rowStyles}>
-          <div className="d-flex justify-content-between">
-            <strong className="text-gray-dark">{app.name}</strong>
-          </div>
-
-          <div style={descriptionStyles}>
-            <p>{app.description}</p>
-          </div>
-
+          <div style={descriptionStyles} dangerouslySetInnerHTML={{__html: marked.parse(app.readme)}} />
           <button 
             className="btn btn-outline-primary float-end btn-sm"
             style={btnStyles}

@@ -170,8 +170,8 @@ github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245 h1:Nyeelmxya
 github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245/go.mod h1:nTakvJ4XYq45UXtn0DbwR4aU9ZdjlnIenpbs6Cd+FM0=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0 h1:fPpQR1iGEVYjZ2OELvUHX600VAK5qmdnDEv3eXOwZUA=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0/go.mod h1:YHukhB04ChJsLHLJEUD6vjFyLX2L3dsX3wPBZcX4tmc=
-github.com/home-cloud-io/core/api v0.4.7 h1:vvPxPrD/T7fgDDvQ6nPzdwtj6REsU8AH5G/J+aIy7wM=
-github.com/home-cloud-io/core/api v0.4.7/go.mod h1:cfq/lv2YmpJGQ5sq1tADE18Y1ScGiYGpsBhimn78Tuk=
+github.com/home-cloud-io/core/api v0.4.8 h1:wla+h11UBsKg5SptWeg78n2gSKEv0lQYayeDZx4M4wI=
+github.com/home-cloud-io/core/api v0.4.8/go.mod h1:cfq/lv2YmpJGQ5sq1tADE18Y1ScGiYGpsBhimn78Tuk=
 github.com/home-cloud-io/core/services/platform/operator v0.0.2 h1:cJLiFxEBUA7rj3oYAHX9TbLPCgGeGgLyEmIeCrwJuvA=
 github.com/home-cloud-io/core/services/platform/operator v0.0.2/go.mod h1:qhOt6mWdpGCpdWlxTIU3FJS8ybzRy66CoTCF3p5mMpI=
 github.com/imdario/mergo v0.3.13 h1:lFzP57bqS/wsqKssCGmtLAb8A0wKjLGrve2q3PPVcBk=
