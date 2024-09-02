@@ -39,13 +39,13 @@ export function InstalledApplicationsList() {
       <div className="my-3 p-3 bg-body rounded shadow-sm">
         <h6 className="border-bottom pb-2 mb-0">Installed Applications</h6>
 
-          {isLoading ? (
-            <p>Loading...</p>
-          ) : error ? (
-            <p>Error: {error}</p>
-          ) : (
-            <ListEntries />
-          )}
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>Error: {error}</p>
+        ) : (
+          <ListEntries />
+        )}
 
 
         {/* <small className="d-block text-end mt-3">
@@ -140,16 +140,19 @@ export function DeviceDetails() {
       </div>
 
       <div className="d-flex text-body-secondary pt-3">
-        <p className="mb-0 small lh-sm border-bottom">
+        <div className="mb-0 small lh-sm border-bottom">
           <strong className="d-block text-gray-dark">Storage</strong>
+
           {isLoading ? (
             <p>Loading...</p>
           ) : error ? (
             <p>Error: {error}</p>
           ) : (
+
             <p>{formatBytes(data.drives[0].freeBytes)} free of {formatBytes(data.drives[0].totalBytes)}</p>
           )}
-        </p>
+        </div>
+
       </div>
 
       <div className="progress-stacked">
