@@ -33,19 +33,6 @@ export default function DashboardPage() {
     return <DeviceOnboardPage />; 
   } 
 
-  if (!isLoading && data.isDeviceSetup === true) {
-    window.history.pushState({}, '', '/home');
-    return <HomePage />;
-  }
-
-  // if the device is setup and the user is not logged in redirect to the login page
-  // TODO: Figure out why state keeps getting reset on page reload.
-  //       Most likely need to use local storage or cookies to persist the token anyways
-  // if (!isLoading && data.isDeviceSetup === true && userSettings.token === "") {
-  //   window.history.pushState({}, '', '/login');
-  //   return <Login />;
-  // }
-
   return (
     <>
       <Routes>
