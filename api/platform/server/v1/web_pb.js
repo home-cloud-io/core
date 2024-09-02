@@ -432,6 +432,7 @@ export const App = proto3.makeMessageType(
     { no: 11, name: "home", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 12, name: "sources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 13, name: "annotations", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 14, name: "readme", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

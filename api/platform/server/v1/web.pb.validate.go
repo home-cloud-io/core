@@ -4557,6 +4557,8 @@ func (m *App) validate(all bool) error {
 
 	// no validation rules for Annotations
 
+	// no validation rules for Readme
+
 	if len(errors) > 0 {
 		return AppMultiError(errors)
 	}

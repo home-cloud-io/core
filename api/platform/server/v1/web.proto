@@ -221,6 +221,9 @@ message App {
   string home = 11;
   repeated string sources = 12;
   map<string, string> annotations = 13;
+  // readme is not from the index but is added by the server from
+  // the README.md of the chart.
+  string readme = 14;
 }
 
 message AppDependency {
