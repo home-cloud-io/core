@@ -136,12 +136,19 @@ message AppsHealthCheckResponse {
 message AppHealth {
   string name = 1;
   AppStatus status = 2;
+  AppDisplay display = 3;
 }
 
 enum AppStatus {
   APP_STATUS_UNSPECIFIED = 0;
   APP_STATUS_HEALTHY = 1;
   APP_STATUS_UNHEALTHY = 2;
+}
+
+message AppDisplay {
+  string name = 1;
+  string icon_url = 2;
+  string description = 3;
 }
 
 message GetSystemStatsRequest {}
@@ -211,6 +218,9 @@ message App {
   string type = 8;
   repeated string urls = 9;
   repeated AppDependency dependencies = 10;
+  string home = 11;
+  repeated string sources = 12;
+  map<string, string> annotations = 13;
 }
 
 message AppDependency {

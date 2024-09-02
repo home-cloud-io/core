@@ -265,6 +265,19 @@ export const AppHealth = proto3.makeMessageType(
   () => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(AppStatus) },
+    { no: 3, name: "display", kind: "message", T: AppDisplay },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.AppDisplay
+ */
+export const AppDisplay = proto3.makeMessageType(
+  "platform.server.v1.AppDisplay",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "icon_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -416,6 +429,9 @@ export const App = proto3.makeMessageType(
     { no: 8, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 9, name: "urls", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 10, name: "dependencies", kind: "message", T: AppDependency, repeated: true },
+    { no: 11, name: "home", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 12, name: "sources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 13, name: "annotations", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ],
 );
 
