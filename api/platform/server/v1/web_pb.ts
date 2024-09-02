@@ -992,6 +992,11 @@ export class AppHealth extends Message<AppHealth> {
    */
   status = AppStatus.UNSPECIFIED;
 
+  /**
+   * @generated from field: platform.server.v1.AppDisplay display = 3;
+   */
+  display?: AppDisplay;
+
   constructor(data?: PartialMessage<AppHealth>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1002,6 +1007,7 @@ export class AppHealth extends Message<AppHealth> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "status", kind: "enum", T: proto3.getEnumType(AppStatus) },
+    { no: 3, name: "display", kind: "message", T: AppDisplay },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppHealth {
@@ -1018,6 +1024,55 @@ export class AppHealth extends Message<AppHealth> {
 
   static equals(a: AppHealth | PlainMessage<AppHealth> | undefined, b: AppHealth | PlainMessage<AppHealth> | undefined): boolean {
     return proto3.util.equals(AppHealth, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.AppDisplay
+ */
+export class AppDisplay extends Message<AppDisplay> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string icon_url = 2;
+   */
+  iconUrl = "";
+
+  /**
+   * @generated from field: string description = 3;
+   */
+  description = "";
+
+  constructor(data?: PartialMessage<AppDisplay>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppDisplay";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "icon_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppDisplay {
+    return new AppDisplay().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppDisplay {
+    return new AppDisplay().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppDisplay {
+    return new AppDisplay().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppDisplay | PlainMessage<AppDisplay> | undefined, b: AppDisplay | PlainMessage<AppDisplay> | undefined): boolean {
+    return proto3.util.equals(AppDisplay, a, b);
   }
 }
 
@@ -1574,6 +1629,21 @@ export class App extends Message<App> {
    */
   dependencies: AppDependency[] = [];
 
+  /**
+   * @generated from field: string home = 11;
+   */
+  home = "";
+
+  /**
+   * @generated from field: repeated string sources = 12;
+   */
+  sources: string[] = [];
+
+  /**
+   * @generated from field: map<string, string> annotations = 13;
+   */
+  annotations: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<App>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1592,6 +1662,9 @@ export class App extends Message<App> {
     { no: 8, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 9, name: "urls", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 10, name: "dependencies", kind: "message", T: AppDependency, repeated: true },
+    { no: 11, name: "home", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 12, name: "sources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 13, name: "annotations", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): App {

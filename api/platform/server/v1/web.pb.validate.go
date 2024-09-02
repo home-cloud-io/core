@@ -2808,6 +2808,35 @@ func (m *AppHealth) validate(all bool) error {
 
 	// no validation rules for Status
 
+	if all {
+		switch v := interface{}(m.GetDisplay()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AppHealthValidationError{
+					field:  "Display",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AppHealthValidationError{
+					field:  "Display",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDisplay()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AppHealthValidationError{
+				field:  "Display",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return AppHealthMultiError(errors)
 	}
@@ -2884,6 +2913,111 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AppHealthValidationError{}
+
+// Validate checks the field values on AppDisplay with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AppDisplay) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppDisplay with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AppDisplayMultiError, or
+// nil if none found.
+func (m *AppDisplay) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppDisplay) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	// no validation rules for IconUrl
+
+	// no validation rules for Description
+
+	if len(errors) > 0 {
+		return AppDisplayMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppDisplayMultiError is an error wrapping multiple validation errors
+// returned by AppDisplay.ValidateAll() if the designated constraints aren't met.
+type AppDisplayMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppDisplayMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppDisplayMultiError) AllErrors() []error { return m }
+
+// AppDisplayValidationError is the validation error returned by
+// AppDisplay.Validate if the designated constraints aren't met.
+type AppDisplayValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppDisplayValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppDisplayValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppDisplayValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppDisplayValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppDisplayValidationError) ErrorName() string { return "AppDisplayValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AppDisplayValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppDisplay.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppDisplayValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppDisplayValidationError{}
 
 // Validate checks the field values on GetSystemStatsRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -4418,6 +4552,10 @@ func (m *App) validate(all bool) error {
 		}
 
 	}
+
+	// no validation rules for Home
+
+	// no validation rules for Annotations
 
 	if len(errors) > 0 {
 		return AppMultiError(errors)
