@@ -205,8 +205,8 @@ github.com/steady-bytes/draft/api v0.3.1 h1:dv4EoLefhqfCFDEukjZlwqVl9GffLWLCQC7Z
 github.com/steady-bytes/draft/api v0.3.1/go.mod h1:mlwxjvRiqvwySGdzVmF8voFhMffWq2F7dyd+xt6kENA=
 github.com/steady-bytes/draft/pkg/chassis v0.3.0 h1:9uk+RRuSec2Sl7wy5ZSNv3IcqRqbU6vYiVSLj5Bo9co=
 github.com/steady-bytes/draft/pkg/chassis v0.3.0/go.mod h1:5TQfgltb/008bcuLe6vAQva0Kzrq1zEDCFoCfQjzzLo=
-github.com/steady-bytes/draft/pkg/loggers v0.2.0 h1:d1a3l6HMfa8g9+o+roeT5BoA7aeDBIh6UMLeOddsNsk=
-github.com/steady-bytes/draft/pkg/loggers v0.2.0/go.mod h1:nXeOQ6lXhsVWHzRqVcJz0JIeSW75ORVN+0izJwwnH+Y=
+github.com/steady-bytes/draft/pkg/loggers v0.2.1 h1:9ng9X87CwuFGvahuKvMTJxUoUQYzqH23EA18YNTVJH0=
+github.com/steady-bytes/draft/pkg/loggers v0.2.1/go.mod h1:nXeOQ6lXhsVWHzRqVcJz0JIeSW75ORVN+0izJwwnH+Y=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=

@@ -17,7 +17,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/steady-bytes/draft/api v0.3.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.3
-	github.com/steady-bytes/draft/pkg/loggers v0.1.0
+	github.com/steady-bytes/draft/pkg/loggers v0.2.1
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/mod v0.18.0
 	google.golang.org/protobuf v1.34.2
