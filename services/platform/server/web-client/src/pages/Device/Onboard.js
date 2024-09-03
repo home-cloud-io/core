@@ -156,7 +156,6 @@ export default function DeviceOnboardPage() {
   const [timezone, setTimezone] = useState("");
   const [autoUpdateApps, setAutoUpdateApps] = useState(true);
   const [autoUpdateOs, setAutoUpdateOs] = useState(true);
-  const [setupError, setSetupError] = useState("");
 
   useEffect(() => {
     if (!isLoading && data) {
@@ -169,17 +168,19 @@ export default function DeviceOnboardPage() {
   const handleClick = (val) => setValue(val);
 
   const initServer = () => {
-    initDevice({
-      username: username,
-      password: password,
-      timezone: timezone,
-      autoUpdateApps: autoUpdateApps,
-      autoUpdateOs: autoUpdateOs,
-    }).then((res) => {
-      navigate('/store');
-    }).catch((err) => {
-      console.error(err);
-    });
+      const res = initDevice({
+        username: username,
+        password: password,
+        timezone: timezone,
+        autoUpdateApps: autoUpdateApps,
+        autoUpdateOs: autoUpdateOs,
+      }).unwrap();
+
+      res.then((data) => {
+        navigate('/store');
+      }).catch((error) => {
+        console.error(error);
+      }); 
   }
 
   return (

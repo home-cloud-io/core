@@ -1,18 +1,13 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { Outlet, NavLink, useNavigate} from "react-router-dom";
+import { useState } from 'react';
+import { Outlet, NavLink } from "react-router-dom";
 
 import "./DefaultLayout.css";
 
 export default function DefaultLayout() {
-  const navigate = useNavigate();
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [isSecondaryNavVisible, setSecondaryNavVisibility] = useState(false);
   const [isAlertVisible, setAlertVisibility] = useState(false);
-
-  useEffect(() => {
-    navigate('/home');
-  }, []);
 
   const onClickNavCollapseBtn = () => {
     setIsNavCollapsed(!isNavCollapsed);
