@@ -6,5 +6,4 @@ service:
     bind_address: localhost
 
 daemon:
-  ip_address: HOME_CLOUD_HOST_IP
   server: http://localhost:8000
