@@ -113,11 +113,11 @@ func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.Ap
 
 func (c *controller) Install(ctx context.Context, logger chassis.Logger, request *v1.InstallAppRequest) error {
 	// check dependencies for app from the store and install if needed
-	apps, err := c.Store(ctx, logger)
+	store, err := c.Store(ctx, logger)
 	if err != nil {
 		return err
 	}
-	for _, app := range apps {
+	for _, app := range store {
 		if request.Chart == app.Name {
 			for _, dep := range app.Dependencies {
 				log := logger.WithField("dependency", dep.Name)
@@ -128,12 +128,21 @@ func (c *controller) Install(ctx context.Context, logger chassis.Logger, request
 					return err
 				}
 				if !installed {
+
+					// get latest version of dep
+					var latest string
+					for _, storeDep := range store {
+						if storeDep.Name == dep.Name {
+							latest = storeDep.Version
+						}
+					}
+
 					log.Info("dependency is needed: installing")
 					err := c.k8sclient.Install(ctx, opv1.AppSpec{
 						Chart:   dep.Name,
 						Repo:    strings.TrimPrefix(dep.Repository, "https://"),
 						Release: dep.Name,
-						Version: dep.Version,
+						Version: latest,
 					})
 					if err != nil {
 						log.WithError(err).Error("failed to install app")

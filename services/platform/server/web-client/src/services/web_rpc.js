@@ -90,7 +90,6 @@ export const serverRPCService = createApi({
     initDevice: builder.mutation({
       queryFn: async (req) => {
         try {
-          console.log(req);
           const res = await client.initializeDevice(req);
           return { data: { isDeviceSetup: res.toJson().setup }};
         } catch (error) {
@@ -123,7 +122,7 @@ export const serverRPCService = createApi({
       queryFn: async () => {
         try {
           const res = await client.appsHealthCheck({});
-          return { data: res.toJson().checks};
+          return { data: res.toJson()};
         } catch (error) {
           return { error: error.rawMessage };
         }
@@ -183,14 +182,12 @@ const values = new Map([
 ]);
 
 export function deleteApp(app) {
-  console.log('delete app called');
   client.deleteApp({
     release: `${app}`,
   });
 }
 
 export function updateApp(app) {
-  console.log('update app called');
   client.updateApp({
     repo: 'home-cloud-io.github.io/store',
     chart: app,

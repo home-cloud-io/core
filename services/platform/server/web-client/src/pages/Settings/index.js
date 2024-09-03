@@ -55,7 +55,6 @@ export default function SettingsPage() {
 function DeviceSettings({settings}) {  
     const onChange = (e) => {
         e.preventDefault();
-        console.log(e.target.value);
     }
 
     return (
