@@ -48,9 +48,10 @@ export const serverRPCService = createApi({
         try {
           const res = await client.installApp({
             repo: 'home-cloud-io.github.io/store',
-            chart: app,
-            release: `${app}`,
-            values: values.get(app),
+            chart: app.name,
+            release: `${app.name}`,
+            values: values.get(app.name),
+            version: app.version,
           });
 
           return { data: res.toJson() };
@@ -180,18 +181,3 @@ const values = new Map([
     ``,
   ],
 ]);
-
-export function deleteApp(app) {
-  client.deleteApp({
-    release: `${app}`,
-  });
-}
-
-export function updateApp(app) {
-  client.updateApp({
-    repo: 'home-cloud-io.github.io/store',
-    chart: app,
-    release: `${app}`,
-    values: values.get(app),
-  });
-}
