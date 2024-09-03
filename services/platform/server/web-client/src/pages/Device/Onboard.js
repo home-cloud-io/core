@@ -1,9 +1,9 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, redirect } from 'react-router-dom';
 import { setUser } from "../../services/web_slice";
-import { useInitDeviceMutation } from "../../services/web_rpc";
+import { useInitDeviceMutation, useGetIsDeviceSetupQuery } from "../../services/web_rpc";
 
 import "./DeviceOnboard.css";
 
@@ -148,13 +148,23 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
 export default function DeviceOnboardPage() {
   const navigate = useNavigate();
   const [initDevice, result] = useInitDeviceMutation();
+  const { data, error, isLoading } = useGetIsDeviceSetupQuery();
 
-  const [pageNum, setValue] = React.useState(0);
+  const [pageNum, setValue] = useState(0);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [timezone, setTimezone] = useState("");
   const [autoUpdateApps, setAutoUpdateApps] = useState(true);
   const [autoUpdateOs, setAutoUpdateOs] = useState(true);
+  const [setupError, setSetupError] = useState("");
+
+  useEffect(() => {
+    if (!isLoading && data) {
+      if (data.isDeviceSetup) {
+        navigate('/home');
+      }
+    }
+  })
 
   const handleClick = (val) => setValue(val);
 
@@ -167,6 +177,8 @@ export default function DeviceOnboardPage() {
       autoUpdateOs: autoUpdateOs,
     }).then((res) => {
       navigate('/store');
+    }).catch((err) => {
+      console.error(err);
     });
   }
 
