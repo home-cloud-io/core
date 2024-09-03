@@ -15,16 +15,16 @@ export default function HomePage() {
 }
 
 export function InstalledApplicationsList() {
-  const { data, error, isLoading } = useGetAppsHealthCheckQuery();
+  const { checks, error, isLoading } = useGetAppsHealthCheckQuery();
 
   const ListEntries = () => {
-    if (data.checks.length === 0) {
-      return <p>No applications installed</p>
+    if (!isLoading || checks.length === 0) {
+      return <p>None</p>
     }
 
     return (
       <div>
-        {data.checks.map(app => {
+        {checks.map(app => {
           return (
             <Application app={app} key={app.name}/>
           )

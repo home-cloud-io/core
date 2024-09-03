@@ -123,7 +123,7 @@ export const serverRPCService = createApi({
       queryFn: async () => {
         try {
           const res = await client.appsHealthCheck({});
-          return { data: res.toJson()};
+          return { data: res.toJson().checks};
         } catch (error) {
           return { error: error.rawMessage };
         }
