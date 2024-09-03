@@ -7,7 +7,7 @@ toolchain go1.22.5
 require (
 	github.com/pion/mdns/v2 v2.0.7
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0
-	github.com/steady-bytes/draft/pkg/loggers v0.2.0
+	github.com/steady-bytes/draft/pkg/loggers v0.2.1
 	golang.org/x/net v0.25.0
 	k8s.io/api v0.30.1
 	k8s.io/apimachinery v0.30.1

@@ -10,9 +10,8 @@ require (
 	connectrpc.com/connect v1.16.2
 	github.com/home-cloud-io/core/api v0.4.6
 	github.com/mackerelio/go-osstat v0.2.5
-	github.com/spf13/viper v1.18.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0
-	github.com/steady-bytes/draft/pkg/loggers v0.1.0
+	github.com/steady-bytes/draft/pkg/loggers v0.2.1
 	golang.org/x/mod v0.13.0
 	golang.org/x/net v0.25.0
 	golang.org/x/sync v0.7.0
@@ -47,6 +46,7 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/viper v1.18.2 // indirect
 	github.com/steady-bytes/draft/api v0.3.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.etcd.io/bbolt v1.3.8 // indirect
