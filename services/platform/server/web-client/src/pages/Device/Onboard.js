@@ -100,7 +100,7 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
 
         <div className="col-12">
           {/* TODO: enable this when it's configurable later on */}
-          <div className="form-check form-switch form-check-reverse" hidden="true">
+          <div className="form-check form-switch form-check-reverse" hidden={true}>
             <input 
               className="form-check-input"
               type="checkbox"
@@ -114,7 +114,7 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
 
         <div className="col-12">
           {/* TODO: enable this when it's configurable later on */}
-          <div className="form-check form-switch form-check-reverse" hidden="true">
+          <div className="form-check form-switch form-check-reverse" hidden={true}>
             <input
               className="form-check-input"
               type="checkbox"

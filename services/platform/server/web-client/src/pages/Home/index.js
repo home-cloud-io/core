@@ -15,22 +15,23 @@ export default function HomePage() {
 }
 
 export function InstalledApplicationsList() {
-  const { checks, error, isLoading } = useGetAppsHealthCheckQuery();
+  const { data, error, isLoading } = useGetAppsHealthCheckQuery();
 
   const ListEntries = () => {
-    if (!isLoading || checks.length === 0) {
-      return <p>None</p>
+    if (data.checks) {
+      if (data.checks.length > 0) {
+        return (
+          <div>
+            {data.checks.map(app => {
+              return (
+                <Application app={app} key={app.name}/>
+              )
+            })}
+          </div>
+        )
+      }
     }
-
-    return (
-      <div>
-        {checks.map(app => {
-          return (
-            <Application app={app} key={app.name}/>
-          )
-        })}
-      </div>
-    )
+    return <p>None</p>
   }
 
   return (
