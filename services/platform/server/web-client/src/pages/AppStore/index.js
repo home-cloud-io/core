@@ -64,11 +64,14 @@ function StoreEntry({app}) {
         <img src={app.icon} width={48} height={48}/>
 
         <div className="pb-3 mb-0 small lh-sm border-bottom w-100 position-relative" style={rowStyles}>
+          <div stype={descriptionStyles} >
+            Version: { app.version }
+          </div>
           <div style={descriptionStyles} dangerouslySetInnerHTML={{__html: marked.parse(app.readme)}} />
           <button 
             className="btn btn-outline-primary float-end btn-sm"
             style={btnStyles}
-            onClick={() => installApp(app.name)}>
+            onClick={() => installApp(app)}>
               Install
           </button>
 
