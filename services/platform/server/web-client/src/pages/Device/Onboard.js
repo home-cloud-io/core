@@ -10,7 +10,7 @@ import "./DeviceOnboard.css";
 function Welcome({ navigate }) {
   return (
     <div className="tab-pane fade show active">
-      <h3>Welcome To Home Cloud</h3>
+      <h3>Welcome to Home Cloud!</h3>
       <p>The easy-to-use solution that enables you to say goodbye to the high-cost, privacy nightmare of Big Tech services so that you can finally take back control over your digital life!</p>
 
       <div className="col-12">
@@ -148,7 +148,7 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
 export default function DeviceOnboardPage() {
   const navigate = useNavigate();
   const [initDevice, result] = useInitDeviceMutation();
-  const { data, error, isLoading } = useGetIsDeviceSetupQuery();
+  const { data, error, isLoading, refetch } = useGetIsDeviceSetupQuery();
 
   const [pageNum, setValue] = useState(0);
   const [username, setUsername] = useState("");
@@ -160,7 +160,7 @@ export default function DeviceOnboardPage() {
   useEffect(() => {
     if (!isLoading && data) {
       if (data.isDeviceSetup) {
-        navigate('/home');
+        navigate('/store');
       }
     }
   })
@@ -174,13 +174,8 @@ export default function DeviceOnboardPage() {
         timezone: timezone,
         autoUpdateApps: autoUpdateApps,
         autoUpdateOs: autoUpdateOs,
-      }).unwrap();
-
-      res.then((data) => {
-        navigate('/store');
-      }).catch((error) => {
-        console.error(error);
-      }); 
+      })
+      refetch()
   }
 
   return (
