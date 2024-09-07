@@ -3,41 +3,31 @@ package system
 import (
 	"fmt"
 
-	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 
 	"connectrpc.com/connect"
 )
 
 type (
 	Commander interface {
-		SetStream(stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error
+		SetStream(stream *connect.BidiStream[dv1.DaemonMessage, dv1.ServerMessage]) error
 		CloseStream()
-
-		ShutdownHost() error
-		RestartHost() error
-		RequestOSUpdateDiff() error
-		RequestCurrentDaemonVersion() error
-		ChangeDaemonVersion(request *v1.ChangeDaemonVersionCommand) error
-		InstallOSUpdate() error
-		SetSystemImage(request *v1.SetSystemImageCommand) error
-		SetUserPassword(request *v1.SetUserPasswordCommand) error
-		SetTimeZone(request *v1.SetTimeZoneCommand) error
 	}
 
 	commander struct {
-		stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]
+		stream *connect.BidiStream[dv1.DaemonMessage, dv1.ServerMessage]
 	}
 )
 
 var (
-	commanderSingleton Commander
+	com *commander
 )
 
 func Init() {
-	commanderSingleton = &commander{}
+	com = &commander{}
 }
 
-func (c *commander) SetStream(stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error {
+func (c *commander) SetStream(stream *connect.BidiStream[dv1.DaemonMessage, dv1.ServerMessage]) error {
 	if c.stream != nil {
 		return fmt.Errorf("stream already set")
 	}
@@ -47,66 +37,4 @@ func (c *commander) SetStream(stream *connect.BidiStream[v1.DaemonMessage, v1.Se
 
 func (c *commander) CloseStream() {
 	c.stream = nil
-}
-
-func (c *commander) ShutdownHost() error {
-	return c.stream.Send(&v1.ServerMessage{
-		Message: &v1.ServerMessage_Shutdown{},
-	})
-}
-
-func (c *commander) RestartHost() error {
-	return c.stream.Send(&v1.ServerMessage{
-		Message: &v1.ServerMessage_Restart{},
-	})
-}
-
-func (c *commander) RequestOSUpdateDiff() error {
-	return c.stream.Send(&v1.ServerMessage{
-		Message: &v1.ServerMessage_RequestOsUpdateDiff{},
-	})
-}
-
-func (c *commander) RequestCurrentDaemonVersion() error {
-	return c.stream.Send(&v1.ServerMessage{
-		Message: &v1.ServerMessage_RequestCurrentDaemonVersion{},
-	})
-}
-
-func (c *commander) ChangeDaemonVersion(request *v1.ChangeDaemonVersionCommand) error {
-	return c.stream.Send(&v1.ServerMessage{
-		Message: &v1.ServerMessage_ChangeDaemonVersionCommand{
-			ChangeDaemonVersionCommand: request,
-		},
-	})
-}
-
-func (c *commander) InstallOSUpdate() error {
-	return c.stream.Send(&v1.ServerMessage{
-		Message: &v1.ServerMessage_InstallOsUpdateCommand{},
-	})
-}
-
-func (c *commander) SetSystemImage(request *v1.SetSystemImageCommand) error {
-	return c.stream.Send(&v1.ServerMessage{
-		Message: &v1.ServerMessage_SetSystemImageCommand{
-			SetSystemImageCommand: request,
-		},
-	})
-}
-
-func (c *commander) SetUserPassword(request *v1.SetUserPasswordCommand) error {
-	return c.stream.Send(&v1.ServerMessage{
-		Message: &v1.ServerMessage_SetUserPasswordCommand{
-			SetUserPasswordCommand: request,
-		},
-	})
-}
-
-func (c *commander) SetTimeZone(request *v1.SetTimeZoneCommand) error {
-	return c.stream.Send(&v1.ServerMessage{
-		Message: &v1.ServerMessage_SetTimeZoneCommand{
-			SetTimeZoneCommand: request,
-		},
-	})
 }

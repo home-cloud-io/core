@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"os"
 
+	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	sv1Connect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
+
 	"connectrpc.com/connect"
 	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
 	ntv1Connect "github.com/steady-bytes/draft/api/core/control_plane/networking/v1/v1connect"
@@ -12,19 +15,73 @@ import (
 	kvv1Connect "github.com/steady-bytes/draft/api/core/registry/key_value/v1/v1connect"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
 	FuseAddressBlueprintKey = "fuse_address"
+	// TODO: retrieve this from blueprint
+	HomeCloudServerAddress = "http://server.home-cloud-system.svc.cluster.local:8090"
 )
 
 func (r *AppReconciler) createRoute(ctx context.Context, route *ntv1.Route) error {
-	val, err := anypb.New(&kvv1.Value{})
+	fuseAddress, err := getFuseAddress(ctx)
 	if err != nil {
 		return err
+	}
+
+	// add route to fuse
+	_, err = ntv1Connect.NewNetworkingServiceClient(http.DefaultClient, fuseAddress).
+		AddRoute(ctx, connect.NewRequest(&ntv1.AddRouteRequest{
+			Route: route,
+		}))
+	if err != nil {
+		return err
+	}
+
+	// add route (mDNS hostname) to server
+	_, err = sv1Connect.NewInternalServiceClient(http.DefaultClient, HomeCloudServerAddress).
+		AddMdnsHost(ctx, connect.NewRequest(&sv1.AddMdnsHostRequest{
+			Hostname: route.Name,
+		}))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *AppReconciler) deleteRoute(ctx context.Context, route string) error {
+	fuseAddress, err := getFuseAddress(ctx)
+	if err != nil {
+		return err
+	}
+
+	// delete route from fuse
+	_, err = ntv1Connect.NewNetworkingServiceClient(http.DefaultClient, fuseAddress).
+		DeleteRoute(ctx, connect.NewRequest(&ntv1.DeleteRouteRequest{
+			Name: route,
+		}))
+	if err != nil {
+		// TODO: return error when fuse implements deletes
+		// return err
+	}
+
+	// remove route (mDNS hostname) from server
+	_, err = sv1Connect.NewInternalServiceClient(http.DefaultClient, HomeCloudServerAddress).
+		RemoveMdnsHost(ctx, connect.NewRequest(&sv1.RemoveMdnsHostRequest{
+			Hostname: route,
+		}))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getFuseAddress(ctx context.Context) (string, error) {
+	val, err := anypb.New(&kvv1.Value{})
+	if err != nil {
+		return "", err
 	}
 
 	// get fuse address from blueprint
@@ -35,39 +92,14 @@ func (r *AppReconciler) createRoute(ctx context.Context, route *ntv1.Route) erro
 			Value: val,
 		}))
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// unmarshal value
 	value := &kvv1.Value{}
 	if err := anypb.UnmarshalTo(response.Msg.GetValue(), value, proto.UnmarshalOptions{}); err != nil {
-		return err
+		return "", err
 	}
 
-	// add route to fuse
-	_, err = ntv1Connect.NewNetworkingServiceClient(http.DefaultClient, value.Data).
-		AddRoute(ctx, connect.NewRequest(&ntv1.AddRouteRequest{
-			Route: route,
-		}))
-	if err != nil {
-		return err
-	}
-
-	// create service for mdns
-	err = r.Create(ctx, &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      route.Name,
-			Namespace: "home-cloud",
-		},
-		Spec: corev1.ServiceSpec{
-			Type:         corev1.ServiceTypeExternalName,
-			// TODO: this needs to take into account the node the app is deployed on
-			ExternalName: os.Getenv("HOST_IP"),
-		},
-	})
-	if client.IgnoreAlreadyExists(err) != nil {
-		return err
-	}
-
-	return nil
+	return value.Data, nil
 }
