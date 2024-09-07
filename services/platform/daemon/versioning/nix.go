@@ -76,7 +76,7 @@ func SetTimeZone(ctx context.Context, logger chassis.Logger, timeZone string) er
 		replacers = []replacer{
 			func(line string) string {
 				if strings.HasPrefix(line, "  time.timeZone =") {
-					return fmt.Sprintf("  time.timeZone = %s;", timeZone)
+					return fmt.Sprintf("  time.timeZone = \"%s\";", timeZone)
 				}
 				return line
 			},
