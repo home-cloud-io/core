@@ -32,6 +32,8 @@ message ServerMessage {
     SetSystemImageCommand set_system_image_command = 8;
     SetUserPasswordCommand set_user_password_command = 9;
     SetTimeZoneCommand set_time_zone_command = 10;
+    AddMdnsHostCommand add_mdns_host_command = 11;
+    RemoveMdnsHostCommand remove_mdns_host_command = 12;
   }
 }
 
@@ -99,4 +101,12 @@ message SetUserPasswordCommand {
 message SetTimeZoneCommand {
   // time_zone must be a valid TZ identifier from: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   string time_zone = 1;
+}
+
+message AddMdnsHostCommand {
+  string hostname = 1;
+}
+
+message RemoveMdnsHostCommand {
+  string hostname = 1;
 }

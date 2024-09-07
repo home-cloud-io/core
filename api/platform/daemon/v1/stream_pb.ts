@@ -145,6 +145,18 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: SetTimeZoneCommand;
     case: "setTimeZoneCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.AddMdnsHostCommand add_mdns_host_command = 11;
+     */
+    value: AddMdnsHostCommand;
+    case: "addMdnsHostCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.RemoveMdnsHostCommand remove_mdns_host_command = 12;
+     */
+    value: RemoveMdnsHostCommand;
+    case: "removeMdnsHostCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -165,6 +177,8 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 8, name: "set_system_image_command", kind: "message", T: SetSystemImageCommand, oneof: "message" },
     { no: 9, name: "set_user_password_command", kind: "message", T: SetUserPasswordCommand, oneof: "message" },
     { no: 10, name: "set_time_zone_command", kind: "message", T: SetTimeZoneCommand, oneof: "message" },
+    { no: 11, name: "add_mdns_host_command", kind: "message", T: AddMdnsHostCommand, oneof: "message" },
+    { no: 12, name: "remove_mdns_host_command", kind: "message", T: RemoveMdnsHostCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -721,6 +735,80 @@ export class SetTimeZoneCommand extends Message<SetTimeZoneCommand> {
 
   static equals(a: SetTimeZoneCommand | PlainMessage<SetTimeZoneCommand> | undefined, b: SetTimeZoneCommand | PlainMessage<SetTimeZoneCommand> | undefined): boolean {
     return proto3.util.equals(SetTimeZoneCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.AddMdnsHostCommand
+ */
+export class AddMdnsHostCommand extends Message<AddMdnsHostCommand> {
+  /**
+   * @generated from field: string hostname = 1;
+   */
+  hostname = "";
+
+  constructor(data?: PartialMessage<AddMdnsHostCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.AddMdnsHostCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "hostname", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddMdnsHostCommand {
+    return new AddMdnsHostCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AddMdnsHostCommand {
+    return new AddMdnsHostCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AddMdnsHostCommand {
+    return new AddMdnsHostCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AddMdnsHostCommand | PlainMessage<AddMdnsHostCommand> | undefined, b: AddMdnsHostCommand | PlainMessage<AddMdnsHostCommand> | undefined): boolean {
+    return proto3.util.equals(AddMdnsHostCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.RemoveMdnsHostCommand
+ */
+export class RemoveMdnsHostCommand extends Message<RemoveMdnsHostCommand> {
+  /**
+   * @generated from field: string hostname = 1;
+   */
+  hostname = "";
+
+  constructor(data?: PartialMessage<RemoveMdnsHostCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.RemoveMdnsHostCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "hostname", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RemoveMdnsHostCommand {
+    return new RemoveMdnsHostCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RemoveMdnsHostCommand {
+    return new RemoveMdnsHostCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RemoveMdnsHostCommand {
+    return new RemoveMdnsHostCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RemoveMdnsHostCommand | PlainMessage<RemoveMdnsHostCommand> | undefined, b: RemoveMdnsHostCommand | PlainMessage<RemoveMdnsHostCommand> | undefined): boolean {
+    return proto3.util.equals(RemoveMdnsHostCommand, a, b);
   }
 }
 
