@@ -20,7 +20,7 @@ import (
 const (
 	FuseAddressBlueprintKey = "fuse_address"
 	// TODO: retrieve this from blueprint
-	HomeCloudServerAddress = "server.home-cloud-system.svc.cluster.local:8090"
+	HomeCloudServerAddress = "http://server.home-cloud-system.svc.cluster.local:8090"
 )
 
 func (r *AppReconciler) createRoute(ctx context.Context, route *ntv1.Route) error {
@@ -62,7 +62,8 @@ func (r *AppReconciler) deleteRoute(ctx context.Context, route string) error {
 			Name: route,
 		}))
 	if err != nil {
-		return err
+		// TODO: return error when fuse implements deletes
+		// return err
 	}
 
 	// remove route (mDNS hostname) from server
