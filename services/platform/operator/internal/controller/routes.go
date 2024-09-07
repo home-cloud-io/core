@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"os"
 
+	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	sv1Connect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
+
 	"connectrpc.com/connect"
 	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
 	ntv1Connect "github.com/steady-bytes/draft/api/core/control_plane/networking/v1/v1connect"
@@ -12,13 +15,12 @@ import (
 	kvv1Connect "github.com/steady-bytes/draft/api/core/registry/key_value/v1/v1connect"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
 	FuseAddressBlueprintKey = "fuse_address"
+	// TODO: retrieve this from blueprint
+	HomeCloudServerAddress = "server.home-cloud-system.svc.cluster.local:8090"
 )
 
 func (r *AppReconciler) createRoute(ctx context.Context, route *ntv1.Route) error {
@@ -53,19 +55,12 @@ func (r *AppReconciler) createRoute(ctx context.Context, route *ntv1.Route) erro
 		return err
 	}
 
-	// create service for mdns
-	err = r.Create(ctx, &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      route.Name,
-			Namespace: "home-cloud",
-		},
-		Spec: corev1.ServiceSpec{
-			Type:         corev1.ServiceTypeExternalName,
-			// TODO: this needs to take into account the node the app is deployed on
-			ExternalName: os.Getenv("HOST_IP"),
-		},
-	})
-	if client.IgnoreAlreadyExists(err) != nil {
+	// add route (mDNS hostname) to server
+	_, err = sv1Connect.NewInternalServiceClient(http.DefaultClient, HomeCloudServerAddress).
+		AddMdnsHost(ctx, connect.NewRequest(&sv1.AddMdnsHostRequest{
+			Hostname: route.Name,
+		}))
+	if err != nil {
 		return err
 	}
 
