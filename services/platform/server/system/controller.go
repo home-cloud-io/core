@@ -39,6 +39,10 @@ type (
 		// ChangeDaemonVersion will update the NixOS config with a new Daemon version
 		// and switch to it.
 		ChangeDaemonVersion(cmd *dv1.ChangeDaemonVersionCommand) error
+		// AddMdnsHost adds a host to the avahi mDNS server managed by the daemon
+		AddMdnsHost(hostname string) error
+		// RemoveMdnsHost removes a host to the avahi mDNS server managed by the daemon
+		RemoveMdnsHost(hostname string) error
 	}
 	OS interface {
 		// CheckForOSUpdates will run the Nix commands to check for any NixOS updates to install.
@@ -114,7 +118,9 @@ const (
 // DAEMON
 
 func (c *controller) ShutdownHost() error {
-	err := commanderSingleton.ShutdownHost()
+	err := com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_Shutdown{},
+	})
 	if err != nil {
 		return err
 	}
@@ -122,7 +128,9 @@ func (c *controller) ShutdownHost() error {
 }
 
 func (c *controller) RestartHost() error {
-	err := commanderSingleton.RestartHost()
+	err := com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_Restart{},
+	})
 	if err != nil {
 		return err
 	}
@@ -130,7 +138,11 @@ func (c *controller) RestartHost() error {
 }
 
 func (c *controller) ChangeDaemonVersion(cmd *dv1.ChangeDaemonVersionCommand) error {
-	err := commanderSingleton.ChangeDaemonVersion(cmd)
+	err := com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_ChangeDaemonVersionCommand{
+			ChangeDaemonVersionCommand: cmd,
+		},
+	})
 	if err != nil {
 		return err
 	}
@@ -138,7 +150,9 @@ func (c *controller) ChangeDaemonVersion(cmd *dv1.ChangeDaemonVersionCommand) er
 }
 
 func (c *controller) InstallOSUpdate() error {
-	err := commanderSingleton.InstallOSUpdate()
+	err := com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_InstallOsUpdateCommand{},
+	})
 	if err != nil {
 		return err
 	}
@@ -146,7 +160,39 @@ func (c *controller) InstallOSUpdate() error {
 }
 
 func (c *controller) SetSystemImage(cmd *dv1.SetSystemImageCommand) error {
-	err := commanderSingleton.SetSystemImage(cmd)
+	err := com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_SetSystemImageCommand{
+			SetSystemImageCommand: cmd,
+		},
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *controller) AddMdnsHost(hostname string) error {
+	err := com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_AddMdnsHostCommand{
+			AddMdnsHostCommand: &dv1.AddMdnsHostCommand{
+				Hostname: hostname,
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *controller) RemoveMdnsHost(hostname string) error {
+	err := com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_RemoveMdnsHostCommand{
+			RemoveMdnsHostCommand: &dv1.RemoveMdnsHostCommand{
+				Hostname: hostname,
+			},
+		},
+	})
 	if err != nil {
 		return err
 	}
@@ -167,7 +213,9 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	)
 
 	// get the os update diff from the daemon
-	err := commanderSingleton.RequestOSUpdateDiff()
+	err := com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_RequestOsUpdateDiff{},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +234,9 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	}
 
 	// get the current daemon version from the daemon
-	err = commanderSingleton.RequestCurrentDaemonVersion()
+	err = com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_RequestCurrentDaemonVersion{},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -255,13 +305,19 @@ func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error 
 	// if the daemon needs updating, install it along with the os updates
 	// otherwise just install the os update
 	if updates.DaemonVersions.Current != updates.DaemonVersions.Latest {
-		err = commanderSingleton.ChangeDaemonVersion(&dv1.ChangeDaemonVersionCommand{
-			Version:    updates.DaemonVersions.Latest.Version,
-			VendorHash: updates.DaemonVersions.Latest.VendorHash,
-			SrcHash:    updates.DaemonVersions.Latest.SrcHash,
+		err = com.stream.Send(&dv1.ServerMessage{
+			Message: &dv1.ServerMessage_ChangeDaemonVersionCommand{
+				ChangeDaemonVersionCommand: &dv1.ChangeDaemonVersionCommand{
+					Version:    updates.DaemonVersions.Latest.Version,
+					VendorHash: updates.DaemonVersions.Latest.VendorHash,
+					SrcHash:    updates.DaemonVersions.Latest.SrcHash,
+				},
+			},
 		})
 	} else {
-		err = commanderSingleton.InstallOSUpdate()
+		err = com.stream.Send(&dv1.ServerMessage{
+			Message: &dv1.ServerMessage_InstallOsUpdateCommand{},
+		})
 	}
 	if err != nil {
 		logger.WithError(err).Error("failed to install system update")
@@ -330,9 +386,13 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 
 	for _, image := range images {
 		if semver.Compare(image.Latest, image.Current) == 1 {
-			err := commanderSingleton.SetSystemImage(&dv1.SetSystemImageCommand{
-				CurrentImage:   fmt.Sprintf("%s:%s", image.Image, image.Current),
-				RequestedImage: fmt.Sprintf("%s:%s", image.Image, image.Latest),
+			err := com.stream.Send(&dv1.ServerMessage{
+				Message: &dv1.ServerMessage_SetSystemImageCommand{
+					SetSystemImageCommand: &dv1.SetSystemImageCommand{
+						CurrentImage:   fmt.Sprintf("%s:%s", image.Image, image.Current),
+						RequestedImage: fmt.Sprintf("%s:%s", image.Image, image.Latest),
+					},
+				},
 			})
 			if err != nil {
 				logger.WithFields(chassis.Fields{
@@ -387,18 +447,26 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 	}
 
 	// set the password for the "admin" user on the device (call to daemon)
-	err = commanderSingleton.SetUserPassword(&dv1.SetUserPasswordCommand{
-		// TODO: Support multiple users? Right now the username "admin" is hardcoded into NixOS.
-		Username: "admin",
-		Password: settings.AdminUser.Password,
+	err = com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_SetUserPasswordCommand{
+			SetUserPasswordCommand: &dv1.SetUserPasswordCommand{
+				// TODO: Support multiple users? Right now the username "admin" is hardcoded into NixOS.
+				Username: "admin",
+				Password: settings.AdminUser.Password,
+			},
+		},
 	})
 	if err != nil {
 		return "", err
 	}
 
 	// set the time zone on the device
-	err = commanderSingleton.SetTimeZone(&dv1.SetTimeZoneCommand{
-		TimeZone: settings.Timezone,
+	err = com.stream.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_SetTimeZoneCommand{
+			SetTimeZoneCommand: &dv1.SetTimeZoneCommand{
+				TimeZone: settings.Timezone,
+			},
+		},
 	})
 	if err != nil {
 		return "", err

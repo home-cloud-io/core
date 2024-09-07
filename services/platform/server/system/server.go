@@ -38,7 +38,7 @@ func (h *server) RegisterRPC(server chassis.Rpcer) {
 }
 
 func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.DaemonMessage, v1.ServerMessage]) error {
-	err := commanderSingleton.SetStream(stream)
+	err := com.SetStream(stream)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 		message, err := stream.Receive()
 		if err != nil {
 			h.logger.WithError(err).Error("failed to recieve message")
-			commanderSingleton.CloseStream()
+			com.CloseStream()
 			return err
 		}
 		switch message.Message.(type) {
