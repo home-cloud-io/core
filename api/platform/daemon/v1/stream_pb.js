@@ -36,6 +36,8 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 8, name: "set_system_image_command", kind: "message", T: SetSystemImageCommand, oneof: "message" },
     { no: 9, name: "set_user_password_command", kind: "message", T: SetUserPasswordCommand, oneof: "message" },
     { no: 10, name: "set_time_zone_command", kind: "message", T: SetTimeZoneCommand, oneof: "message" },
+    { no: 11, name: "add_mdns_host_command", kind: "message", T: AddMdnsHostCommand, oneof: "message" },
+    { no: 12, name: "remove_mdns_host_command", kind: "message", T: RemoveMdnsHostCommand, oneof: "message" },
   ],
 );
 
@@ -184,6 +186,26 @@ export const SetTimeZoneCommand = proto3.makeMessageType(
   "platform.daemon.v1.SetTimeZoneCommand",
   () => [
     { no: 1, name: "time_zone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.AddMdnsHostCommand
+ */
+export const AddMdnsHostCommand = proto3.makeMessageType(
+  "platform.daemon.v1.AddMdnsHostCommand",
+  () => [
+    { no: 1, name: "hostname", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.RemoveMdnsHostCommand
+ */
+export const RemoveMdnsHostCommand = proto3.makeMessageType(
+  "platform.daemon.v1.RemoveMdnsHostCommand",
+  () => [
+    { no: 1, name: "hostname", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
