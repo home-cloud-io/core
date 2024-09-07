@@ -112,19 +112,9 @@ func (r *AppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
-	actionConfiguration, err := createHelmAction(app.Namespace)
-	if err != nil {
-		return err
-	}
 
-	// construct helm configuration
-	act := action.NewInstall(actionConfiguration)
-	act.Version = app.Spec.Version
-	act.Namespace = app.Namespace
-	act.RepoURL = repoURL(app)
-	act.ReleaseName = app.Spec.Release
-	namespace := app.Spec.Release
-	chart, values, err := getChartAndValues(act.ChartPathOptions, app)
+	// read combined app config from chart values and override values configured in the app
+	appConfig, err := config(app)
 	if err != nil {
 		return err
 	}
@@ -132,22 +122,16 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 	// create namespace before installing anything else
 	err = r.Client.Create(ctx, &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: namespace,
+			Name: appConfig.Namespace,
 		},
 	})
 	if client.IgnoreAlreadyExists(err) != nil {
 		return err
 	}
 
-	// read combined app config from chart values and override values configured in the app
-	appConfig, err := config(chart, app)
-	if err != nil {
-		return err
-	}
-
 	// create secrets
 	for _, s := range appConfig.Secrets {
-		err := r.createSecret(ctx, s, namespace)
+		err := r.createSecret(ctx, s, appConfig.Namespace)
 		if err != nil {
 			return err
 		}
@@ -155,7 +139,7 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 
 	// create persistence (PV/PVCs)
 	for _, p := range appConfig.Persistence {
-		err := r.createPersistence(ctx, p, app, namespace)
+		err := r.createPersistence(ctx, p, app, appConfig.Namespace)
 		if err != nil {
 			return err
 		}
@@ -163,7 +147,7 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 
 	// create database (and users/initialization scripts)
 	for _, d := range appConfig.Databases {
-		err := r.createDatabase(ctx, d, namespace)
+		err := r.createDatabase(ctx, d, appConfig.Namespace)
 		if err != nil {
 			return err
 		}
@@ -178,13 +162,28 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 				Host:   fmt.Sprintf("%s.local", route.Name),
 			},
 			Endpoint: &ntv1.Endpoint{
-				Host: fmt.Sprintf("%s.%s.svc.cluster.local", route.Service.Name, namespace),
+				Host: fmt.Sprintf("%s.%s.svc.cluster.local", route.Service.Name, appConfig.Namespace),
 				Port: route.Service.Port,
 			},
 		})
 		if err != nil {
 			return err
 		}
+	}
+
+	// construct helm configuration
+	actionConfiguration, err := createHelmAction(app.Namespace)
+	if err != nil {
+		return err
+	}
+	act := action.NewInstall(actionConfiguration)
+	act.Version = app.Spec.Version
+	act.Namespace = app.Namespace
+	act.RepoURL = repoURL(app)
+	act.ReleaseName = app.Spec.Release
+	chart, values, err := getChartAndValues(act.ChartPathOptions, app)
+	if err != nil {
+		return err
 	}
 
 	// finally, install helm chart
@@ -232,6 +231,20 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 	_, err = act.Run(app.Spec.Release)
 	if err != nil {
 		return err
+	}
+
+	// read combined app config from chart values and override values configured in the app
+	appConfig, err := config(app)
+	if err != nil {
+		return err
+	}
+
+	// delete all routes
+	for _, route := range appConfig.Routes {
+		err = r.deleteRoute(ctx, route.Name)
+		if err != nil {
+			return err
+		}
 	}
 
 	// TODO: option to hard-delete all add-on components (namespace, secrets, PV/PVCs, etc.)
@@ -328,22 +341,39 @@ func repoURL(app *v1.App) string {
 	return "https://" + app.Spec.Repo
 }
 
-func config(chart *chart.Chart, app *v1.App) (config *AppConfig, err error) {
-	values, err := yaml.Marshal(chart.Values)
+func config(app *v1.App) (config *AppConfig, err error) {
+	// get chart from app spec
+	actionConfiguration, err := createHelmAction(app.Namespace)
+	if err != nil {
+		return nil, err
+	}
+	act := action.NewInstall(actionConfiguration)
+	act.Version = app.Spec.Version
+	act.Namespace = app.Namespace
+	act.RepoURL = repoURL(app)
+	act.ReleaseName = app.Spec.Release
+	chart, _, err := getChartAndValues(act.ChartPathOptions, app)
 	if err != nil {
 		return nil, err
 	}
 
+	// convert values from chart into config
+	values, err := yaml.Marshal(chart.Values)
+	if err != nil {
+		return nil, err
+	}
 	base, err := valuesToConfig(values)
 	if err != nil {
 		return nil, err
 	}
 
+	// convert values from app spec into config
 	override, err := valuesToConfig([]byte(app.Spec.Values))
 	if err != nil {
 		return nil, err
 	}
 
+	// merge chart values and app spec values
 	err = mergo.Merge(override, base)
 	if err != nil {
 		return nil, err
