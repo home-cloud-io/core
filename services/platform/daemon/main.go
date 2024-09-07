@@ -10,8 +10,8 @@ import (
 func main() {
 	var (
 		logger = zerolog.New()
-		client = communicate.NewClient(logger)
 		mdns   = host.NewDNSPublisher(logger)
+		client = communicate.NewClient(logger, mdns)
 	)
 
 	defer chassis.New(logger).

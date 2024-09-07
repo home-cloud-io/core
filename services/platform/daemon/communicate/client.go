@@ -31,6 +31,7 @@ type (
 	client struct {
 		logger chassis.Logger
 		stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
+		mdns   host.DNSPublisher
 	}
 )
 
@@ -43,9 +44,10 @@ var (
 	clientSingleton Client
 )
 
-func NewClient(logger chassis.Logger) Client {
+func NewClient(logger chassis.Logger, mdns host.DNSPublisher) Client {
 	clientSingleton = &client{
 		logger: logger,
+		mdns:   mdns,
 	}
 	return clientSingleton
 }
@@ -133,6 +135,10 @@ func (c *client) listen(ctx context.Context) error {
 			go c.setUserPassword(ctx, message.GetSetUserPasswordCommand())
 		case *v1.ServerMessage_SetTimeZoneCommand:
 			go c.setTimeZone(ctx, message.GetSetTimeZoneCommand())
+		case *v1.ServerMessage_AddMdnsHostCommand:
+			go c.addMdnsHost(ctx, message.GetAddMdnsHostCommand())
+		case *v1.ServerMessage_RemoveMdnsHostCommand:
+			go c.removeMdnsHost(ctx, message.GetRemoveMdnsHostCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -316,4 +322,15 @@ func (c *client) setTimeZone(ctx context.Context, def *v1.SetTimeZoneCommand) {
 		logger.WithError(err).Error("failed to set time zone")
 	}
 	logger.Info("successfully set time zone")
+}
+
+func (c *client) addMdnsHost(ctx context.Context, def *v1.AddMdnsHostCommand) {
+	c.mdns.AddHost(ctx, def.Hostname)
+}
+
+func (c *client) removeMdnsHost(_ context.Context, def *v1.RemoveMdnsHostCommand) {
+	err := c.mdns.RemoveHost(def.Hostname)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to remove mDNS host")
+	}
 }
