@@ -778,6 +778,88 @@ func (m *ServerMessage) validate(all bool) error {
 			}
 		}
 
+	case *ServerMessage_AddMdnsHostCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAddMdnsHostCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "AddMdnsHostCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "AddMdnsHostCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAddMdnsHostCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "AddMdnsHostCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_RemoveMdnsHostCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRemoveMdnsHostCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RemoveMdnsHostCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RemoveMdnsHostCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRemoveMdnsHostCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "RemoveMdnsHostCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -2357,3 +2439,211 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SetTimeZoneCommandValidationError{}
+
+// Validate checks the field values on AddMdnsHostCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddMdnsHostCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddMdnsHostCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddMdnsHostCommandMultiError, or nil if none found.
+func (m *AddMdnsHostCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddMdnsHostCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Hostname
+
+	if len(errors) > 0 {
+		return AddMdnsHostCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddMdnsHostCommandMultiError is an error wrapping multiple validation errors
+// returned by AddMdnsHostCommand.ValidateAll() if the designated constraints
+// aren't met.
+type AddMdnsHostCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddMdnsHostCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddMdnsHostCommandMultiError) AllErrors() []error { return m }
+
+// AddMdnsHostCommandValidationError is the validation error returned by
+// AddMdnsHostCommand.Validate if the designated constraints aren't met.
+type AddMdnsHostCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddMdnsHostCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddMdnsHostCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddMdnsHostCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddMdnsHostCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddMdnsHostCommandValidationError) ErrorName() string {
+	return "AddMdnsHostCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddMdnsHostCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddMdnsHostCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddMdnsHostCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddMdnsHostCommandValidationError{}
+
+// Validate checks the field values on RemoveMdnsHostCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RemoveMdnsHostCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RemoveMdnsHostCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RemoveMdnsHostCommandMultiError, or nil if none found.
+func (m *RemoveMdnsHostCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RemoveMdnsHostCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Hostname
+
+	if len(errors) > 0 {
+		return RemoveMdnsHostCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// RemoveMdnsHostCommandMultiError is an error wrapping multiple validation
+// errors returned by RemoveMdnsHostCommand.ValidateAll() if the designated
+// constraints aren't met.
+type RemoveMdnsHostCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RemoveMdnsHostCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RemoveMdnsHostCommandMultiError) AllErrors() []error { return m }
+
+// RemoveMdnsHostCommandValidationError is the validation error returned by
+// RemoveMdnsHostCommand.Validate if the designated constraints aren't met.
+type RemoveMdnsHostCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RemoveMdnsHostCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RemoveMdnsHostCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RemoveMdnsHostCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RemoveMdnsHostCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RemoveMdnsHostCommandValidationError) ErrorName() string {
+	return "RemoveMdnsHostCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RemoveMdnsHostCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRemoveMdnsHostCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RemoveMdnsHostCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RemoveMdnsHostCommandValidationError{}
