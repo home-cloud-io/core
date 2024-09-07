@@ -379,6 +379,8 @@ func config(app *v1.App) (config *AppConfig, err error) {
 		return nil, err
 	}
 
+	// TODO: should we rethink this?
+	override.Namespace = app.Spec.Release
 	return override, nil
 }
 
