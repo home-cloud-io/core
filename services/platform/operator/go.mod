@@ -2,11 +2,11 @@ module github.com/home-cloud-io/core/services/platform/operator
 
 go 1.22.5
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
 require (
 	connectrpc.com/connect v1.16.2
-	github.com/home-cloud-io/core/api v0.4.8
+	github.com/home-cloud-io/core/api v0.4.9
 	github.com/imdario/mergo v0.3.13
 	github.com/steady-bytes/draft/api v0.3.1
 	github.com/uptrace/bun v1.2.1
