@@ -5,9 +5,10 @@ import { WebService } from 'api/platform/server/v1/web_connect';
 import { setUserSettings } from './user_slice';
 
 let BASE_URL = '';
+let LOCAL_DOMAIN = 'localhost';
 
 if (process.env.NODE_ENV === 'development') {
-  BASE_URL = 'http://localhost:8000';
+  BASE_URL = `http://${LOCAL_DOMAIN}:8000`;
 } else {
   BASE_URL = 'http://home-cloud.local';
 }
