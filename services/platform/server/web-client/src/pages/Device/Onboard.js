@@ -2,6 +2,10 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, redirect } from 'react-router-dom';
+
+import Toast from 'react-bootstrap/Toast';
+import ToastContainer from 'react-bootstrap/ToastContainer';
+
 import { setUser } from "../../services/web_slice";
 import { useInitDeviceMutation, useGetIsDeviceSetupQuery } from "../../services/web_rpc";
 
@@ -256,7 +260,8 @@ export default function DeviceOnboardPage() {
   }
 
   return (
-    <>
+    <div>
+
       <div className="container card shadow d-flex justify-content-center">
         <div className="tab-content" id="pills-tabContent p-3">
           {pageNum == 0 && <Welcome navigate={handleClick}/>}
@@ -273,6 +278,17 @@ export default function DeviceOnboardPage() {
             />}
         </div>
       </div>
-    </>
+
+      <ToastContainer className="p-3" position="bottom-center" style={{zIndex: 1}}>
+        <Toast show={result.isError}>
+          <Toast.Header>
+            <strong className="me-auto">Server Error</strong>
+            <small></small>
+          </Toast.Header>
+          <Toast.Body>Failed to setup the server, please try again</Toast.Body>
+        </Toast>
+      </ToastContainer>
+
+    </div>
   );
 }
