@@ -26,33 +26,92 @@ function Welcome({ navigate }) {
 
 function UserSetup({ navigate, setUsername, setPassword, username, password}) {
   const dispatch = useDispatch();
+  const [isFormDirty, setFormDirty] = useState(false);
+  const [isUsernameValid, setUsernameValidity] = useState(false);
+  const [isPasswordValid, setPasswordValidity] = useState(false);
+
+  useEffect(() => {
+    if (username.length >= 4) {
+      setUsernameValidity(true);
+    }
+
+    if (password.length >= 4) {
+      setPasswordValidity(true);
+    }
+  }, [username, password]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(setUser({ username, password }));
-    navigate(2);
+
+    if (username.length < 4) {
+      setUsernameValidity(false);
+    }
+
+    if (password.length < 4) {
+      setPasswordValidity(false);
+    }
+
+    if (isPasswordValid && isUsernameValid) {
+      dispatch(setUser({ username, password }));
+      navigate(2);
+    } else {
+      return;
+    }
+  }
+
+  const handleUsernameChange = (e) => {
+    e.preventDefault();
+    const username = e.target.value;
+    setFormDirty(true);
+    setUsername(username);
+
+    if (username.length < 4) {
+      setUsernameValidity(false);
+    } else {
+      setUsernameValidity(true);
+    } 
+  }
+
+  const handlePasswordChange = (e) => {
+    e.preventDefault();
+    const password = e.target.value;
+    setFormDirty(true);
+    setPassword(password);
+
+    if (password.length < 4) {
+      setPasswordValidity(false);
+    } else {
+      setPasswordValidity(true);
+    }
   }
 
   return (
     <div className="tab-pane fade show active">
       <p>Setup the default administrative user. Don't worry you can always change it later.</p>
-      <form className="row g-3">
+      <form className="row g-3 needs-validation">
           <div className="col-12">
+            <label className="form-label" htmlFor="usernameValidation">Username</label>
             <input
-              className="form-control"
+              id="usernameValidation"
+              className={`form-control ${isFormDirty ? (isUsernameValid ? "is-valid" : "is-invalid") : ""}`}
               type="text"
               placeholder="Username"
               value={username}
-              onChange={e => setUsername(e.target.value)} />
+              onChange={e => handleUsernameChange(e)}
+              required />
+
+            <div className={`invalid-feedback ${isFormDirty ? (isUsernameValid ? "d-none" : "") : ""}`}>Username must be at least 4 characters long</div>
           </div>
 
           <div className="col-12">
             <input
-              className="form-control"
+              className={`form-control ${isFormDirty ? (isPasswordValid ? "is-valid" : "is-invalid") : ""}`}
               type="password"
               placeholder="Password"
               value={password}
-              onChange={e => setPassword(e.target.value)} />
+              onChange={e => handlePasswordChange(e)} />
+
+            <div className={`invalid-feedback ${isFormDirty ? (isPasswordValid ? "d-none" : ""): ""}`}>Password must be at least 4 characters long</div>
           </div>
 
           <div className="col-12">
@@ -75,9 +134,25 @@ function UserSetup({ navigate, setUsername, setPassword, username, password}) {
 }
 
 function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApps, setAutoUpdateOs, timezone, autoUpdateApps, autoUpdateOs }) {
+  const [isFormDirty, setFormDirty] = useState(false);
+  const [isTimezoneValid, setTimezoneValidity] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     useInitDevice();
+  }
+
+  const handleSetTimezone = (e) => {
+    e.preventDefault();
+    const timezone = e.target.value;
+    setFormDirty(true);
+    setTimezone(timezone);
+
+    if (timezone === "NONE") {
+      setTimezoneValidity(false);
+    } else {
+      setTimezoneValidity(true);
+    }
   }
 
   return (
@@ -87,15 +162,17 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
       <form className="row g-3">
         <div className="col-12"> 
           <select
-            className="form-select"
+            className={`form-select ${isFormDirty ? (isTimezoneValid ? "is-valid" : "is-invalid"): ""}`}
             value={timezone}
-            onChange={e => setTimezone(e.target.value)}>
-              <option>Select a timezone...</option>
+            onChange={e => handleSetTimezone(e)}>
+              <option disabled value="NONE">Select a timezone...</option>
               <option value="America/New_York">Eastern (US)</option>
               <option value="America/Chicago">Central (US)</option>
               <option value="America/Denver">Mountain (US)</option>
               <option value="America/Los_Angeles">Pacific (US)</option>
           </select>
+
+          <div className={`invalid-feedback ${isFormDirty ? (isTimezoneValid? "d-none" : ""): ""}`}>Please select a valid timezone</div>
         </div> 
 
         <div className="col-12">
@@ -153,7 +230,7 @@ export default function DeviceOnboardPage() {
   const [pageNum, setValue] = useState(0);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [timezone, setTimezone] = useState("");
+  const [timezone, setTimezone] = useState("NONE");
   const [autoUpdateApps, setAutoUpdateApps] = useState(true);
   const [autoUpdateOs, setAutoUpdateOs] = useState(true);
 
