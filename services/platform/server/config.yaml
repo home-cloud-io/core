@@ -1,7 +1,7 @@
 service:
   name: home-cloud-server
   domain: platform
-  entrypoint: http://10.0.0.27:2221
+  entrypoint: http://localhost:2221
 
   network:
     port: 8000
