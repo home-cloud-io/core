@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/home-cloud-io/core/services/platform/daemon/execute"
+	"github.com/spf13/viper"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
@@ -24,6 +25,10 @@ type (
 		// a map of FQDNs to their respective cancel functions
 		cancels map[string]context.CancelFunc
 	}
+)
+
+const (
+	hostnamesConfigKey = "daemon.hostnames"
 )
 
 func NewDNSPublisher(logger chassis.Logger) DNSPublisher {
@@ -52,8 +57,8 @@ func (p *dnsPublisher) Start() {
 	p.logger.WithField("address", address).Info("found outbound IP address")
 	p.address = address
 
-	// start initial set of hosts from config
-	hostnames := config.GetStringSlice("daemon.hostnames")
+	// start with initial set of hosts from config
+	hostnames := config.GetStringSlice(hostnamesConfigKey)
 	for _, hostname := range hostnames {
 		p.AddHost(ctx, hostname)
 	}
@@ -68,6 +73,11 @@ func (p *dnsPublisher) AddHost(ctx context.Context, hostname string) {
 
 	p.cancels[fqdn] = cancel
 	go publish(c, logger, fqdn, p.address)
+
+	err := setHostnames(p.cancels)
+	if err != nil {
+		logger.WithError(err).Error("failed to save hostname to config")
+	}
 
 	logger.Info("host added to mDNS")
 }
@@ -84,6 +94,12 @@ func (p *dnsPublisher) RemoveHost(hostname string) error {
 		return fmt.Errorf("host not found to remove")
 	}
 	f()
+
+	delete(p.cancels, fqdn)
+	err := setHostnames(p.cancels)
+	if err != nil {
+		logger.WithError(err).Error("failed to remove hostname from config")
+	}
 
 	logger.Info("host removed from mDNS")
 	return nil
@@ -120,4 +136,15 @@ func getOutboundIP() (string, error) {
 	defer conn.Close()
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 	return localAddr.IP.String(), nil
+}
+
+func setHostnames(cancels map[string]context.CancelFunc) error {
+	hostnames := make([]string, len(cancels))
+	i := 0
+	for hostname := range cancels {
+		hostnames[i] = hostname
+		i++
+	}
+	viper.Set(hostnamesConfigKey, hostnames)
+	return viper.WriteConfig()
 }
