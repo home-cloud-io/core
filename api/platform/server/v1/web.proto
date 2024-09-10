@@ -41,6 +41,9 @@ service WebService {
   rpc GetAppsInStore(GetAppsInStoreRequest) returns (GetAppsInStoreResponse) {}
   // Get the device settings
   rpc GetDeviceSettings(GetDeviceSettingsRequest) returns (GetDeviceSettingsResponse) {}
+
+  // Subscribe to the server for events
+  rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
 }
 
 message ShutdownHostRequest {}
@@ -275,4 +278,26 @@ message DiskStats {
 message User {
   string username = 1;
   string password = 2;
+}
+
+// Subscription events
+
+message SubscribeRequest {}
+
+message ServerEvent {
+  oneof event {
+    HeartbeatEvent heartbeat = 1;
+    ErrorEvent error = 2;
+    AppInstalledEvent app_installed = 3;
+  }
+}
+
+message HeartbeatEvent {}
+
+message ErrorEvent {
+  string error = 1;
+}
+
+message AppInstalledEvent {
+  string name = 1;
 }

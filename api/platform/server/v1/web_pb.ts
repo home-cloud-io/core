@@ -2073,3 +2073,196 @@ export class User extends Message<User> {
   }
 }
 
+/**
+ * @generated from message platform.server.v1.SubscribeRequest
+ */
+export class SubscribeRequest extends Message<SubscribeRequest> {
+  constructor(data?: PartialMessage<SubscribeRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.SubscribeRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubscribeRequest {
+    return new SubscribeRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubscribeRequest {
+    return new SubscribeRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubscribeRequest {
+    return new SubscribeRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SubscribeRequest | PlainMessage<SubscribeRequest> | undefined, b: SubscribeRequest | PlainMessage<SubscribeRequest> | undefined): boolean {
+    return proto3.util.equals(SubscribeRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.ServerEvent
+ */
+export class ServerEvent extends Message<ServerEvent> {
+  /**
+   * @generated from oneof platform.server.v1.ServerEvent.event
+   */
+  event: {
+    /**
+     * @generated from field: platform.server.v1.HeartbeatEvent heartbeat = 1;
+     */
+    value: HeartbeatEvent;
+    case: "heartbeat";
+  } | {
+    /**
+     * @generated from field: platform.server.v1.ErrorEvent error = 2;
+     */
+    value: ErrorEvent;
+    case: "error";
+  } | {
+    /**
+     * @generated from field: platform.server.v1.AppInstalledEvent app_installed = 3;
+     */
+    value: AppInstalledEvent;
+    case: "appInstalled";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<ServerEvent>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.ServerEvent";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "heartbeat", kind: "message", T: HeartbeatEvent, oneof: "event" },
+    { no: 2, name: "error", kind: "message", T: ErrorEvent, oneof: "event" },
+    { no: 3, name: "app_installed", kind: "message", T: AppInstalledEvent, oneof: "event" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerEvent {
+    return new ServerEvent().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ServerEvent {
+    return new ServerEvent().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ServerEvent {
+    return new ServerEvent().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ServerEvent | PlainMessage<ServerEvent> | undefined, b: ServerEvent | PlainMessage<ServerEvent> | undefined): boolean {
+    return proto3.util.equals(ServerEvent, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.HeartbeatEvent
+ */
+export class HeartbeatEvent extends Message<HeartbeatEvent> {
+  constructor(data?: PartialMessage<HeartbeatEvent>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.HeartbeatEvent";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): HeartbeatEvent {
+    return new HeartbeatEvent().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): HeartbeatEvent {
+    return new HeartbeatEvent().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): HeartbeatEvent {
+    return new HeartbeatEvent().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: HeartbeatEvent | PlainMessage<HeartbeatEvent> | undefined, b: HeartbeatEvent | PlainMessage<HeartbeatEvent> | undefined): boolean {
+    return proto3.util.equals(HeartbeatEvent, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.ErrorEvent
+ */
+export class ErrorEvent extends Message<ErrorEvent> {
+  /**
+   * @generated from field: string error = 1;
+   */
+  error = "";
+
+  constructor(data?: PartialMessage<ErrorEvent>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.ErrorEvent";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ErrorEvent {
+    return new ErrorEvent().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ErrorEvent {
+    return new ErrorEvent().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ErrorEvent {
+    return new ErrorEvent().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ErrorEvent | PlainMessage<ErrorEvent> | undefined, b: ErrorEvent | PlainMessage<ErrorEvent> | undefined): boolean {
+    return proto3.util.equals(ErrorEvent, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.AppInstalledEvent
+ */
+export class AppInstalledEvent extends Message<AppInstalledEvent> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  constructor(data?: PartialMessage<AppInstalledEvent>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppInstalledEvent";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppInstalledEvent {
+    return new AppInstalledEvent().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppInstalledEvent {
+    return new AppInstalledEvent().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppInstalledEvent {
+    return new AppInstalledEvent().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppInstalledEvent | PlainMessage<AppInstalledEvent> | undefined, b: AppInstalledEvent | PlainMessage<AppInstalledEvent> | undefined): boolean {
+    return proto3.util.equals(AppInstalledEvent, a, b);
+  }
+}
+

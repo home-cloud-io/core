@@ -5628,3 +5628,635 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UserValidationError{}
+
+// Validate checks the field values on SubscribeRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *SubscribeRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SubscribeRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SubscribeRequestMultiError, or nil if none found.
+func (m *SubscribeRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SubscribeRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SubscribeRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SubscribeRequestMultiError is an error wrapping multiple validation errors
+// returned by SubscribeRequest.ValidateAll() if the designated constraints
+// aren't met.
+type SubscribeRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SubscribeRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SubscribeRequestMultiError) AllErrors() []error { return m }
+
+// SubscribeRequestValidationError is the validation error returned by
+// SubscribeRequest.Validate if the designated constraints aren't met.
+type SubscribeRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SubscribeRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SubscribeRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SubscribeRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SubscribeRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SubscribeRequestValidationError) ErrorName() string { return "SubscribeRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SubscribeRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSubscribeRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SubscribeRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SubscribeRequestValidationError{}
+
+// Validate checks the field values on ServerEvent with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ServerEvent) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ServerEvent with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ServerEventMultiError, or
+// nil if none found.
+func (m *ServerEvent) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ServerEvent) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Event.(type) {
+	case *ServerEvent_Heartbeat:
+		if v == nil {
+			err := ServerEventValidationError{
+				field:  "Event",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetHeartbeat()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerEventValidationError{
+						field:  "Heartbeat",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerEventValidationError{
+						field:  "Heartbeat",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetHeartbeat()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerEventValidationError{
+					field:  "Heartbeat",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerEvent_Error:
+		if v == nil {
+			err := ServerEventValidationError{
+				field:  "Event",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetError()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerEventValidationError{
+						field:  "Error",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerEventValidationError{
+						field:  "Error",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerEventValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerEvent_AppInstalled:
+		if v == nil {
+			err := ServerEventValidationError{
+				field:  "Event",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAppInstalled()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerEventValidationError{
+						field:  "AppInstalled",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerEventValidationError{
+						field:  "AppInstalled",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAppInstalled()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerEventValidationError{
+					field:  "AppInstalled",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return ServerEventMultiError(errors)
+	}
+
+	return nil
+}
+
+// ServerEventMultiError is an error wrapping multiple validation errors
+// returned by ServerEvent.ValidateAll() if the designated constraints aren't met.
+type ServerEventMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ServerEventMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ServerEventMultiError) AllErrors() []error { return m }
+
+// ServerEventValidationError is the validation error returned by
+// ServerEvent.Validate if the designated constraints aren't met.
+type ServerEventValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ServerEventValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ServerEventValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ServerEventValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ServerEventValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ServerEventValidationError) ErrorName() string { return "ServerEventValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ServerEventValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sServerEvent.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ServerEventValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ServerEventValidationError{}
+
+// Validate checks the field values on HeartbeatEvent with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *HeartbeatEvent) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on HeartbeatEvent with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in HeartbeatEventMultiError,
+// or nil if none found.
+func (m *HeartbeatEvent) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *HeartbeatEvent) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return HeartbeatEventMultiError(errors)
+	}
+
+	return nil
+}
+
+// HeartbeatEventMultiError is an error wrapping multiple validation errors
+// returned by HeartbeatEvent.ValidateAll() if the designated constraints
+// aren't met.
+type HeartbeatEventMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m HeartbeatEventMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m HeartbeatEventMultiError) AllErrors() []error { return m }
+
+// HeartbeatEventValidationError is the validation error returned by
+// HeartbeatEvent.Validate if the designated constraints aren't met.
+type HeartbeatEventValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HeartbeatEventValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HeartbeatEventValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HeartbeatEventValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HeartbeatEventValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HeartbeatEventValidationError) ErrorName() string { return "HeartbeatEventValidationError" }
+
+// Error satisfies the builtin error interface
+func (e HeartbeatEventValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHeartbeatEvent.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HeartbeatEventValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HeartbeatEventValidationError{}
+
+// Validate checks the field values on ErrorEvent with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ErrorEvent) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ErrorEvent with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ErrorEventMultiError, or
+// nil if none found.
+func (m *ErrorEvent) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ErrorEvent) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Error
+
+	if len(errors) > 0 {
+		return ErrorEventMultiError(errors)
+	}
+
+	return nil
+}
+
+// ErrorEventMultiError is an error wrapping multiple validation errors
+// returned by ErrorEvent.ValidateAll() if the designated constraints aren't met.
+type ErrorEventMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ErrorEventMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ErrorEventMultiError) AllErrors() []error { return m }
+
+// ErrorEventValidationError is the validation error returned by
+// ErrorEvent.Validate if the designated constraints aren't met.
+type ErrorEventValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ErrorEventValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ErrorEventValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ErrorEventValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ErrorEventValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ErrorEventValidationError) ErrorName() string { return "ErrorEventValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ErrorEventValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sErrorEvent.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ErrorEventValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ErrorEventValidationError{}
+
+// Validate checks the field values on AppInstalledEvent with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *AppInstalledEvent) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppInstalledEvent with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AppInstalledEventMultiError, or nil if none found.
+func (m *AppInstalledEvent) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppInstalledEvent) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return AppInstalledEventMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppInstalledEventMultiError is an error wrapping multiple validation errors
+// returned by AppInstalledEvent.ValidateAll() if the designated constraints
+// aren't met.
+type AppInstalledEventMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppInstalledEventMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppInstalledEventMultiError) AllErrors() []error { return m }
+
+// AppInstalledEventValidationError is the validation error returned by
+// AppInstalledEvent.Validate if the designated constraints aren't met.
+type AppInstalledEventValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppInstalledEventValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppInstalledEventValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppInstalledEventValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppInstalledEventValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppInstalledEventValidationError) ErrorName() string {
+	return "AppInstalledEventValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AppInstalledEventValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppInstalledEvent.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppInstalledEventValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppInstalledEventValidationError{}
