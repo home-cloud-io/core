@@ -3480,11 +3480,38 @@ func (m *InitializeDeviceRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Username
+	if utf8.RuneCountInString(m.GetUsername()) < 4 {
+		err := InitializeDeviceRequestValidationError{
+			field:  "Username",
+			reason: "value length must be at least 4 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
-	// no validation rules for Password
+	if utf8.RuneCountInString(m.GetPassword()) < 4 {
+		err := InitializeDeviceRequestValidationError{
+			field:  "Password",
+			reason: "value length must be at least 4 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
-	// no validation rules for Timezone
+	if utf8.RuneCountInString(m.GetTimezone()) < 4 {
+		err := InitializeDeviceRequestValidationError{
+			field:  "Timezone",
+			reason: "value length must be at least 4 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	// no validation rules for AutoUpdateApps
 

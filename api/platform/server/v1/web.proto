@@ -4,6 +4,7 @@ package platform.server.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 
+import "validate/validate.proto";
 import "platform/daemon/v1/system.proto";
 
 service WebService {
@@ -167,9 +168,10 @@ message IsDeviceSetupResponse {
 }
 
 message InitializeDeviceRequest {
-  string username = 1;
-  string password = 2;
-  string timezone = 3;
+  string username = 1 [(validate.rules).string.min_len = 4];
+  string password = 2 [(validate.rules).string.min_len = 4];
+  // validate timezone is at least not empty
+  string timezone = 3 [(validate.rules).string.min_len = 4];
   bool auto_update_apps = 4;
   bool auto_update_os = 5;
   repeated string default_apps = 6;

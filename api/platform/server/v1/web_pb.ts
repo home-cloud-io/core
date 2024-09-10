@@ -1229,6 +1229,8 @@ export class InitializeDeviceRequest extends Message<InitializeDeviceRequest> {
   password = "";
 
   /**
+   * validate timezone is at least not empty
+   *
    * @generated from field: string timezone = 3;
    */
   timezone = "";
