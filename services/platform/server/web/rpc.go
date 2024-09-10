@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
@@ -52,11 +53,35 @@ func (h *rpc) RegisterRPC(server chassis.Rpcer) {
 
 func (h *rpc) InstallApp(ctx context.Context, request *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("install request")
-	err := h.actl.Install(ctx, h.logger, request.Msg)
-	if err != nil {
-		h.logger.WithError(err).Error("failed to install app")
-		return nil, err
-	}
+	go func(){
+		c := context.WithoutCancel(ctx)
+		err := h.actl.Install(c, h.logger, request.Msg)
+		if err != nil {
+			h.logger.WithError(err).Error("failed to install app")
+			err := events.Send(&v1.ServerEvent{
+				Event: &v1.ServerEvent_Error{
+					Error: &v1.ErrorEvent{
+						Error: err.Error(),
+					},
+				},
+			})
+			if err != nil {
+				h.logger.WithError(err).Error("failed to send error event to client")
+			}
+			return
+		}
+		h.logger.Info("app finished installing")
+		err = events.Send(&v1.ServerEvent{
+			Event: &v1.ServerEvent_AppInstalled{
+				AppInstalled: &v1.AppInstalledEvent{
+					Name: request.Msg.Release,
+				},
+			},
+		})
+		if err != nil {
+			h.logger.WithError(err).Error("failed to send app installed event to client")
+		}
+	}()
 	h.logger.Info("finished request")
 	return connect.NewResponse(&v1.InstallAppResponse{}), nil
 }
@@ -264,4 +289,26 @@ func (h *rpc) GetDeviceSettings(ctx context.Context, request *connect.Request[v1
 	}
 
 	return connect.NewResponse(&v1.GetDeviceSettingsResponse{Settings: settings}), nil
+}
+
+func (h *rpc) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {
+	err := events.SetStream(stream)
+	if err != nil {
+		return err
+	}
+	h.logger.Info("establishing client stream")
+	for {
+		err := stream.Send(&v1.ServerEvent{
+			Event: &v1.ServerEvent_Heartbeat{},
+		})
+		if err != nil {
+			if err.Error() == "canceled: http2: stream closed" {
+				h.logger.Info("stream closed by client")
+				return nil
+			}
+			h.logger.WithError(err).Error("failed to send client heartbeat")
+			return err
+		}
+		time.Sleep(5 * time.Second)
+	}
 }
