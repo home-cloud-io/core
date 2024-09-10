@@ -60,14 +60,15 @@ func NewClient(logger chassis.Logger) Client {
 	config := chassis.GetConfig()
 	kubeConfig, err := clientcmd.BuildConfigFromFlags(config.GetString("server.k8s.master_url"), config.GetString("server.k8s.config_path"))
 	if err != nil {
-		logger.WithError(err).Panic("failed to build kube config")
+		logger.WithError(err).Error("failed to read kube config")
 	}
 
 	c, err := crclient.New(kubeConfig, crclient.Options{})
 	if err != nil {
-		logger.WithError(err).Panic("failed to create new k8s client")
+		logger.WithError(err).Error("failed to create new k8s client")
+	} else {
+		opv1.AddToScheme(c.Scheme())
 	}
-	opv1.AddToScheme(c.Scheme())
 
 	return &client{
 		client: c,
