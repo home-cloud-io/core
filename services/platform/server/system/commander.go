@@ -20,12 +20,8 @@ type (
 )
 
 var (
-	com *commander
-)
-
-func Init() {
 	com = &commander{}
-}
+)
 
 func (c *commander) SetStream(stream *connect.BidiStream[dv1.DaemonMessage, dv1.ServerMessage]) error {
 	if c.stream != nil {

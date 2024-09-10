@@ -25,7 +25,6 @@ type (
 var CurrentStats *v1.SystemStats
 
 func New(logger chassis.Logger, messages chan *v1.DaemonMessage) Server {
-	Init()
 	return &server{
 		logger:    logger,
 		messages:  messages,
@@ -42,7 +41,7 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 	if err != nil {
 		return err
 	}
-	h.logger.Info("establishing stream")
+	h.logger.Info("establishing daemon stream")
 	for {
 		message, err := stream.Receive()
 		if err != nil {

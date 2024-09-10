@@ -76,7 +76,7 @@ func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.Ap
 	logger.Info("getting apps in store (from cache)")
 	err = kvclient.Get(ctx, kvclient.APP_STORE_ENTRIES_KEY, appStore)
 	if err != nil {
-		logger.WithError(err).Error("failed to build get request")
+		logger.WithError(err).Error("failed to get app store entries from cache")
 		return nil, errors.New(ErrFailedToGetApps)
 	}
 
@@ -154,7 +154,7 @@ func (c *controller) Install(ctx context.Context, logger chassis.Logger, request
 					err = c.waitForInstall(timeCtx, log, dep.Name)
 					cancel()
 					if err != nil {
-						log.WithError(err).Error("failed to wait for install")
+						log.WithError(err).Error("failed to wait for dependency install")
 						return err
 					}
 				}
@@ -173,6 +173,15 @@ func (c *controller) Install(ctx context.Context, logger chassis.Logger, request
 	})
 	if err != nil {
 		logger.WithError(err).Error("failed to install app")
+		return err
+	}
+
+	// wait on app install
+	timeCtx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+	err = c.waitForInstall(timeCtx, logger, request.Release)
+	cancel()
+	if err != nil {
+		logger.WithError(err).Error("failed to wait for app install")
 		return err
 	}
 
