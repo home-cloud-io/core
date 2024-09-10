@@ -213,6 +213,7 @@ func (c *controller) Update(ctx context.Context, logger chassis.Logger, request 
 }
 
 func (c *controller) UpdateAll(ctx context.Context, logger chassis.Logger) error {
+	logger.Info("updating all apps")
 	settings := &v1.DeviceSettings{}
 	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
@@ -239,9 +240,17 @@ func (c *controller) UpdateAll(ctx context.Context, logger chassis.Logger) error
 
 	// check each installed app for an update and install it if needed
 	for _, installed := range installedApps {
+		logger.WithField("app", installed.Name).Info("processing installed app")
 		for _, store := range storeApps {
 			if installed.Name == store.Name {
-				if semver.Compare(store.Version, installed.Spec.Version) == 1 {
+				log := logger.WithFields(chassis.Fields{
+					"app":               installed.Name,
+					"installed_version": installed.Spec.Version,
+					"latest_version":    store.Version,
+				})
+				log.Info("checking if update is needed")
+				if semver.Compare("v" + store.Version, "v" + installed.Spec.Version) == 1 {
+					log.Info("update is needed")
 					err := c.Update(ctx, logger, &v1.UpdateAppRequest{
 						// keep everything the same except the version
 						Chart:   installed.Spec.Chart,
@@ -251,18 +260,21 @@ func (c *controller) UpdateAll(ctx context.Context, logger chassis.Logger) error
 						Version: store.Version,
 					})
 					if err != nil {
-						logger.WithFields(chassis.Fields{
+						log.WithFields(chassis.Fields{
 							"app":               installed.Name,
 							"installed_version": installed.Spec.Version,
 							"latest_version":    store.Version,
 						}).WithError(err).Error("failed to update app")
 						// don't return, try to update the other apps
 					}
+				} else {
+					log.Info("no update needed")
 				}
 			}
 		}
 	}
 
+	logger.Info("finished updating all apps")
 	return nil
 }
 
@@ -308,8 +320,11 @@ func (c *controller) AutoUpdate(logger chassis.Logger) {
 			logger.WithError(err).Error("failed to run auto app update job")
 		}
 	}
-	cr.AddFunc(autoUpdateCron, f)
-	go cr.Start()
+	_, err := cr.AddFunc(autoUpdateCron, f)
+	if err != nil {
+		logger.WithError(err).Panic("failed to initialize auto-update for apps")
+	}
+	cr.Start()
 }
 
 func (c *controller) waitForInstall(ctx context.Context, logger chassis.Logger, appName string) error {

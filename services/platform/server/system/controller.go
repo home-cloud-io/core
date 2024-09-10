@@ -118,7 +118,7 @@ const (
 // DAEMON
 
 func (c *controller) ShutdownHost() error {
-	err := com.stream.Send(&dv1.ServerMessage{
+	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_Shutdown{},
 	})
 	if err != nil {
@@ -128,7 +128,7 @@ func (c *controller) ShutdownHost() error {
 }
 
 func (c *controller) RestartHost() error {
-	err := com.stream.Send(&dv1.ServerMessage{
+	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_Restart{},
 	})
 	if err != nil {
@@ -138,7 +138,7 @@ func (c *controller) RestartHost() error {
 }
 
 func (c *controller) ChangeDaemonVersion(cmd *dv1.ChangeDaemonVersionCommand) error {
-	err := com.stream.Send(&dv1.ServerMessage{
+	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_ChangeDaemonVersionCommand{
 			ChangeDaemonVersionCommand: cmd,
 		},
@@ -150,7 +150,7 @@ func (c *controller) ChangeDaemonVersion(cmd *dv1.ChangeDaemonVersionCommand) er
 }
 
 func (c *controller) InstallOSUpdate() error {
-	err := com.stream.Send(&dv1.ServerMessage{
+	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_InstallOsUpdateCommand{},
 	})
 	if err != nil {
@@ -160,7 +160,7 @@ func (c *controller) InstallOSUpdate() error {
 }
 
 func (c *controller) SetSystemImage(cmd *dv1.SetSystemImageCommand) error {
-	err := com.stream.Send(&dv1.ServerMessage{
+	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SetSystemImageCommand{
 			SetSystemImageCommand: cmd,
 		},
@@ -172,7 +172,7 @@ func (c *controller) SetSystemImage(cmd *dv1.SetSystemImageCommand) error {
 }
 
 func (c *controller) AddMdnsHost(hostname string) error {
-	err := com.stream.Send(&dv1.ServerMessage{
+	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddMdnsHostCommand{
 			AddMdnsHostCommand: &dv1.AddMdnsHostCommand{
 				Hostname: hostname,
@@ -186,7 +186,7 @@ func (c *controller) AddMdnsHost(hostname string) error {
 }
 
 func (c *controller) RemoveMdnsHost(hostname string) error {
-	err := com.stream.Send(&dv1.ServerMessage{
+	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RemoveMdnsHostCommand{
 			RemoveMdnsHostCommand: &dv1.RemoveMdnsHostCommand{
 				Hostname: hostname,
@@ -213,7 +213,7 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	)
 
 	// get the os update diff from the daemon
-	err := com.stream.Send(&dv1.ServerMessage{
+	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestOsUpdateDiff{},
 	})
 	if err != nil {
@@ -224,6 +224,9 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 		switch msg.Message.(type) {
 		case *dv1.DaemonMessage_OsUpdateDiff:
 			m := msg.Message.(*dv1.DaemonMessage_OsUpdateDiff)
+			if m.OsUpdateDiff.Error != nil {
+				return nil, fmt.Errorf(m.OsUpdateDiff.Error.Error)
+			}
 			response.OsDiff = m.OsUpdateDiff.Description
 		default:
 			logger.WithField("message", msg).Warn("unrequested message type received")
@@ -234,7 +237,7 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	}
 
 	// get the current daemon version from the daemon
-	err = com.stream.Send(&dv1.ServerMessage{
+	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestCurrentDaemonVersion{},
 	})
 	if err != nil {
@@ -245,6 +248,9 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 		switch msg.Message.(type) {
 		case *dv1.DaemonMessage_CurrentDaemonVersion:
 			m := msg.Message.(*dv1.DaemonMessage_CurrentDaemonVersion)
+			if m.CurrentDaemonVersion.Error != nil {
+				return nil, fmt.Errorf(m.CurrentDaemonVersion.Error.Error)
+			}
 			response.DaemonVersions = &v1.DaemonVersions{
 				Current: &v1.DaemonVersion{
 					Version:    m.CurrentDaemonVersion.Version,
@@ -279,11 +285,15 @@ func (c *controller) AutoUpdateOS(logger chassis.Logger) {
 			logger.WithError(err).Error("failed to run auto os update job")
 		}
 	}
-	cr.AddFunc(osAutoUpdateCron, f)
-	go cr.Start()
+	_, err := cr.AddFunc(osAutoUpdateCron, f)
+	if err != nil {
+		logger.WithError(err).Panic("failed to initialize auto-update for os")
+	}
+	cr.Start()
 }
 
 func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error {
+	logger.Info("updating os")
 	settings := &v1.DeviceSettings{}
 	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
@@ -305,7 +315,7 @@ func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error 
 	// if the daemon needs updating, install it along with the os updates
 	// otherwise just install the os update
 	if updates.DaemonVersions.Current != updates.DaemonVersions.Latest {
-		err = com.stream.Send(&dv1.ServerMessage{
+		err = com.Send(&dv1.ServerMessage{
 			Message: &dv1.ServerMessage_ChangeDaemonVersionCommand{
 				ChangeDaemonVersionCommand: &dv1.ChangeDaemonVersionCommand{
 					Version:    updates.DaemonVersions.Latest.Version,
@@ -315,7 +325,7 @@ func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error 
 			},
 		})
 	} else {
-		err = com.stream.Send(&dv1.ServerMessage{
+		err = com.Send(&dv1.ServerMessage{
 			Message: &dv1.ServerMessage_InstallOsUpdateCommand{},
 		})
 	}
@@ -360,11 +370,15 @@ func (c *controller) AutoUpdateContainers(logger chassis.Logger) {
 			logger.WithError(err).Error("failed to run auto container update job")
 		}
 	}
-	cr.AddFunc(osAutoUpdateCron, f)
-	go cr.Start()
+	_, err := cr.AddFunc(containerAutoUpdateCron, f)
+	if err != nil {
+		logger.WithError(err).Panic("failed to initialize auto-update for system containers")
+	}
+	cr.Start()
 }
 
 func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger) error {
+	logger.Info("updating containers")
 	settings := &v1.DeviceSettings{}
 	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
@@ -386,7 +400,7 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 
 	for _, image := range images {
 		if semver.Compare(image.Latest, image.Current) == 1 {
-			err := com.stream.Send(&dv1.ServerMessage{
+			err := com.Send(&dv1.ServerMessage{
 				Message: &dv1.ServerMessage_SetSystemImageCommand{
 					SetSystemImageCommand: &dv1.SetSystemImageCommand{
 						CurrentImage:   fmt.Sprintf("%s:%s", image.Image, image.Current),
@@ -447,7 +461,7 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 	}
 
 	// set the password for the "admin" user on the device (call to daemon)
-	err = com.stream.Send(&dv1.ServerMessage{
+	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SetUserPasswordCommand{
 			SetUserPasswordCommand: &dv1.SetUserPasswordCommand{
 				// TODO: Support multiple users? Right now the username "admin" is hardcoded into NixOS.
@@ -461,7 +475,7 @@ func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSe
 	}
 
 	// set the time zone on the device
-	err = com.stream.Send(&dv1.ServerMessage{
+	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SetTimeZoneCommand{
 			SetTimeZoneCommand: &dv1.SetTimeZoneCommand{
 				TimeZone: settings.Timezone,

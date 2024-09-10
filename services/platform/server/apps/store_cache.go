@@ -44,6 +44,7 @@ func AppStoreCache(logger chassis.Logger) {
 	}
 }
 func refresh(logger chassis.Logger) error {
+	logger.Info("refreshing app store cache")
 	ctx := context.Background()
 	httpClient := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, APP_STORE_URL, nil)
@@ -84,14 +85,12 @@ func refresh(logger chassis.Logger) error {
 	}
 
 	// store in blueprint
-	val, err := kvclient.Set(ctx, kvclient.APP_STORE_ENTRIES_KEY, entries)
+	_, err = kvclient.Set(ctx, kvclient.APP_STORE_ENTRIES_KEY, entries)
 	if err != nil {
 		logger.Error("failed to save app store entries")
 		return errors.New(ErrFailedToPopulateAppStore)
 	}
 
-	logger.WithField("app_store", val).Info("blueprint has been populated with app store entries")
-	logger.Info("app store cache has been created")
-
+	logger.Info("app store cache has been refreshed")
 	return nil
 }

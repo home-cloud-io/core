@@ -208,10 +208,13 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 		c.stream.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_OsUpdateDiff{
 				OsUpdateDiff: &v1.OSUpdateDiff{
-					Description: fmt.Sprintf("failed with error: %s", err.Error()),
+					Error: &v1.DaemonError{
+						Error: err.Error(),
+					},
 				},
 			},
 		})
+		return
 	} else {
 		err := c.stream.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_OsUpdateDiff{
@@ -235,10 +238,13 @@ func (c *client) currentDaemonVersion() {
 		c.stream.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_CurrentDaemonVersion{
 				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
-					Version: fmt.Sprintf("failed with error: %s", err.Error()),
+					Error: &v1.DaemonError{
+						Error: err.Error(),
+					},
 				},
 			},
 		})
+		return
 	} else {
 		err := c.stream.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_CurrentDaemonVersion{
@@ -287,6 +293,7 @@ func (c *client) setSystemImage(ctx context.Context, def *v1.SetSystemImageComma
 	if err != nil {
 		logger.WithError(err).Error("failed to set system image")
 		// TODO: return error to the server?
+		return
 	}
 	logger.Info("system image set successfully")
 }

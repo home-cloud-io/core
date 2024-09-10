@@ -21,6 +21,7 @@ type (
 
 var (
 	com = &commander{}
+	ErrNoStream = fmt.Errorf("no stream")
 )
 
 func (c *commander) SetStream(stream *connect.BidiStream[dv1.DaemonMessage, dv1.ServerMessage]) error {
@@ -33,4 +34,11 @@ func (c *commander) SetStream(stream *connect.BidiStream[dv1.DaemonMessage, dv1.
 
 func (c *commander) CloseStream() {
 	c.stream = nil
+}
+
+func (c *commander) Send(request *dv1.ServerMessage) error {
+	if c.stream == nil {
+		return ErrNoStream
+	}
+	return c.stream.Send(request)
 }
