@@ -535,3 +535,51 @@ export const User = proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.server.v1.SubscribeRequest
+ */
+export const SubscribeRequest = proto3.makeMessageType(
+  "platform.server.v1.SubscribeRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.ServerEvent
+ */
+export const ServerEvent = proto3.makeMessageType(
+  "platform.server.v1.ServerEvent",
+  () => [
+    { no: 1, name: "heartbeat", kind: "message", T: HeartbeatEvent, oneof: "event" },
+    { no: 2, name: "error", kind: "message", T: ErrorEvent, oneof: "event" },
+    { no: 3, name: "app_installed", kind: "message", T: AppInstalledEvent, oneof: "event" },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.HeartbeatEvent
+ */
+export const HeartbeatEvent = proto3.makeMessageType(
+  "platform.server.v1.HeartbeatEvent",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.ErrorEvent
+ */
+export const ErrorEvent = proto3.makeMessageType(
+  "platform.server.v1.ErrorEvent",
+  () => [
+    { no: 1, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.AppInstalledEvent
+ */
+export const AppInstalledEvent = proto3.makeMessageType(
+  "platform.server.v1.AppInstalledEvent",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+

@@ -78,6 +78,8 @@ const (
 	// WebServiceGetDeviceSettingsProcedure is the fully-qualified name of the WebService's
 	// GetDeviceSettings RPC.
 	WebServiceGetDeviceSettingsProcedure = "/platform.server.v1.WebService/GetDeviceSettings"
+	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
+	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -100,6 +102,7 @@ var (
 	webServiceLoginMethodDescriptor                    = webServiceServiceDescriptor.Methods().ByName("Login")
 	webServiceGetAppsInStoreMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("GetAppsInStore")
 	webServiceGetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("GetDeviceSettings")
+	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
 )
 
 // WebServiceClient is a client for the platform.server.v1.WebService service.
@@ -138,6 +141,8 @@ type WebServiceClient interface {
 	GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error)
 	// Get the device settings
 	GetDeviceSettings(context.Context, *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error)
+	// Subscribe to the server for events
+	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
 }
 
 // NewWebServiceClient constructs a client for the platform.server.v1.WebService service. By
@@ -252,6 +257,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceGetDeviceSettingsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		subscribe: connect.NewClient[v1.SubscribeRequest, v1.ServerEvent](
+			httpClient,
+			baseURL+WebServiceSubscribeProcedure,
+			connect.WithSchema(webServiceSubscribeMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -274,6 +285,7 @@ type webServiceClient struct {
 	login                    *connect.Client[v1.LoginRequest, v1.LoginResponse]
 	getAppsInStore           *connect.Client[v1.GetAppsInStoreRequest, v1.GetAppsInStoreResponse]
 	getDeviceSettings        *connect.Client[v1.GetDeviceSettingsRequest, v1.GetDeviceSettingsResponse]
+	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
 }
 
 // ShutdownHost calls platform.server.v1.WebService.ShutdownHost.
@@ -361,6 +373,11 @@ func (c *webServiceClient) GetDeviceSettings(ctx context.Context, req *connect.R
 	return c.getDeviceSettings.CallUnary(ctx, req)
 }
 
+// Subscribe calls platform.server.v1.WebService.Subscribe.
+func (c *webServiceClient) Subscribe(ctx context.Context, req *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error) {
+	return c.subscribe.CallServerStream(ctx, req)
+}
+
 // WebServiceHandler is an implementation of the platform.server.v1.WebService service.
 type WebServiceHandler interface {
 	// Shutdown the host machine running Home Cloud
@@ -397,6 +414,8 @@ type WebServiceHandler interface {
 	GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error)
 	// Get the device settings
 	GetDeviceSettings(context.Context, *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error)
+	// Subscribe to the server for events
+	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
 }
 
 // NewWebServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -507,6 +526,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceGetDeviceSettingsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceSubscribeHandler := connect.NewServerStreamHandler(
+		WebServiceSubscribeProcedure,
+		svc.Subscribe,
+		connect.WithSchema(webServiceSubscribeMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.server.v1.WebService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case WebServiceShutdownHostProcedure:
@@ -543,6 +568,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceGetAppsInStoreHandler.ServeHTTP(w, r)
 		case WebServiceGetDeviceSettingsProcedure:
 			webServiceGetDeviceSettingsHandler.ServeHTTP(w, r)
+		case WebServiceSubscribeProcedure:
+			webServiceSubscribeHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -618,4 +645,8 @@ func (UnimplementedWebServiceHandler) GetAppsInStore(context.Context, *connect.R
 
 func (UnimplementedWebServiceHandler) GetDeviceSettings(context.Context, *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetDeviceSettings is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.Subscribe is not implemented"))
 }
