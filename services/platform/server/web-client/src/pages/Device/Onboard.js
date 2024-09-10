@@ -280,12 +280,12 @@ export default function DeviceOnboardPage() {
       </div>
 
       <ToastContainer className="p-3" position="bottom-center" style={{zIndex: 1}}>
-        <Toast show={result.isError}>
+        <Toast show={result.isError} onClose={() => result.reset()}>
           <Toast.Header>
             <strong className="me-auto">Server Error</strong>
             <small></small>
           </Toast.Header>
-          <Toast.Body>Failed to setup the server, please try again</Toast.Body>
+          <Toast.Body>{result.error}</Toast.Body>
         </Toast>
       </ToastContainer>
 
