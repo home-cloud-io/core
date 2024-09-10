@@ -22,7 +22,7 @@ type (
 		logger  chassis.Logger
 		domain  string
 		address string
-		// a map of FQDNs to their respective cancel functions
+		// a map of hostnames to their respective cancel functions
 		cancels map[string]context.CancelFunc
 	}
 )
@@ -71,7 +71,7 @@ func (p *dnsPublisher) AddHost(ctx context.Context, hostname string) {
 
 	logger.Info("adding host to mDNS")
 
-	p.cancels[fqdn] = cancel
+	p.cancels[hostname] = cancel
 	go publish(c, logger, fqdn, p.address)
 
 	err := setHostnames(p.cancels)
@@ -89,13 +89,13 @@ func (p *dnsPublisher) RemoveHost(hostname string) error {
 	logger.Info("removing host from mDNS")
 
 	// find and canel context associated with the given hostname
-	f, ok := p.cancels[fqdn]
+	f, ok := p.cancels[hostname]
 	if !ok {
 		return fmt.Errorf("host not found to remove")
 	}
 	f()
 
-	delete(p.cancels, fqdn)
+	delete(p.cancels, hostname)
 	err := setHostnames(p.cancels)
 	if err != nil {
 		logger.WithError(err).Error("failed to remove hostname from config")
