@@ -70,47 +70,8 @@ func ExecuteCommand(ctx context.Context, cmd *exec.Cmd) error {
 // ExecuteCommandAndRelease will execute the given command and release all associated resources so that it will
 // continue to run even if the caller is terminated.
 func ExecuteCommandAndRelease(ctx context.Context, cmd *exec.Cmd) error {
-	// create a pipe for the output
-	cmdReader, err := cmd.StdoutPipe()
-	if err != nil {
-		return err
-	}
-	// create a pipe for the error output
-	cmdErrReader, err := cmd.StderrPipe()
-	if err != nil {
-		return err
-	}
-
-	// scanner for output
-	scanner := bufio.NewScanner(cmdReader)
-	go func() {
-		for scanner.Scan() {
-			fmt.Println(scanner.Text())
-		}
-	}()
-
-	// scanner for error output
-	scannerErr := bufio.NewScanner(cmdErrReader)
-	go func() {
-		for scannerErr.Scan() {
-			fmt.Println(scannerErr.Text())
-		}
-	}()
-
-	// watch for done signal and kill process if received
-	go func() {
-		<-ctx.Done()
-		err := cmd.Process.Kill()
-		if err != nil {
-			// only error if not closed by user
-			if err.Error() != "signal: killed" && err.Error() != "os: process already finished" {
-				fmt.Println(err.Error())
-			}
-		}
-	}()
-
 	// start the command
-	err = cmd.Start()
+	err := cmd.Start()
 	if err != nil {
 		return err
 	}
