@@ -39,7 +39,7 @@ func GetDaemonVersion(logger chassis.Logger) (*v1.CurrentDaemonVersion, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.Contains(line, versionPrefix) {
-			current.Version = "v" + semverRegex.FindString(line)
+			current.Version = semverRegex.FindString(line)
 			continue
 		}
 		if strings.HasPrefix(line, vendorHashPrefix) {
