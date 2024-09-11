@@ -66,6 +66,7 @@ func RebuildAndSwitchOS(ctx context.Context, logger chassis.Logger) error {
 		logger.WithError(err).Error("failed to run `nixos-rebuild switch`")
 		return err
 	}
+	logger.Info("os update command issued to run in the background")
 
 	return nil
 }
