@@ -275,7 +275,7 @@ func (c *client) changeDaemonVersion(ctx context.Context, def *v1.ChangeDaemonVe
 
 func (c *client) installOsUpdate(ctx context.Context) {
 	c.logger.Info("install os update command")
-	err := versioning.InstallOSUpdate(ctx, c.logger)
+	err := versioning.RebuildAndSwitchOS(ctx, c.logger)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to install os update")
 		// TODO: return error to the server?

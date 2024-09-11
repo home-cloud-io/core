@@ -5,12 +5,10 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	"github.com/home-cloud-io/core/services/platform/daemon/execute"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
 )
@@ -67,7 +65,6 @@ func GetDaemonVersion(logger chassis.Logger) (*v1.CurrentDaemonVersion, error) {
 // stateful logic which checks if a rollback is really needed. It's out of scope for RC1 but should be revisited later.
 func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.ChangeDaemonVersionCommand) error {
 	var (
-		cmd       *exec.Cmd
 		err       error
 		replacers = []replacer{
 			func(line string) string {
@@ -98,14 +95,10 @@ func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.Cha
 		return err
 	}
 
-	logger.Info("building nixos with new daemon version")
-	cmd = exec.Command("nixos-rebuild", "switch")
-	err = execute.ExecuteCommand(ctx, cmd)
+	err = RebuildAndSwitchOS(ctx, logger)
 	if err != nil {
-		logger.WithError(err).Error("failed to run `nixos-rebuild switch`")
 		return err
 	}
-	logger.Info("building nixos with new daemon version: DONE")
 
 	return nil
 }
