@@ -53,7 +53,7 @@ func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error
 }
 
 // NOTE: must call this after calling GetOSVersionDiff if you want to perform a channel update.
-func InstallOSUpdate(ctx context.Context, logger chassis.Logger) error {
+func RebuildAndSwitchOS(ctx context.Context, logger chassis.Logger) error {
 	var (
 		cmd *exec.Cmd
 		err error
@@ -61,12 +61,12 @@ func InstallOSUpdate(ctx context.Context, logger chassis.Logger) error {
 
 	logger.Info("building and switching to updated nixos")
 	cmd = exec.Command("nixos-rebuild", "switch")
-	err = execute.ExecuteCommand(ctx, cmd)
+	err = execute.ExecuteCommandAndRelease(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nixos-rebuild switch`")
 		return err
 	}
-	logger.Info("building and switching to updated nixos: DONE")
+	logger.Info("os update command issued to run in the background")
 
 	return nil
 }
@@ -89,7 +89,7 @@ func SetTimeZone(ctx context.Context, logger chassis.Logger, timeZone string) er
 		return err
 	}
 
-	err = InstallOSUpdate(ctx, logger)
+	err = RebuildAndSwitchOS(ctx, logger)
 	if err != nil {
 		return err
 	}

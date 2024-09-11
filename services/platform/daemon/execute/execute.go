@@ -67,6 +67,24 @@ func ExecuteCommand(ctx context.Context, cmd *exec.Cmd) error {
 	return nil
 }
 
+// ExecuteCommandAndRelease will execute the given command and release all associated resources so that it will
+// continue to run even if the caller is terminated.
+func ExecuteCommandAndRelease(ctx context.Context, cmd *exec.Cmd) error {
+	// start the command
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	// release any associated resources
+	err = cmd.Process.Release()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ExecuteCommandReturnStdout executes a command and returns the output of stdout as a string.
 // It does not print the output to the console. This can be used to get the output of a command.
 // It will not return until the command has completed or the context is cancelled.
