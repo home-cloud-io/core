@@ -29,7 +29,7 @@ type (
 const (
 	APP_STORE_URL               = "https://apps.home-cloud.io/index.yaml"
 	ErrFailedToPopulateAppStore = "failed to populate app store"
-	storeCacheInterval          = 60 * time.Hour
+	storeCacheInterval          = 60 * time.Minute
 )
 
 // AppStoreCache creates a new store cache that runs in the background
