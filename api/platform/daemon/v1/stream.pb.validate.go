@@ -263,6 +263,47 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_DeviceInitialized:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetDeviceInitialized()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "DeviceInitialized",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "DeviceInitialized",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetDeviceInitialized()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "DeviceInitialized",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -860,6 +901,47 @@ func (m *ServerMessage) validate(all bool) error {
 			}
 		}
 
+	case *ServerMessage_InitializeDeviceCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetInitializeDeviceCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "InitializeDeviceCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "InitializeDeviceCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetInitializeDeviceCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "InitializeDeviceCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -1407,6 +1489,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CurrentDaemonVersionValidationError{}
+
+// Validate checks the field values on DeviceInitialized with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DeviceInitialized) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeviceInitialized with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeviceInitializedMultiError, or nil if none found.
+func (m *DeviceInitialized) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeviceInitialized) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeviceInitializedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeviceInitializedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeviceInitializedValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DeviceInitializedMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeviceInitializedMultiError is an error wrapping multiple validation errors
+// returned by DeviceInitialized.ValidateAll() if the designated constraints
+// aren't met.
+type DeviceInitializedMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeviceInitializedMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeviceInitializedMultiError) AllErrors() []error { return m }
+
+// DeviceInitializedValidationError is the validation error returned by
+// DeviceInitialized.Validate if the designated constraints aren't met.
+type DeviceInitializedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeviceInitializedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeviceInitializedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeviceInitializedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeviceInitializedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeviceInitializedValidationError) ErrorName() string {
+	return "DeviceInitializedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeviceInitializedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeviceInitialized.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeviceInitializedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeviceInitializedValidationError{}
 
 // Validate checks the field values on DaemonError with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
@@ -2229,6 +2442,166 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SetSystemImageCommandValidationError{}
+
+// Validate checks the field values on InitializeDeviceCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *InitializeDeviceCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InitializeDeviceCommand with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// InitializeDeviceCommandMultiError, or nil if none found.
+func (m *InitializeDeviceCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InitializeDeviceCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetUser()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, InitializeDeviceCommandValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, InitializeDeviceCommandValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return InitializeDeviceCommandValidationError{
+				field:  "User",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetTimeZone()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, InitializeDeviceCommandValidationError{
+					field:  "TimeZone",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, InitializeDeviceCommandValidationError{
+					field:  "TimeZone",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTimeZone()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return InitializeDeviceCommandValidationError{
+				field:  "TimeZone",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return InitializeDeviceCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// InitializeDeviceCommandMultiError is an error wrapping multiple validation
+// errors returned by InitializeDeviceCommand.ValidateAll() if the designated
+// constraints aren't met.
+type InitializeDeviceCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InitializeDeviceCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InitializeDeviceCommandMultiError) AllErrors() []error { return m }
+
+// InitializeDeviceCommandValidationError is the validation error returned by
+// InitializeDeviceCommand.Validate if the designated constraints aren't met.
+type InitializeDeviceCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InitializeDeviceCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InitializeDeviceCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InitializeDeviceCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InitializeDeviceCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InitializeDeviceCommandValidationError) ErrorName() string {
+	return "InitializeDeviceCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e InitializeDeviceCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInitializeDeviceCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InitializeDeviceCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InitializeDeviceCommandValidationError{}
 
 // Validate checks the field values on SetUserPasswordCommand with the rules
 // defined in the proto definition for this message. If any rules are

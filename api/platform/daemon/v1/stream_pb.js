@@ -17,6 +17,7 @@ export const DaemonMessage = proto3.makeMessageType(
     { no: 3, name: "os_update_diff", kind: "message", T: OSUpdateDiff, oneof: "message" },
     { no: 4, name: "current_daemon_version", kind: "message", T: CurrentDaemonVersion, oneof: "message" },
     { no: 5, name: "system_stats", kind: "message", T: SystemStats, oneof: "message" },
+    { no: 6, name: "device_initialized", kind: "message", T: DeviceInitialized, oneof: "message" },
   ],
 );
 
@@ -38,6 +39,7 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 10, name: "set_time_zone_command", kind: "message", T: SetTimeZoneCommand, oneof: "message" },
     { no: 11, name: "add_mdns_host_command", kind: "message", T: AddMdnsHostCommand, oneof: "message" },
     { no: 12, name: "remove_mdns_host_command", kind: "message", T: RemoveMdnsHostCommand, oneof: "message" },
+    { no: 13, name: "initialize_device_command", kind: "message", T: InitializeDeviceCommand, oneof: "message" },
   ],
 );
 
@@ -83,6 +85,16 @@ export const CurrentDaemonVersion = proto3.makeMessageType(
     { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.DeviceInitialized
+ */
+export const DeviceInitialized = proto3.makeMessageType(
+  "platform.daemon.v1.DeviceInitialized",
+  () => [
     { no: 16, name: "error", kind: "message", T: DaemonError },
   ],
 );
@@ -165,6 +177,17 @@ export const SetSystemImageCommand = proto3.makeMessageType(
   () => [
     { no: 1, name: "current_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "requested_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.InitializeDeviceCommand
+ */
+export const InitializeDeviceCommand = proto3.makeMessageType(
+  "platform.daemon.v1.InitializeDeviceCommand",
+  () => [
+    { no: 1, name: "user", kind: "message", T: SetUserPasswordCommand },
+    { no: 2, name: "time_zone", kind: "message", T: SetTimeZoneCommand },
   ],
 );
 

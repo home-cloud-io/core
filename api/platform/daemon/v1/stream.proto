@@ -17,6 +17,7 @@ message DaemonMessage {
     OSUpdateDiff os_update_diff = 3;
     CurrentDaemonVersion current_daemon_version = 4;
     SystemStats system_stats = 5;
+    DeviceInitialized device_initialized = 6;
   }
 }
 
@@ -34,6 +35,7 @@ message ServerMessage {
     SetTimeZoneCommand set_time_zone_command = 10;
     AddMdnsHostCommand add_mdns_host_command = 11;
     RemoveMdnsHostCommand remove_mdns_host_command = 12;
+    InitializeDeviceCommand initialize_device_command = 13;
   }
 }
 
@@ -59,6 +61,10 @@ message CurrentDaemonVersion {
   string vendor_hash = 2;
   string src_hash = 3;
 
+  DaemonError error = 16;
+}
+
+message DeviceInitialized {
   DaemonError error = 16;
 }
 
@@ -91,6 +97,11 @@ message InstallOSUpdateCommand { }
 message SetSystemImageCommand {
   string current_image = 1;
   string requested_image = 2;
+}
+
+message InitializeDeviceCommand {
+  SetUserPasswordCommand user = 1;
+  SetTimeZoneCommand time_zone = 2;
 }
 
 message SetUserPasswordCommand {

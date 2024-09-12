@@ -44,6 +44,12 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: SystemStats;
     case: "systemStats";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.DeviceInitialized device_initialized = 6;
+     */
+    value: DeviceInitialized;
+    case: "deviceInitialized";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -59,6 +65,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 3, name: "os_update_diff", kind: "message", T: OSUpdateDiff, oneof: "message" },
     { no: 4, name: "current_daemon_version", kind: "message", T: CurrentDaemonVersion, oneof: "message" },
     { no: 5, name: "system_stats", kind: "message", T: SystemStats, oneof: "message" },
+    { no: 6, name: "device_initialized", kind: "message", T: DeviceInitialized, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -157,6 +164,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: RemoveMdnsHostCommand;
     case: "removeMdnsHostCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.InitializeDeviceCommand initialize_device_command = 13;
+     */
+    value: InitializeDeviceCommand;
+    case: "initializeDeviceCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -179,6 +192,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 10, name: "set_time_zone_command", kind: "message", T: SetTimeZoneCommand, oneof: "message" },
     { no: 11, name: "add_mdns_host_command", kind: "message", T: AddMdnsHostCommand, oneof: "message" },
     { no: 12, name: "remove_mdns_host_command", kind: "message", T: RemoveMdnsHostCommand, oneof: "message" },
+    { no: 13, name: "initialize_device_command", kind: "message", T: InitializeDeviceCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -361,6 +375,43 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
 
   static equals(a: CurrentDaemonVersion | PlainMessage<CurrentDaemonVersion> | undefined, b: CurrentDaemonVersion | PlainMessage<CurrentDaemonVersion> | undefined): boolean {
     return proto3.util.equals(CurrentDaemonVersion, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.DeviceInitialized
+ */
+export class DeviceInitialized extends Message<DeviceInitialized> {
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
+  constructor(data?: PartialMessage<DeviceInitialized>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.DeviceInitialized";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeviceInitialized {
+    return new DeviceInitialized().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeviceInitialized {
+    return new DeviceInitialized().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeviceInitialized {
+    return new DeviceInitialized().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeviceInitialized | PlainMessage<DeviceInitialized> | undefined, b: DeviceInitialized | PlainMessage<DeviceInitialized> | undefined): boolean {
+    return proto3.util.equals(DeviceInitialized, a, b);
   }
 }
 
@@ -653,6 +704,49 @@ export class SetSystemImageCommand extends Message<SetSystemImageCommand> {
 
   static equals(a: SetSystemImageCommand | PlainMessage<SetSystemImageCommand> | undefined, b: SetSystemImageCommand | PlainMessage<SetSystemImageCommand> | undefined): boolean {
     return proto3.util.equals(SetSystemImageCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.InitializeDeviceCommand
+ */
+export class InitializeDeviceCommand extends Message<InitializeDeviceCommand> {
+  /**
+   * @generated from field: platform.daemon.v1.SetUserPasswordCommand user = 1;
+   */
+  user?: SetUserPasswordCommand;
+
+  /**
+   * @generated from field: platform.daemon.v1.SetTimeZoneCommand time_zone = 2;
+   */
+  timeZone?: SetTimeZoneCommand;
+
+  constructor(data?: PartialMessage<InitializeDeviceCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.InitializeDeviceCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "user", kind: "message", T: SetUserPasswordCommand },
+    { no: 2, name: "time_zone", kind: "message", T: SetTimeZoneCommand },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InitializeDeviceCommand {
+    return new InitializeDeviceCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InitializeDeviceCommand {
+    return new InitializeDeviceCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InitializeDeviceCommand {
+    return new InitializeDeviceCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: InitializeDeviceCommand | PlainMessage<InitializeDeviceCommand> | undefined, b: InitializeDeviceCommand | PlainMessage<InitializeDeviceCommand> | undefined): boolean {
+    return proto3.util.equals(InitializeDeviceCommand, a, b);
   }
 }
 
