@@ -400,6 +400,24 @@ export const GetDeviceSettingsResponse = proto3.makeMessageType(
 );
 
 /**
+ * @generated from message platform.server.v1.SetDeviceSettingsRequest
+ */
+export const SetDeviceSettingsRequest = proto3.makeMessageType(
+  "platform.server.v1.SetDeviceSettingsRequest",
+  () => [
+    { no: 1, name: "settings", kind: "message", T: DeviceSettings },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.SetDeviceSettingsResponse
+ */
+export const SetDeviceSettingsResponse = proto3.makeMessageType(
+  "platform.server.v1.SetDeviceSettingsResponse",
+  [],
+);
+
+/**
  * @generated from message platform.server.v1.Apps
  */
 export const Apps = proto3.makeMessageType(

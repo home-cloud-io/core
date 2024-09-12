@@ -1537,6 +1537,74 @@ export class GetDeviceSettingsResponse extends Message<GetDeviceSettingsResponse
 }
 
 /**
+ * @generated from message platform.server.v1.SetDeviceSettingsRequest
+ */
+export class SetDeviceSettingsRequest extends Message<SetDeviceSettingsRequest> {
+  /**
+   * @generated from field: platform.server.v1.DeviceSettings settings = 1;
+   */
+  settings?: DeviceSettings;
+
+  constructor(data?: PartialMessage<SetDeviceSettingsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.SetDeviceSettingsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "settings", kind: "message", T: DeviceSettings },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetDeviceSettingsRequest {
+    return new SetDeviceSettingsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetDeviceSettingsRequest {
+    return new SetDeviceSettingsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetDeviceSettingsRequest {
+    return new SetDeviceSettingsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetDeviceSettingsRequest | PlainMessage<SetDeviceSettingsRequest> | undefined, b: SetDeviceSettingsRequest | PlainMessage<SetDeviceSettingsRequest> | undefined): boolean {
+    return proto3.util.equals(SetDeviceSettingsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.SetDeviceSettingsResponse
+ */
+export class SetDeviceSettingsResponse extends Message<SetDeviceSettingsResponse> {
+  constructor(data?: PartialMessage<SetDeviceSettingsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.SetDeviceSettingsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetDeviceSettingsResponse {
+    return new SetDeviceSettingsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetDeviceSettingsResponse {
+    return new SetDeviceSettingsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetDeviceSettingsResponse {
+    return new SetDeviceSettingsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetDeviceSettingsResponse | PlainMessage<SetDeviceSettingsResponse> | undefined, b: SetDeviceSettingsResponse | PlainMessage<SetDeviceSettingsResponse> | undefined): boolean {
+    return proto3.util.equals(SetDeviceSettingsResponse, a, b);
+  }
+}
+
+/**
  * @generated from message platform.server.v1.Apps
  */
 export class Apps extends Message<Apps> {

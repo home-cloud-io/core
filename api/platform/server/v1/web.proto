@@ -42,6 +42,8 @@ service WebService {
   rpc GetAppsInStore(GetAppsInStoreRequest) returns (GetAppsInStoreResponse) {}
   // Get the device settings
   rpc GetDeviceSettings(GetDeviceSettingsRequest) returns (GetDeviceSettingsResponse) {}
+  // Set the device settings
+  rpc SetDeviceSettings(SetDeviceSettingsRequest) returns (SetDeviceSettingsResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
@@ -199,6 +201,11 @@ message GetDeviceSettingsRequest {}
 message GetDeviceSettingsResponse {
   DeviceSettings settings = 1;
 }
+
+message SetDeviceSettingsRequest {
+  DeviceSettings settings = 1;
+}
+message SetDeviceSettingsResponse {}
 
 //////////////////////////////////////////////////////////////////////////
 // MODELS
