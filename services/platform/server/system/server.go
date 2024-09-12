@@ -64,6 +64,8 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 			h.messages <- message
 		case *v1.DaemonMessage_CurrentDaemonVersion:
 			h.messages <- message
+		case *v1.DaemonMessage_DeviceInitialized:
+			h.messages <- message
 		case *v1.DaemonMessage_SystemStats:
 			CurrentStats = message.GetSystemStats()
 		default:

@@ -77,7 +77,7 @@ type (
 		// InitializeDevice initializes the device with the given settings. It first checks if the device is already setup
 		// Uses the user-provided password to set the password for the "admin" user on the device
 		// and save the remaining settings in the key-value store
-		InitializeDevice(ctx context.Context, settings *v1.DeviceSettings) (string, error)
+		InitializeDevice(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error
 		// Login receives a username and password and returns a token.
 		//
 		// NOTE: the token is unimplemented so this only checks the validity of the password for now
@@ -399,7 +399,13 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 	}
 
 	for _, image := range images {
+		log := logger.WithFields(chassis.Fields{
+			"image":           image.Image,
+			"current_version": image.Current,
+			"latest_version":  image.Latest,
+		})
 		if semver.Compare(image.Latest, image.Current) == 1 {
+			log.Info("updating image")
 			err := com.Send(&dv1.ServerMessage{
 				Message: &dv1.ServerMessage_SetSystemImageCommand{
 					SetSystemImageCommand: &dv1.SetSystemImageCommand{
@@ -409,13 +415,11 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 				},
 			})
 			if err != nil {
-				logger.WithFields(chassis.Fields{
-					"image":           image.Image,
-					"current_version": image.Current,
-					"latest_version":  image.Latest,
-				}).WithError(err).Error("failed to update system container image")
+				log.WithError(err).Error("failed to update system container image")
 				// don't return, try to update other containers
 			}
+		} else {
+			log.Info("no update needed")
 		}
 	}
 
@@ -452,55 +456,66 @@ func (c *controller) IsDeviceSetup(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
-func (c *controller) InitializeDevice(ctx context.Context, settings *v1.DeviceSettings) (string, error) {
+func (c *controller) InitializeDevice(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {
 	yes, err := c.IsDeviceSetup(ctx)
 	if err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
+		return errors.New(ErrFailedToGetSettings)
 	} else if yes {
-		return "", errors.New(ErrDeviceAlreadySetup)
+		logger.Warn("device is already set up")
+		return errors.New(ErrDeviceAlreadySetup)
 	}
 
-	// set the password for the "admin" user on the device (call to daemon)
+	// set the device settings on the host (via the daemon)
 	err = com.Send(&dv1.ServerMessage{
-		Message: &dv1.ServerMessage_SetUserPasswordCommand{
-			SetUserPasswordCommand: &dv1.SetUserPasswordCommand{
-				// TODO: Support multiple users? Right now the username "admin" is hardcoded into NixOS.
-				Username: "admin",
-				Password: settings.AdminUser.Password,
+		Message: &dv1.ServerMessage_InitializeDeviceCommand{
+			InitializeDeviceCommand: &dv1.InitializeDeviceCommand{
+				User: &dv1.SetUserPasswordCommand{
+					// TODO: Support multiple users? Right now the username "admin" is hardcoded into NixOS.
+					Username: "admin",
+					Password: settings.AdminUser.Password,
+				},
+				TimeZone: &dv1.SetTimeZoneCommand{
+					TimeZone: settings.Timezone,
+				},
 			},
 		},
 	})
 	if err != nil {
-		return "", err
+		return err
 	}
-
-	// set the time zone on the device
-	err = com.Send(&dv1.ServerMessage{
-		Message: &dv1.ServerMessage_SetTimeZoneCommand{
-			SetTimeZoneCommand: &dv1.SetTimeZoneCommand{
-				TimeZone: settings.Timezone,
-			},
-		},
-	})
-	if err != nil {
-		return "", err
+	for {
+		var done bool
+		msg := <-c.messages
+		switch msg.Message.(type) {
+		case *dv1.DaemonMessage_DeviceInitialized:
+			m := msg.Message.(*dv1.DaemonMessage_DeviceInitialized)
+			if m.DeviceInitialized.Error != nil {
+				return fmt.Errorf(m.DeviceInitialized.Error.Error)
+			}
+			done = true
+		default:
+			logger.WithField("message", msg).Warn("unrequested message type received")
+		}
+		if done {
+			break
+		}
 	}
 
 	// get seed salt value from blueprint
 	seed, err := getSaltValue(ctx)
 	if err != nil {
-		return "", err
+		return err
 	} else {
 		// salt & hash the meat before you put in on the grill
 		settings.AdminUser.Password = hashPassword(settings.AdminUser.Password, []byte(seed))
 	}
 
-	key, err := kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
-		return "", errors.New(ErrFailedToCreateSettings)
+		return errors.New(ErrFailedToCreateSettings)
 	}
 
-	return key, nil
+	return nil
 }
 
 func (c *controller) Login(ctx context.Context, username, password string) (string, error) {

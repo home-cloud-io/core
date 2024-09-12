@@ -229,12 +229,11 @@ func (h *rpc) IsDeviceSetup(ctx context.Context, request *connect.Request[v1.IsD
 }
 
 func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
-	h.logger.Info("setting up device for the first time")
+	h.logger.Info("requested to set up device for the first time")
 
 	var msg = request.Msg
-
-	if err := msg.Validate(); err != nil {
-		return nil, fmt.Errorf(ErrInvalidInputValues)
+	if err := msg.ValidateAll(); err != nil {
+		return nil, err
 	}
 
 	// convert the request to the `DeviceSettings` object
@@ -248,7 +247,7 @@ func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.
 		AutoUpdateOs:   msg.GetAutoUpdateOs(),
 	}
 
-	_, err := h.sctl.InitializeDevice(ctx, deviceSettings)
+	err := h.sctl.InitializeDevice(ctx, h.logger, deviceSettings)
 	if err != nil {
 		if err.Error() == system.ErrDeviceAlreadySetup {
 			return connect.NewResponse(&v1.InitializeDeviceResponse{Setup: true}), nil
