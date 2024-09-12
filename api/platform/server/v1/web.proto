@@ -171,7 +171,7 @@ message InitializeDeviceRequest {
   string username = 1 [(validate.rules).string.min_len = 4];
   string password = 2 [(validate.rules).string.min_len = 4];
   // validate timezone is at least not empty
-  string timezone = 3 [(validate.rules).string.min_len = 4];
+  string timezone = 3 [(validate.rules).string.min_len = 7];
   bool auto_update_apps = 4;
   bool auto_update_os = 5;
   repeated string default_apps = 6;
