@@ -12,7 +12,6 @@ import (
 var (
 	systemKubernetesManifests = []string{
 		"/var/lib/rancher/k3s/server/manifests/draft.yaml",
-		"/var/lib/rancher/k3s/server/manifests/mdns.yaml",
 		"/var/lib/rancher/k3s/server/manifests/operator.yaml",
 		"/var/lib/rancher/k3s/server/manifests/server.yaml",
 	}
