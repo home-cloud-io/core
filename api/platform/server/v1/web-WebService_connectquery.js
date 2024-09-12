@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RestartHostRequest, RestartHostResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
  * Shutdown the host machine running Home Cloud
@@ -273,6 +273,22 @@ export const getDeviceSettings = {
   kind: MethodKind.Unary,
   I: GetDeviceSettingsRequest,
   O: GetDeviceSettingsResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * Set the device settings
+ *
+ * @generated from rpc platform.server.v1.WebService.SetDeviceSettings
+ */
+export const setDeviceSettings = {
+  localName: "setDeviceSettings",
+  name: "SetDeviceSettings",
+  kind: MethodKind.Unary,
+  I: SetDeviceSettingsRequest,
+  O: SetDeviceSettingsResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

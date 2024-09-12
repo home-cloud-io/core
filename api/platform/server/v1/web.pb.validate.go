@@ -4377,6 +4377,239 @@ var _ interface {
 	ErrorName() string
 } = GetDeviceSettingsResponseValidationError{}
 
+// Validate checks the field values on SetDeviceSettingsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetDeviceSettingsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetDeviceSettingsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetDeviceSettingsRequestMultiError, or nil if none found.
+func (m *SetDeviceSettingsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetDeviceSettingsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetSettings()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SetDeviceSettingsRequestValidationError{
+					field:  "Settings",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SetDeviceSettingsRequestValidationError{
+					field:  "Settings",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSettings()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SetDeviceSettingsRequestValidationError{
+				field:  "Settings",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SetDeviceSettingsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetDeviceSettingsRequestMultiError is an error wrapping multiple validation
+// errors returned by SetDeviceSettingsRequest.ValidateAll() if the designated
+// constraints aren't met.
+type SetDeviceSettingsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetDeviceSettingsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetDeviceSettingsRequestMultiError) AllErrors() []error { return m }
+
+// SetDeviceSettingsRequestValidationError is the validation error returned by
+// SetDeviceSettingsRequest.Validate if the designated constraints aren't met.
+type SetDeviceSettingsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetDeviceSettingsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetDeviceSettingsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetDeviceSettingsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetDeviceSettingsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetDeviceSettingsRequestValidationError) ErrorName() string {
+	return "SetDeviceSettingsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetDeviceSettingsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetDeviceSettingsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetDeviceSettingsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetDeviceSettingsRequestValidationError{}
+
+// Validate checks the field values on SetDeviceSettingsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetDeviceSettingsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetDeviceSettingsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetDeviceSettingsResponseMultiError, or nil if none found.
+func (m *SetDeviceSettingsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetDeviceSettingsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SetDeviceSettingsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetDeviceSettingsResponseMultiError is an error wrapping multiple validation
+// errors returned by SetDeviceSettingsResponse.ValidateAll() if the
+// designated constraints aren't met.
+type SetDeviceSettingsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetDeviceSettingsResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetDeviceSettingsResponseMultiError) AllErrors() []error { return m }
+
+// SetDeviceSettingsResponseValidationError is the validation error returned by
+// SetDeviceSettingsResponse.Validate if the designated constraints aren't met.
+type SetDeviceSettingsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetDeviceSettingsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetDeviceSettingsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetDeviceSettingsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetDeviceSettingsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetDeviceSettingsResponseValidationError) ErrorName() string {
+	return "SetDeviceSettingsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetDeviceSettingsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetDeviceSettingsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetDeviceSettingsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetDeviceSettingsResponseValidationError{}
+
 // Validate checks the field values on Apps with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
 // encountered is returned, or nil if there are no violations.
