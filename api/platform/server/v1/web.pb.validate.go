@@ -3502,10 +3502,10 @@ func (m *InitializeDeviceRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if utf8.RuneCountInString(m.GetTimezone()) < 4 {
+	if utf8.RuneCountInString(m.GetTimezone()) < 7 {
 		err := InitializeDeviceRequestValidationError{
 			field:  "Timezone",
-			reason: "value length must be at least 4 runes",
+			reason: "value length must be at least 7 runes",
 		}
 		if !all {
 			return err
