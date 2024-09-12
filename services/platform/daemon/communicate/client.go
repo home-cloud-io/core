@@ -139,6 +139,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.addMdnsHost(ctx, message.GetAddMdnsHostCommand())
 		case *v1.ServerMessage_RemoveMdnsHostCommand:
 			go c.removeMdnsHost(ctx, message.GetRemoveMdnsHostCommand())
+		case *v1.ServerMessage_InitializeDeviceCommand:
+			go c.initializeDevice(ctx, message.GetInitializeDeviceCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -297,7 +299,7 @@ func (c *client) setSystemImage(ctx context.Context, def *v1.SetSystemImageComma
 	logger.Info("system image set successfully")
 }
 
-func (c *client) setUserPassword(ctx context.Context, def *v1.SetUserPasswordCommand) {
+func (c *client) setUserPassword(ctx context.Context, def *v1.SetUserPasswordCommand) error {
 	logger := c.logger.WithField("username", def.Username)
 
 	cmd := exec.Command("chpasswd")
@@ -306,6 +308,7 @@ func (c *client) setUserPassword(ctx context.Context, def *v1.SetUserPasswordCom
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		logger.WithError(err).Error("failed to get stdin pipe")
+		return err
 	}
 	go func() {
 		defer stdin.Close()
@@ -316,18 +319,21 @@ func (c *client) setUserPassword(ctx context.Context, def *v1.SetUserPasswordCom
 	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to set user password")
-		return
+		return err
 	}
 	logger.Info("user password set successfully")
+	return nil
 }
 
-func (c *client) setTimeZone(ctx context.Context, def *v1.SetTimeZoneCommand) {
+func (c *client) setTimeZone(ctx context.Context, def *v1.SetTimeZoneCommand) error {
 	logger := c.logger.WithField("time_zone", def.TimeZone)
 	err := versioning.SetTimeZone(ctx, logger, def.TimeZone)
 	if err != nil {
 		logger.WithError(err).Error("failed to set time zone")
+		return err
 	}
 	logger.Info("successfully set time zone")
+	return nil
 }
 
 func (c *client) addMdnsHost(ctx context.Context, def *v1.AddMdnsHostCommand) {
@@ -339,4 +345,52 @@ func (c *client) removeMdnsHost(_ context.Context, def *v1.RemoveMdnsHostCommand
 	if err != nil {
 		c.logger.WithError(err).Error("failed to remove mDNS host")
 	}
+}
+
+func (c *client) initializeDevice(ctx context.Context, def *v1.InitializeDeviceCommand) {
+	c.logger.Info("initializing device")
+	err := c.setUserPassword(ctx, def.User)
+	if err != nil {
+		err = c.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_DeviceInitialized{
+				DeviceInitialized: &v1.DeviceInitialized{
+					Error: &v1.DaemonError{
+						Error: fmt.Sprintf("failed to set user password: %s", err.Error()),
+					},
+				},
+			},
+		})
+		if err != nil {
+			c.logger.WithError(err).Error("failed to send error")
+		}
+		return
+	}
+	err = c.setTimeZone(ctx, def.TimeZone)
+	if err != nil {
+		err = c.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_DeviceInitialized{
+				DeviceInitialized: &v1.DeviceInitialized{
+					Error: &v1.DaemonError{
+						Error: fmt.Sprintf("failed to set time zone: %s", err.Error()),
+					},
+				},
+			},
+		})
+		if err != nil {
+			c.logger.WithError(err).Error("failed to send error")
+		}
+		return
+	}
+
+	err = c.Send(&v1.DaemonMessage{
+		Message: &v1.DaemonMessage_DeviceInitialized{
+			DeviceInitialized: &v1.DeviceInitialized{},
+		},
+	})
+	if err != nil {
+		c.logger.WithError(err).Error("failed to send success")
+		return
+	}
+
+	c.logger.Info("finished initializing device")
 }
