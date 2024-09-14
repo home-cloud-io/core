@@ -1,18 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// TODO: Update the initial state to match the server request. Investigate if the empty request can be the initial state
-// of the slice.
+export const EventConnectionStatus = Object.freeze({
+    CONNECTED: 'connected',
+    CONNECTING: 'connecting',
+    DISCONNECTED: 'disconnected',
+    ERROR: 'error',
+});
+
 const initialState = {
     username: '',
-    password: '',
-    timezone: '',
-    autoUpdateApps: '',
-    autoUpdateOs: '', 
-    default_apps: [],
+    event_stream_connection_status: EventConnectionStatus.DISCONNECTED,
+    event: [],
 }
 
 export const serverSlice = createSlice({
-    name: 'device_setup',
+    name: 'server',
     initialState,
     reducers: {
         setUser: (state, action) => {
@@ -25,12 +27,25 @@ export const serverSlice = createSlice({
             state.autoUpdateApps = autoUpdateApps;
             state.autoUpdateOs = autoUpdateOs;
         },
+        setEventStreamConnectionStatus: (state, action) => {
+            state.event_stream_connection_status = action.payload.status;
+        },
+        setEvent: (state, action) => {
+            // filter out heartbeat events
+            if (action.payload.data.heartbeat) {
+                return;
+            }
+
+            state.event.push(action.payload.data);
+        },
     }
 });
 
 export const {
     setUser,
     setDeviceSettings,
+    setEventStreamConnectionStatus,
+    setEvent,
 } = serverSlice.actions;
 
-  export default serverSlice.reducer;
+export default serverSlice.reducer;
