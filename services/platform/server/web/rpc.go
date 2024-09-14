@@ -290,6 +290,23 @@ func (h *rpc) GetDeviceSettings(ctx context.Context, request *connect.Request[v1
 	return connect.NewResponse(&v1.GetDeviceSettingsResponse{Settings: settings}), nil
 }
 
+func (h *rpc) SetDeviceSettings(ctx context.Context, request *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error) {
+	h.logger.Info("setting device settings")
+
+	err := request.Msg.ValidateAll()
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.sctl.SetServerSettings(ctx, h.logger, request.Msg.Settings)
+	if err != nil {
+		h.logger.WithError(err).Error(system.ErrFailedToSetSettings)
+		return nil, fmt.Errorf("%s: %s", system.ErrFailedToSetSettings, err.Error())
+	}
+
+	return connect.NewResponse(&v1.SetDeviceSettingsResponse{}), nil
+}
+
 func (h *rpc) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {
 	err := events.SetStream(stream)
 	if err != nil {

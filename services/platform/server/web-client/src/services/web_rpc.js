@@ -23,7 +23,6 @@ export const serverRPCService = createApi({
   reducerPath: 'server_rpc_service',
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
   endpoints: (builder) => ({
-    // TODO: Update the main page to use these function instead of the direct calls
     shutdownHost: builder.mutation({
       queryFn: async () => {
         try {
@@ -51,7 +50,6 @@ export const serverRPCService = createApi({
             repo: 'home-cloud-io.github.io/store',
             chart: app.name,
             release: `${app.name}`,
-            values: values.get(app.name),
             version: app.version,
           });
           return { data: res.toJson() };
@@ -68,8 +66,8 @@ export const serverRPCService = createApi({
           });
           return { data: res.toJson() };
         } catch (error) {
-          return { error: error.rawMessage};
-        };
+          return { error: error.rawMessage };
+        }
       },
     }),
     updateApp: builder.mutation({
@@ -82,7 +80,7 @@ export const serverRPCService = createApi({
       queryFn: async () => {
         try {
           const res = await client.isDeviceSetup({});
-          return { data: { isDeviceSetup: res.setup }};
+          return { data: { isDeviceSetup: res.setup } };
         } catch (error) {
           return { error: error.rawMessage };
         }
@@ -92,7 +90,17 @@ export const serverRPCService = createApi({
       queryFn: async (req) => {
         try {
           const res = await client.initializeDevice(req);
-          return { data: { isDeviceSetup: res.toJson().setup }};
+          return { data: { isDeviceSetup: res.toJson().setup } };
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
+      },
+    }),
+    setDeviceSettings: builder.mutation({
+      queryFn: async (req) => {
+        try {
+          const res = await client.setDeviceSettings(req);
+          return {};
         } catch (error) {
           return { error: error.rawMessage };
         }
@@ -102,18 +110,20 @@ export const serverRPCService = createApi({
       queryFn: async (req, store) => {
         try {
           const res = await client.login(req);
-          store.dispatch(setUserSettings({ username: req.username, token: res.token }));
-          return { data: { user: res.toJson() }};
+          store.dispatch(
+            setUserSettings({ username: req.username, token: res.token })
+          );
+          return { data: { user: res.toJson() } };
         } catch (error) {
           return { error: error.rawMessage };
         }
-      }
+      },
     }),
     getAppStoreEntities: builder.query({
       queryFn: async () => {
         try {
           const res = await client.getAppsInStore({});
-          return { data: res.toJson().apps};
+          return { data: res.toJson().apps };
         } catch (error) {
           return { error };
         }
@@ -123,11 +133,11 @@ export const serverRPCService = createApi({
       queryFn: async () => {
         try {
           const res = await client.appsHealthCheck({});
-          return { data: res.toJson()};
+          return { data: res.toJson() };
         } catch (error) {
           return { error: error.rawMessage };
         }
-      }
+      },
     }),
     getDeviceSettings: builder.query({
       queryFn: async () => {
@@ -137,7 +147,7 @@ export const serverRPCService = createApi({
         } catch (error) {
           return { error: error.rawMessage };
         }
-      }
+      },
     }),
     getSystemStats: builder.query({
       queryFn: async () => {
@@ -147,7 +157,7 @@ export const serverRPCService = createApi({
         } catch (error) {
           return { error: error.rawMessage };
         }
-      }
+      },
     }),
   }),
 });
@@ -160,24 +170,10 @@ export const {
   useUpdateAppMutation,
   useGetIsDeviceSetupQuery,
   useInitDeviceMutation,
+  useSetDeviceSettingsMutation,
   useLoginMutation,
   useGetAppStoreEntitiesQuery,
   useGetAppsHealthCheckQuery,
   useGetDeviceSettingsQuery,
   useGetSystemStatsQuery,
 } = serverRPCService;
-
-const values = new Map([
-  [
-    'hello-world',
-    ``,
-  ],
-  [
-    'postgres',
-    ``,
-  ],
-  [
-    'immich',
-    ``,
-  ],
-]);
