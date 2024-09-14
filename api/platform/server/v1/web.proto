@@ -272,8 +272,8 @@ message AppStoreEntries {
 // User settings for the device
 
 message DeviceSettings {
-  User admin_user = 1;
-  string timezone = 2;
+  User admin_user = 1 [(validate.rules).message.required = true];
+  string timezone = 2 [(validate.rules).string.min_len = 7];
   bool auto_update_apps = 3;
   bool auto_update_os = 4;
 }
