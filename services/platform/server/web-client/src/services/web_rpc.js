@@ -13,11 +13,11 @@ if (process.env.NODE_ENV === 'development') {
   BASE_URL = 'http://home-cloud.local';
 }
 
-const web_service_transport = createConnectTransport({
+export const web_service_transport = createConnectTransport({
   baseUrl: BASE_URL,
 });
 
-const client = createPromiseClient(WebService, web_service_transport);
+export const client = createPromiseClient(WebService, web_service_transport);
 
 export const serverRPCService = createApi({
   reducerPath: 'server_rpc_service',
@@ -54,7 +54,6 @@ export const serverRPCService = createApi({
             values: values.get(app.name),
             version: app.version,
           });
-
           return { data: res.toJson() };
         } catch (error) {
           return { error: error.rawMessage };
@@ -70,7 +69,7 @@ export const serverRPCService = createApi({
           return { data: res.toJson() };
         } catch (error) {
           return { error: error.rawMessage};
-        };  
+        };
       },
     }),
     updateApp: builder.mutation({
@@ -107,7 +106,7 @@ export const serverRPCService = createApi({
           return { data: { user: res.toJson() }};
         } catch (error) {
           return { error: error.rawMessage };
-        }  
+        }
       }
     }),
     getAppStoreEntities: builder.query({
@@ -153,7 +152,7 @@ export const serverRPCService = createApi({
   }),
 });
 
-export const { 
+export const {
   useShutdownHostMutation,
   useRestartHostMutation,
   useInstallAppMutation,

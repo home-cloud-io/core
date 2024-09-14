@@ -10,7 +10,7 @@
   },
   "author": "Home Cloud",
   "license": "Apache-2.0",
-  "proxy": "http://localhost:8000",
+  "proxy": "http://127.0.0.1:8000",
   "dependencies": {
     "@blueprintjs/core": "^5.8.2",
     "@blueprintjs/icons": "^5.7.0",
@@ -23,7 +23,7 @@
     "@mui/icons-material": "^5.14.19",
     "@mui/material": "^5.14.20",
     "@reduxjs/toolkit": "^2.0.1",
-    "api": "https://gitpkg.vercel.app/home-cloud-io/core/api?api/v0.4.8",
+    "api": "https://gitpkg.vercel.app/home-cloud-io/core/api?api/v0.4.12",
     "localforage": "^1.10.0",
     "marked": "^14.1.0",
     "match-sorter": "^6.3.1",

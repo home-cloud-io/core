@@ -16,7 +16,7 @@ export default function DashboardPage() {
   // TODO: make this way better
   if (isLoading) {
     return <div>Loading...</div>;
-  } 
+  }
 
   // TODO: make this way better
   if (error) {
@@ -27,8 +27,8 @@ export default function DashboardPage() {
   if (!isLoading && data.isDeviceSetup === false) {
     // TODO: refine this to use the react-router-dom redirect if possible
     window.history.pushState({}, '', '/getting-started');
-    return <DeviceOnboardPage />; 
-  } 
+    return <DeviceOnboardPage />;
+  }
 
   return (
     <>

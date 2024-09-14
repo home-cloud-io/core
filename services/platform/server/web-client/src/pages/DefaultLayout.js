@@ -1,13 +1,20 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, NavLink } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+
+import { SUBSCRIBE_EVENTS_ACTION } from '../services/event_stream';
 
 import "./DefaultLayout.css";
 
 export default function DefaultLayout() {
+  const dispatch = useDispatch();
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [isSecondaryNavVisible, setSecondaryNavVisibility] = useState(false);
   const [isAlertVisible, setAlertVisibility] = useState(false);
+
+  useEffect(() => {
+    dispatch({type: SUBSCRIBE_EVENTS_ACTION});
+  })
 
   const onClickNavCollapseBtn = () => {
     setIsNavCollapsed(!isNavCollapsed);
@@ -26,7 +33,7 @@ export default function DefaultLayout() {
             </div>
 
             <div>
-              <button 
+              <button
                 id="navbarSideCollapse"
                 className="navbar-toggler p-0 border-0"
                 type="button"
