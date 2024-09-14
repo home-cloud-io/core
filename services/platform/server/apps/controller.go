@@ -13,8 +13,8 @@ import (
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
-	"github.com/robfig/cron/v3"
 
+	"github.com/robfig/cron/v3"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
 )
@@ -47,6 +47,7 @@ type (
 )
 
 func NewController(logger chassis.Logger) Controller {
+	chassis.GetConfig().SetDefault(autoUpdateCronConfigKey, "0 3 * * *")
 	return &controller{
 		k8sclient: k8sclient.NewClient(logger),
 	}
@@ -62,8 +63,8 @@ const (
 	ErrFailedToGetSeedValue        = "failed to get seed value"
 	ErrFailedToUnmarshalSeedValue  = "failed to unmarshal seed value"
 
-	autoUpdateCron  = "0 3 * * *"
-	rawChartBaseUrl = "https://raw.githubusercontent.com/home-cloud-io/store"
+	autoUpdateCronConfigKey = "server.updates.apps_auto_update_cron"
+	rawChartBaseUrl         = "https://raw.githubusercontent.com/home-cloud-io/store"
 )
 
 func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.App, error) {
@@ -249,7 +250,7 @@ func (c *controller) UpdateAll(ctx context.Context, logger chassis.Logger) error
 					"latest_version":    store.Version,
 				})
 				log.Info("checking if update is needed")
-				if semver.Compare("v" + store.Version, "v" + installed.Spec.Version) == 1 {
+				if semver.Compare("v"+store.Version, "v"+installed.Spec.Version) == 1 {
 					log.Info("update is needed")
 					err := c.Update(ctx, logger, &v1.UpdateAppRequest{
 						// keep everything the same except the version
@@ -320,7 +321,9 @@ func (c *controller) AutoUpdate(logger chassis.Logger) {
 			logger.WithError(err).Error("failed to run auto app update job")
 		}
 	}
-	_, err := cr.AddFunc(autoUpdateCron, f)
+	cron := chassis.GetConfig().GetString(autoUpdateCronConfigKey)
+	logger.WithField("cron", cron).Info("setting apps auto-update interval")
+	_, err := cr.AddFunc(cron, f)
 	if err != nil {
 		logger.WithError(err).Panic("failed to initialize auto-update for apps")
 	}
