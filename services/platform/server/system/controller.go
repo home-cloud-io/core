@@ -71,6 +71,8 @@ type (
 		// GetServerSettings returns the current server settings after filtering out the
 		// admin username and password.
 		GetServerSettings(ctx context.Context) (*v1.DeviceSettings, error)
+		// SetServerSettings updates the settings on the server with the given values
+		SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error
 		// IsDeviceSetup checks if the device is already setup by checking if the DEFAULT_DEVICE_SETTINGS_KEY key exists in the key-value store
 		// with the default settings model
 		IsDeviceSetup(ctx context.Context) (bool, error)
@@ -104,6 +106,7 @@ const (
 	ErrFailedToCreateSettings      = "failed to create settings"
 	ErrFailedToSaveSettings        = "failed to save settings"
 	ErrFailedToGetSettings         = "failed to get settings"
+	ErrFailedToSetSettings         = "failed to save settings"
 	ErrFailedToBuildSeedGetRequest = "failed to build get request for seed"
 	ErrFailedToGetSeedValue        = "failed to get seed value"
 	ErrFailedToUnmarshalSeedValue  = "failed to unmarshal seed value"
@@ -436,9 +439,74 @@ func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings,
 	}
 
 	settings.AdminUser.Password = "" // don't return the password
-	settings.AdminUser.Username = "" // don't return the username
 
 	return settings, nil
+}
+
+func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {
+	// set the device settings on the host (via the daemon)
+	err := com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_InitializeDeviceCommand{
+			InitializeDeviceCommand: &dv1.InitializeDeviceCommand{
+				User: &dv1.SetUserPasswordCommand{
+					// TODO: Support multiple users? Right now the username "admin" is hardcoded into NixOS.
+					Username: "admin",
+					Password: settings.AdminUser.Password,
+				},
+				TimeZone: &dv1.SetTimeZoneCommand{
+					TimeZone: settings.Timezone,
+				},
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	for {
+		var done bool
+		msg := <-c.messages
+		switch msg.Message.(type) {
+		case *dv1.DaemonMessage_DeviceInitialized:
+			m := msg.Message.(*dv1.DaemonMessage_DeviceInitialized)
+			if m.DeviceInitialized.Error != nil {
+				return fmt.Errorf(m.DeviceInitialized.Error.Error)
+			}
+			done = true
+		default:
+			logger.WithField("message", msg).Warn("unrequested message type received")
+		}
+		if done {
+			break
+		}
+	}
+
+	// salt and hash given password if set
+	// otherwise, get existing value from cache
+	if settings.AdminUser.Password != "" {
+		logger.Info("updating admin user password")
+		// get seed salt value from blueprint
+		seed, err := getSaltValue(ctx)
+		if err != nil {
+			return err
+		} else {
+			// salt & hash the meat before you put in on the grill
+			settings.AdminUser.Password = hashPassword(settings.AdminUser.Password, []byte(seed))
+		}
+	} else {
+		existingSettings := &v1.DeviceSettings{}
+		err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, existingSettings)
+		if err != nil {
+			return fmt.Errorf(ErrFailedToGetSettings)
+		}
+		settings.AdminUser.Password = existingSettings.AdminUser.Password
+	}
+
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return errors.New(ErrFailedToCreateSettings)
+	}
+
+	return nil
 }
 
 func (c *controller) IsDeviceSetup(ctx context.Context) (bool, error) {
