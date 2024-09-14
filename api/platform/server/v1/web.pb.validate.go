@@ -5569,6 +5569,17 @@ func (m *DeviceSettings) validate(all bool) error {
 
 	var errors []error
 
+	if m.GetAdminUser() == nil {
+		err := DeviceSettingsValidationError{
+			field:  "AdminUser",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if all {
 		switch v := interface{}(m.GetAdminUser()).(type) {
 		case interface{ ValidateAll() error }:
@@ -5598,7 +5609,16 @@ func (m *DeviceSettings) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for Timezone
+	if utf8.RuneCountInString(m.GetTimezone()) < 7 {
+		err := DeviceSettingsValidationError{
+			field:  "Timezone",
+			reason: "value length must be at least 7 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	// no validation rules for AutoUpdateApps
 
