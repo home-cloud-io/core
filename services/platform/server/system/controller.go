@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
@@ -94,6 +95,9 @@ type (
 )
 
 func NewController(logger chassis.Logger, messages chan *dv1.DaemonMessage) Controller {
+	config := chassis.GetConfig()
+	config.SetDefault(osAutoUpdateCronConfigKey, "0 1 * * *")
+	config.SetDefault(containerAutoUpdateCronConfigKey, "0 2 * * *")
 	return &controller{
 		k8sclient:        k8sclient.NewClient(logger),
 		messages:         messages,
@@ -111,11 +115,11 @@ const (
 	ErrFailedToGetSeedValue        = "failed to get seed value"
 	ErrFailedToUnmarshalSeedValue  = "failed to unmarshal seed value"
 
-	homeCloudCoreRepo       = "https://github.com/home-cloud-io/core"
-	homeCloudCoreTrunk      = "main"
-	daemonTagPath           = "refs/tags/services/platform/daemon/"
-	osAutoUpdateCron        = "0 1 * * *"
-	containerAutoUpdateCron = "0 2 * * *"
+	homeCloudCoreRepo                = "https://github.com/home-cloud-io/core"
+	homeCloudCoreTrunk               = "main"
+	daemonTagPath                    = "refs/tags/services/platform/daemon/"
+	osAutoUpdateCronConfigKey        = "server.updates.os_auto_update_cron"
+	containerAutoUpdateCronConfigKey = "server.updates.containers_auto_update_cron"
 )
 
 // DAEMON
@@ -288,7 +292,9 @@ func (c *controller) AutoUpdateOS(logger chassis.Logger) {
 			logger.WithError(err).Error("failed to run auto os update job")
 		}
 	}
-	_, err := cr.AddFunc(osAutoUpdateCron, f)
+	cron := chassis.GetConfig().GetString(osAutoUpdateCronConfigKey)
+	logger.WithField("cron", cron).Info("setting os auto-update interval")
+	_, err := cr.AddFunc(cron, f)
 	if err != nil {
 		logger.WithError(err).Panic("failed to initialize auto-update for os")
 	}
@@ -373,7 +379,9 @@ func (c *controller) AutoUpdateContainers(logger chassis.Logger) {
 			logger.WithError(err).Error("failed to run auto container update job")
 		}
 	}
-	_, err := cr.AddFunc(containerAutoUpdateCron, f)
+	cron := chassis.GetConfig().GetString(containerAutoUpdateCronConfigKey)
+	logger.WithField("cron", cron).Info("setting container auto-update interval")
+	_, err := cr.AddFunc(cron, f)
 	if err != nil {
 		logger.WithError(err).Panic("failed to initialize auto-update for system containers")
 	}
@@ -421,6 +429,8 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 				log.WithError(err).Error("failed to update system container image")
 				// don't return, try to update other containers
 			}
+			// TODO: this is a hack, should really be event-driven
+			time.Sleep(3 * time.Second)
 		} else {
 			log.Info("no update needed")
 		}
