@@ -302,6 +302,11 @@ func (c *client) setSystemImage(ctx context.Context, def *v1.SetSystemImageComma
 func (c *client) setUserPassword(ctx context.Context, def *v1.SetUserPasswordCommand) error {
 	logger := c.logger.WithField("username", def.Username)
 
+	if def.Password == "" {
+		logger.Info("ignoring empty password change")
+		return nil
+	}
+
 	cmd := exec.Command("chpasswd")
 
 	// write the username:password to stdin when the command executes
@@ -348,8 +353,11 @@ func (c *client) removeMdnsHost(_ context.Context, def *v1.RemoveMdnsHostCommand
 }
 
 func (c *client) initializeDevice(ctx context.Context, def *v1.InitializeDeviceCommand) {
+	var (
+		err error
+	)
 	c.logger.Info("initializing device")
-	err := c.setUserPassword(ctx, def.User)
+	err = c.setUserPassword(ctx, def.User)
 	if err != nil {
 		err = c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_DeviceInitialized{
