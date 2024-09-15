@@ -1,13 +1,18 @@
 import * as React from 'react';
+import { useDispatch, shallowEqual, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 
-import { 
+import {
   useInstallAppMutation,
   useGetAppStoreEntitiesQuery
 } from '../../services/web_rpc';
 import { marked } from 'marked';
+import { AppInstallStatus, setAppInstallStatus } from '../../services/web_slice';
 
 export default function AppStorePage() {
-  const { data, error, isLoading } = useGetAppStoreEntitiesQuery(); 
+  const { data, error, isLoading } = useGetAppStoreEntitiesQuery();
+  const installStatus = useSelector(state => state.server.app_install_status, shallowEqual);
 
   const ListEntries = () => {
     return (
@@ -15,7 +20,10 @@ export default function AppStorePage() {
         <h6 className="border-bottom pb-2 mb-0">Applications</h6>
         {data.map(app => {
           return (
-            <StoreEntry app={app} key={app.digest}/>
+            <StoreEntry
+              app={app}
+              key={app.digest}
+              status={installStatus[app.name]} />
           )
         })}
       </div>
@@ -35,8 +43,20 @@ export default function AppStorePage() {
   );
 }
 
-function StoreEntry({app}) {
+function StoreEntry({app, status = AppInstallStatus.DEFAULT}) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [installApp, result] = useInstallAppMutation();
+
+  const handleAppInstallClick = (app) => {
+    status = AppInstallStatus.INSTALLING;
+    dispatch(setAppInstallStatus({app, status}));
+    installApp({app});
+  }
+
+  const handleAppOpenClick = () => {
+    navigate('/home');
+  }
 
   const rowStyles = {
     paddingLeft: "2rem",
@@ -50,14 +70,6 @@ function StoreEntry({app}) {
     marginTop: ".50rem",
   }
 
-  const onAppClick = (app) => {
-    console.log(`App clicked: ${app}`);
-  }
-
-  const onMouseOver = (app) => {
-    console.log(`App entered: ${app}`);
-  }
-
   return (
     <div className="d-flex text-body-secondary pt-3">
 
@@ -68,12 +80,35 @@ function StoreEntry({app}) {
             Version: { app.version }
           </div>
           <div style={descriptionStyles} dangerouslySetInnerHTML={{__html: marked.parse(app.readme)}} />
-          <button 
-            className="btn btn-outline-primary float-end btn-sm"
-            style={btnStyles}
-            onClick={() => installApp(app)}>
-              Install
-          </button>
+
+          <div>
+            {status === AppInstallStatus.DEFAULT && (
+              <button
+                className="btn btn-outline-primary float-end btn-sm"
+                style={btnStyles}
+                onClick={() => handleAppInstallClick(app)}>
+                  Install
+              </button>
+            )}
+          </div>
+
+          <div>
+            {status === AppInstallStatus.INSTALLING && (
+              <ProgressBar animated now={100} />
+            )}
+          </div>
+
+          <div>
+            {status === AppInstallStatus.INSTALLED && (
+              <button
+                className="btn btn-outline-success float-end btn-sm"
+                style={btnStyles}
+                onClick={() => handleAppOpenClick()}
+                >
+                 Open
+              </button>
+            )}
+          </div>
 
         </div>
     </div>

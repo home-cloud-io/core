@@ -7,10 +7,18 @@ export const EventConnectionStatus = Object.freeze({
     ERROR: 'error',
 });
 
+export const AppInstallStatus = Object.freeze({
+    DEFAULT: 'default',
+    INSTALLING: 'installing',
+    INSTALLED: 'installed',
+    ERROR: 'error',
+});
+
 const initialState = {
     username: '',
     event_stream_connection_status: EventConnectionStatus.DISCONNECTED,
     event: [],
+    app_install_status: {},
 }
 
 export const serverSlice = createSlice({
@@ -36,12 +44,27 @@ export const serverSlice = createSlice({
                 return;
             }
 
+            if (action.payload.data.error) {
+                console.error("Received error event: ", action.payload.data.error);
+                return;
+            }
+
+            if (action.payload.data.appInstalled) {
+                state.app_install_status[action.payload.data.appInstalled.name] = AppInstallStatus.INSTALLED;
+                return;
+            }
+
             state.event.push(action.payload.data);
+        },
+        setAppInstallStatus: (state, action) => {
+            const { app, status } = action.payload;
+            state.app_install_status[app.name] = status;
         },
     }
 });
 
 export const {
+    setAppInstallStatus,
     setUser,
     setDeviceSettings,
     setEventStreamConnectionStatus,

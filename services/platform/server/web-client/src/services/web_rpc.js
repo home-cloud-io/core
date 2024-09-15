@@ -44,14 +44,16 @@ export const serverRPCService = createApi({
       },
     }),
     installApp: builder.mutation({
-      queryFn: async (app) => {
-        try {
-          const res = await client.installApp({
+      queryFn: async ({app}) => {
+        const req = {
             repo: 'home-cloud-io.github.io/store',
             chart: app.name,
             release: `${app.name}`,
             version: app.version,
-          });
+        }
+
+        try {
+          const res = await client.installApp(req);
           return { data: res.toJson() };
         } catch (error) {
           return { error: error.rawMessage };
