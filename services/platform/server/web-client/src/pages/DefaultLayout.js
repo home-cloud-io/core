@@ -44,15 +44,15 @@ export default function DefaultLayout() {
               <div className={`navbar-collapse offcanvas-collapse ${isNavCollapsed ? '' : 'open'}`} id="navbarsExampleDefault">
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
-                      <NavLink className="nav-link" to="/home">Home</NavLink>
+                      <NavLink className="nav-link" to="/home" onClick={onClickNavCollapseBtn}>Home</NavLink>
                   </li>
 
                   <li className="nav-item">
-                      <NavLink to="/store" className="nav-link">Store</NavLink>
+                      <NavLink to="/store" className="nav-link" onClick={onClickNavCollapseBtn}>Store</NavLink>
                   </li>
 
                   <li className="nav-item">
-                      <NavLink to="/settings" className="nav-link">Settings</NavLink>
+                      <NavLink to="/settings" className="nav-link" onClick={onClickNavCollapseBtn}>Settings</NavLink>
                   </li>
                 </ul>
               </div>
