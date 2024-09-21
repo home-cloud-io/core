@@ -34,7 +34,7 @@ func (r *AppReconciler) createDatabase(ctx context.Context, d AppDatabase, names
 		db := bun.NewDB(sqldb, pgdialect.New())
 
 		// check if user already exists (this happens on a reinstall without wiping old data)
-		exists, err := sysObjectExists(ctx, db, fmt.Sprintf("SELECT 1 FROM pg_roles WHERE rolname='%s'", "immich"))
+		exists, err := sysObjectExists(ctx, db, fmt.Sprintf("SELECT 1 FROM pg_roles WHERE rolname='%s'", d.Name))
 		if err != nil {
 			return err
 		}
