@@ -1,11 +1,13 @@
 package apps
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -108,6 +110,11 @@ func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.Ap
 		}
 		app.Readme = string(body)
 	}
+
+	// sort apps by name
+	slices.SortFunc(apps, func(a, b *v1.App) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
 
 	return apps, nil
 }
@@ -308,6 +315,11 @@ func (c *controller) Healthcheck(ctx context.Context, logger chassis.Logger) ([]
 			}
 		}
 	}
+
+	// sort apps by name
+	slices.SortFunc(apps, func(a, b *v1.AppHealth) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
 
 	return apps, nil
 }
