@@ -119,6 +119,108 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 		return err
 	}
 
+	err = r.createDependencies(ctx, app, appConfig)
+	if err != nil {
+		return err
+	}
+
+	// construct helm configuration
+	actionConfiguration, err := createHelmAction(app.Namespace)
+	if err != nil {
+		return err
+	}
+	act := action.NewInstall(actionConfiguration)
+	act.Version = app.Spec.Version
+	act.Namespace = app.Namespace
+	act.RepoURL = repoURL(app)
+	act.ReleaseName = app.Spec.Release
+	chart, values, err := getChartAndValues(act.ChartPathOptions, app)
+	if err != nil {
+		return err
+	}
+
+	// finally, install helm chart
+	_, err = act.Run(chart, values)
+	if err != nil {
+		return err
+	}
+
+	return r.updateStatus(ctx, app)
+}
+
+func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
+
+	// read combined app config from chart values and override values configured in the app
+	appConfig, err := config(app)
+	if err != nil {
+		return err
+	}
+
+	err = r.createDependencies(ctx, app, appConfig)
+	if err != nil {
+		return err
+	}
+
+	// construct helm configuration
+	actionConfiguration, err := createHelmAction(app.Namespace)
+	if err != nil {
+		return err
+	}
+	act := action.NewUpgrade(actionConfiguration)
+	act.Version = app.Spec.Version
+	act.Namespace = app.Namespace
+	act.RepoURL = repoURL(app)
+	chart, values, err := getChartAndValues(act.ChartPathOptions, app)
+	if err != nil {
+		return err
+	}
+
+	_, err = act.Run(app.Spec.Release, chart, values)
+	if err != nil {
+		return err
+	}
+
+	return r.updateStatus(ctx, app)
+}
+
+func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
+	actionConfiguration, err := createHelmAction(app.Namespace)
+	if err != nil {
+		return err
+	}
+
+	act := action.NewUninstall(actionConfiguration)
+	act.IgnoreNotFound = true
+
+	_, err = act.Run(app.Spec.Release)
+	if err != nil {
+		return err
+	}
+
+	// read combined app config from chart values and override values configured in the app
+	appConfig, err := config(app)
+	if err != nil {
+		return err
+	}
+
+	// delete all routes
+	for _, route := range appConfig.Routes {
+		err = r.deleteRoute(ctx, route.Name)
+		if err != nil {
+			return err
+		}
+	}
+
+	// TODO: option to hard-delete all add-on components (namespace, secrets, PV/PVCs, etc.)
+
+	return nil
+}
+
+func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, appConfig *AppConfig) error {
+	var (
+		err error
+	)
+
 	// create namespace before installing anything else
 	err = r.Client.Create(ctx, &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
@@ -170,84 +272,6 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 			return err
 		}
 	}
-
-	// construct helm configuration
-	actionConfiguration, err := createHelmAction(app.Namespace)
-	if err != nil {
-		return err
-	}
-	act := action.NewInstall(actionConfiguration)
-	act.Version = app.Spec.Version
-	act.Namespace = app.Namespace
-	act.RepoURL = repoURL(app)
-	act.ReleaseName = app.Spec.Release
-	chart, values, err := getChartAndValues(act.ChartPathOptions, app)
-	if err != nil {
-		return err
-	}
-
-	// finally, install helm chart
-	_, err = act.Run(chart, values)
-	if err != nil {
-		return err
-	}
-
-	return r.updateStatus(ctx, app)
-}
-
-func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
-	actionConfiguration, err := createHelmAction(app.Namespace)
-	if err != nil {
-		return err
-	}
-
-	act := action.NewUpgrade(actionConfiguration)
-	act.Version = app.Spec.Version
-	act.Namespace = app.Namespace
-	act.RepoURL = repoURL(app)
-
-	chart, values, err := getChartAndValues(act.ChartPathOptions, app)
-	if err != nil {
-		return err
-	}
-
-	_, err = act.Run(app.Spec.Release, chart, values)
-	if err != nil {
-		return err
-	}
-
-	return r.updateStatus(ctx, app)
-}
-
-func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
-	actionConfiguration, err := createHelmAction(app.Namespace)
-	if err != nil {
-		return err
-	}
-
-	act := action.NewUninstall(actionConfiguration)
-	act.IgnoreNotFound = true
-
-	_, err = act.Run(app.Spec.Release)
-	if err != nil {
-		return err
-	}
-
-	// read combined app config from chart values and override values configured in the app
-	appConfig, err := config(app)
-	if err != nil {
-		return err
-	}
-
-	// delete all routes
-	for _, route := range appConfig.Routes {
-		err = r.deleteRoute(ctx, route.Name)
-		if err != nil {
-			return err
-		}
-	}
-
-	// TODO: option to hard-delete all add-on components (namespace, secrets, PV/PVCs, etc.)
 
 	return nil
 }
