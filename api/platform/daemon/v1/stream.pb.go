@@ -733,6 +733,7 @@ func (x *DaemonError) GetError() string {
 	return ""
 }
 
+// UploadFileReady tells the server that the daemon is ready to start receiving file data chunks
 type UploadFileReady struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -780,6 +781,7 @@ func (x *UploadFileReady) GetId() string {
 	return ""
 }
 
+// UploadFileChunkCompleted tells the server that the daemon is ready for another chunk of data during a file upload
 type UploadFileChunkCompleted struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1399,6 +1401,7 @@ func (x *RemoveMdnsHostCommand) GetHostname() string {
 	return ""
 }
 
+// UploadFileRequest tells the daemon that the server would like to initiate a file upload
 type UploadFileRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1494,6 +1497,7 @@ func (*UploadFileRequest_Chunk) isUploadFileRequest_Data() {}
 
 func (*UploadFileRequest_Done) isUploadFileRequest_Data() {}
 
+// FileInfo defines the metadata information about a file to be uploaded
 type FileInfo struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1549,6 +1553,7 @@ func (x *FileInfo) GetFilePath() string {
 	return ""
 }
 
+// FileChunk defines a chunk of data passed to the daemon during a file upload
 type FileChunk struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1612,6 +1617,7 @@ func (x *FileChunk) GetData() []byte {
 	return nil
 }
 
+// FileDone tells the daemon that the last file data chunk has been uploaded and the daemon can assemble the final file
 type FileDone struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

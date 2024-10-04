@@ -474,6 +474,8 @@ export class DaemonError extends Message<DaemonError> {
 }
 
 /**
+ * UploadFileReady tells the server that the daemon is ready to start receiving file data chunks
+ *
  * @generated from message platform.daemon.v1.UploadFileReady
  */
 export class UploadFileReady extends Message<UploadFileReady> {
@@ -511,6 +513,8 @@ export class UploadFileReady extends Message<UploadFileReady> {
 }
 
 /**
+ * UploadFileChunkCompleted tells the server that the daemon is ready for another chunk of data during a file upload
+ *
  * @generated from message platform.daemon.v1.UploadFileChunkCompleted
  */
 export class UploadFileChunkCompleted extends Message<UploadFileChunkCompleted> {
@@ -1008,6 +1012,8 @@ export class RemoveMdnsHostCommand extends Message<RemoveMdnsHostCommand> {
 }
 
 /**
+ * UploadFileRequest tells the daemon that the server would like to initiate a file upload
+ *
  * @generated from message platform.daemon.v1.UploadFileRequest
  */
 export class UploadFileRequest extends Message<UploadFileRequest> {
@@ -1065,6 +1071,8 @@ export class UploadFileRequest extends Message<UploadFileRequest> {
 }
 
 /**
+ * FileInfo defines the metadata information about a file to be uploaded
+ *
  * @generated from message platform.daemon.v1.FileInfo
  */
 export class FileInfo extends Message<FileInfo> {
@@ -1108,6 +1116,8 @@ export class FileInfo extends Message<FileInfo> {
 }
 
 /**
+ * FileChunk defines a chunk of data passed to the daemon during a file upload
+ *
  * @generated from message platform.daemon.v1.FileChunk
  */
 export class FileChunk extends Message<FileChunk> {
@@ -1157,6 +1167,8 @@ export class FileChunk extends Message<FileChunk> {
 }
 
 /**
+ * FileDone tells the daemon that the last file data chunk has been uploaded and the daemon can assemble the final file
+ *
  * @generated from message platform.daemon.v1.FileDone
  */
 export class FileDone extends Message<FileDone> {
