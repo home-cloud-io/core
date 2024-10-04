@@ -2199,6 +2199,12 @@ export class ServerEvent extends Message<ServerEvent> {
      */
     value: AppInstalledEvent;
     case: "appInstalled";
+  } | {
+    /**
+     * @generated from field: platform.server.v1.FileUploadedEvent file_uploaded = 4;
+     */
+    value: FileUploadedEvent;
+    case: "fileUploaded";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerEvent>) {
@@ -2212,6 +2218,7 @@ export class ServerEvent extends Message<ServerEvent> {
     { no: 1, name: "heartbeat", kind: "message", T: HeartbeatEvent, oneof: "event" },
     { no: 2, name: "error", kind: "message", T: ErrorEvent, oneof: "event" },
     { no: 3, name: "app_installed", kind: "message", T: AppInstalledEvent, oneof: "event" },
+    { no: 4, name: "file_uploaded", kind: "message", T: FileUploadedEvent, oneof: "event" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerEvent {
@@ -2333,6 +2340,43 @@ export class AppInstalledEvent extends Message<AppInstalledEvent> {
 
   static equals(a: AppInstalledEvent | PlainMessage<AppInstalledEvent> | undefined, b: AppInstalledEvent | PlainMessage<AppInstalledEvent> | undefined): boolean {
     return proto3.util.equals(AppInstalledEvent, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.FileUploadedEvent
+ */
+export class FileUploadedEvent extends Message<FileUploadedEvent> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  constructor(data?: PartialMessage<FileUploadedEvent>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.FileUploadedEvent";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FileUploadedEvent {
+    return new FileUploadedEvent().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FileUploadedEvent {
+    return new FileUploadedEvent().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FileUploadedEvent {
+    return new FileUploadedEvent().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FileUploadedEvent | PlainMessage<FileUploadedEvent> | undefined, b: FileUploadedEvent | PlainMessage<FileUploadedEvent> | undefined): boolean {
+    return proto3.util.equals(FileUploadedEvent, a, b);
   }
 }
 
