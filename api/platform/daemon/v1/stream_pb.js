@@ -113,6 +113,8 @@ export const DaemonError = proto3.makeMessageType(
 );
 
 /**
+ * UploadFileReady tells the server that the daemon is ready to start receiving file data chunks
+ *
  * @generated from message platform.daemon.v1.UploadFileReady
  */
 export const UploadFileReady = proto3.makeMessageType(
@@ -123,6 +125,8 @@ export const UploadFileReady = proto3.makeMessageType(
 );
 
 /**
+ * UploadFileChunkCompleted tells the server that the daemon is ready for another chunk of data during a file upload
+ *
  * @generated from message platform.daemon.v1.UploadFileChunkCompleted
  */
 export const UploadFileChunkCompleted = proto3.makeMessageType(
@@ -257,6 +261,8 @@ export const RemoveMdnsHostCommand = proto3.makeMessageType(
 );
 
 /**
+ * UploadFileRequest tells the daemon that the server would like to initiate a file upload
+ *
  * @generated from message platform.daemon.v1.UploadFileRequest
  */
 export const UploadFileRequest = proto3.makeMessageType(
@@ -269,6 +275,8 @@ export const UploadFileRequest = proto3.makeMessageType(
 );
 
 /**
+ * FileInfo defines the metadata information about a file to be uploaded
+ *
  * @generated from message platform.daemon.v1.FileInfo
  */
 export const FileInfo = proto3.makeMessageType(
@@ -280,6 +288,8 @@ export const FileInfo = proto3.makeMessageType(
 );
 
 /**
+ * FileChunk defines a chunk of data passed to the daemon during a file upload
+ *
  * @generated from message platform.daemon.v1.FileChunk
  */
 export const FileChunk = proto3.makeMessageType(
@@ -292,6 +302,8 @@ export const FileChunk = proto3.makeMessageType(
 );
 
 /**
+ * FileDone tells the daemon that the last file data chunk has been uploaded and the daemon can assemble the final file
+ *
  * @generated from message platform.daemon.v1.FileDone
  */
 export const FileDone = proto3.makeMessageType(

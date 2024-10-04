@@ -3012,6 +3012,7 @@ func (x *AppInstalledEvent) GetName() string {
 	return ""
 }
 
+// FileUploadedEvent is sent from the server to connected clients when a file upload completes successfully
 type FileUploadedEvent struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

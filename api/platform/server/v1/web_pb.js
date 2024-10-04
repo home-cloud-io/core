@@ -603,6 +603,8 @@ export const AppInstalledEvent = proto3.makeMessageType(
 );
 
 /**
+ * FileUploadedEvent is sent from the server to connected clients when a file upload completes successfully
+ *
  * @generated from message platform.server.v1.FileUploadedEvent
  */
 export const FileUploadedEvent = proto3.makeMessageType(
