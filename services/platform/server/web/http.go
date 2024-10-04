@@ -36,7 +36,7 @@ type (
 )
 
 const (
-	appRootPath = "mnt/k8s-pvs"
+	appRootPath = "/mnt/k8s-pvs"
 )
 
 func NewHttp(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Http {

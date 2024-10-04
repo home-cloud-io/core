@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	chunkPath     = "etc/daemon/tmp"
+	chunkPath     = "/etc/daemon/tmp"
 )
 
 func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
