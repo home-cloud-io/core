@@ -18,6 +18,8 @@ export const DaemonMessage = proto3.makeMessageType(
     { no: 4, name: "current_daemon_version", kind: "message", T: CurrentDaemonVersion, oneof: "message" },
     { no: 5, name: "system_stats", kind: "message", T: SystemStats, oneof: "message" },
     { no: 6, name: "device_initialized", kind: "message", T: DeviceInitialized, oneof: "message" },
+    { no: 7, name: "upload_file_ready", kind: "message", T: UploadFileReady, oneof: "message" },
+    { no: 8, name: "upload_file_chunk_completed", kind: "message", T: UploadFileChunkCompleted, oneof: "message" },
   ],
 );
 
@@ -40,6 +42,7 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 11, name: "add_mdns_host_command", kind: "message", T: AddMdnsHostCommand, oneof: "message" },
     { no: 12, name: "remove_mdns_host_command", kind: "message", T: RemoveMdnsHostCommand, oneof: "message" },
     { no: 13, name: "initialize_device_command", kind: "message", T: InitializeDeviceCommand, oneof: "message" },
+    { no: 14, name: "upload_file_request", kind: "message", T: UploadFileRequest, oneof: "message" },
   ],
 );
 
@@ -106,6 +109,27 @@ export const DaemonError = proto3.makeMessageType(
   "platform.daemon.v1.DaemonError",
   () => [
     { no: 1, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.UploadFileReady
+ */
+export const UploadFileReady = proto3.makeMessageType(
+  "platform.daemon.v1.UploadFileReady",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.UploadFileChunkCompleted
+ */
+export const UploadFileChunkCompleted = proto3.makeMessageType(
+  "platform.daemon.v1.UploadFileChunkCompleted",
+  () => [
+    { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ],
 );
 
@@ -229,6 +253,52 @@ export const RemoveMdnsHostCommand = proto3.makeMessageType(
   "platform.daemon.v1.RemoveMdnsHostCommand",
   () => [
     { no: 1, name: "hostname", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.UploadFileRequest
+ */
+export const UploadFileRequest = proto3.makeMessageType(
+  "platform.daemon.v1.UploadFileRequest",
+  () => [
+    { no: 1, name: "info", kind: "message", T: FileInfo, oneof: "data" },
+    { no: 2, name: "chunk", kind: "message", T: FileChunk, oneof: "data" },
+    { no: 3, name: "done", kind: "message", T: FileDone, oneof: "data" },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.FileInfo
+ */
+export const FileInfo = proto3.makeMessageType(
+  "platform.daemon.v1.FileInfo",
+  () => [
+    { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "file_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.FileChunk
+ */
+export const FileChunk = proto3.makeMessageType(
+  "platform.daemon.v1.FileChunk",
+  () => [
+    { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "data", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.FileDone
+ */
+export const FileDone = proto3.makeMessageType(
+  "platform.daemon.v1.FileDone",
+  () => [
+    { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "chunk_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ],
 );
 

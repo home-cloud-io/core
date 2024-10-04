@@ -18,6 +18,8 @@ message DaemonMessage {
     CurrentDaemonVersion current_daemon_version = 4;
     SystemStats system_stats = 5;
     DeviceInitialized device_initialized = 6;
+    UploadFileReady upload_file_ready = 7;
+    UploadFileChunkCompleted upload_file_chunk_completed = 8;
   }
 }
 
@@ -36,6 +38,7 @@ message ServerMessage {
     AddMdnsHostCommand add_mdns_host_command = 11;
     RemoveMdnsHostCommand remove_mdns_host_command = 12;
     InitializeDeviceCommand initialize_device_command = 13;
+    UploadFileRequest upload_file_request = 14;
   }
 }
 
@@ -70,6 +73,15 @@ message DeviceInitialized {
 
 message DaemonError {
   string error = 1;
+}
+
+message UploadFileReady {
+  string id = 1;
+}
+
+message UploadFileChunkCompleted {
+  string file_id = 1;
+  uint32 index = 2;
 }
 
 // Server -> Daemon
@@ -120,4 +132,28 @@ message AddMdnsHostCommand {
 
 message RemoveMdnsHostCommand {
   string hostname = 1;
+}
+
+message UploadFileRequest {
+  oneof data {
+    FileInfo info = 1;
+    FileChunk chunk = 2;
+    FileDone done = 3;
+  }
+}
+
+message FileInfo {
+  string file_id = 1;
+  string file_path = 2;
+}
+
+message FileChunk {
+  string file_id = 1;
+  uint32 index = 2;
+  bytes data = 3;
+}
+
+message FileDone {
+  string file_id = 1;
+  uint32 chunk_count = 2;
 }
