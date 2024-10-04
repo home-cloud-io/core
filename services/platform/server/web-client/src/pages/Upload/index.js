@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useDispatch, shallowEqual, useSelector } from 'react-redux';
 import { FileUploadStatus, setFileUploadStatus } from '../../services/web_slice';
+import { useGetAppsHealthCheckQuery } from '../../services/web_rpc';
 
 const loading = require('../../assets/loading.gif');
 
@@ -15,6 +16,7 @@ if (process.env.NODE_ENV === 'development') {
 
 export default function UploadPage() {
   const uploadStatus = useSelector(state => state.server.file_upload_status, shallowEqual);
+  const { data, error, isLoading } = useGetAppsHealthCheckQuery();
 
   const headerStyles = {
     paddingTop: '.75rem',
@@ -27,17 +29,20 @@ export default function UploadPage() {
         <h6 className="border-bottom" style={headerStyles}>
           Upload File
         </h6>
-        <div>
-          <UploadForm
-            status={uploadStatus["file_id"]} />
-        </div>
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>Error: {error}</p>
+        ) : (
+          <UploadForm status={uploadStatus["file_id"]} apps={data.checks} />
+        )}
       </div>
     </div>
   );
 }
 
 
-function UploadForm({status = FileUploadStatus.DEFAULT}) {
+function UploadForm({status = FileUploadStatus.DEFAULT, apps}) {
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
@@ -66,8 +71,11 @@ function UploadForm({status = FileUploadStatus.DEFAULT}) {
           </div>
           <select className="form-select" id="app" name="app" defaultValue="" required >
             <option hidden disabled value=""> -- select an option -- </option>
-            <option value="jellyfin">Jellyfin</option>
-            <option value="immich">Immich</option>
+            {apps.map(app => {
+              return (
+                <option value={app.name} key={app.name}>{app.display.name}</option>
+              )
+            })}
           </select>
         </div>
 
