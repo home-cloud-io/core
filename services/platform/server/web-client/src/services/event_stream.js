@@ -41,7 +41,7 @@ export const subscribeMiddleware = (client) => (params) => (next) => (action) =>
         dispatch(setEvent({ data: res.toJson() }));
     }, (err) => {
         if (err) {
-            console.error("Error subscribing to events: ", err);
+            console.warn("Error subscribing to events: ", err);
             dispatch(setEventStreamConnectionStatus({ status: EventConnectionStatus.ERROR }));
         }
     });

@@ -54,6 +54,10 @@ export default function DefaultLayout() {
                   <li className="nav-item">
                       <NavLink to="/settings" className="nav-link" onClick={onClickNavCollapseBtn}>Settings</NavLink>
                   </li>
+
+                  <li className="nav-item">
+                      <NavLink to="/upload" className="nav-link" onClick={onClickNavCollapseBtn}>Upload</NavLink>
+                  </li>
                 </ul>
               </div>
             </div>

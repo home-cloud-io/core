@@ -14,11 +14,19 @@ export const AppInstallStatus = Object.freeze({
     ERROR: 'error',
 });
 
+export const FileUploadStatus = Object.freeze({
+    DEFAULT: 'default',
+    UPLOADING: 'uploading',
+    COMPLETE: 'complete',
+    ERROR: 'error',
+});
+
 const initialState = {
     username: '',
     event_stream_connection_status: EventConnectionStatus.DISCONNECTED,
     event: [],
     app_install_status: {},
+    file_upload_status: {},
 }
 
 export const serverSlice = createSlice({
@@ -54,17 +62,29 @@ export const serverSlice = createSlice({
                 return;
             }
 
+            if (action.payload.data.fileUploaded) {
+                // TODO: handle file ids properly
+                // state.file_upload_status[action.payload.data.fileUploaded.id] = FileUploadStatus.COMPLETE
+                state.file_upload_status["file_id"] = FileUploadStatus.COMPLETE
+                return;
+            }
+
             state.event.push(action.payload.data);
         },
         setAppInstallStatus: (state, action) => {
             const { app, status } = action.payload;
             state.app_install_status[app.name] = status;
         },
+        setFileUploadStatus: (state, action) => {
+            const { id, status } = action.payload;
+            state.file_upload_status[id] = status;
+        },
     }
 });
 
 export const {
     setAppInstallStatus,
+    setFileUploadStatus,
     setUser,
     setDeviceSettings,
     setEventStreamConnectionStatus,
