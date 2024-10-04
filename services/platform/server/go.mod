@@ -2,7 +2,7 @@ module github.com/home-cloud-io/core/services/platform/server
 
 go 1.22.5
 
-// replace github.com/home-cloud-io/core/api => ../../../api
+replace github.com/home-cloud-io/core/api => ../../../api
 
 // replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 
@@ -12,6 +12,7 @@ require (
 	connectrpc.com/connect v1.16.2
 	github.com/containers/image/v5 v5.32.2
 	github.com/go-git/go-git/v5 v5.12.0
+	github.com/google/uuid v1.6.0
 	github.com/home-cloud-io/core/api v0.4.16
 	github.com/home-cloud-io/core/services/platform/operator v0.0.2
 	github.com/robfig/cron/v3 v3.0.0
@@ -20,6 +21,7 @@ require (
 	github.com/steady-bytes/draft/pkg/loggers v0.2.1
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/mod v0.18.0
+	golang.org/x/sync v0.8.0
 	google.golang.org/protobuf v1.34.2
 	k8s.io/api v0.30.3
 	k8s.io/apimachinery v0.30.3
@@ -66,7 +68,6 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
@@ -116,7 +117,6 @@ require (
 	golang.org/x/crypto v0.26.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/oauth2 v0.22.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/term v0.23.0 // indirect
 	golang.org/x/text v0.17.0 // indirect

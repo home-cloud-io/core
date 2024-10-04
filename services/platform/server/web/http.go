@@ -1,0 +1,121 @@
+package web
+
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"path/filepath"
+
+	"github.com/home-cloud-io/core/services/platform/server/apps"
+	"github.com/home-cloud-io/core/services/platform/server/system"
+	"github.com/steady-bytes/draft/pkg/chassis"
+)
+
+type (
+	Http interface {
+		chassis.RPCRegistrar
+	}
+
+	httpStruct struct {
+		logger chassis.Logger
+		actl   apps.Controller
+		sctl   system.Controller
+	}
+
+	uploadForm struct {
+		file             io.Reader
+		app              string
+		path             string
+		fileName         string
+		fileNameOverride string
+	}
+)
+
+const (
+	appRootPath = "mnt/k8s-pvs"
+)
+
+func NewHttp(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Http {
+	return &httpStruct{
+		logger,
+		actl,
+		sctl,
+	}
+}
+
+// Implement the `RPCRegistrar` interface of draft so the `grpc` handlers are enabled
+func (h *httpStruct) RegisterRPC(server chassis.Rpcer) {
+	server.AddHandler("/upload", http.HandlerFunc(h.fileUploadHandler), true)
+}
+
+func (h *httpStruct) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	h.logger.Info("receiving file for upload")
+
+	// read all parts of form
+	reader, err := r.MultipartReader()
+	if err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	form, err := readForm(reader)
+	if err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	fileName := form.fileName
+	if form.fileNameOverride != "" {
+		fileName = form.fileNameOverride
+	}
+	fileName = filepath.Join(appRootPath, form.app, form.path, fileName)
+
+	err = h.sctl.UploadFileStream(ctx, h.logger, form.file, fileName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func readForm(reader *multipart.Reader) (uploadForm, error) {
+	form := uploadForm{}
+	for {
+		part, err := reader.NextPart()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return uploadForm{}, err
+		}
+
+		switch part.FormName() {
+		case "file":
+			form.file = bufio.NewReader(part)
+			form.fileName = part.FileName()
+			return form, nil
+		case "app":
+			s, err := io.ReadAll(part)
+			if err != nil {
+				return uploadForm{}, err
+			}
+			form.app = string(s)
+		case "path":
+			s, err := io.ReadAll(part)
+			if err != nil {
+				return uploadForm{}, err
+			}
+			form.path = string(s)
+		case "file-name-override":
+			s, err := io.ReadAll(part)
+			if err != nil {
+				return uploadForm{}, err
+			}
+			form.fileNameOverride = string(s)
+		}
+	}
+	return form, fmt.Errorf("no file provided in form")
+}

@@ -6,12 +6,14 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 	"sync"
 	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	"github.com/home-cloud-io/core/services/platform/server/async"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 
@@ -19,10 +21,12 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 	kvv1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
+	"golang.org/x/sync/errgroup"
 )
 
 type (
@@ -44,6 +48,7 @@ type (
 		AddMdnsHost(hostname string) error
 		// RemoveMdnsHost removes a host to the avahi mDNS server managed by the daemon
 		RemoveMdnsHost(hostname string) error
+		UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileName string) error
 	}
 	OS interface {
 		// CheckForOSUpdates will run the Nix commands to check for any NixOS updates to install.
@@ -89,19 +94,23 @@ type (
 
 	controller struct {
 		k8sclient        k8sclient.System
-		messages         chan *dv1.DaemonMessage
 		systemUpdateLock sync.Mutex
+		broadcaster      async.Broadcaster
+	}
+	fileChunk struct {
+		index int
+		data  []byte
 	}
 )
 
-func NewController(logger chassis.Logger, messages chan *dv1.DaemonMessage) Controller {
+func NewController(logger chassis.Logger, broadcaster async.Broadcaster) Controller {
 	config := chassis.GetConfig()
 	config.SetDefault(osAutoUpdateCronConfigKey, "0 1 * * *")
 	config.SetDefault(containerAutoUpdateCronConfigKey, "0 2 * * *")
 	return &controller{
 		k8sclient:        k8sclient.NewClient(logger),
-		messages:         messages,
 		systemUpdateLock: sync.Mutex{},
+		broadcaster:      broadcaster,
 	}
 }
 
@@ -206,6 +215,51 @@ func (c *controller) RemoveMdnsHost(hostname string) error {
 	return nil
 }
 
+func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileName string) error {
+	var (
+		fileId = uuid.New().String()
+	)
+
+	done := make(chan bool)
+	go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileReady]{
+		Callback: func(event *dv1.UploadFileReady) (bool, error) {
+			if event.Id == fileId {
+				done <- true
+				return true, nil
+			}
+			return false, nil
+		},
+	}).Listen(ctx)
+
+	// prepare upload to daemon
+	err := com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_UploadFileRequest{
+			UploadFileRequest: &dv1.UploadFileRequest{
+				Data: &dv1.UploadFileRequest_Info{
+					Info: &dv1.FileInfo{
+						FileId:   fileId,
+						FilePath: fileName,
+					},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	<-done
+	logger.Info("daemon ready for file upload")
+
+	// chunk file and upload
+	err = c.streamFile(ctx, logger, buf, fileId)
+	if err != nil {
+		logger.WithError(err).Error("failed to upload chunked file")
+		return err
+	}
+
+	return nil
+}
+
 // OS
 
 func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logger) (*v1.CheckForSystemUpdatesResponse, error) {
@@ -220,57 +274,42 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	)
 
 	// get the os update diff from the daemon
+	done := make(chan bool)
+	go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.OSUpdateDiff]{
+		Callback: func(event *dv1.OSUpdateDiff) (bool, error) {
+			response.OsDiff = event.Description
+			done <- true
+			return true, nil
+		},
+	}).Listen(ctx)
 	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestOsUpdateDiff{},
 	})
 	if err != nil {
 		return nil, err
 	}
-	for {
-		msg := <-c.messages
-		switch msg.Message.(type) {
-		case *dv1.DaemonMessage_OsUpdateDiff:
-			m := msg.Message.(*dv1.DaemonMessage_OsUpdateDiff)
-			if m.OsUpdateDiff.Error != nil {
-				return nil, fmt.Errorf(m.OsUpdateDiff.Error.Error)
-			}
-			response.OsDiff = m.OsUpdateDiff.Description
-		default:
-			logger.WithField("message", msg).Warn("unrequested message type received")
-		}
-		if response.OsDiff != "" {
-			break
-		}
-	}
+	<-done
 
 	// get the current daemon version from the daemon
+	done = make(chan bool)
+	go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.CurrentDaemonVersion]{
+		Callback: func(event *dv1.CurrentDaemonVersion) (bool, error) {
+			response.DaemonVersions = &v1.DaemonVersions{
+				Current: &v1.DaemonVersion{
+					Version:    event.Version,
+					VendorHash: event.VendorHash,
+					SrcHash:    event.SrcHash,
+				},
+			}
+			done <- true
+			return true, nil
+		},
+	}).Listen(ctx)
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestCurrentDaemonVersion{},
 	})
 	if err != nil {
 		return nil, err
-	}
-	for {
-		msg := <-c.messages
-		switch msg.Message.(type) {
-		case *dv1.DaemonMessage_CurrentDaemonVersion:
-			m := msg.Message.(*dv1.DaemonMessage_CurrentDaemonVersion)
-			if m.CurrentDaemonVersion.Error != nil {
-				return nil, fmt.Errorf(m.CurrentDaemonVersion.Error.Error)
-			}
-			response.DaemonVersions = &v1.DaemonVersions{
-				Current: &v1.DaemonVersion{
-					Version:    m.CurrentDaemonVersion.Version,
-					VendorHash: m.CurrentDaemonVersion.VendorHash,
-					SrcHash:    m.CurrentDaemonVersion.SrcHash,
-				},
-			}
-		default:
-			logger.WithField("message", msg).Warn("unrequested message type received")
-		}
-		if response.DaemonVersions != nil {
-			break
-		}
 	}
 
 	// get latest available daemon version
@@ -455,6 +494,18 @@ func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings,
 
 func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {
 	// set the device settings on the host (via the daemon)
+	done := make(chan bool)
+	var listenerErr error
+	go func() {
+		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.DeviceInitialized]{
+			Callback: func(event *dv1.DeviceInitialized) (bool, error) {
+				if event.Error != nil {
+					return true, fmt.Errorf(event.Error.Error)
+				}
+				return true, nil
+			},
+		}).Listen(ctx)
+	}()
 	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_InitializeDeviceCommand{
 			InitializeDeviceCommand: &dv1.InitializeDeviceCommand{
@@ -472,22 +523,9 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 	if err != nil {
 		return err
 	}
-	for {
-		var done bool
-		msg := <-c.messages
-		switch msg.Message.(type) {
-		case *dv1.DaemonMessage_DeviceInitialized:
-			m := msg.Message.(*dv1.DaemonMessage_DeviceInitialized)
-			if m.DeviceInitialized.Error != nil {
-				return fmt.Errorf(m.DeviceInitialized.Error.Error)
-			}
-			done = true
-		default:
-			logger.WithField("message", msg).Warn("unrequested message type received")
-		}
-		if done {
-			break
-		}
+	<-done
+	if listenerErr != nil {
+		return listenerErr
 	}
 
 	// salt and hash given password if set
@@ -544,6 +582,18 @@ func (c *controller) InitializeDevice(ctx context.Context, logger chassis.Logger
 	}
 
 	// set the device settings on the host (via the daemon)
+	done := make(chan bool)
+	var listenerErr error
+	go func() {
+		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.DeviceInitialized]{
+			Callback: func(event *dv1.DeviceInitialized) (bool, error) {
+				if event.Error != nil {
+					return true, fmt.Errorf(event.Error.Error)
+				}
+				return true, nil
+			},
+		}).Listen(ctx)
+	}()
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_InitializeDeviceCommand{
 			InitializeDeviceCommand: &dv1.InitializeDeviceCommand{
@@ -561,22 +611,9 @@ func (c *controller) InitializeDevice(ctx context.Context, logger chassis.Logger
 	if err != nil {
 		return err
 	}
-	for {
-		var done bool
-		msg := <-c.messages
-		switch msg.Message.(type) {
-		case *dv1.DaemonMessage_DeviceInitialized:
-			m := msg.Message.(*dv1.DaemonMessage_DeviceInitialized)
-			if m.DeviceInitialized.Error != nil {
-				return fmt.Errorf(m.DeviceInitialized.Error.Error)
-			}
-			done = true
-		default:
-			logger.WithField("message", msg).Warn("unrequested message type received")
-		}
-		if done {
-			break
-		}
+	<-done
+	if listenerErr != nil {
+		return listenerErr
 	}
 
 	// get seed salt value from blueprint
@@ -758,4 +795,119 @@ func getLatestImageTag(ctx context.Context, image string) (string, error) {
 	}
 
 	return latestVersion, nil
+}
+
+func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId string) error {
+	var (
+		g         errgroup.Group
+		log       = logger.WithField("file_id", fileId)
+		chunkSize = 10 << 20
+	)
+
+	// Create channels to communicate between goroutines
+	chunks := make(chan fileChunk, 1)
+
+	// Start multiple goroutines to process chunks in parallel
+	for i := 0; i < 4; i++ { // Number of parallel workers
+		g.Go(func() error {
+			log := log.WithField("worker", i)
+			log.Info("waiting for work")
+			for chunk := range chunks {
+				log := log.WithField("chunk_index", chunk.index)
+				log.Info("uploading chunk")
+				// upload chunk
+				done := make(chan bool)
+				go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileChunkCompleted]{
+					Callback: func(event *dv1.UploadFileChunkCompleted) (bool, error) {
+						if event.FileId == fileId && event.Index == uint32(chunk.index) {
+							done <- true
+							return true, nil
+						}
+						return false, nil
+					},
+				}).Listen(ctx)
+				err := com.Send(&dv1.ServerMessage{
+					Message: &dv1.ServerMessage_UploadFileRequest{
+						UploadFileRequest: &dv1.UploadFileRequest{
+							Data: &dv1.UploadFileRequest_Chunk{
+								Chunk: &dv1.FileChunk{
+									FileId: fileId,
+									Index:  uint32(chunk.index),
+									Data:   chunk.data,
+								},
+							},
+						},
+					},
+				})
+				if err != nil {
+					return err
+				}
+
+				// wait for done signal before uploading next chunk
+				log.Debug("wait for done signal")
+				<-done
+				log.Debug("chunk upload complete")
+			}
+			log.Info("done with work")
+			return nil
+		})
+	}
+
+	// send chunks to workers
+	currentChunk := 0
+	for {
+		chunk := make([]byte, chunkSize)
+		count, err := io.ReadFull(buf, chunk)
+		if err != nil {
+			// EOF means we're done
+			if err == io.EOF {
+				break
+			}
+			// error out on non-EOF error
+			if err != io.ErrUnexpectedEOF {
+				return err
+			}
+			// ErrUnexpectedEOF means we hit the end of the file before reaching chunkSize
+			// so we need to trim excess bytes
+			chunk = chunk[:count]
+		}
+		// send chunk to workers
+		chunks <- fileChunk{
+			index: currentChunk,
+			data:  chunk,
+		}
+		// exit if we hit ErrUnexpectedEOF and trimmed the chunk
+		if len(chunk) < chunkSize {
+			break
+		}
+		currentChunk++
+	}
+	close(chunks)
+	currentChunk++
+
+	// Wait for all goroutines to finish
+	err := g.Wait()
+	if err != nil {
+		return err
+	}
+	log.Info("finished uploading chunks")
+
+	// send done signal to daemon
+	err = com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_UploadFileRequest{
+			UploadFileRequest: &dv1.UploadFileRequest{
+				Data: &dv1.UploadFileRequest_Done{
+					Done: &dv1.FileDone{
+						FileId:     fileId,
+						ChunkCount: uint32(currentChunk),
+					},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
