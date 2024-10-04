@@ -48,7 +48,7 @@ type (
 		AddMdnsHost(hostname string) error
 		// RemoveMdnsHost removes a host to the avahi mDNS server managed by the daemon
 		RemoveMdnsHost(hostname string) error
-		UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileName string) error
+		UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileName string) (string, error)
 	}
 	OS interface {
 		// CheckForOSUpdates will run the Nix commands to check for any NixOS updates to install.
@@ -215,7 +215,7 @@ func (c *controller) RemoveMdnsHost(hostname string) error {
 	return nil
 }
 
-func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileName string) error {
+func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileName string) (string, error) {
 	var (
 		fileId = uuid.New().String()
 	)
@@ -245,7 +245,7 @@ func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger
 		},
 	})
 	if err != nil {
-		return err
+		return fileId, err
 	}
 	<-done
 	logger.Info("daemon ready for file upload")
@@ -254,10 +254,10 @@ func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger
 	err = c.streamFile(ctx, logger, buf, fileId)
 	if err != nil {
 		logger.WithError(err).Error("failed to upload chunked file")
-		return err
+		return fileId, err
 	}
 
-	return nil
+	return fileId, nil
 }
 
 // OS
@@ -499,6 +499,7 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 	go func() {
 		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.DeviceInitialized]{
 			Callback: func(event *dv1.DeviceInitialized) (bool, error) {
+				done<-true
 				if event.Error != nil {
 					return true, fmt.Errorf(event.Error.Error)
 				}
@@ -587,6 +588,7 @@ func (c *controller) InitializeDevice(ctx context.Context, logger chassis.Logger
 	go func() {
 		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.DeviceInitialized]{
 			Callback: func(event *dv1.DeviceInitialized) (bool, error) {
+				done<-true
 				if event.Error != nil {
 					return true, fmt.Errorf(event.Error.Error)
 				}
@@ -809,9 +811,9 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 
 	// Start multiple goroutines to process chunks in parallel
 	for i := 0; i < 4; i++ { // Number of parallel workers
+		log := log.WithField("worker", i)
 		g.Go(func() error {
-			log := log.WithField("worker", i)
-			log.Info("waiting for work")
+			log.Debug("waiting for work")
 			for chunk := range chunks {
 				log := log.WithField("chunk_index", chunk.index)
 				log.Info("uploading chunk")
@@ -848,7 +850,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 				<-done
 				log.Debug("chunk upload complete")
 			}
-			log.Info("done with work")
+			log.Debug("done with work")
 			return nil
 		})
 	}
