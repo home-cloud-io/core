@@ -570,6 +570,7 @@ export const ServerEvent = proto3.makeMessageType(
     { no: 1, name: "heartbeat", kind: "message", T: HeartbeatEvent, oneof: "event" },
     { no: 2, name: "error", kind: "message", T: ErrorEvent, oneof: "event" },
     { no: 3, name: "app_installed", kind: "message", T: AppInstalledEvent, oneof: "event" },
+    { no: 4, name: "file_uploaded", kind: "message", T: FileUploadedEvent, oneof: "event" },
   ],
 );
 
@@ -598,6 +599,16 @@ export const AppInstalledEvent = proto3.makeMessageType(
   "platform.server.v1.AppInstalledEvent",
   () => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.FileUploadedEvent
+ */
+export const FileUploadedEvent = proto3.makeMessageType(
+  "platform.server.v1.FileUploadedEvent",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
