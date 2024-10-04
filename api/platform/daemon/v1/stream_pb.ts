@@ -50,6 +50,18 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: DeviceInitialized;
     case: "deviceInitialized";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.UploadFileReady upload_file_ready = 7;
+     */
+    value: UploadFileReady;
+    case: "uploadFileReady";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.UploadFileChunkCompleted upload_file_chunk_completed = 8;
+     */
+    value: UploadFileChunkCompleted;
+    case: "uploadFileChunkCompleted";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -66,6 +78,8 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 4, name: "current_daemon_version", kind: "message", T: CurrentDaemonVersion, oneof: "message" },
     { no: 5, name: "system_stats", kind: "message", T: SystemStats, oneof: "message" },
     { no: 6, name: "device_initialized", kind: "message", T: DeviceInitialized, oneof: "message" },
+    { no: 7, name: "upload_file_ready", kind: "message", T: UploadFileReady, oneof: "message" },
+    { no: 8, name: "upload_file_chunk_completed", kind: "message", T: UploadFileChunkCompleted, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -170,6 +184,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: InitializeDeviceCommand;
     case: "initializeDeviceCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.UploadFileRequest upload_file_request = 14;
+     */
+    value: UploadFileRequest;
+    case: "uploadFileRequest";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -193,6 +213,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 11, name: "add_mdns_host_command", kind: "message", T: AddMdnsHostCommand, oneof: "message" },
     { no: 12, name: "remove_mdns_host_command", kind: "message", T: RemoveMdnsHostCommand, oneof: "message" },
     { no: 13, name: "initialize_device_command", kind: "message", T: InitializeDeviceCommand, oneof: "message" },
+    { no: 14, name: "upload_file_request", kind: "message", T: UploadFileRequest, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -449,6 +470,90 @@ export class DaemonError extends Message<DaemonError> {
 
   static equals(a: DaemonError | PlainMessage<DaemonError> | undefined, b: DaemonError | PlainMessage<DaemonError> | undefined): boolean {
     return proto3.util.equals(DaemonError, a, b);
+  }
+}
+
+/**
+ * UploadFileReady tells the server that the daemon is ready to start receiving file data chunks
+ *
+ * @generated from message platform.daemon.v1.UploadFileReady
+ */
+export class UploadFileReady extends Message<UploadFileReady> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  constructor(data?: PartialMessage<UploadFileReady>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.UploadFileReady";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UploadFileReady {
+    return new UploadFileReady().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UploadFileReady {
+    return new UploadFileReady().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UploadFileReady {
+    return new UploadFileReady().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UploadFileReady | PlainMessage<UploadFileReady> | undefined, b: UploadFileReady | PlainMessage<UploadFileReady> | undefined): boolean {
+    return proto3.util.equals(UploadFileReady, a, b);
+  }
+}
+
+/**
+ * UploadFileChunkCompleted tells the server that the daemon is ready for another chunk of data during a file upload
+ *
+ * @generated from message platform.daemon.v1.UploadFileChunkCompleted
+ */
+export class UploadFileChunkCompleted extends Message<UploadFileChunkCompleted> {
+  /**
+   * @generated from field: string file_id = 1;
+   */
+  fileId = "";
+
+  /**
+   * @generated from field: uint32 index = 2;
+   */
+  index = 0;
+
+  constructor(data?: PartialMessage<UploadFileChunkCompleted>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.UploadFileChunkCompleted";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UploadFileChunkCompleted {
+    return new UploadFileChunkCompleted().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UploadFileChunkCompleted {
+    return new UploadFileChunkCompleted().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UploadFileChunkCompleted {
+    return new UploadFileChunkCompleted().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UploadFileChunkCompleted | PlainMessage<UploadFileChunkCompleted> | undefined, b: UploadFileChunkCompleted | PlainMessage<UploadFileChunkCompleted> | undefined): boolean {
+    return proto3.util.equals(UploadFileChunkCompleted, a, b);
   }
 }
 
@@ -903,6 +1008,206 @@ export class RemoveMdnsHostCommand extends Message<RemoveMdnsHostCommand> {
 
   static equals(a: RemoveMdnsHostCommand | PlainMessage<RemoveMdnsHostCommand> | undefined, b: RemoveMdnsHostCommand | PlainMessage<RemoveMdnsHostCommand> | undefined): boolean {
     return proto3.util.equals(RemoveMdnsHostCommand, a, b);
+  }
+}
+
+/**
+ * UploadFileRequest tells the daemon that the server would like to initiate a file upload
+ *
+ * @generated from message platform.daemon.v1.UploadFileRequest
+ */
+export class UploadFileRequest extends Message<UploadFileRequest> {
+  /**
+   * @generated from oneof platform.daemon.v1.UploadFileRequest.data
+   */
+  data: {
+    /**
+     * @generated from field: platform.daemon.v1.FileInfo info = 1;
+     */
+    value: FileInfo;
+    case: "info";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.FileChunk chunk = 2;
+     */
+    value: FileChunk;
+    case: "chunk";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.FileDone done = 3;
+     */
+    value: FileDone;
+    case: "done";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<UploadFileRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.UploadFileRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "info", kind: "message", T: FileInfo, oneof: "data" },
+    { no: 2, name: "chunk", kind: "message", T: FileChunk, oneof: "data" },
+    { no: 3, name: "done", kind: "message", T: FileDone, oneof: "data" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UploadFileRequest {
+    return new UploadFileRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UploadFileRequest {
+    return new UploadFileRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UploadFileRequest {
+    return new UploadFileRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UploadFileRequest | PlainMessage<UploadFileRequest> | undefined, b: UploadFileRequest | PlainMessage<UploadFileRequest> | undefined): boolean {
+    return proto3.util.equals(UploadFileRequest, a, b);
+  }
+}
+
+/**
+ * FileInfo defines the metadata information about a file to be uploaded
+ *
+ * @generated from message platform.daemon.v1.FileInfo
+ */
+export class FileInfo extends Message<FileInfo> {
+  /**
+   * @generated from field: string file_id = 1;
+   */
+  fileId = "";
+
+  /**
+   * @generated from field: string file_path = 2;
+   */
+  filePath = "";
+
+  constructor(data?: PartialMessage<FileInfo>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.FileInfo";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "file_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FileInfo {
+    return new FileInfo().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FileInfo {
+    return new FileInfo().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FileInfo {
+    return new FileInfo().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FileInfo | PlainMessage<FileInfo> | undefined, b: FileInfo | PlainMessage<FileInfo> | undefined): boolean {
+    return proto3.util.equals(FileInfo, a, b);
+  }
+}
+
+/**
+ * FileChunk defines a chunk of data passed to the daemon during a file upload
+ *
+ * @generated from message platform.daemon.v1.FileChunk
+ */
+export class FileChunk extends Message<FileChunk> {
+  /**
+   * @generated from field: string file_id = 1;
+   */
+  fileId = "";
+
+  /**
+   * @generated from field: uint32 index = 2;
+   */
+  index = 0;
+
+  /**
+   * @generated from field: bytes data = 3;
+   */
+  data = new Uint8Array(0);
+
+  constructor(data?: PartialMessage<FileChunk>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.FileChunk";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "data", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FileChunk {
+    return new FileChunk().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FileChunk {
+    return new FileChunk().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FileChunk {
+    return new FileChunk().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FileChunk | PlainMessage<FileChunk> | undefined, b: FileChunk | PlainMessage<FileChunk> | undefined): boolean {
+    return proto3.util.equals(FileChunk, a, b);
+  }
+}
+
+/**
+ * FileDone tells the daemon that the last file data chunk has been uploaded and the daemon can assemble the final file
+ *
+ * @generated from message platform.daemon.v1.FileDone
+ */
+export class FileDone extends Message<FileDone> {
+  /**
+   * @generated from field: string file_id = 1;
+   */
+  fileId = "";
+
+  /**
+   * @generated from field: uint32 chunk_count = 2;
+   */
+  chunkCount = 0;
+
+  constructor(data?: PartialMessage<FileDone>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.FileDone";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "chunk_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FileDone {
+    return new FileDone().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FileDone {
+    return new FileDone().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FileDone {
+    return new FileDone().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: FileDone | PlainMessage<FileDone> | undefined, b: FileDone | PlainMessage<FileDone> | undefined): boolean {
+    return proto3.util.equals(FileDone, a, b);
   }
 }
 

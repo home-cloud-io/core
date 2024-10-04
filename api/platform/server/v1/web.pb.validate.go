@@ -6155,6 +6155,47 @@ func (m *ServerEvent) validate(all bool) error {
 			}
 		}
 
+	case *ServerEvent_FileUploaded:
+		if v == nil {
+			err := ServerEventValidationError{
+				field:  "Event",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetFileUploaded()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerEventValidationError{
+						field:  "FileUploaded",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerEventValidationError{
+						field:  "FileUploaded",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetFileUploaded()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerEventValidationError{
+					field:  "FileUploaded",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -6540,3 +6581,107 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AppInstalledEventValidationError{}
+
+// Validate checks the field values on FileUploadedEvent with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *FileUploadedEvent) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FileUploadedEvent with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// FileUploadedEventMultiError, or nil if none found.
+func (m *FileUploadedEvent) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FileUploadedEvent) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return FileUploadedEventMultiError(errors)
+	}
+
+	return nil
+}
+
+// FileUploadedEventMultiError is an error wrapping multiple validation errors
+// returned by FileUploadedEvent.ValidateAll() if the designated constraints
+// aren't met.
+type FileUploadedEventMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FileUploadedEventMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FileUploadedEventMultiError) AllErrors() []error { return m }
+
+// FileUploadedEventValidationError is the validation error returned by
+// FileUploadedEvent.Validate if the designated constraints aren't met.
+type FileUploadedEventValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FileUploadedEventValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FileUploadedEventValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FileUploadedEventValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FileUploadedEventValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FileUploadedEventValidationError) ErrorName() string {
+	return "FileUploadedEventValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e FileUploadedEventValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFileUploadedEvent.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FileUploadedEventValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FileUploadedEventValidationError{}

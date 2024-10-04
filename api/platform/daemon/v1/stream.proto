@@ -18,6 +18,8 @@ message DaemonMessage {
     CurrentDaemonVersion current_daemon_version = 4;
     SystemStats system_stats = 5;
     DeviceInitialized device_initialized = 6;
+    UploadFileReady upload_file_ready = 7;
+    UploadFileChunkCompleted upload_file_chunk_completed = 8;
   }
 }
 
@@ -36,6 +38,7 @@ message ServerMessage {
     AddMdnsHostCommand add_mdns_host_command = 11;
     RemoveMdnsHostCommand remove_mdns_host_command = 12;
     InitializeDeviceCommand initialize_device_command = 13;
+    UploadFileRequest upload_file_request = 14;
   }
 }
 
@@ -70,6 +73,17 @@ message DeviceInitialized {
 
 message DaemonError {
   string error = 1;
+}
+
+// UploadFileReady tells the server that the daemon is ready to start receiving file data chunks
+message UploadFileReady {
+  string id = 1;
+}
+
+// UploadFileChunkCompleted tells the server that the daemon is ready for another chunk of data during a file upload
+message UploadFileChunkCompleted {
+  string file_id = 1;
+  uint32 index = 2;
 }
 
 // Server -> Daemon
@@ -120,4 +134,32 @@ message AddMdnsHostCommand {
 
 message RemoveMdnsHostCommand {
   string hostname = 1;
+}
+
+// UploadFileRequest tells the daemon that the server would like to initiate a file upload
+message UploadFileRequest {
+  oneof data {
+    FileInfo info = 1;
+    FileChunk chunk = 2;
+    FileDone done = 3;
+  }
+}
+
+// FileInfo defines the metadata information about a file to be uploaded
+message FileInfo {
+  string file_id = 1;
+  string file_path = 2;
+}
+
+// FileChunk defines a chunk of data passed to the daemon during a file upload
+message FileChunk {
+  string file_id = 1;
+  uint32 index = 2;
+  bytes data = 3;
+}
+
+// FileDone tells the daemon that the last file data chunk has been uploaded and the daemon can assemble the final file
+message FileDone {
+  string file_id = 1;
+  uint32 chunk_count = 2;
 }

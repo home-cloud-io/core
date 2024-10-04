@@ -298,6 +298,7 @@ message ServerEvent {
     HeartbeatEvent heartbeat = 1;
     ErrorEvent error = 2;
     AppInstalledEvent app_installed = 3;
+    FileUploadedEvent file_uploaded = 4;
   }
 }
 
@@ -309,4 +310,9 @@ message ErrorEvent {
 
 message AppInstalledEvent {
   string name = 1;
+}
+
+// FileUploadedEvent is sent from the server to connected clients when a file upload completes successfully
+message FileUploadedEvent {
+  string id = 1;
 }

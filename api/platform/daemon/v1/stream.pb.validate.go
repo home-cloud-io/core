@@ -304,6 +304,88 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_UploadFileReady:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetUploadFileReady()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "UploadFileReady",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "UploadFileReady",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetUploadFileReady()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "UploadFileReady",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *DaemonMessage_UploadFileChunkCompleted:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetUploadFileChunkCompleted()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "UploadFileChunkCompleted",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "UploadFileChunkCompleted",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetUploadFileChunkCompleted()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "UploadFileChunkCompleted",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -936,6 +1018,47 @@ func (m *ServerMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
 					field:  "InitializeDeviceCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_UploadFileRequest:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetUploadFileRequest()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "UploadFileRequest",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "UploadFileRequest",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetUploadFileRequest()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "UploadFileRequest",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -1721,6 +1844,214 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DaemonErrorValidationError{}
+
+// Validate checks the field values on UploadFileReady with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UploadFileReady) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UploadFileReady with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UploadFileReadyMultiError, or nil if none found.
+func (m *UploadFileReady) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UploadFileReady) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return UploadFileReadyMultiError(errors)
+	}
+
+	return nil
+}
+
+// UploadFileReadyMultiError is an error wrapping multiple validation errors
+// returned by UploadFileReady.ValidateAll() if the designated constraints
+// aren't met.
+type UploadFileReadyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UploadFileReadyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UploadFileReadyMultiError) AllErrors() []error { return m }
+
+// UploadFileReadyValidationError is the validation error returned by
+// UploadFileReady.Validate if the designated constraints aren't met.
+type UploadFileReadyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UploadFileReadyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UploadFileReadyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UploadFileReadyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UploadFileReadyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UploadFileReadyValidationError) ErrorName() string { return "UploadFileReadyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UploadFileReadyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUploadFileReady.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UploadFileReadyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UploadFileReadyValidationError{}
+
+// Validate checks the field values on UploadFileChunkCompleted with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UploadFileChunkCompleted) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UploadFileChunkCompleted with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UploadFileChunkCompletedMultiError, or nil if none found.
+func (m *UploadFileChunkCompleted) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UploadFileChunkCompleted) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for FileId
+
+	// no validation rules for Index
+
+	if len(errors) > 0 {
+		return UploadFileChunkCompletedMultiError(errors)
+	}
+
+	return nil
+}
+
+// UploadFileChunkCompletedMultiError is an error wrapping multiple validation
+// errors returned by UploadFileChunkCompleted.ValidateAll() if the designated
+// constraints aren't met.
+type UploadFileChunkCompletedMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UploadFileChunkCompletedMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UploadFileChunkCompletedMultiError) AllErrors() []error { return m }
+
+// UploadFileChunkCompletedValidationError is the validation error returned by
+// UploadFileChunkCompleted.Validate if the designated constraints aren't met.
+type UploadFileChunkCompletedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UploadFileChunkCompletedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UploadFileChunkCompletedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UploadFileChunkCompletedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UploadFileChunkCompletedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UploadFileChunkCompletedValidationError) ErrorName() string {
+	return "UploadFileChunkCompletedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UploadFileChunkCompletedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUploadFileChunkCompleted.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UploadFileChunkCompletedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UploadFileChunkCompletedValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -3020,3 +3351,544 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RemoveMdnsHostCommandValidationError{}
+
+// Validate checks the field values on UploadFileRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UploadFileRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UploadFileRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UploadFileRequestMultiError, or nil if none found.
+func (m *UploadFileRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UploadFileRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	switch v := m.Data.(type) {
+	case *UploadFileRequest_Info:
+		if v == nil {
+			err := UploadFileRequestValidationError{
+				field:  "Data",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetInfo()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UploadFileRequestValidationError{
+						field:  "Info",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UploadFileRequestValidationError{
+						field:  "Info",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetInfo()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UploadFileRequestValidationError{
+					field:  "Info",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *UploadFileRequest_Chunk:
+		if v == nil {
+			err := UploadFileRequestValidationError{
+				field:  "Data",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetChunk()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UploadFileRequestValidationError{
+						field:  "Chunk",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UploadFileRequestValidationError{
+						field:  "Chunk",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetChunk()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UploadFileRequestValidationError{
+					field:  "Chunk",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *UploadFileRequest_Done:
+		if v == nil {
+			err := UploadFileRequestValidationError{
+				field:  "Data",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetDone()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UploadFileRequestValidationError{
+						field:  "Done",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UploadFileRequestValidationError{
+						field:  "Done",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetDone()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UploadFileRequestValidationError{
+					field:  "Done",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return UploadFileRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UploadFileRequestMultiError is an error wrapping multiple validation errors
+// returned by UploadFileRequest.ValidateAll() if the designated constraints
+// aren't met.
+type UploadFileRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UploadFileRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UploadFileRequestMultiError) AllErrors() []error { return m }
+
+// UploadFileRequestValidationError is the validation error returned by
+// UploadFileRequest.Validate if the designated constraints aren't met.
+type UploadFileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UploadFileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UploadFileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UploadFileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UploadFileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UploadFileRequestValidationError) ErrorName() string {
+	return "UploadFileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UploadFileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUploadFileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UploadFileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UploadFileRequestValidationError{}
+
+// Validate checks the field values on FileInfo with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *FileInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FileInfo with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in FileInfoMultiError, or nil
+// if none found.
+func (m *FileInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FileInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for FileId
+
+	// no validation rules for FilePath
+
+	if len(errors) > 0 {
+		return FileInfoMultiError(errors)
+	}
+
+	return nil
+}
+
+// FileInfoMultiError is an error wrapping multiple validation errors returned
+// by FileInfo.ValidateAll() if the designated constraints aren't met.
+type FileInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FileInfoMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FileInfoMultiError) AllErrors() []error { return m }
+
+// FileInfoValidationError is the validation error returned by
+// FileInfo.Validate if the designated constraints aren't met.
+type FileInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FileInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FileInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FileInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FileInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FileInfoValidationError) ErrorName() string { return "FileInfoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FileInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFileInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FileInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FileInfoValidationError{}
+
+// Validate checks the field values on FileChunk with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *FileChunk) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FileChunk with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in FileChunkMultiError, or nil
+// if none found.
+func (m *FileChunk) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FileChunk) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for FileId
+
+	// no validation rules for Index
+
+	// no validation rules for Data
+
+	if len(errors) > 0 {
+		return FileChunkMultiError(errors)
+	}
+
+	return nil
+}
+
+// FileChunkMultiError is an error wrapping multiple validation errors returned
+// by FileChunk.ValidateAll() if the designated constraints aren't met.
+type FileChunkMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FileChunkMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FileChunkMultiError) AllErrors() []error { return m }
+
+// FileChunkValidationError is the validation error returned by
+// FileChunk.Validate if the designated constraints aren't met.
+type FileChunkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FileChunkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FileChunkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FileChunkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FileChunkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FileChunkValidationError) ErrorName() string { return "FileChunkValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FileChunkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFileChunk.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FileChunkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FileChunkValidationError{}
+
+// Validate checks the field values on FileDone with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *FileDone) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FileDone with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in FileDoneMultiError, or nil
+// if none found.
+func (m *FileDone) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FileDone) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for FileId
+
+	// no validation rules for ChunkCount
+
+	if len(errors) > 0 {
+		return FileDoneMultiError(errors)
+	}
+
+	return nil
+}
+
+// FileDoneMultiError is an error wrapping multiple validation errors returned
+// by FileDone.ValidateAll() if the designated constraints aren't met.
+type FileDoneMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FileDoneMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FileDoneMultiError) AllErrors() []error { return m }
+
+// FileDoneValidationError is the validation error returned by
+// FileDone.Validate if the designated constraints aren't met.
+type FileDoneValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FileDoneValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FileDoneValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FileDoneValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FileDoneValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FileDoneValidationError) ErrorName() string { return "FileDoneValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FileDoneValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFileDone.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FileDoneValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FileDoneValidationError{}
