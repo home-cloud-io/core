@@ -8,8 +8,10 @@ import (
 	"net/http"
 	"path/filepath"
 
+	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
 	"github.com/home-cloud-io/core/services/platform/server/system"
+
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
@@ -18,7 +20,7 @@ type (
 		chassis.RPCRegistrar
 	}
 
-	httpStruct struct {
+	httpHandler struct {
 		logger chassis.Logger
 		actl   apps.Controller
 		sctl   system.Controller
@@ -38,7 +40,7 @@ const (
 )
 
 func NewHttp(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Http {
-	return &httpStruct{
+	return &httpHandler{
 		logger,
 		actl,
 		sctl,
@@ -46,11 +48,11 @@ func NewHttp(logger chassis.Logger, actl apps.Controller, sctl system.Controller
 }
 
 // Implement the `RPCRegistrar` interface of draft so the `grpc` handlers are enabled
-func (h *httpStruct) RegisterRPC(server chassis.Rpcer) {
+func (h *httpHandler) RegisterRPC(server chassis.Rpcer) {
 	server.AddHandler("/upload", http.HandlerFunc(h.fileUploadHandler), true)
 }
 
-func (h *httpStruct) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
+func (h *httpHandler) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	h.logger.Info("receiving file for upload")
 
@@ -74,11 +76,25 @@ func (h *httpStruct) fileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fileName = filepath.Join(appRootPath, form.app, form.path, fileName)
 
-	err = h.sctl.UploadFileStream(ctx, h.logger, form.file, fileName)
+	id, err := h.sctl.UploadFileStream(ctx, h.logger, form.file, fileName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	h.logger.Info("file upload complete")
+	err = events.Send(&v1.ServerEvent{
+		Event: &v1.ServerEvent_FileUploaded{
+			FileUploaded: &v1.FileUploadedEvent{
+				Id: id,
+			},
+		},
+	})
+	if err != nil {
+		h.logger.WithError(err).Error("failed to send file uploaded event to client")
+		return
+	}
+	h.logger.Info("sent uploaded event to client")
 }
 
 func readForm(reader *multipart.Reader) (uploadForm, error) {
