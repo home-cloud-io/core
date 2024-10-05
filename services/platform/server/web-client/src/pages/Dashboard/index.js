@@ -7,6 +7,7 @@ import DeviceOnboardPage from "../Device/Onboard";
 import AppStorePage from "../AppStore";
 import HomePage from "../Home";
 import SettingsPage from "../Settings";
+import UploadPage from "../Upload";
 
 import {useGetIsDeviceSetupQuery} from "../../services/web_rpc";
 
@@ -37,6 +38,7 @@ export default function DashboardPage() {
           <Route path="home" element={<HomePage />} />
           <Route path="store" element={<AppStorePage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="upload" element={<UploadPage />} />
         </Route>
 
         <Route path="getting-started" element={<DeviceOnboardPage/>} />

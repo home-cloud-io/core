@@ -3,8 +3,8 @@ package main
 import (
 	"embed"
 
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
+	"github.com/home-cloud-io/core/services/platform/server/async"
 	"github.com/home-cloud-io/core/services/platform/server/internal"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	"github.com/home-cloud-io/core/services/platform/server/system"
@@ -20,12 +20,13 @@ var files embed.FS
 
 func main() {
 	var (
+		broadcaster = async.NewBroadcaster()
 		logger      = zerolog.New()
-		messages    = make(chan *dv1.DaemonMessage)
-		daemonRPC   = system.New(logger, messages)
+		daemonRPC   = system.New(logger, broadcaster)
 		actl        = apps.NewController(logger)
-		sctl        = system.NewController(logger, messages)
+		sctl        = system.NewController(logger, broadcaster)
 		webRPC      = web.New(logger, actl, sctl)
+		webHTTP     = web.NewHttp(logger, actl, sctl)
 		internalRPC = internal.New(logger, sctl)
 	)
 
@@ -42,6 +43,7 @@ func main() {
 		WithClientApplication(files).
 		WithRPCHandler(daemonRPC).
 		WithRPCHandler(webRPC).
+		WithRPCHandler(webHTTP).
 		WithRPCHandler(internalRPC).
 		WithRunner(runner).
 		WithRoute(&ntv1.Route{

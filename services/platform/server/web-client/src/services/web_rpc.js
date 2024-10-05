@@ -161,6 +161,16 @@ export const serverRPCService = createApi({
         }
       },
     }),
+    getAppStorage: builder.query({
+      queryFn: async () => {
+        try {
+          const res = await client.getAppStorage({});
+          return { data: res.toJson().apps };
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
+      },
+    }),
   }),
 });
 
@@ -178,4 +188,5 @@ export const {
   useGetAppsHealthCheckQuery,
   useGetDeviceSettingsQuery,
   useGetSystemStatsQuery,
+  useGetAppStorageQuery,
 } = serverRPCService;

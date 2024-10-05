@@ -41,6 +41,8 @@ type (
 		// AutoUpdate will check for and install app updates on a schedule. It is designed to
 		// be called at bootup.
 		AutoUpdate(logger chassis.Logger)
+		// GetAppStorage will retrieve the app storage volumes for all installed apps.
+		GetAppStorage(ctx context.Context, logger chassis.Logger) ([]*v1.AppStorage, error)
 	}
 
 	controller struct {
@@ -60,6 +62,7 @@ const (
 	ErrFailedToCreateSettings = "failed to create settings"
 	ErrFailedToSaveSettings   = "failed to save settings"
 	ErrFailedToGetApps        = "failed to get apps"
+	ErrFailedToGetAppStorage  = "failed to get app storage"
 
 	ErrFailedToBuildSeedGetRequest = "failed to build get request for seed"
 	ErrFailedToGetSeedValue        = "failed to get seed value"
@@ -340,6 +343,22 @@ func (c *controller) AutoUpdate(logger chassis.Logger) {
 		logger.WithError(err).Panic("failed to initialize auto-update for apps")
 	}
 	cr.Start()
+}
+
+func (c *controller) GetAppStorage(ctx context.Context, logger chassis.Logger) ([]*v1.AppStorage, error) {
+	apps, err := c.k8sclient.InstalledApps(ctx)
+	if err != nil {
+		logger.WithError(err).Error("failed to get installed apps")
+		return nil, err
+	}
+
+	storage, err := c.k8sclient.AppStorage(ctx, apps)
+	if err != nil {
+		logger.WithError(err).Error("failed to get app storage")
+		return nil, err
+	}
+
+	return storage, err
 }
 
 func (c *controller) waitForInstall(ctx context.Context, logger chassis.Logger, appName string) error {
