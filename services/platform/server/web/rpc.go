@@ -54,7 +54,7 @@ func (h *rpcHandler) RegisterRPC(server chassis.Rpcer) {
 
 func (h *rpcHandler) InstallApp(ctx context.Context, request *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("install request")
-	go func(){
+	go func() {
 		c := context.WithoutCancel(ctx)
 		err := h.actl.Install(c, h.logger, request.Msg)
 		if err != nil {
@@ -306,6 +306,18 @@ func (h *rpcHandler) SetDeviceSettings(ctx context.Context, request *connect.Req
 	}
 
 	return connect.NewResponse(&v1.SetDeviceSettingsResponse{}), nil
+}
+
+func (h *rpcHandler) GetAppStorage(ctx context.Context, request *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error) {
+	h.logger.Info("getting app storage")
+
+	appsStorage, err := h.actl.GetAppStorage(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error(apps.ErrFailedToGetAppStorage)
+		return nil, errors.New(apps.ErrFailedToGetAppStorage)
+	}
+
+	return connect.NewResponse(&v1.GetAppStorageResponse{Apps: appsStorage}), nil
 }
 
 func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {

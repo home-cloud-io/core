@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useDispatch, shallowEqual, useSelector } from 'react-redux';
 import { FileUploadStatus, setFileUploadStatus } from '../../services/web_slice';
-import { useGetAppsHealthCheckQuery } from '../../services/web_rpc';
+import { useGetAppStorageQuery } from '../../services/web_rpc';
 
 const loading = require('../../assets/loading.gif');
 
@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === 'development') {
 
 export default function UploadPage() {
   const uploadStatus = useSelector(state => state.server.file_upload_status, shallowEqual);
-  const { data, error, isLoading } = useGetAppsHealthCheckQuery();
+  const { data, error, isLoading } = useGetAppStorageQuery();
 
   const headerStyles = {
     paddingTop: '.75rem',
@@ -34,7 +34,7 @@ export default function UploadPage() {
         ) : error ? (
           <p>Error: {error}</p>
         ) : (
-          <UploadForm status={uploadStatus["file_id"]} apps={data.checks} />
+          <UploadForm status={uploadStatus["file_id"]} apps={data} />
         )}
       </div>
     </div>
@@ -63,18 +63,20 @@ function UploadForm({status = FileUploadStatus.DEFAULT, apps}) {
         onSubmit={(e) => handleSubmit(e)}
       >
         <div className="col-12">
-          <div className="container" display="inline-block" title="Choose the installed App you want to upload this file to. For example, you could upload a movie file to your Jellyfin collection." >
+          <div className="container" display="inline-block" title="Choose the installed App storage volume you want to upload this file to. For example, you could upload a movie file to your Jellyfin collection by choosing the 'jellyfin-media' option." >
             <HelpIcon/>
             <label className="form-label" >
-              &ensp;Select an App:
+              &ensp;Select an App storage volume:
             </label>
           </div>
           <select className="form-select" id="app" name="app" defaultValue="" required >
             <option hidden disabled value=""> -- select an option -- </option>
             {apps.map(app => {
-              return (
-                <option value={app.name} key={app.name}>{app.display.name}</option>
-              )
+              return app.volumes.map(volume => {
+                return (
+                  <option value={volume} key={volume}>{volume}</option>
+                )
+              })
             })}
           </select>
         </div>
