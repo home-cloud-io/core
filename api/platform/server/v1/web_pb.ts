@@ -1605,6 +1605,117 @@ export class SetDeviceSettingsResponse extends Message<SetDeviceSettingsResponse
 }
 
 /**
+ * @generated from message platform.server.v1.GetAppStorageRequest
+ */
+export class GetAppStorageRequest extends Message<GetAppStorageRequest> {
+  constructor(data?: PartialMessage<GetAppStorageRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetAppStorageRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAppStorageRequest {
+    return new GetAppStorageRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAppStorageRequest {
+    return new GetAppStorageRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAppStorageRequest {
+    return new GetAppStorageRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetAppStorageRequest | PlainMessage<GetAppStorageRequest> | undefined, b: GetAppStorageRequest | PlainMessage<GetAppStorageRequest> | undefined): boolean {
+    return proto3.util.equals(GetAppStorageRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetAppStorageResponse
+ */
+export class GetAppStorageResponse extends Message<GetAppStorageResponse> {
+  /**
+   * @generated from field: repeated platform.server.v1.AppStorage apps = 1;
+   */
+  apps: AppStorage[] = [];
+
+  constructor(data?: PartialMessage<GetAppStorageResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetAppStorageResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "apps", kind: "message", T: AppStorage, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAppStorageResponse {
+    return new GetAppStorageResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAppStorageResponse {
+    return new GetAppStorageResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAppStorageResponse {
+    return new GetAppStorageResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetAppStorageResponse | PlainMessage<GetAppStorageResponse> | undefined, b: GetAppStorageResponse | PlainMessage<GetAppStorageResponse> | undefined): boolean {
+    return proto3.util.equals(GetAppStorageResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.AppStorage
+ */
+export class AppStorage extends Message<AppStorage> {
+  /**
+   * @generated from field: string app_name = 1;
+   */
+  appName = "";
+
+  /**
+   * @generated from field: repeated string volumes = 2;
+   */
+  volumes: string[] = [];
+
+  constructor(data?: PartialMessage<AppStorage>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppStorage";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "app_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "volumes", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppStorage {
+    return new AppStorage().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppStorage {
+    return new AppStorage().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppStorage {
+    return new AppStorage().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppStorage | PlainMessage<AppStorage> | undefined, b: AppStorage | PlainMessage<AppStorage> | undefined): boolean {
+    return proto3.util.equals(AppStorage, a, b);
+  }
+}
+
+/**
  * @generated from message platform.server.v1.Apps
  */
 export class Apps extends Message<Apps> {

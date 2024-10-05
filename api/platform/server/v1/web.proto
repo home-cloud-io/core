@@ -44,6 +44,8 @@ service WebService {
   rpc GetDeviceSettings(GetDeviceSettingsRequest) returns (GetDeviceSettingsResponse) {}
   // Set the device settings
   rpc SetDeviceSettings(SetDeviceSettingsRequest) returns (SetDeviceSettingsResponse) {}
+  // Get all installed app storage volumes
+  rpc GetAppStorage(GetAppStorageRequest) returns (GetAppStorageResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
@@ -206,6 +208,15 @@ message SetDeviceSettingsRequest {
   DeviceSettings settings = 1;
 }
 message SetDeviceSettingsResponse {}
+
+message GetAppStorageRequest {}
+message GetAppStorageResponse {
+  repeated AppStorage apps = 1;
+}
+message AppStorage {
+  string app_name = 1;
+  repeated string volumes = 2;
+}
 
 //////////////////////////////////////////////////////////////////////////
 // MODELS

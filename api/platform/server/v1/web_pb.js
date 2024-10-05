@@ -418,6 +418,35 @@ export const SetDeviceSettingsResponse = proto3.makeMessageType(
 );
 
 /**
+ * @generated from message platform.server.v1.GetAppStorageRequest
+ */
+export const GetAppStorageRequest = proto3.makeMessageType(
+  "platform.server.v1.GetAppStorageRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.GetAppStorageResponse
+ */
+export const GetAppStorageResponse = proto3.makeMessageType(
+  "platform.server.v1.GetAppStorageResponse",
+  () => [
+    { no: 1, name: "apps", kind: "message", T: AppStorage, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.AppStorage
+ */
+export const AppStorage = proto3.makeMessageType(
+  "platform.server.v1.AppStorage",
+  () => [
+    { no: 1, name: "app_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "volumes", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ],
+);
+
+/**
  * @generated from message platform.server.v1.Apps
  */
 export const Apps = proto3.makeMessageType(

@@ -4610,6 +4610,345 @@ var _ interface {
 	ErrorName() string
 } = SetDeviceSettingsResponseValidationError{}
 
+// Validate checks the field values on GetAppStorageRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetAppStorageRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetAppStorageRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetAppStorageRequestMultiError, or nil if none found.
+func (m *GetAppStorageRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetAppStorageRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return GetAppStorageRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetAppStorageRequestMultiError is an error wrapping multiple validation
+// errors returned by GetAppStorageRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetAppStorageRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetAppStorageRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetAppStorageRequestMultiError) AllErrors() []error { return m }
+
+// GetAppStorageRequestValidationError is the validation error returned by
+// GetAppStorageRequest.Validate if the designated constraints aren't met.
+type GetAppStorageRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetAppStorageRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetAppStorageRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetAppStorageRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetAppStorageRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetAppStorageRequestValidationError) ErrorName() string {
+	return "GetAppStorageRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetAppStorageRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetAppStorageRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetAppStorageRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetAppStorageRequestValidationError{}
+
+// Validate checks the field values on GetAppStorageResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetAppStorageResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetAppStorageResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetAppStorageResponseMultiError, or nil if none found.
+func (m *GetAppStorageResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetAppStorageResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetApps() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetAppStorageResponseValidationError{
+						field:  fmt.Sprintf("Apps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetAppStorageResponseValidationError{
+						field:  fmt.Sprintf("Apps[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetAppStorageResponseValidationError{
+					field:  fmt.Sprintf("Apps[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetAppStorageResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetAppStorageResponseMultiError is an error wrapping multiple validation
+// errors returned by GetAppStorageResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetAppStorageResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetAppStorageResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetAppStorageResponseMultiError) AllErrors() []error { return m }
+
+// GetAppStorageResponseValidationError is the validation error returned by
+// GetAppStorageResponse.Validate if the designated constraints aren't met.
+type GetAppStorageResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetAppStorageResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetAppStorageResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetAppStorageResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetAppStorageResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetAppStorageResponseValidationError) ErrorName() string {
+	return "GetAppStorageResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetAppStorageResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetAppStorageResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetAppStorageResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetAppStorageResponseValidationError{}
+
+// Validate checks the field values on AppStorage with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AppStorage) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppStorage with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AppStorageMultiError, or
+// nil if none found.
+func (m *AppStorage) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppStorage) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AppName
+
+	if len(errors) > 0 {
+		return AppStorageMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppStorageMultiError is an error wrapping multiple validation errors
+// returned by AppStorage.ValidateAll() if the designated constraints aren't met.
+type AppStorageMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppStorageMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppStorageMultiError) AllErrors() []error { return m }
+
+// AppStorageValidationError is the validation error returned by
+// AppStorage.Validate if the designated constraints aren't met.
+type AppStorageValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppStorageValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppStorageValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppStorageValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppStorageValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppStorageValidationError) ErrorName() string { return "AppStorageValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AppStorageValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppStorage.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppStorageValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppStorageValidationError{}
+
 // Validate checks the field values on Apps with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
 // encountered is returned, or nil if there are no violations.

@@ -81,6 +81,9 @@ const (
 	// WebServiceSetDeviceSettingsProcedure is the fully-qualified name of the WebService's
 	// SetDeviceSettings RPC.
 	WebServiceSetDeviceSettingsProcedure = "/platform.server.v1.WebService/SetDeviceSettings"
+	// WebServiceGetAppStorageProcedure is the fully-qualified name of the WebService's GetAppStorage
+	// RPC.
+	WebServiceGetAppStorageProcedure = "/platform.server.v1.WebService/GetAppStorage"
 	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
 	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
 )
@@ -106,6 +109,7 @@ var (
 	webServiceGetAppsInStoreMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("GetAppsInStore")
 	webServiceGetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("GetDeviceSettings")
 	webServiceSetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("SetDeviceSettings")
+	webServiceGetAppStorageMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("GetAppStorage")
 	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
 )
 
@@ -147,6 +151,8 @@ type WebServiceClient interface {
 	GetDeviceSettings(context.Context, *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error)
 	// Set the device settings
 	SetDeviceSettings(context.Context, *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error)
+	// Get all installed app storage volumes
+	GetAppStorage(context.Context, *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
 }
@@ -269,6 +275,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceSetDeviceSettingsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getAppStorage: connect.NewClient[v1.GetAppStorageRequest, v1.GetAppStorageResponse](
+			httpClient,
+			baseURL+WebServiceGetAppStorageProcedure,
+			connect.WithSchema(webServiceGetAppStorageMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		subscribe: connect.NewClient[v1.SubscribeRequest, v1.ServerEvent](
 			httpClient,
 			baseURL+WebServiceSubscribeProcedure,
@@ -298,6 +310,7 @@ type webServiceClient struct {
 	getAppsInStore           *connect.Client[v1.GetAppsInStoreRequest, v1.GetAppsInStoreResponse]
 	getDeviceSettings        *connect.Client[v1.GetDeviceSettingsRequest, v1.GetDeviceSettingsResponse]
 	setDeviceSettings        *connect.Client[v1.SetDeviceSettingsRequest, v1.SetDeviceSettingsResponse]
+	getAppStorage            *connect.Client[v1.GetAppStorageRequest, v1.GetAppStorageResponse]
 	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
 }
 
@@ -391,6 +404,11 @@ func (c *webServiceClient) SetDeviceSettings(ctx context.Context, req *connect.R
 	return c.setDeviceSettings.CallUnary(ctx, req)
 }
 
+// GetAppStorage calls platform.server.v1.WebService.GetAppStorage.
+func (c *webServiceClient) GetAppStorage(ctx context.Context, req *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error) {
+	return c.getAppStorage.CallUnary(ctx, req)
+}
+
 // Subscribe calls platform.server.v1.WebService.Subscribe.
 func (c *webServiceClient) Subscribe(ctx context.Context, req *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error) {
 	return c.subscribe.CallServerStream(ctx, req)
@@ -434,6 +452,8 @@ type WebServiceHandler interface {
 	GetDeviceSettings(context.Context, *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error)
 	// Set the device settings
 	SetDeviceSettings(context.Context, *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error)
+	// Get all installed app storage volumes
+	GetAppStorage(context.Context, *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
 }
@@ -552,6 +572,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceSetDeviceSettingsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceGetAppStorageHandler := connect.NewUnaryHandler(
+		WebServiceGetAppStorageProcedure,
+		svc.GetAppStorage,
+		connect.WithSchema(webServiceGetAppStorageMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	webServiceSubscribeHandler := connect.NewServerStreamHandler(
 		WebServiceSubscribeProcedure,
 		svc.Subscribe,
@@ -596,6 +622,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceGetDeviceSettingsHandler.ServeHTTP(w, r)
 		case WebServiceSetDeviceSettingsProcedure:
 			webServiceSetDeviceSettingsHandler.ServeHTTP(w, r)
+		case WebServiceGetAppStorageProcedure:
+			webServiceGetAppStorageHandler.ServeHTTP(w, r)
 		case WebServiceSubscribeProcedure:
 			webServiceSubscribeHandler.ServeHTTP(w, r)
 		default:
@@ -677,6 +705,10 @@ func (UnimplementedWebServiceHandler) GetDeviceSettings(context.Context, *connec
 
 func (UnimplementedWebServiceHandler) SetDeviceSettings(context.Context, *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.SetDeviceSettings is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) GetAppStorage(context.Context, *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetAppStorage is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {
