@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, NavLink } from "react-router-dom";
-import { useDispatch } from 'react-redux';
+import { useDispatch, shallowEqual, useSelector } from 'react-redux';
 
 import { SUBSCRIBE_EVENTS_ACTION } from '../services/event_stream';
 
@@ -11,6 +11,7 @@ export default function DefaultLayout() {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [isSecondaryNavVisible, setSecondaryNavVisibility] = useState(false);
   const [isAlertVisible, setAlertVisibility] = useState(false);
+  const serverStatus = useSelector(state => state.server.event_stream_connection_status, shallowEqual);
 
   useEffect(() => {
     dispatch({type: SUBSCRIBE_EVENTS_ACTION});
@@ -29,7 +30,7 @@ export default function DefaultLayout() {
         aria-label="Main navigation">
           <div className="container-fluid">
             <div>
-              <a className="navbar-brand" href="#">Home Cloud</a>
+              <a className="navbar-brand" href="#">Home Cloud ({serverStatus})</a>
             </div>
 
             <div>
