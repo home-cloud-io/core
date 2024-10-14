@@ -39,24 +39,15 @@ export const subscribeMiddleware = (client) => (params) => (next) => async (acti
     // check if the store is already subscribed
     dispatch(setEventStreamConnectionStatus({ status: EventConnectionStatus.CONNECTING }));
 
-    let done = false;
-    for (let i = 0; i < 5; i++) {
-      client.subscribe({}, (res) => {
-          dispatch(setEvent({ data: res.toJson() }));
-          done = true;
-      }, (err) => {
-          if (err) {
-              console.warn("Error subscribing to events: ", err);
-              dispatch(setEventStreamConnectionStatus({ status: EventConnectionStatus.ERROR }));
+    client.subscribe({}, (res) => {
+        dispatch(setEvent({ data: res.toJson() }));
+    }, (err) => {
+        if (err) {
+            console.warn("Error subscribing to events: ", err);
+            dispatch(setEventStreamConnectionStatus({ status: EventConnectionStatus.ERROR }));
 
-          }
-      });
-      if (done) {
-        break;
-      }
-      console.log("retrying event stream")
-      await delay(1000);
-    }
+        }
+    });
 
     dispatch(setEventStreamConnectionStatus({ status: EventConnectionStatus.CONNECTED }));
   }
