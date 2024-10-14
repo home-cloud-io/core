@@ -49,7 +49,6 @@ export const serverSlice = createSlice({
         setEvent: (state, action) => {
             // filter out heartbeat events
             if (action.payload.data.heartbeat) {
-                console.log("heartbeat")
                 return;
             }
 

@@ -18,10 +18,12 @@ if (process.env.NODE_ENV === 'development') {
   BASE_URL = 'http://home-cloud.local';
 }
 
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 export const streamingClient = createCallbackClient(WebService, web_service_transport);
 export const SUBSCRIBE_EVENTS_ACTION = 'events/subscribe';
 
-export const subscribeMiddleware = (client) => (params) => (next) => (action) => {
+export const subscribeMiddleware = (client) => (params) => (next) => async (action) => {
   const { dispatch, getState } = params;
 
   if (action.type === SUBSCRIBE_EVENTS_ACTION) {
@@ -37,14 +39,24 @@ export const subscribeMiddleware = (client) => (params) => (next) => (action) =>
     // check if the store is already subscribed
     dispatch(setEventStreamConnectionStatus({ status: EventConnectionStatus.CONNECTING }));
 
-    client.subscribe({}, (res) => {
-        dispatch(setEvent({ data: res.toJson() }));
-    }, (err) => {
-        if (err) {
-            console.warn("Error subscribing to events: ", err);
-            dispatch(setEventStreamConnectionStatus({ status: EventConnectionStatus.ERROR }));
-        }
-    });
+    let done = false;
+    for (let i = 0; i < 5; i++) {
+      client.subscribe({}, (res) => {
+          dispatch(setEvent({ data: res.toJson() }));
+          done = true;
+      }, (err) => {
+          if (err) {
+              console.warn("Error subscribing to events: ", err);
+              dispatch(setEventStreamConnectionStatus({ status: EventConnectionStatus.ERROR }));
+
+          }
+      });
+      if (done) {
+        break;
+      }
+      console.log("retrying event stream")
+      await delay(1000);
+    }
 
     dispatch(setEventStreamConnectionStatus({ status: EventConnectionStatus.CONNECTED }));
   }
