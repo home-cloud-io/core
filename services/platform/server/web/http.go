@@ -49,7 +49,7 @@ func NewHttp(logger chassis.Logger, actl apps.Controller, sctl system.Controller
 
 // Implement the `RPCRegistrar` interface of draft so the `grpc` handlers are enabled
 func (h *httpHandler) RegisterRPC(server chassis.Rpcer) {
-	server.AddHandler("/upload", http.HandlerFunc(h.fileUploadHandler), true)
+	server.AddHandler("/upload-file", http.HandlerFunc(h.fileUploadHandler), true)
 }
 
 func (h *httpHandler) fileUploadHandler(w http.ResponseWriter, r *http.Request) {

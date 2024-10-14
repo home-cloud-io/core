@@ -56,7 +56,7 @@ function UploadForm({status = FileUploadStatus.DEFAULT, apps}) {
       <iframe name="dummyframe" id="dummyframe" style={{ display: 'none' }} ></iframe>
       <form
         className="row g-3"
-        action={`${BASE_URL}/upload`}
+        action={`${BASE_URL}/upload-file`}
         method="post"
         encType="multipart/form-data"
         target="dummyframe"
