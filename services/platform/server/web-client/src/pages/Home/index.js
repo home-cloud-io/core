@@ -171,7 +171,7 @@ export function DeviceDetails() {
   )
 }
 
-function StatusLabel({text, color}) {
+export function StatusLabel({text, color}) {
   const styles = {
     float: "right",
     marginTop: "-2.75rem",

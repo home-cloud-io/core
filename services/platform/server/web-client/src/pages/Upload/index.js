@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FileUploadStatus } from '../../services/web_slice';
 import { useGetAppStorageQuery, useGetEventsQuery } from '../../services/web_rpc';
 import * as Config from '../../utils/config';
+import { StatusLabel } from '../Home/index';
 import { v4 as uuidv4 } from 'uuid';
 
 const loading = require('../../assets/loading.gif');
@@ -43,12 +44,19 @@ function UploadForm({events = [], apps}) {
   if (events.length > 0) {
     const latestEvent = events.at(-1)["fileUploaded"];
     if (latestEvent && latestEvent.id === state.fileId) {
-        if (state.status === FileUploadStatus.UPLOADING) {
+      if (state.status === FileUploadStatus.UPLOADING) {
+        if (latestEvent.success === true) {
+            setState({
+              status: FileUploadStatus.COMPLETE,
+              fileId: uuidv4(),
+            });
+        } else {
           setState({
-            status: FileUploadStatus.COMPLETE,
+            status: FileUploadStatus.ERROR,
             fileId: uuidv4(),
           });
         }
+      }
     }
   }
 
@@ -148,8 +156,19 @@ function UploadForm({events = [], apps}) {
         </div>
 
         <div className="container" display="inline-block" >
+        </div>
+
+        <div className="container" display="inline-block" >
           { state.status === FileUploadStatus.UPLOADING ? <LoadingIcon/> : <SubmitButton/> }
         </div>
+
+        { state.status === FileUploadStatus.COMPLETE &&
+          <StatusLabel text="Success" color="#28e053"/>
+        }
+
+        { state.status === FileUploadStatus.ERROR &&
+          <StatusLabel text="Failed" color="#ff0000"/>
+        }
       </form>
     </div>
   );
