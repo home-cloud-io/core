@@ -6945,6 +6945,8 @@ func (m *FileUploadedEvent) validate(all bool) error {
 
 	// no validation rules for Id
 
+	// no validation rules for Success
+
 	if len(errors) > 0 {
 		return FileUploadedEventMultiError(errors)
 	}

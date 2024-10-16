@@ -326,4 +326,5 @@ message AppInstalledEvent {
 // FileUploadedEvent is sent from the server to connected clients when a file upload completes successfully
 message FileUploadedEvent {
   string id = 1;
+  bool success = 2;
 }
