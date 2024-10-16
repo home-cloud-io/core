@@ -632,7 +632,7 @@ export const AppInstalledEvent = proto3.makeMessageType(
 );
 
 /**
- * FileUploadedEvent is sent from the server to connected clients when a file upload completes successfully
+ * FileUploadedEvent is sent from the server to connected clients when a file upload completes
  *
  * @generated from message platform.server.v1.FileUploadedEvent
  */
@@ -640,6 +640,7 @@ export const FileUploadedEvent = proto3.makeMessageType(
   "platform.server.v1.FileUploadedEvent",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 

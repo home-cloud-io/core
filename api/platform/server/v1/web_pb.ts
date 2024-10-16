@@ -2455,7 +2455,7 @@ export class AppInstalledEvent extends Message<AppInstalledEvent> {
 }
 
 /**
- * FileUploadedEvent is sent from the server to connected clients when a file upload completes successfully
+ * FileUploadedEvent is sent from the server to connected clients when a file upload completes
  *
  * @generated from message platform.server.v1.FileUploadedEvent
  */
@@ -2464,6 +2464,13 @@ export class FileUploadedEvent extends Message<FileUploadedEvent> {
    * @generated from field: string id = 1;
    */
   id = "";
+
+  /**
+   * true when the file upload was successful, false when it failed
+   *
+   * @generated from field: bool success = 2;
+   */
+  success = false;
 
   constructor(data?: PartialMessage<FileUploadedEvent>) {
     super();
@@ -2474,6 +2481,7 @@ export class FileUploadedEvent extends Message<FileUploadedEvent> {
   static readonly typeName = "platform.server.v1.FileUploadedEvent";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FileUploadedEvent {
