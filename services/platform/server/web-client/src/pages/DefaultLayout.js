@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Outlet, NavLink } from "react-router-dom";
-import { useDispatch, shallowEqual, useSelector } from 'react-redux';
-import { useGetEventsQuery } from '../services/web_rpc';
 
 import "./DefaultLayout.css";
 
 export default function DefaultLayout() {
-  const dispatch = useDispatch();
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [isSecondaryNavVisible, setSecondaryNavVisibility] = useState(false);
   const [isAlertVisible, setAlertVisibility] = useState(false);
-  const serverStatus = useSelector(state => state.server.event_stream_connection_status, shallowEqual);
-  const { data, error, isLoading } = useGetEventsQuery();
 
   const onClickNavCollapseBtn = () => {
     setIsNavCollapsed(!isNavCollapsed);
@@ -26,7 +21,7 @@ export default function DefaultLayout() {
         aria-label="Main navigation">
           <div className="container-fluid">
             <div>
-              <a className="navbar-brand" href="#">Home Cloud ({serverStatus})</a>
+              <a className="navbar-brand" href="#">Home Cloud</a>
             </div>
 
             <div>
