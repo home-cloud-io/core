@@ -816,11 +816,11 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 		chunkSize = 10 << 20
 	)
 
-	// Create channels to communicate between goroutines
+	// create channels to communicate between goroutines
 	chunks := make(chan fileChunk, 1)
 
-	// Start multiple goroutines to process chunks in parallel
-	for i := 0; i < 4; i++ { // Number of parallel workers
+	// start multiple goroutines to process chunks in parallel
+	for i := 0; i < 4; i++ {
 		log := log.WithField("worker", i)
 		g.Go(func() error {
 			log.Debug("waiting for work")
@@ -897,7 +897,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 	close(chunks)
 	currentChunk++
 
-	// Wait for all goroutines to finish
+	// wait for all goroutines to finish
 	err := g.Wait()
 	if err != nil {
 		return err

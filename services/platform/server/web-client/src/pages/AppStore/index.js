@@ -65,10 +65,6 @@ function StoreEntry({events = [], app}) {
     deleteApp(app.name);
   }
 
-  const handleAppOpenClick = () => {
-    navigate('/home');
-  }
-
   const rowStyles = {
     paddingLeft: "2rem",
   }

@@ -26,7 +26,6 @@ const initialState = {
     event_stream_connection_status: EventConnectionStatus.DISCONNECTED,
     event: [],
     app_install_status: {},
-    file_upload_status: {},
 }
 
 export const serverSlice = createSlice({
@@ -50,12 +49,9 @@ export const serverSlice = createSlice({
 });
 
 export const {
-    setAppInstallStatus,
-    setFileUploadStatus,
     setUser,
     setDeviceSettings,
     setEventStreamConnectionStatus,
-    setEvent,
 } = serverSlice.actions;
 
 export default serverSlice.reducer;

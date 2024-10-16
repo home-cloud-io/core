@@ -14,7 +14,9 @@ const defaultTimeout = 15 * time.Second
 
 type (
 	Listener interface {
+		// Listen will start consuming events and send them to the configured Callback function.
 		Listen(ctx context.Context) error
+		// Stop will deregister the Listener.
 		Stop()
 	}
 	listener[T proto.Message] struct {
@@ -39,6 +41,8 @@ func EventGroup() (*errgroup.Group, Broadcaster) {
 	return new(errgroup.Group), NewBroadcaster()
 }
 
+// RegisterListener will create a new Listener which is registered to receive events of the given type from the provided Broadcaster.
+// A subsequent call to Listener.Listen() is required to process events and trigger the provided Callback function.
 func RegisterListener[T proto.Message](ctx context.Context, events Broadcaster, options *ListenerOptions[T]) Listener {
 	// set options
 	if options == nil {
