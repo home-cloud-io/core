@@ -2131,6 +2131,16 @@ export class DeviceSettings extends Message<DeviceSettings> {
    */
   autoUpdateOs = false;
 
+  /**
+   * @generated from field: bool enable_ssh = 5;
+   */
+  enableSsh = false;
+
+  /**
+   * @generated from field: repeated string trusted_ssh_keys = 6;
+   */
+  trustedSshKeys: string[] = [];
+
   constructor(data?: PartialMessage<DeviceSettings>) {
     super();
     proto3.util.initPartial(data, this);
@@ -2143,6 +2153,8 @@ export class DeviceSettings extends Message<DeviceSettings> {
     { no: 2, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeviceSettings {
