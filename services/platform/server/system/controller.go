@@ -219,7 +219,7 @@ func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger
 	logger.Info("uploading file")
 	var listenerErr error
 	done := make(chan bool)
-	go func(){
+	go func() {
 		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileReady]{
 			Callback: func(event *dv1.UploadFileReady) (bool, error) {
 				if event.Id == fileId {
@@ -503,40 +503,16 @@ func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings,
 }
 
 func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {
+
 	// set the device settings on the host (via the daemon)
-	done := make(chan bool)
-	var listenerErr error
-	go func() {
-		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.DeviceInitialized]{
-			Callback: func(event *dv1.DeviceInitialized) (bool, error) {
-				done<-true
-				if event.Error != nil {
-					return true, fmt.Errorf(event.Error.Error)
-				}
-				return true, nil
-			},
-		}).Listen(ctx)
-	}()
-	err := com.Send(&dv1.ServerMessage{
-		Message: &dv1.ServerMessage_InitializeDeviceCommand{
-			InitializeDeviceCommand: &dv1.InitializeDeviceCommand{
-				User: &dv1.SetUserPasswordCommand{
-					// TODO: Support multiple users? Right now the username "admin" is hardcoded into NixOS.
-					Username: "admin",
-					Password: settings.AdminUser.Password,
-				},
-				TimeZone: &dv1.SetTimeZoneCommand{
-					TimeZone: settings.Timezone,
-				},
-			},
-		},
+	err := c.saveSettings(ctx, &dv1.SaveSettingsCommand{
+		AdminPassword:  settings.AdminUser.Password,
+		TimeZone:       settings.Timezone,
+		EnableSsh:      settings.EnableSsh,
+		TrustedSshKeys: settings.TrustedSshKeys,
 	})
 	if err != nil {
 		return err
-	}
-	<-done
-	if listenerErr != nil {
-		return listenerErr
 	}
 
 	// salt and hash given password if set
@@ -593,39 +569,14 @@ func (c *controller) InitializeDevice(ctx context.Context, logger chassis.Logger
 	}
 
 	// set the device settings on the host (via the daemon)
-	done := make(chan bool)
-	var listenerErr error
-	go func() {
-		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.DeviceInitialized]{
-			Callback: func(event *dv1.DeviceInitialized) (bool, error) {
-				done<-true
-				if event.Error != nil {
-					return true, fmt.Errorf(event.Error.Error)
-				}
-				return true, nil
-			},
-		}).Listen(ctx)
-	}()
-	err = com.Send(&dv1.ServerMessage{
-		Message: &dv1.ServerMessage_InitializeDeviceCommand{
-			InitializeDeviceCommand: &dv1.InitializeDeviceCommand{
-				User: &dv1.SetUserPasswordCommand{
-					// TODO: Support multiple users? Right now the username "admin" is hardcoded into NixOS.
-					Username: "admin",
-					Password: settings.AdminUser.Password,
-				},
-				TimeZone: &dv1.SetTimeZoneCommand{
-					TimeZone: settings.Timezone,
-				},
-			},
-		},
+	err = c.saveSettings(ctx, &dv1.SaveSettingsCommand{
+		AdminPassword:  settings.AdminUser.Password,
+		TimeZone:       settings.Timezone,
+		EnableSsh:      settings.EnableSsh,
+		TrustedSshKeys: settings.TrustedSshKeys,
 	})
 	if err != nil {
 		return err
-	}
-	<-done
-	if listenerErr != nil {
-		return listenerErr
 	}
 
 	// get seed salt value from blueprint
@@ -668,6 +619,38 @@ func (c *controller) Login(ctx context.Context, username, password string) (stri
 }
 
 // helper functions
+
+func (c *controller) saveSettings(ctx context.Context, cmd *dv1.SaveSettingsCommand) error {
+	done := make(chan bool)
+	var listenerErr error
+	go func() {
+		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.SettingsSaved]{
+			Callback: func(event *dv1.SettingsSaved) (bool, error) {
+				done <- true
+				if event.Error != nil {
+					return true, fmt.Errorf(event.Error.Error)
+				}
+				return true, nil
+			},
+		}).Listen(ctx)
+		if listenerErr != nil {
+			done <- true
+		}
+	}()
+	err := com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_SaveSettingsCommand{
+			SaveSettingsCommand: cmd,
+		},
+	})
+	if err != nil {
+		return err
+	}
+	<-done
+	if listenerErr != nil {
+		return listenerErr
+	}
+	return nil
+}
 
 func getSaltValue(ctx context.Context) (string, error) {
 	seedVal := &kvv1.Value{}
