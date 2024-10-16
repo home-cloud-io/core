@@ -170,6 +170,12 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 			return nil, err
 		}
 
+		// there must be a pod for the app to be considered healthy
+		if len(pods.Items) == 0 {
+			checks[index].Status = webv1.AppStatus_APP_STATUS_UNHEALTHY
+			continue
+		}
+
 		for _, pod := range pods.Items {
 			// if any pod isn't in running status mark app as unhealthy and break
 			if pod.Status.Phase != corev1.PodRunning {
