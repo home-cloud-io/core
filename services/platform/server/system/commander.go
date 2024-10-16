@@ -25,8 +25,6 @@ var (
 	com = &commander{
 		mutex: sync.Mutex{},
 	}
-	listeners      = map[string]chan<- *dv1.DaemonMessage{}
-	listenersMutex = sync.Mutex{}
 	ErrNoStream    = fmt.Errorf("no stream")
 )
 
