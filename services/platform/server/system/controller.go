@@ -21,7 +21,6 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/storage/memory"
-	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 	kvv1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -48,7 +47,7 @@ type (
 		AddMdnsHost(hostname string) error
 		// RemoveMdnsHost removes a host to the avahi mDNS server managed by the daemon
 		RemoveMdnsHost(hostname string) error
-		UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileName string) (string, error)
+		UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId, fileName string) (string, error)
 	}
 	OS interface {
 		// CheckForOSUpdates will run the Nix commands to check for any NixOS updates to install.
@@ -215,11 +214,7 @@ func (c *controller) RemoveMdnsHost(hostname string) error {
 	return nil
 }
 
-func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileName string) (string, error) {
-	var (
-		fileId = uuid.New().String()
-	)
-
+func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId, fileName string) (string, error) {
 	done := make(chan bool)
 	go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileReady]{
 		Callback: func(event *dv1.UploadFileReady) (bool, error) {

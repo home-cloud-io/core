@@ -32,11 +32,12 @@ type (
 		path             string
 		fileName         string
 		fileNameOverride string
+		id               string
 	}
 )
 
 const (
-	appRootPath = "/mnt/k8s-pvs"
+	appRootPath = "mnt/k8s-pvs"
 )
 
 func NewHttp(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Http {
@@ -76,7 +77,8 @@ func (h *httpHandler) fileUploadHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	fileName = filepath.Join(appRootPath, form.app, form.path, fileName)
 
-	id, err := h.sctl.UploadFileStream(ctx, h.logger, form.file, fileName)
+	h.logger.WithField("form", form).Info("received form")
+	id, err := h.sctl.UploadFileStream(ctx, h.logger, form.file, form.id, fileName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -131,6 +133,12 @@ func readForm(reader *multipart.Reader) (uploadForm, error) {
 				return uploadForm{}, err
 			}
 			form.fileNameOverride = string(s)
+		case "id":
+			s, err := io.ReadAll(part)
+			if err != nil {
+				return uploadForm{}, err
+			}
+			form.id = string(s)
 		}
 	}
 	return form, fmt.Errorf("no file provided in form")
