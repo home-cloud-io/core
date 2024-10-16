@@ -5,5 +5,4 @@ if (process.env.NODE_ENV === 'development') {
   BASE_URL = `http://${LOCAL_DOMAIN}:8002`;
 } else {
   BASE_URL = 'http://home-cloud.local';
-  BASE_URL = `http://${LOCAL_DOMAIN}:8002`;
 }
