@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"sync"
 	"time"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
@@ -29,9 +30,20 @@ type (
 		Send(*v1.DaemonMessage) error
 	}
 	client struct {
-		logger chassis.Logger
-		stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
-		mdns   host.DNSPublisher
+		mutex      sync.Mutex
+		logger     chassis.Logger
+		stream     *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
+		mdns       host.DNSPublisher
+		fileMetas  map[string]fileMeta
+		chunkMetas sync.Map
+	}
+	fileMeta struct {
+		id       string
+		filePath string
+	}
+	chunkMeta struct {
+		index    uint32
+		fileName string
 	}
 )
 
@@ -42,12 +54,17 @@ const (
 
 var (
 	clientSingleton Client
+
+	ErrNoStream = fmt.Errorf("no stream")
 )
 
 func NewClient(logger chassis.Logger, mdns host.DNSPublisher) Client {
 	clientSingleton = &client{
-		logger: logger,
-		mdns:   mdns,
+		mutex:      sync.Mutex{},
+		logger:     logger,
+		mdns:       mdns,
+		fileMetas:  map[string]fileMeta{},
+		chunkMetas: sync.Map{},
 	}
 	return clientSingleton
 }
@@ -103,12 +120,19 @@ func newInsecureClient() *http.Client {
 }
 
 func (c *client) Send(message *v1.DaemonMessage) error {
-	return c.stream.Send(message)
+	if c.stream == nil {
+		return ErrNoStream
+	}
+	c.mutex.Lock()
+	err := c.stream.Send(message)
+	c.mutex.Unlock()
+	return err
 }
 
 // WORKERS
 
 func (c *client) listen(ctx context.Context) error {
+	c.logger.Info("listening for messages from server")
 	for {
 		message, err := c.stream.Receive()
 		if err != nil {
@@ -141,6 +165,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.removeMdnsHost(ctx, message.GetRemoveMdnsHostCommand())
 		case *v1.ServerMessage_InitializeDeviceCommand:
 			go c.initializeDevice(ctx, message.GetInitializeDeviceCommand())
+		case *v1.ServerMessage_UploadFileRequest:
+			go c.uploadFile(ctx, message.GetUploadFileRequest())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}

@@ -36,6 +36,8 @@ type (
 		Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error)
 		// InstalledApps will retrive all installed apps
 		InstalledApps(ctx context.Context) ([]opv1.App, error)
+		// AppStorage will retrive storage volumes for the given app list
+		AppStorage(ctx context.Context, apps []opv1.App) ([]*webv1.AppStorage, error)
 	}
 	System interface {
 		// CurrentImages will retrieve the current images of all system containers. System
@@ -168,6 +170,12 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 			return nil, err
 		}
 
+		// there must be a pod for the app to be considered healthy
+		if len(pods.Items) == 0 {
+			checks[index].Status = webv1.AppStatus_APP_STATUS_UNHEALTHY
+			continue
+		}
+
 		for _, pod := range pods.Items {
 			// if any pod isn't in running status mark app as unhealthy and break
 			if pod.Status.Phase != corev1.PodRunning {
@@ -208,6 +216,36 @@ func (c *client) InstalledApps(ctx context.Context) ([]opv1.App, error) {
 	}
 
 	return apps.Items, nil
+}
+
+func (c *client) AppStorage(ctx context.Context, apps []opv1.App) ([]*webv1.AppStorage, error) {
+	var (
+		err     error
+		storage = []*webv1.AppStorage{}
+	)
+
+	for _, app := range apps {
+		pvcs := &corev1.PersistentVolumeClaimList{}
+		err = c.client.List(ctx, pvcs, &crclient.ListOptions{
+			Namespace: app.Name,
+		})
+		if err != nil {
+			return nil, err
+		}
+		if len(pvcs.Items) == 0 {
+			continue
+		}
+		s := &webv1.AppStorage{
+			AppName: app.Name,
+			Volumes: make([]string, len(pvcs.Items)),
+		}
+		for i, pvc := range pvcs.Items {
+			s.Volumes[i] = pvc.Name
+		}
+		storage = append(storage, s)
+	}
+
+	return storage, nil
 }
 
 func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, images map[string]*webv1.ImageVersion) error {

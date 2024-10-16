@@ -1,29 +1,26 @@
 import * as React from 'react';
-import { useDispatch, shallowEqual, useSelector } from 'react-redux';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProgressBar from 'react-bootstrap/ProgressBar';
-
-import {
-  useInstallAppMutation,
-  useGetAppStoreEntitiesQuery
-} from '../../services/web_rpc';
 import { marked } from 'marked';
 import { AppInstallStatus, setAppInstallStatus } from '../../services/web_slice';
+import { useGetEventsQuery, useGetAppStoreEntitiesQuery, useInstallAppMutation, useDeleteAppMutation } from '../../services/web_rpc';
 
 export default function AppStorePage() {
   const { data, error, isLoading } = useGetAppStoreEntitiesQuery();
-  const installStatus = useSelector(state => state.server.app_install_status, shallowEqual);
+  const { data: events } = useGetEventsQuery();
 
   const ListEntries = () => {
     return (
       <div className="my-3 p-3 bg-body rounded shadow-sm">
-        <h6 className="border-bottom pb-2 mb-0">Applications</h6>
+        <h6 className="border-bottom pb-2 mb-0">App Store</h6>
         {data.map(app => {
           return (
             <StoreEntry
+              events={events}
               app={app}
               key={app.digest}
-              status={installStatus[app.name]} />
+            />
           )
         })}
       </div>
@@ -43,19 +40,29 @@ export default function AppStorePage() {
   );
 }
 
-function StoreEntry({app, status = AppInstallStatus.DEFAULT}) {
-  const dispatch = useDispatch();
+function StoreEntry({events = [], app}) {
   const navigate = useNavigate();
-  const [installApp, result] = useInstallAppMutation();
+  const [installApp] = useInstallAppMutation();
+  const [deleteApp] = useDeleteAppMutation();
+  const [status, setStatus] = useState(app.installed ? AppInstallStatus.INSTALLED : AppInstallStatus.DEFAULT);
+
+  if (events.length > 0) {
+    const latestEvent = events.at(-1)["appInstalled"];
+    if (latestEvent && latestEvent.name === app.name) {
+        if (status === AppInstallStatus.INSTALLING) {
+          setStatus(AppInstallStatus.INSTALLED);
+        }
+    }
+  }
 
   const handleAppInstallClick = (app) => {
-    status = AppInstallStatus.INSTALLING;
-    dispatch(setAppInstallStatus({app, status}));
+    setStatus(AppInstallStatus.INSTALLING);
     installApp({app});
   }
 
-  const handleAppOpenClick = () => {
-    navigate('/home');
+  const handleAppUninstallClick = (app) => {
+    setStatus(AppInstallStatus.DEFAULT);
+    deleteApp(app.name);
   }
 
   const rowStyles = {
@@ -90,23 +97,18 @@ function StoreEntry({app, status = AppInstallStatus.DEFAULT}) {
                   Install
               </button>
             )}
+            {status === AppInstallStatus.INSTALLED && (
+              <button
+                className="btn btn-warning float-end btn-sm"
+                onClick={() => handleAppUninstallClick(app)}>
+                  Uninstall
+              </button>
+            )}
           </div>
 
           <div>
             {status === AppInstallStatus.INSTALLING && (
               <ProgressBar animated now={100} />
-            )}
-          </div>
-
-          <div>
-            {status === AppInstallStatus.INSTALLED && (
-              <button
-                className="btn btn-outline-success float-end btn-sm"
-                style={btnStyles}
-                onClick={() => handleAppOpenClick()}
-                >
-                 Open
-              </button>
             )}
           </div>
 

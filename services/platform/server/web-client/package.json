@@ -23,7 +23,7 @@
     "@mui/icons-material": "^5.14.19",
     "@mui/material": "^5.14.20",
     "@reduxjs/toolkit": "^2.0.1",
-    "api": "https://gitpkg.vercel.app/home-cloud-io/core/api?api/v0.4.16",
+    "api": "https://gitpkg.vercel.app/home-cloud-io/core/api?api/v0.4.19",
     "localforage": "^1.10.0",
     "marked": "^14.1.0",
     "match-sorter": "^6.3.1",
@@ -34,7 +34,8 @@
     "react-redux": "^9.0.4",
     "react-router-dom": "^6.20.1",
     "recharts": "^2.10.3",
-    "sort-by": "^0.0.2"
+    "sort-by": "^0.0.2",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.65",

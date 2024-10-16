@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
@@ -22,7 +23,7 @@ type (
 		sdConnect.WebServiceHandler
 	}
 
-	rpc struct {
+	rpcHandler struct {
 		logger chassis.Logger
 		actl   apps.Controller
 		sctl   system.Controller
@@ -36,7 +37,7 @@ const (
 )
 
 func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Rpc {
-	return &rpc{
+	return &rpcHandler{
 		logger,
 		actl,
 		sctl,
@@ -44,16 +45,16 @@ func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Rp
 }
 
 // Implement the `RPCRegistrar` interface of draft so the `grpc` handlers are enabled
-func (h *rpc) RegisterRPC(server chassis.Rpcer) {
+func (h *rpcHandler) RegisterRPC(server chassis.Rpcer) {
 	pattern, handler := sdConnect.NewWebServiceHandler(h)
 	server.AddHandler(pattern, handler, true)
 }
 
 // APPS
 
-func (h *rpc) InstallApp(ctx context.Context, request *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error) {
+func (h *rpcHandler) InstallApp(ctx context.Context, request *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("install request")
-	go func(){
+	go func() {
 		c := context.WithoutCancel(ctx)
 		err := h.actl.Install(c, h.logger, request.Msg)
 		if err != nil {
@@ -86,7 +87,7 @@ func (h *rpc) InstallApp(ctx context.Context, request *connect.Request[v1.Instal
 	return connect.NewResponse(&v1.InstallAppResponse{}), nil
 }
 
-func (h *rpc) DeleteApp(ctx context.Context, request *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error) {
+func (h *rpcHandler) DeleteApp(ctx context.Context, request *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("delete request")
 	err := h.actl.Delete(ctx, h.logger, request.Msg)
 	if err != nil {
@@ -97,7 +98,7 @@ func (h *rpc) DeleteApp(ctx context.Context, request *connect.Request[v1.DeleteA
 	return connect.NewResponse(&v1.DeleteAppResponse{}), nil
 }
 
-func (h *rpc) UpdateApp(ctx context.Context, request *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error) {
+func (h *rpcHandler) UpdateApp(ctx context.Context, request *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error) {
 	h.logger.WithField("request", request.Msg).Info("update request")
 	err := h.actl.Update(ctx, h.logger, request.Msg)
 	if err != nil {
@@ -108,7 +109,7 @@ func (h *rpc) UpdateApp(ctx context.Context, request *connect.Request[v1.UpdateA
 	return connect.NewResponse(&v1.UpdateAppResponse{}), nil
 }
 
-func (h *rpc) AppsHealthCheck(ctx context.Context, request *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error) {
+func (h *rpcHandler) AppsHealthCheck(ctx context.Context, request *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error) {
 	checks, err := h.actl.Healthcheck(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to check apps health")
@@ -119,7 +120,7 @@ func (h *rpc) AppsHealthCheck(ctx context.Context, request *connect.Request[v1.A
 	}), nil
 }
 
-func (h *rpc) GetAppsInStore(ctx context.Context, request *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error) {
+func (h *rpcHandler) GetAppsInStore(ctx context.Context, request *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error) {
 	h.logger.Info("getting apps in store")
 
 	list, err := h.actl.Store(ctx, h.logger)
@@ -133,7 +134,7 @@ func (h *rpc) GetAppsInStore(ctx context.Context, request *connect.Request[v1.Ge
 
 // SYSTEM
 
-func (h *rpc) ShutdownHost(ctx context.Context, request *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error) {
+func (h *rpcHandler) ShutdownHost(ctx context.Context, request *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error) {
 	err := h.sctl.ShutdownHost()
 	if err != nil {
 		return nil, err
@@ -141,7 +142,7 @@ func (h *rpc) ShutdownHost(ctx context.Context, request *connect.Request[v1.Shut
 	return connect.NewResponse(&v1.ShutdownHostResponse{}), nil
 }
 
-func (h *rpc) RestartHost(ctx context.Context, request *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error) {
+func (h *rpcHandler) RestartHost(ctx context.Context, request *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error) {
 	err := h.sctl.RestartHost()
 	if err != nil {
 		return nil, err
@@ -149,7 +150,7 @@ func (h *rpc) RestartHost(ctx context.Context, request *connect.Request[v1.Resta
 	return connect.NewResponse(&v1.RestartHostResponse{}), nil
 }
 
-func (h *rpc) CheckForSystemUpdates(ctx context.Context, request *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error) {
+func (h *rpcHandler) CheckForSystemUpdates(ctx context.Context, request *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error) {
 	h.logger.Info("check for system updates request")
 	response, err := h.sctl.CheckForOSUpdates(ctx, h.logger)
 	if err != nil {
@@ -159,7 +160,7 @@ func (h *rpc) CheckForSystemUpdates(ctx context.Context, request *connect.Reques
 	return connect.NewResponse(response), nil
 }
 
-func (h *rpc) CheckForContainerUpdates(ctx context.Context, request *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error) {
+func (h *rpcHandler) CheckForContainerUpdates(ctx context.Context, request *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error) {
 	images, err := h.sctl.CheckForContainerUpdates(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to check for system container updates")
@@ -170,7 +171,7 @@ func (h *rpc) CheckForContainerUpdates(ctx context.Context, request *connect.Req
 	}), err
 }
 
-func (h *rpc) ChangeDaemonVersion(ctx context.Context, request *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
+func (h *rpcHandler) ChangeDaemonVersion(ctx context.Context, request *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
 	err := h.sctl.ChangeDaemonVersion(&dv1.ChangeDaemonVersionCommand{
 		Version:    request.Msg.Version,
 		SrcHash:    request.Msg.SrcHash,
@@ -183,7 +184,7 @@ func (h *rpc) ChangeDaemonVersion(ctx context.Context, request *connect.Request[
 	return connect.NewResponse(&v1.ChangeDaemonVersionResponse{}), nil
 }
 
-func (h *rpc) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
+func (h *rpcHandler) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
 	err := h.sctl.InstallOSUpdate()
 	if err != nil {
 		h.logger.WithError(err).Error("failed to change install os update")
@@ -192,7 +193,7 @@ func (h *rpc) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.I
 	return connect.NewResponse(&v1.InstallOSUpdateResponse{}), nil
 }
 
-func (h *rpc) SetSystemImage(ctx context.Context, request *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
+func (h *rpcHandler) SetSystemImage(ctx context.Context, request *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
 	err := h.sctl.SetSystemImage(&dv1.SetSystemImageCommand{
 		CurrentImage:   request.Msg.CurrentImage,
 		RequestedImage: request.Msg.RequestedImage,
@@ -204,7 +205,7 @@ func (h *rpc) SetSystemImage(ctx context.Context, request *connect.Request[v1.Se
 	return connect.NewResponse(&v1.SetSystemImageResponse{}), nil
 }
 
-func (h *rpc) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
+func (h *rpcHandler) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
 	// grab the in-memory cache of current system stats
 	stats := system.CurrentStats
 	if stats == nil {
@@ -218,7 +219,7 @@ func (h *rpc) GetSystemStats(ctx context.Context, request *connect.Request[v1.Ge
 
 // IsDeviceSetup checks if the device is setup. It's also the first request made by the FE when loading. If the device is not setup, the FE will redirect to the setup page.
 // A device is considered setup (or will return true) if the device has a username, password, and the `Settings` object is not empty in `blueprint`.
-func (h *rpc) IsDeviceSetup(ctx context.Context, request *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error) {
+func (h *rpcHandler) IsDeviceSetup(ctx context.Context, request *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error) {
 	h.logger.Info("checking if device is setup")
 	isSetup, err := h.sctl.IsDeviceSetup(ctx)
 	if err != nil {
@@ -228,7 +229,7 @@ func (h *rpc) IsDeviceSetup(ctx context.Context, request *connect.Request[v1.IsD
 	return connect.NewResponse(&v1.IsDeviceSetupResponse{Setup: isSetup}), nil
 }
 
-func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
+func (h *rpcHandler) InitializeDevice(ctx context.Context, request *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
 	h.logger.Info("requested to set up device for the first time")
 
 	var msg = request.Msg
@@ -260,7 +261,7 @@ func (h *rpc) InitializeDevice(ctx context.Context, request *connect.Request[v1.
 	return connect.NewResponse(&v1.InitializeDeviceResponse{Setup: true}), nil
 }
 
-func (h *rpc) Login(ctx context.Context, request *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
+func (h *rpcHandler) Login(ctx context.Context, request *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
 	h.logger.Info("login request")
 
 	msg := request.Msg
@@ -278,7 +279,7 @@ func (h *rpc) Login(ctx context.Context, request *connect.Request[v1.LoginReques
 	return connect.NewResponse(&v1.LoginResponse{Token: res}), nil
 }
 
-func (h *rpc) GetDeviceSettings(ctx context.Context, request *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error) {
+func (h *rpcHandler) GetDeviceSettings(ctx context.Context, request *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error) {
 	h.logger.Info("getting device settings")
 
 	settings, err := h.sctl.GetServerSettings(ctx)
@@ -290,7 +291,7 @@ func (h *rpc) GetDeviceSettings(ctx context.Context, request *connect.Request[v1
 	return connect.NewResponse(&v1.GetDeviceSettingsResponse{Settings: settings}), nil
 }
 
-func (h *rpc) SetDeviceSettings(ctx context.Context, request *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error) {
+func (h *rpcHandler) SetDeviceSettings(ctx context.Context, request *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error) {
 	h.logger.Info("setting device settings")
 
 	err := request.Msg.ValidateAll()
@@ -307,22 +308,32 @@ func (h *rpc) SetDeviceSettings(ctx context.Context, request *connect.Request[v1
 	return connect.NewResponse(&v1.SetDeviceSettingsResponse{}), nil
 }
 
-func (h *rpc) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {
-	err := events.SetStream(stream)
+func (h *rpcHandler) GetAppStorage(ctx context.Context, request *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error) {
+	h.logger.Info("getting app storage")
+
+	appsStorage, err := h.actl.GetAppStorage(ctx, h.logger)
 	if err != nil {
-		return err
+		h.logger.WithError(err).Error(apps.ErrFailedToGetAppStorage)
+		return nil, errors.New(apps.ErrFailedToGetAppStorage)
 	}
+
+	return connect.NewResponse(&v1.GetAppStorageResponse{Apps: appsStorage}), nil
+}
+
+func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {
 	h.logger.Info("establishing client stream")
+	id := events.AddStream(stream)
 	for {
 		err := stream.Send(&v1.ServerEvent{
 			Event: &v1.ServerEvent_Heartbeat{},
 		})
 		if err != nil {
-			if err.Error() == "canceled: http2: stream closed" {
+			events.CloseStream(id)
+			if err.Error() == "canceled: http2: stream closed" || strings.Contains(err.Error(), "write: broken pipe") {
 				h.logger.Info("stream closed by client")
 				return nil
 			}
-			h.logger.WithError(err).Error("failed to send client heartbeat")
+			h.logger.WithError(err).Warn("failed to send client heartbeat")
 			return err
 		}
 		time.Sleep(5 * time.Second)

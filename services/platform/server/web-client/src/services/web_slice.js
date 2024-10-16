@@ -14,6 +14,13 @@ export const AppInstallStatus = Object.freeze({
     ERROR: 'error',
 });
 
+export const FileUploadStatus = Object.freeze({
+    DEFAULT: 'default',
+    UPLOADING: 'uploading',
+    COMPLETE: 'complete',
+    ERROR: 'error',
+});
+
 const initialState = {
     username: '',
     event_stream_connection_status: EventConnectionStatus.DISCONNECTED,
@@ -38,37 +45,13 @@ export const serverSlice = createSlice({
         setEventStreamConnectionStatus: (state, action) => {
             state.event_stream_connection_status = action.payload.status;
         },
-        setEvent: (state, action) => {
-            // filter out heartbeat events
-            if (action.payload.data.heartbeat) {
-                return;
-            }
-
-            if (action.payload.data.error) {
-                console.error("Received error event: ", action.payload.data.error);
-                return;
-            }
-
-            if (action.payload.data.appInstalled) {
-                state.app_install_status[action.payload.data.appInstalled.name] = AppInstallStatus.INSTALLED;
-                return;
-            }
-
-            state.event.push(action.payload.data);
-        },
-        setAppInstallStatus: (state, action) => {
-            const { app, status } = action.payload;
-            state.app_install_status[app.name] = status;
-        },
     }
 });
 
 export const {
-    setAppInstallStatus,
     setUser,
     setDeviceSettings,
     setEventStreamConnectionStatus,
-    setEvent,
 } = serverSlice.actions;
 
 export default serverSlice.reducer;

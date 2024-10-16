@@ -1,20 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Outlet, NavLink } from "react-router-dom";
-import { useDispatch } from 'react-redux';
-
-import { SUBSCRIBE_EVENTS_ACTION } from '../services/event_stream';
 
 import "./DefaultLayout.css";
 
 export default function DefaultLayout() {
-  const dispatch = useDispatch();
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [isSecondaryNavVisible, setSecondaryNavVisibility] = useState(false);
   const [isAlertVisible, setAlertVisibility] = useState(false);
-
-  useEffect(() => {
-    dispatch({type: SUBSCRIBE_EVENTS_ACTION});
-  })
 
   const onClickNavCollapseBtn = () => {
     setIsNavCollapsed(!isNavCollapsed);
@@ -49,6 +41,10 @@ export default function DefaultLayout() {
 
                   <li className="nav-item">
                       <NavLink to="/store" className="nav-link" onClick={onClickNavCollapseBtn}>Store</NavLink>
+                  </li>
+
+                  <li className="nav-item">
+                      <NavLink to="/upload" className="nav-link" onClick={onClickNavCollapseBtn}>Upload</NavLink>
                   </li>
 
                   <li className="nav-item">

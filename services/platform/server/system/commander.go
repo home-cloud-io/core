@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"sync"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 
@@ -15,13 +16,16 @@ type (
 	}
 
 	commander struct {
+		mutex  sync.Mutex
 		stream *connect.BidiStream[dv1.DaemonMessage, dv1.ServerMessage]
 	}
 )
 
 var (
-	com = &commander{}
-	ErrNoStream = fmt.Errorf("no stream")
+	com = &commander{
+		mutex: sync.Mutex{},
+	}
+	ErrNoStream    = fmt.Errorf("no stream")
 )
 
 func (c *commander) SetStream(stream *connect.BidiStream[dv1.DaemonMessage, dv1.ServerMessage]) error {
@@ -40,5 +44,8 @@ func (c *commander) Send(request *dv1.ServerMessage) error {
 	if c.stream == nil {
 		return ErrNoStream
 	}
-	return c.stream.Send(request)
+	c.mutex.Lock()
+	err := c.stream.Send(request)
+	c.mutex.Unlock()
+	return err
 }
