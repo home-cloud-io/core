@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, NavLink } from "react-router-dom";
 import { useDispatch, shallowEqual, useSelector } from 'react-redux';
-
-import { SUBSCRIBE_EVENTS_ACTION } from '../services/event_stream';
+import { useGetEventsQuery } from '../services/web_rpc';
 
 import "./DefaultLayout.css";
 
@@ -12,10 +11,7 @@ export default function DefaultLayout() {
   const [isSecondaryNavVisible, setSecondaryNavVisibility] = useState(false);
   const [isAlertVisible, setAlertVisibility] = useState(false);
   const serverStatus = useSelector(state => state.server.event_stream_connection_status, shallowEqual);
-
-  useEffect(() => {
-    dispatch({type: SUBSCRIBE_EVENTS_ACTION});
-  })
+  const { data, error, isLoading } = useGetEventsQuery();
 
   const onClickNavCollapseBtn = () => {
     setIsNavCollapsed(!isNavCollapsed);
@@ -53,11 +49,11 @@ export default function DefaultLayout() {
                   </li>
 
                   <li className="nav-item">
-                      <NavLink to="/settings" className="nav-link" onClick={onClickNavCollapseBtn}>Settings</NavLink>
+                      <NavLink to="/upload" className="nav-link" onClick={onClickNavCollapseBtn}>Upload</NavLink>
                   </li>
 
                   <li className="nav-item">
-                      <NavLink to="/upload" className="nav-link" onClick={onClickNavCollapseBtn}>Upload</NavLink>
+                      <NavLink to="/settings" className="nav-link" onClick={onClickNavCollapseBtn}>Settings</NavLink>
                   </li>
                 </ul>
               </div>

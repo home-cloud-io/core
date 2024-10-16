@@ -3,26 +3,66 @@ import { createConnectTransport } from '@connectrpc/connect-web';
 import { createPromiseClient } from '@connectrpc/connect';
 import { WebService } from 'api/platform/server/v1/web_connect';
 import { setUserSettings } from './user_slice';
+import * as Config from '../utils/config';
 
-let BASE_URL = '';
-let LOCAL_DOMAIN = 'localhost';
-
-if (process.env.NODE_ENV === 'development') {
-  BASE_URL = `http://${LOCAL_DOMAIN}:8000`;
-} else {
-  BASE_URL = 'http://home-cloud.local';
-}
 
 export const web_service_transport = createConnectTransport({
-  baseUrl: BASE_URL,
+  baseUrl: Config.BASE_URL,
 });
 
 export const client = createPromiseClient(WebService, web_service_transport);
 
 export const serverRPCService = createApi({
   reducerPath: 'server_rpc_service',
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl: Config.BASE_URL }),
   endpoints: (builder) => ({
+    getEvents: builder.query({
+      queryFn: () => ({ data: [] }),
+      async onCacheEntryAdded(
+        arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
+      ) {
+        console.log("setting up events cache")
+        // create a stream when the cache subscription starts
+        // const client = createCallbackClient(WebService, web_service_transport);
+        try {
+          // wait for the initial query to resolve before proceeding
+          await cacheDataLoaded
+
+          const listen = async function(){
+            try {
+              // when data is received from the stream to the server,
+              // if it is a message and for the appropriate channel,
+              // update our query result with the received message
+              for await (const event of client.subscribe({})) {
+                // ignore heartbeats
+                if (event.event.case === "heartbeat") {
+                  console.log("heartbeat")
+                  continue
+                }
+
+                const data = event.toJson();
+                updateCachedData((draft) => {
+                  draft.push(data);
+                });
+              }
+            } catch (err) {
+              console.warn("stream failed")
+            }
+          }
+          listen()
+          console.log("listening to event stream")
+        } catch (err) {
+          // no-op in case `cacheEntryRemoved` resolves before `cacheDataLoaded`,
+          // in which case `cacheDataLoaded` will throw
+          console.warn("subscription failed for cache: ", err)
+        }
+        // cacheEntryRemoved will resolve when the cache subscription is no longer active
+        await cacheEntryRemoved
+        // perform cleanup steps once the `cacheEntryRemoved` promise resolves
+        // client.close()
+      },
+    }),
     shutdownHost: builder.mutation({
       queryFn: async () => {
         try {
@@ -124,8 +164,29 @@ export const serverRPCService = createApi({
     getAppStoreEntities: builder.query({
       queryFn: async () => {
         try {
-          const res = await client.getAppsInStore({});
-          return { data: res.toJson().apps };
+          const resInstalled = await client.appsHealthCheck({});
+          const resStore = await client.getAppsInStore({});
+
+          const apps = []
+          for (const storeApp of resStore.apps) {
+            let app = {
+              name: storeApp.name,
+              version: storeApp.version,
+              icon: storeApp.icon,
+              digest: storeApp.digest,
+              readme: storeApp.readme,
+              installed: false,
+            };
+            for (const installedApp of resInstalled.checks) {
+              if (storeApp.name === installedApp.name) {
+                app.installed = true;
+                break
+              }
+            }
+            apps.push(app);
+          }
+
+          return { data: apps };
         } catch (error) {
           return { error };
         }
@@ -189,4 +250,5 @@ export const {
   useGetDeviceSettingsQuery,
   useGetSystemStatsQuery,
   useGetAppStorageQuery,
+  useGetEventsQuery,
 } = serverRPCService;

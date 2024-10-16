@@ -46,40 +46,6 @@ export const serverSlice = createSlice({
         setEventStreamConnectionStatus: (state, action) => {
             state.event_stream_connection_status = action.payload.status;
         },
-        setEvent: (state, action) => {
-            // filter out heartbeat events
-            if (action.payload.data.heartbeat) {
-                console.log("heartbeat")
-                return;
-            }
-
-            if (action.payload.data.error) {
-                console.error("Received error event: ", action.payload.data.error);
-                return;
-            }
-
-            if (action.payload.data.appInstalled) {
-                state.app_install_status[action.payload.data.appInstalled.name] = AppInstallStatus.INSTALLED;
-                return;
-            }
-
-            if (action.payload.data.fileUploaded) {
-                // TODO: handle file ids properly
-                // state.file_upload_status[action.payload.data.fileUploaded.id] = FileUploadStatus.COMPLETE
-                state.file_upload_status["file_id"] = FileUploadStatus.COMPLETE
-                return;
-            }
-
-            state.event.push(action.payload.data);
-        },
-        setAppInstallStatus: (state, action) => {
-            const { app, status } = action.payload;
-            state.app_install_status[app.name] = status;
-        },
-        setFileUploadStatus: (state, action) => {
-            const { id, status } = action.payload;
-            state.file_upload_status[id] = status;
-        },
     }
 });
 

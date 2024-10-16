@@ -1,21 +1,14 @@
 import * as React from 'react';
-import { useDispatch, shallowEqual, useSelector } from 'react-redux';
-import { FileUploadStatus, setFileUploadStatus } from '../../services/web_slice';
-import { useGetAppStorageQuery } from '../../services/web_rpc';
+import { useState } from 'react';
+import { FileUploadStatus } from '../../services/web_slice';
+import { useGetAppStorageQuery, useGetEventsQuery } from '../../services/web_rpc';
+import * as Config from '../../utils/config';
+import { v4 as uuidv4 } from 'uuid';
 
 const loading = require('../../assets/loading.gif');
 
-let BASE_URL = '';
-let LOCAL_DOMAIN = 'localhost';
-
-if (process.env.NODE_ENV === 'development') {
-  BASE_URL = `http://${LOCAL_DOMAIN}:8000`;
-} else {
-  BASE_URL = 'http://home-cloud.local';
-}
-
 export default function UploadPage() {
-  const uploadStatus = useSelector(state => state.server.file_upload_status, shallowEqual);
+  const { data: events } = useGetEventsQuery();
   const { data, error, isLoading } = useGetAppStorageQuery();
 
   const headerStyles = {
@@ -34,21 +27,36 @@ export default function UploadPage() {
         ) : error ? (
           <p>Error: {error}</p>
         ) : (
-          <UploadForm status={uploadStatus["file_id"]} apps={data} />
+          <UploadForm events={events} apps={data} />
         )}
       </div>
     </div>
   );
 }
 
+function UploadForm({events = [], apps}) {
+  const [state, setState] = useState({
+    status: FileUploadStatus.DEFAULT,
+    fileId: uuidv4(),
+  });
 
-function UploadForm({status = FileUploadStatus.DEFAULT, apps}) {
-  const dispatch = useDispatch();
+  if (events.length > 0) {
+    const latestEvent = events.at(-1)["fileUploaded"];
+    if (latestEvent && latestEvent.id === state.fileId) {
+        if (state.status === FileUploadStatus.UPLOADING) {
+          setState({
+            status: FileUploadStatus.COMPLETE,
+            fileId: uuidv4(),
+          });
+        }
+    }
+  }
 
   const handleSubmit = (e) => {
-    status = FileUploadStatus.UPLOADING;
-    let id = "file_id"
-    dispatch(setFileUploadStatus({status, id}));
+    setState({
+      status: FileUploadStatus.UPLOADING,
+      fileId: state.fileId,
+    });
   };
 
   return (
@@ -56,12 +64,24 @@ function UploadForm({status = FileUploadStatus.DEFAULT, apps}) {
       <iframe name="dummyframe" id="dummyframe" style={{ display: 'none' }} ></iframe>
       <form
         className="row g-3"
-        action={`${BASE_URL}/upload-file`}
+        action={`${Config.BASE_URL}/upload-file`}
         method="post"
         encType="multipart/form-data"
         target="dummyframe"
         onSubmit={(e) => handleSubmit(e)}
       >
+        <div className="col-12" hidden={true}>
+          <input
+            className="form-control"
+            id="id"
+            name="id"
+            type="text"
+            value={state.fileId}
+            readOnly
+            required
+          />
+        </div>
+
         <div className="col-12">
           <div className="container" display="inline-block" title="Choose the installed App storage volume you want to upload this file to. For example, you could upload a movie file to your Jellyfin collection by choosing the 'jellyfin-media' option." >
             <HelpIcon/>
@@ -128,7 +148,7 @@ function UploadForm({status = FileUploadStatus.DEFAULT, apps}) {
         </div>
 
         <div className="container" display="inline-block" >
-          { status === FileUploadStatus.UPLOADING ? <LoadingIcon/> : <SubmitButton/> }
+          { state.status === FileUploadStatus.UPLOADING ? <LoadingIcon/> : <SubmitButton/> }
         </div>
       </form>
     </div>
