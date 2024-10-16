@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"os"
@@ -16,7 +15,6 @@ import (
 	sdConnect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	"github.com/home-cloud-io/core/services/platform/daemon/execute"
 	"github.com/home-cloud-io/core/services/platform/daemon/host"
-	"github.com/home-cloud-io/core/services/platform/daemon/versioning"
 
 	"connectrpc.com/connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -155,18 +153,14 @@ func (c *client) listen(ctx context.Context) error {
 			go c.installOsUpdate(ctx)
 		case *v1.ServerMessage_SetSystemImageCommand:
 			go c.setSystemImage(ctx, message.GetSetSystemImageCommand())
-		case *v1.ServerMessage_SetUserPasswordCommand:
-			go c.setUserPassword(ctx, message.GetSetUserPasswordCommand())
-		case *v1.ServerMessage_SetTimeZoneCommand:
-			go c.setTimeZone(ctx, message.GetSetTimeZoneCommand())
 		case *v1.ServerMessage_AddMdnsHostCommand:
 			go c.addMdnsHost(ctx, message.GetAddMdnsHostCommand())
 		case *v1.ServerMessage_RemoveMdnsHostCommand:
 			go c.removeMdnsHost(ctx, message.GetRemoveMdnsHostCommand())
-		case *v1.ServerMessage_InitializeDeviceCommand:
-			go c.initializeDevice(ctx, message.GetInitializeDeviceCommand())
 		case *v1.ServerMessage_UploadFileRequest:
 			go c.uploadFile(ctx, message.GetUploadFileRequest())
+		case *v1.ServerMessage_SaveSettingsCommand:
+			go c.saveSettings(ctx, message.GetSaveSettingsCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -230,7 +224,7 @@ func (c *client) shutdown(ctx context.Context) {
 
 func (c *client) osUpdateDiff(ctx context.Context) {
 	c.logger.Info("os update diff command")
-	osUpdateDiff, err := versioning.GetOSVersionDiff(ctx, c.logger)
+	osUpdateDiff, err := host.GetOSVersionDiff(ctx, c.logger)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to get os version diff")
 		c.stream.Send(&v1.DaemonMessage{
@@ -260,7 +254,7 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 
 func (c *client) currentDaemonVersion() {
 	c.logger.Info("current daemon version command")
-	current, err := versioning.GetDaemonVersion(c.logger)
+	current, err := host.GetDaemonVersion(c.logger)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to get current daemon version")
 		c.stream.Send(&v1.DaemonMessage{
@@ -293,7 +287,7 @@ func (c *client) changeDaemonVersion(ctx context.Context, def *v1.ChangeDaemonVe
 		"vendor_hash": def.VendorHash,
 	})
 	logger.Info("change daemon version command")
-	err := versioning.ChangeDaemonVersion(ctx, c.logger, def)
+	err := host.ChangeDaemonVersion(ctx, c.logger, def)
 	if err != nil {
 		logger.WithError(err).Error("failed to change daemon version")
 		// TODO: return error to the server?
@@ -303,7 +297,7 @@ func (c *client) changeDaemonVersion(ctx context.Context, def *v1.ChangeDaemonVe
 
 func (c *client) installOsUpdate(ctx context.Context) {
 	c.logger.Info("install os update command")
-	err := versioning.RebuildAndSwitchOS(ctx, c.logger)
+	err := host.RebuildAndSwitchOS(ctx, c.logger)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to install os update")
 		// TODO: return error to the server?
@@ -316,55 +310,13 @@ func (c *client) setSystemImage(ctx context.Context, def *v1.SetSystemImageComma
 		"requested_image": def.RequestedImage,
 	})
 	logger.Info("set system image command")
-	err := versioning.SetSystemImage(ctx, c.logger, def)
+	err := host.SetSystemImage(ctx, c.logger, def)
 	if err != nil {
 		logger.WithError(err).Error("failed to set system image")
 		// TODO: return error to the server?
 		return
 	}
 	logger.Info("system image set successfully")
-}
-
-func (c *client) setUserPassword(ctx context.Context, def *v1.SetUserPasswordCommand) error {
-	logger := c.logger.WithField("username", def.Username)
-
-	if def.Password == "" {
-		logger.Info("ignoring empty password change")
-		return nil
-	}
-
-	cmd := exec.Command("chpasswd")
-
-	// write the username:password to stdin when the command executes
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		logger.WithError(err).Error("failed to get stdin pipe")
-		return err
-	}
-	go func() {
-		defer stdin.Close()
-		io.WriteString(stdin, fmt.Sprintf("%s:%s", def.Username, def.Password))
-	}()
-
-	// execute command
-	err = execute.ExecuteCommand(ctx, cmd)
-	if err != nil {
-		logger.WithError(err).Error("failed to set user password")
-		return err
-	}
-	logger.Info("user password set successfully")
-	return nil
-}
-
-func (c *client) setTimeZone(ctx context.Context, def *v1.SetTimeZoneCommand) error {
-	logger := c.logger.WithField("time_zone", def.TimeZone)
-	err := versioning.SetTimeZone(ctx, logger, def.TimeZone)
-	if err != nil {
-		logger.WithError(err).Error("failed to set time zone")
-		return err
-	}
-	logger.Info("successfully set time zone")
-	return nil
 }
 
 func (c *client) addMdnsHost(ctx context.Context, def *v1.AddMdnsHostCommand) {
@@ -378,34 +330,14 @@ func (c *client) removeMdnsHost(_ context.Context, def *v1.RemoveMdnsHostCommand
 	}
 }
 
-func (c *client) initializeDevice(ctx context.Context, def *v1.InitializeDeviceCommand) {
-	var (
-		err error
-	)
-	c.logger.Info("initializing device")
-	err = c.setUserPassword(ctx, def.User)
+func (c *client) saveSettings(ctx context.Context, def *v1.SaveSettingsCommand) {
+	err := host.SaveSettings(ctx, c.logger, def)
 	if err != nil {
 		err = c.Send(&v1.DaemonMessage{
-			Message: &v1.DaemonMessage_DeviceInitialized{
-				DeviceInitialized: &v1.DeviceInitialized{
+			Message: &v1.DaemonMessage_SettingsSaved{
+				SettingsSaved: &v1.SettingsSaved{
 					Error: &v1.DaemonError{
-						Error: fmt.Sprintf("failed to set user password: %s", err.Error()),
-					},
-				},
-			},
-		})
-		if err != nil {
-			c.logger.WithError(err).Error("failed to send error")
-		}
-		return
-	}
-	err = c.setTimeZone(ctx, def.TimeZone)
-	if err != nil {
-		err = c.Send(&v1.DaemonMessage{
-			Message: &v1.DaemonMessage_DeviceInitialized{
-				DeviceInitialized: &v1.DeviceInitialized{
-					Error: &v1.DaemonError{
-						Error: fmt.Sprintf("failed to set time zone: %s", err.Error()),
+						Error: fmt.Sprintf("failed to save settings: %s", err.Error()),
 					},
 				},
 			},
@@ -417,14 +349,12 @@ func (c *client) initializeDevice(ctx context.Context, def *v1.InitializeDeviceC
 	}
 
 	err = c.Send(&v1.DaemonMessage{
-		Message: &v1.DaemonMessage_DeviceInitialized{
-			DeviceInitialized: &v1.DeviceInitialized{},
+		Message: &v1.DaemonMessage_SettingsSaved{
+			SettingsSaved: &v1.SettingsSaved{},
 		},
 	})
 	if err != nil {
 		c.logger.WithError(err).Error("failed to send success")
 		return
 	}
-
-	c.logger.Info("finished initializing device")
 }

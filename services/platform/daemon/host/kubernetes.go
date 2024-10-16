@@ -1,4 +1,4 @@
-package versioning
+package host
 
 import (
 	"context"
@@ -19,7 +19,7 @@ var (
 
 func SetSystemImage(ctx context.Context, logger chassis.Logger, def *v1.SetSystemImageCommand) error {
 	var (
-		replacers = []replacer{
+		replacers = []Replacer{
 			func(line string) string {
 				return strings.ReplaceAll(line, def.CurrentImage, def.RequestedImage)
 			},
@@ -27,7 +27,7 @@ func SetSystemImage(ctx context.Context, logger chassis.Logger, def *v1.SetSyste
 	)
 
 	for _, filename := range systemKubernetesManifests {
-		err := lineByLineReplace(filename, replacers)
+		err := LineByLineReplace(filename, replacers)
 		if err != nil {
 			return err
 		}
