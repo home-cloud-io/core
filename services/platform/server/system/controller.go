@@ -47,6 +47,7 @@ type (
 		AddMdnsHost(hostname string) error
 		// RemoveMdnsHost removes a host to the avahi mDNS server managed by the daemon
 		RemoveMdnsHost(hostname string) error
+		// UploadFileStream will stream a file in chunks as an upload to the daemon
 		UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId, fileName string) (string, error)
 	}
 	OS interface {
@@ -215,16 +216,24 @@ func (c *controller) RemoveMdnsHost(hostname string) error {
 }
 
 func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId, fileName string) (string, error) {
+	logger.Info("uploading file")
+	var listenerErr error
 	done := make(chan bool)
-	go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileReady]{
-		Callback: func(event *dv1.UploadFileReady) (bool, error) {
-			if event.Id == fileId {
-				done <- true
-				return true, nil
-			}
-			return false, nil
-		},
-	}).Listen(ctx)
+	go func(){
+		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileReady]{
+			Callback: func(event *dv1.UploadFileReady) (bool, error) {
+				if event.Id == fileId {
+					done <- true
+					return true, nil
+				}
+				return false, nil
+			},
+			Timeout: 5 * time.Second,
+		}).Listen(ctx)
+		if listenerErr != nil {
+			done <- true
+		}
+	}()
 
 	// prepare upload to daemon
 	err := com.Send(&dv1.ServerMessage{
@@ -240,9 +249,15 @@ func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger
 		},
 	})
 	if err != nil {
+		logger.WithError(err).Error("failed to ready daemon for file upload")
 		return fileId, err
 	}
+	logger.Info("waiting for done signal")
 	<-done
+	if listenerErr != nil {
+		logger.WithError(listenerErr).Error("failed to ready daemon for file upload")
+		return fileId, listenerErr
+	}
 	logger.Info("daemon ready for file upload")
 
 	// chunk file and upload

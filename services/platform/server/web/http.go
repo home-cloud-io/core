@@ -80,23 +80,20 @@ func (h *httpHandler) fileUploadHandler(w http.ResponseWriter, r *http.Request) 
 	h.logger.WithField("form", form).Info("received form")
 	id, err := h.sctl.UploadFileStream(ctx, h.logger, form.file, form.id, fileName)
 	if err != nil {
+		h.logger.WithError(err).Error("failed to upload file")
+		sendEventToClient(h.logger, &v1.FileUploadedEvent{
+			Id:      id,
+			Success: false,
+		})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	h.logger.Info("file upload complete")
-	err = events.Send(&v1.ServerEvent{
-		Event: &v1.ServerEvent_FileUploaded{
-			FileUploaded: &v1.FileUploadedEvent{
-				Id: id,
-			},
-		},
+	sendEventToClient(h.logger, &v1.FileUploadedEvent{
+		Id:      id,
+		Success: true,
 	})
-	if err != nil {
-		h.logger.WithError(err).Error("failed to send file uploaded event to client")
-		return
-	}
-	h.logger.Info("sent uploaded event to client")
 }
 
 func readForm(reader *multipart.Reader) (uploadForm, error) {
@@ -142,4 +139,17 @@ func readForm(reader *multipart.Reader) (uploadForm, error) {
 		}
 	}
 	return form, fmt.Errorf("no file provided in form")
+}
+
+func sendEventToClient(logger chassis.Logger, event *v1.FileUploadedEvent) {
+	err := events.Send(&v1.ServerEvent{
+		Event: &v1.ServerEvent_FileUploaded{
+			FileUploaded: event,
+		},
+	})
+	if err != nil {
+		logger.WithError(err).Error("failed to send file uploaded event to client")
+		return
+	}
+	logger.Info("sent uploaded event to client")
 }
