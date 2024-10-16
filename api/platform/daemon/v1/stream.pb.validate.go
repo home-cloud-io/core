@@ -386,6 +386,47 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_SettingsSaved:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetSettingsSaved()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "SettingsSaved",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "SettingsSaved",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSettingsSaved()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "SettingsSaved",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -1059,6 +1100,47 @@ func (m *ServerMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
 					field:  "UploadFileRequest",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_SaveSettingsCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetSaveSettingsCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "SaveSettingsCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "SaveSettingsCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSaveSettingsCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "SaveSettingsCommand",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2052,6 +2134,135 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UploadFileChunkCompletedValidationError{}
+
+// Validate checks the field values on SettingsSaved with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SettingsSaved) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SettingsSaved with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SettingsSavedMultiError, or
+// nil if none found.
+func (m *SettingsSaved) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SettingsSaved) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SettingsSavedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SettingsSavedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SettingsSavedValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SettingsSavedMultiError(errors)
+	}
+
+	return nil
+}
+
+// SettingsSavedMultiError is an error wrapping multiple validation errors
+// returned by SettingsSaved.ValidateAll() if the designated constraints
+// aren't met.
+type SettingsSavedMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SettingsSavedMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SettingsSavedMultiError) AllErrors() []error { return m }
+
+// SettingsSavedValidationError is the validation error returned by
+// SettingsSaved.Validate if the designated constraints aren't met.
+type SettingsSavedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SettingsSavedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SettingsSavedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SettingsSavedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SettingsSavedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SettingsSavedValidationError) ErrorName() string { return "SettingsSavedValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SettingsSavedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSettingsSaved.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SettingsSavedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SettingsSavedValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -3892,3 +4103,111 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = FileDoneValidationError{}
+
+// Validate checks the field values on SaveSettingsCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SaveSettingsCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SaveSettingsCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SaveSettingsCommandMultiError, or nil if none found.
+func (m *SaveSettingsCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SaveSettingsCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AdminPassword
+
+	// no validation rules for TimeZone
+
+	// no validation rules for EnableSsh
+
+	if len(errors) > 0 {
+		return SaveSettingsCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// SaveSettingsCommandMultiError is an error wrapping multiple validation
+// errors returned by SaveSettingsCommand.ValidateAll() if the designated
+// constraints aren't met.
+type SaveSettingsCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SaveSettingsCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SaveSettingsCommandMultiError) AllErrors() []error { return m }
+
+// SaveSettingsCommandValidationError is the validation error returned by
+// SaveSettingsCommand.Validate if the designated constraints aren't met.
+type SaveSettingsCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SaveSettingsCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SaveSettingsCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SaveSettingsCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SaveSettingsCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SaveSettingsCommandValidationError) ErrorName() string {
+	return "SaveSettingsCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SaveSettingsCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSaveSettingsCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SaveSettingsCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SaveSettingsCommandValidationError{}
