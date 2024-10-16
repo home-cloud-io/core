@@ -2455,7 +2455,7 @@ export class AppInstalledEvent extends Message<AppInstalledEvent> {
 }
 
 /**
- * FileUploadedEvent is sent from the server to connected clients when a file upload completes successfully
+ * FileUploadedEvent is sent from the server to connected clients when a file upload completes
  *
  * @generated from message platform.server.v1.FileUploadedEvent
  */
@@ -2466,6 +2466,8 @@ export class FileUploadedEvent extends Message<FileUploadedEvent> {
   id = "";
 
   /**
+   * true when the file upload was successful, false when it failed
+   *
    * @generated from field: bool success = 2;
    */
   success = false;

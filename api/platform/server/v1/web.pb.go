@@ -3152,14 +3152,15 @@ func (x *AppInstalledEvent) GetName() string {
 	return ""
 }
 
-// FileUploadedEvent is sent from the server to connected clients when a file upload completes successfully
+// FileUploadedEvent is sent from the server to connected clients when a file upload completes
 type FileUploadedEvent struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id      string `protobuf:"bytes,1,opt,name=id,proto3" json:"id" bun:"id" csv:"id" pg:"id" yaml:"id"`
-	Success bool   `protobuf:"varint,2,opt,name=success,proto3" json:"success" bun:"success" csv:"success" pg:"success" yaml:"success"`
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id" bun:"id" csv:"id" pg:"id" yaml:"id"`
+	// true when the file upload was successful, false when it failed
+	Success bool `protobuf:"varint,2,opt,name=success,proto3" json:"success" bun:"success" csv:"success" pg:"success" yaml:"success"`
 }
 
 func (x *FileUploadedEvent) Reset() {
