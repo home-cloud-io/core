@@ -99,8 +99,8 @@ func setUserPassword(ctx context.Context, logger chassis.Logger, password string
 	}
 
 	config := chassis.GetConfig()
-	if config.Env() == "local" {
-		logger.Info("mocking password change when local")
+	if config.Env() == "test" {
+		logger.Info("mocking password change")
 		return nil
 	}
 

@@ -20,8 +20,8 @@ func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error
 	defer osMutex.Unlock()
 
 	config := chassis.GetConfig()
-	if config.Env() == "local" {
-		logger.Info("mocking os version diff when local")
+	if config.Env() == "test" {
+		logger.Info("mocking os version diff")
 		return "fake os version diff", nil
 	}
 
@@ -67,8 +67,8 @@ func RebuildAndSwitchOS(ctx context.Context, logger chassis.Logger) error {
 	defer osMutex.Unlock()
 
 	config := chassis.GetConfig()
-	if config.Env() == "local" {
-		logger.Info("mocking nixos rebuild when local")
+	if config.Env() == "test" {
+		logger.Info("mocking nixos rebuild")
 		return nil
 	}
 
