@@ -46,6 +46,8 @@ export class DaemonMessage extends Message<DaemonMessage> {
     case: "systemStats";
   } | {
     /**
+     * Deprecated: use SettingsSaved instead
+     *
      * @generated from field: platform.daemon.v1.DeviceInitialized device_initialized = 6;
      */
     value: DeviceInitialized;
@@ -62,6 +64,12 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: UploadFileChunkCompleted;
     case: "uploadFileChunkCompleted";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.SettingsSaved settings_saved = 9;
+     */
+    value: SettingsSaved;
+    case: "settingsSaved";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -80,6 +88,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 6, name: "device_initialized", kind: "message", T: DeviceInitialized, oneof: "message" },
     { no: 7, name: "upload_file_ready", kind: "message", T: UploadFileReady, oneof: "message" },
     { no: 8, name: "upload_file_chunk_completed", kind: "message", T: UploadFileChunkCompleted, oneof: "message" },
+    { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -156,12 +165,16 @@ export class ServerMessage extends Message<ServerMessage> {
     case: "setSystemImageCommand";
   } | {
     /**
+     * Deprecated: use SaveSettingsCommand instead
+     *
      * @generated from field: platform.daemon.v1.SetUserPasswordCommand set_user_password_command = 9;
      */
     value: SetUserPasswordCommand;
     case: "setUserPasswordCommand";
   } | {
     /**
+     * Deprecated: use SaveSettingsCommand instead
+     *
      * @generated from field: platform.daemon.v1.SetTimeZoneCommand set_time_zone_command = 10;
      */
     value: SetTimeZoneCommand;
@@ -180,6 +193,8 @@ export class ServerMessage extends Message<ServerMessage> {
     case: "removeMdnsHostCommand";
   } | {
     /**
+     * Deprecated: use SaveSettingsCommand instead
+     *
      * @generated from field: platform.daemon.v1.InitializeDeviceCommand initialize_device_command = 13;
      */
     value: InitializeDeviceCommand;
@@ -190,6 +205,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: UploadFileRequest;
     case: "uploadFileRequest";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.SaveSettingsCommand save_settings_command = 15;
+     */
+    value: SaveSettingsCommand;
+    case: "saveSettingsCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -214,6 +235,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 12, name: "remove_mdns_host_command", kind: "message", T: RemoveMdnsHostCommand, oneof: "message" },
     { no: 13, name: "initialize_device_command", kind: "message", T: InitializeDeviceCommand, oneof: "message" },
     { no: 14, name: "upload_file_request", kind: "message", T: UploadFileRequest, oneof: "message" },
+    { no: 15, name: "save_settings_command", kind: "message", T: SaveSettingsCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -400,6 +422,8 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
 }
 
 /**
+ * Deprecated: use SettingsSaved instead
+ *
  * @generated from message platform.daemon.v1.DeviceInitialized
  */
 export class DeviceInitialized extends Message<DeviceInitialized> {
@@ -554,6 +578,43 @@ export class UploadFileChunkCompleted extends Message<UploadFileChunkCompleted> 
 
   static equals(a: UploadFileChunkCompleted | PlainMessage<UploadFileChunkCompleted> | undefined, b: UploadFileChunkCompleted | PlainMessage<UploadFileChunkCompleted> | undefined): boolean {
     return proto3.util.equals(UploadFileChunkCompleted, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.SettingsSaved
+ */
+export class SettingsSaved extends Message<SettingsSaved> {
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
+  constructor(data?: PartialMessage<SettingsSaved>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.SettingsSaved";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SettingsSaved {
+    return new SettingsSaved().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SettingsSaved {
+    return new SettingsSaved().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SettingsSaved {
+    return new SettingsSaved().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SettingsSaved | PlainMessage<SettingsSaved> | undefined, b: SettingsSaved | PlainMessage<SettingsSaved> | undefined): boolean {
+    return proto3.util.equals(SettingsSaved, a, b);
   }
 }
 
@@ -813,6 +874,8 @@ export class SetSystemImageCommand extends Message<SetSystemImageCommand> {
 }
 
 /**
+ * Deprecated: use SaveSettingsCommand instead
+ *
  * @generated from message platform.daemon.v1.InitializeDeviceCommand
  */
 export class InitializeDeviceCommand extends Message<InitializeDeviceCommand> {
@@ -856,6 +919,8 @@ export class InitializeDeviceCommand extends Message<InitializeDeviceCommand> {
 }
 
 /**
+ * Deprecated: use SaveSettingsCommand instead
+ *
  * @generated from message platform.daemon.v1.SetUserPasswordCommand
  */
 export class SetUserPasswordCommand extends Message<SetUserPasswordCommand> {
@@ -899,6 +964,8 @@ export class SetUserPasswordCommand extends Message<SetUserPasswordCommand> {
 }
 
 /**
+ * Deprecated: use SaveSettingsCommand instead
+ *
  * @generated from message platform.daemon.v1.SetTimeZoneCommand
  */
 export class SetTimeZoneCommand extends Message<SetTimeZoneCommand> {
@@ -1208,6 +1275,63 @@ export class FileDone extends Message<FileDone> {
 
   static equals(a: FileDone | PlainMessage<FileDone> | undefined, b: FileDone | PlainMessage<FileDone> | undefined): boolean {
     return proto3.util.equals(FileDone, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.SaveSettingsCommand
+ */
+export class SaveSettingsCommand extends Message<SaveSettingsCommand> {
+  /**
+   * time_zone must be a valid TZ identifier from: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+   *
+   * @generated from field: string admin_password = 1;
+   */
+  adminPassword = "";
+
+  /**
+   * @generated from field: string time_zone = 2;
+   */
+  timeZone = "";
+
+  /**
+   * @generated from field: bool enable_ssh = 3;
+   */
+  enableSsh = false;
+
+  /**
+   * @generated from field: repeated string trusted_ssh_keys = 4;
+   */
+  trustedSshKeys: string[] = [];
+
+  constructor(data?: PartialMessage<SaveSettingsCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.SaveSettingsCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "admin_password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "time_zone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SaveSettingsCommand {
+    return new SaveSettingsCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SaveSettingsCommand {
+    return new SaveSettingsCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SaveSettingsCommand {
+    return new SaveSettingsCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SaveSettingsCommand | PlainMessage<SaveSettingsCommand> | undefined, b: SaveSettingsCommand | PlainMessage<SaveSettingsCommand> | undefined): boolean {
+    return proto3.util.equals(SaveSettingsCommand, a, b);
   }
 }
 

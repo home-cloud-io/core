@@ -20,6 +20,7 @@ export const DaemonMessage = proto3.makeMessageType(
     { no: 6, name: "device_initialized", kind: "message", T: DeviceInitialized, oneof: "message" },
     { no: 7, name: "upload_file_ready", kind: "message", T: UploadFileReady, oneof: "message" },
     { no: 8, name: "upload_file_chunk_completed", kind: "message", T: UploadFileChunkCompleted, oneof: "message" },
+    { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
   ],
 );
 
@@ -43,6 +44,7 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 12, name: "remove_mdns_host_command", kind: "message", T: RemoveMdnsHostCommand, oneof: "message" },
     { no: 13, name: "initialize_device_command", kind: "message", T: InitializeDeviceCommand, oneof: "message" },
     { no: 14, name: "upload_file_request", kind: "message", T: UploadFileRequest, oneof: "message" },
+    { no: 15, name: "save_settings_command", kind: "message", T: SaveSettingsCommand, oneof: "message" },
   ],
 );
 
@@ -93,6 +95,8 @@ export const CurrentDaemonVersion = proto3.makeMessageType(
 );
 
 /**
+ * Deprecated: use SettingsSaved instead
+ *
  * @generated from message platform.daemon.v1.DeviceInitialized
  */
 export const DeviceInitialized = proto3.makeMessageType(
@@ -134,6 +138,16 @@ export const UploadFileChunkCompleted = proto3.makeMessageType(
   () => [
     { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.SettingsSaved
+ */
+export const SettingsSaved = proto3.makeMessageType(
+  "platform.daemon.v1.SettingsSaved",
+  () => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
   ],
 );
 
@@ -209,6 +223,8 @@ export const SetSystemImageCommand = proto3.makeMessageType(
 );
 
 /**
+ * Deprecated: use SaveSettingsCommand instead
+ *
  * @generated from message platform.daemon.v1.InitializeDeviceCommand
  */
 export const InitializeDeviceCommand = proto3.makeMessageType(
@@ -220,6 +236,8 @@ export const InitializeDeviceCommand = proto3.makeMessageType(
 );
 
 /**
+ * Deprecated: use SaveSettingsCommand instead
+ *
  * @generated from message platform.daemon.v1.SetUserPasswordCommand
  */
 export const SetUserPasswordCommand = proto3.makeMessageType(
@@ -231,6 +249,8 @@ export const SetUserPasswordCommand = proto3.makeMessageType(
 );
 
 /**
+ * Deprecated: use SaveSettingsCommand instead
+ *
  * @generated from message platform.daemon.v1.SetTimeZoneCommand
  */
 export const SetTimeZoneCommand = proto3.makeMessageType(
@@ -311,6 +331,19 @@ export const FileDone = proto3.makeMessageType(
   () => [
     { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "chunk_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.SaveSettingsCommand
+ */
+export const SaveSettingsCommand = proto3.makeMessageType(
+  "platform.daemon.v1.SaveSettingsCommand",
+  () => [
+    { no: 1, name: "admin_password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "time_zone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ],
 );
 

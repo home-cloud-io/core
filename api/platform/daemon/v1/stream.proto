@@ -17,9 +17,11 @@ message DaemonMessage {
     OSUpdateDiff os_update_diff = 3;
     CurrentDaemonVersion current_daemon_version = 4;
     SystemStats system_stats = 5;
+    // Deprecated: use SettingsSaved instead
     DeviceInitialized device_initialized = 6;
     UploadFileReady upload_file_ready = 7;
     UploadFileChunkCompleted upload_file_chunk_completed = 8;
+    SettingsSaved settings_saved = 9;
   }
 }
 
@@ -33,12 +35,16 @@ message ServerMessage {
     ChangeDaemonVersionCommand change_daemon_version_command = 6;
     InstallOSUpdateCommand install_os_update_command = 7;
     SetSystemImageCommand set_system_image_command = 8;
+    // Deprecated: use SaveSettingsCommand instead
     SetUserPasswordCommand set_user_password_command = 9;
+    // Deprecated: use SaveSettingsCommand instead
     SetTimeZoneCommand set_time_zone_command = 10;
     AddMdnsHostCommand add_mdns_host_command = 11;
     RemoveMdnsHostCommand remove_mdns_host_command = 12;
+    // Deprecated: use SaveSettingsCommand instead
     InitializeDeviceCommand initialize_device_command = 13;
     UploadFileRequest upload_file_request = 14;
+    SaveSettingsCommand save_settings_command = 15;
   }
 }
 
@@ -67,6 +73,7 @@ message CurrentDaemonVersion {
   DaemonError error = 16;
 }
 
+// Deprecated: use SettingsSaved instead
 message DeviceInitialized {
   DaemonError error = 16;
 }
@@ -84,6 +91,10 @@ message UploadFileReady {
 message UploadFileChunkCompleted {
   string file_id = 1;
   uint32 index = 2;
+}
+
+message SettingsSaved {
+  DaemonError error = 16;
 }
 
 // Server -> Daemon
@@ -113,16 +124,19 @@ message SetSystemImageCommand {
   string requested_image = 2;
 }
 
+// Deprecated: use SaveSettingsCommand instead
 message InitializeDeviceCommand {
   SetUserPasswordCommand user = 1;
   SetTimeZoneCommand time_zone = 2;
 }
 
+// Deprecated: use SaveSettingsCommand instead
 message SetUserPasswordCommand {
   string username = 1;
   string password = 2;
 }
 
+// Deprecated: use SaveSettingsCommand instead
 message SetTimeZoneCommand {
   // time_zone must be a valid TZ identifier from: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   string time_zone = 1;
@@ -162,4 +176,12 @@ message FileChunk {
 message FileDone {
   string file_id = 1;
   uint32 chunk_count = 2;
+}
+
+message SaveSettingsCommand {
+  // time_zone must be a valid TZ identifier from: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  string admin_password = 1;
+  string time_zone = 2;
+  bool enable_ssh = 3;
+  repeated string trusted_ssh_keys = 4;
 }

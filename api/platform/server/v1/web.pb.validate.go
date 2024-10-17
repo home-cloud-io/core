@@ -5963,6 +5963,8 @@ func (m *DeviceSettings) validate(all bool) error {
 
 	// no validation rules for AutoUpdateOs
 
+	// no validation rules for EnableSsh
+
 	if len(errors) > 0 {
 		return DeviceSettingsMultiError(errors)
 	}

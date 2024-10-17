@@ -287,6 +287,8 @@ message DeviceSettings {
   string timezone = 2 [(validate.rules).string.min_len = 7];
   bool auto_update_apps = 3;
   bool auto_update_os = 4;
+  bool enable_ssh = 5;
+  repeated string trusted_ssh_keys = 6;
 }
 
 message DiskStats {
