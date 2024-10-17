@@ -1,4 +1,4 @@
-package versioning
+package host
 
 import (
 	"bufio"
@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
 )
@@ -66,7 +67,7 @@ func GetDaemonVersion(logger chassis.Logger) (*v1.CurrentDaemonVersion, error) {
 func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.ChangeDaemonVersionCommand) error {
 	var (
 		err       error
-		replacers = []replacer{
+		replacers = []Replacer{
 			func(line string) string {
 				if strings.Contains(line, "version =") {
 					line = fmt.Sprintf("  version = \"%s\";", def.Version)
@@ -89,7 +90,7 @@ func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.Cha
 		}
 	)
 
-	err = lineByLineReplace(daemonNixFile, replacers)
+	err = LineByLineReplace(daemonNixFile, replacers)
 	if err != nil {
 		logger.WithError(err).Error("failed to replace version")
 		return err

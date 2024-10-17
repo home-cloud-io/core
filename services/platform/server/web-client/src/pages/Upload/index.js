@@ -72,7 +72,7 @@ function UploadForm({events = [], apps}) {
       <iframe name="dummyframe" id="dummyframe" style={{ display: 'none' }} ></iframe>
       <form
         className="row g-3"
-        action={`${Config.BASE_URL}/upload-file`}
+        action={`${Config.BASE_URL}/api/upload`}
         method="post"
         encType="multipart/form-data"
         target="dummyframe"

@@ -1,4 +1,4 @@
-package versioning
+package host
 
 import (
 	"bufio"
@@ -6,16 +6,26 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
 type (
-	// replacer take in a line in a file and outputs the replacement line (which could be the same if no change is needed)
-	replacer func(line string) string
+	// Replacer take in a line in a file and outputs the replacement line (which could be the same if no change is needed)
+	Replacer func(line string) string
 )
 
-// lineByLineReplace will process all lines in the given file running all replacers against each line.
-// NOTE: the replacers will be run in the order they appear in the slice
-func lineByLineReplace(filename string, replacers []replacer) error {
+var (
+	// fileMutex is a safety check to make sure we don't accidentally write to the same file from multiple threads
+	// in the future this could be put into a map keyed off of filenames to allow parallel writes to different files
+	fileMutex = sync.Mutex{}
+)
+
+// LineByLineReplace will process all lines in the given file running all Replacers against each line.
+// NOTE: the Replacers will be run in the order they appear in the slice
+func LineByLineReplace(filename string, replacers []Replacer) error {
+	fileMutex.Lock()
+	defer fileMutex.Unlock()
+
 	// read original file
 	reader, err := os.Open(filename)
 	if err != nil {
