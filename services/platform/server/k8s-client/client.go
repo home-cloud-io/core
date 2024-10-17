@@ -63,6 +63,7 @@ func NewClient(logger chassis.Logger) Client {
 	kubeConfig, err := clientcmd.BuildConfigFromFlags(config.GetString("server.k8s.master_url"), config.GetString("server.k8s.config_path"))
 	if err != nil {
 		logger.WithError(err).Error("failed to read kube config")
+		panic(err)
 	}
 
 	c, err := crclient.New(kubeConfig, crclient.Options{})
