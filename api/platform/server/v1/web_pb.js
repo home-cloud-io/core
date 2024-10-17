@@ -556,6 +556,8 @@ export const DeviceSettings = proto3.makeMessageType(
     { no: 2, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 5, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ],
 );
 
