@@ -114,7 +114,12 @@ export const serverRPCService = createApi({
     }),
     updateApp: builder.mutation({
       queryFn: async (req) => {
-        return client.updateApp(req);
+        try {
+          const res = await client.updateApp(req);
+          return { data: res.toJson() };
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
       },
     }),
     // TODO: Add remaining endpoints here
@@ -188,7 +193,7 @@ export const serverRPCService = createApi({
 
           return { data: apps };
         } catch (error) {
-          return { error };
+          return { error: error.rawMessage };
         }
       },
     }),
