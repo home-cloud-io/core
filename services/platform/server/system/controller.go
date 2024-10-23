@@ -633,6 +633,7 @@ func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cm
 				}
 				return true, nil
 			},
+			Timeout: 30 * time.Second,
 		}).Listen(ctx)
 		if listenerErr != nil {
 			done <- true
