@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { marked } from 'marked';
 import { AppInstallStatus, setAppInstallStatus } from '../../services/web_slice';
@@ -41,10 +40,13 @@ export default function AppStorePage() {
 }
 
 function StoreEntry({events = [], app}) {
-  const navigate = useNavigate();
   const [installApp] = useInstallAppMutation();
   const [deleteApp] = useDeleteAppMutation();
-  const [status, setStatus] = useState(app.installed ? AppInstallStatus.INSTALLED : AppInstallStatus.DEFAULT);
+  const [status, setStatus] = useState(AppInstallStatus.DEFAULT);
+
+  if (status === AppInstallStatus.DEFAULT) {
+    setStatus(app.installed ? AppInstallStatus.INSTALLED : AppInstallStatus.UNINSTALLED);
+  }
 
   if (events.length > 0) {
     const latestEvent = events.at(-1)["appInstalled"];
@@ -61,7 +63,8 @@ function StoreEntry({events = [], app}) {
   }
 
   const handleAppUninstallClick = (app) => {
-    setStatus(AppInstallStatus.DEFAULT);
+    // TODO: recieve an event back from the server when uninstalling is done
+    setStatus(AppInstallStatus.UNINSTALLED);
     deleteApp(app.name);
   }
 
@@ -89,7 +92,7 @@ function StoreEntry({events = [], app}) {
           <div style={descriptionStyles} dangerouslySetInnerHTML={{__html: marked.parse(app.readme)}} />
 
           <div>
-            {status === AppInstallStatus.DEFAULT && (
+            {status === AppInstallStatus.UNINSTALLED && (
               <button
                 className="btn btn-outline-primary float-end btn-sm"
                 style={btnStyles}

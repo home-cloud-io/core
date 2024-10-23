@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
+import { SubmitButton } from '../../elements/buttons';
 
 export default function SettingsPage() {
   const [shutdownHost, shutdownResult] = useShutdownHostMutation();
@@ -80,7 +81,7 @@ export default function SettingsPage() {
           <p>Error: {error.message}</p>
         ) : (
           <div>
-            <DeviceSettings settings={data} saveSettings={saveSettings} />
+            <DeviceSettings settings={data} saveSettings={saveSettings} disable={result.isLoading} />
           </div>
         )}
       </div>
@@ -102,7 +103,7 @@ export default function SettingsPage() {
   );
 }
 
-function DeviceSettings({ settings, saveSettings }) {
+function DeviceSettings({ settings, saveSettings, disable }) {
   const [isFormDirty, setFormDirty] = useState(false);
   const [isTimezoneValid, setTimezoneValidity] = useState(true);
   const [isUsernameValid, setUsernameValidity] = useState(true);
@@ -329,16 +330,7 @@ function DeviceSettings({ settings, saveSettings }) {
           </div>
         }
 
-        <div className="col-12">
-          <button
-            style={{ float: 'right' }}
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={(e) => handleSubmit(e)}
-          >
-            Save
-          </button>
-        </div>
+        <SubmitButton text="Save" loading={disable} onClick={handleSubmit} />
       </form>
     </div>
   );
