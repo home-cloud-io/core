@@ -91,6 +91,14 @@ func (c *client) Listen() {
 		g.Go(func() error {
 			return c.systemStats(gctx)
 		})
+		// send the SettingsSaved event to cover the case where the daemon could be restarted while running the `nixos-rebuild switch` command
+		g.Go(func() error {
+			return c.stream.Send(&v1.DaemonMessage{
+				Message: &v1.DaemonMessage_SettingsSaved{
+					SettingsSaved: &v1.SettingsSaved{},
+				},
+			})
+		})
 
 		// wait on errors
 		if err := g.Wait(); err != nil {

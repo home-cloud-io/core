@@ -23,8 +23,6 @@ export const serverRPCService = createApi({
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
       ) {
         console.log("setting up events cache")
-        // create a stream when the cache subscription starts
-        // const client = createCallbackClient(WebService, web_service_transport);
         try {
           // wait for the initial query to resolve before proceeding
           await cacheDataLoaded

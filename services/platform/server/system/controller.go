@@ -505,7 +505,7 @@ func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings,
 func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {
 
 	// set the device settings on the host (via the daemon)
-	err := c.saveSettings(ctx, &dv1.SaveSettingsCommand{
+	err := c.saveSettings(ctx, logger, &dv1.SaveSettingsCommand{
 		AdminPassword:  settings.AdminUser.Password,
 		TimeZone:       settings.Timezone,
 		EnableSsh:      settings.EnableSsh,
@@ -569,7 +569,7 @@ func (c *controller) InitializeDevice(ctx context.Context, logger chassis.Logger
 	}
 
 	// set the device settings on the host (via the daemon)
-	err = c.saveSettings(ctx, &dv1.SaveSettingsCommand{
+	err = c.saveSettings(ctx, logger, &dv1.SaveSettingsCommand{
 		AdminPassword:  settings.AdminUser.Password,
 		TimeZone:       settings.Timezone,
 		EnableSsh:      settings.EnableSsh,
@@ -620,7 +620,8 @@ func (c *controller) Login(ctx context.Context, username, password string) (stri
 
 // helper functions
 
-func (c *controller) saveSettings(ctx context.Context, cmd *dv1.SaveSettingsCommand) error {
+func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cmd *dv1.SaveSettingsCommand) error {
+	logger.Info("saving settings")
 	done := make(chan bool)
 	var listenerErr error
 	go func() {
@@ -649,6 +650,7 @@ func (c *controller) saveSettings(ctx context.Context, cmd *dv1.SaveSettingsComm
 	if listenerErr != nil {
 		return listenerErr
 	}
+	logger.Info("settings saved successfully")
 	return nil
 }
 

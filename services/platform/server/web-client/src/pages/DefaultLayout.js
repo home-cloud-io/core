@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink } from "react-router-dom";
+import { useGetEventsQuery } from '../services/web_rpc';
 
 import "./DefaultLayout.css";
 
@@ -7,6 +8,8 @@ export default function DefaultLayout() {
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [isSecondaryNavVisible, setSecondaryNavVisibility] = useState(false);
   const [isAlertVisible, setAlertVisibility] = useState(false);
+  // events are not used here (yet) but this is called to initialize the event stream on any page load
+  useGetEventsQuery();
 
   const onClickNavCollapseBtn = () => {
     setIsNavCollapsed(!isNavCollapsed);

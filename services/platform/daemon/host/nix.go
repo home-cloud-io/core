@@ -4,6 +4,7 @@ import (
 	"context"
 	"os/exec"
 	"sync"
+	"syscall"
 
 	"github.com/home-cloud-io/core/services/platform/daemon/execute"
 
@@ -79,7 +80,10 @@ func RebuildAndSwitchOS(ctx context.Context, logger chassis.Logger) error {
 
 	logger.Info("building and switching to updated nixos")
 	cmd = exec.Command("nixos-rebuild", "switch")
-	err = execute.ExecuteCommandAndRelease(ctx, cmd)
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nixos-rebuild switch`")
 		return err
