@@ -214,6 +214,10 @@ func (c *client) systemStats(ctx context.Context) error {
 
 func (c *client) restart(ctx context.Context) {
 	c.logger.Info("restart command")
+	if chassis.GetConfig().Env() == "test" {
+		c.logger.Info("mocking restart")
+		return
+	}
 	err := execute.ExecuteCommand(ctx, exec.Command("reboot", "now"))
 	if err != nil {
 		c.logger.WithError(err).Error("failed to execute restart command")
@@ -223,6 +227,10 @@ func (c *client) restart(ctx context.Context) {
 
 func (c *client) shutdown(ctx context.Context) {
 	c.logger.Info("shutdown command")
+	if chassis.GetConfig().Env() == "test" {
+		c.logger.Info("mocking shutdown")
+		return
+	}
 	err := execute.ExecuteCommand(ctx, exec.Command("shutdown", "now"))
 	if err != nil {
 		c.logger.WithError(err).Error("failed to execute shutdown command")

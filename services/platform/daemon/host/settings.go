@@ -13,10 +13,6 @@ import (
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
-const (
-	NixosConfigFile = "/etc/nixos/configuration.nix"
-)
-
 func SaveSettings(ctx context.Context, logger chassis.Logger, def *v1.SaveSettingsCommand) error {
 	var (
 		replacers = []Replacer{}

@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
 type (
@@ -15,12 +17,35 @@ type (
 )
 
 var (
+	ChunkPath            = "/etc/daemon/tmp"
+	ConfigFile           = "/etc/home-cloud/config.yaml"
+	MigrationsFile       = "/etc/home-cloud/migrations.yaml"
+	DaemonNixFile        = "/etc/nixos/home-cloud/daemon/default.nix"
+	NixosConfigFile      = "/etc/nixos/configuration.nix"
+	DraftManifestFile    = "/var/lib/rancher/k3s/server/manifests/draft.yaml"
+	OperatorManifestFile = "/var/lib/rancher/k3s/server/manifests/operator.yaml"
+	ServerManifestFile   = "/var/lib/rancher/k3s/server/manifests/server.yaml"
+)
+
+var (
 	// fileMutex is a safety check to make sure we don't accidentally write to the same file from multiple threads
 	// in the future this could be put into a map keyed off of filenames to allow parallel writes to different files
 	fileMutex = sync.Mutex{}
 )
 
+func ConfigureFilePaths(logger chassis.Logger) {
+	logger.Info("configuring file paths")
+	NixosConfigFile = FilePath(NixosConfigFile)
+	DraftManifestFile = FilePath(DraftManifestFile)
+	OperatorManifestFile = FilePath(OperatorManifestFile)
+	ServerManifestFile = FilePath(ServerManifestFile)
+	ChunkPath = FilePath(ChunkPath)
+	DaemonNixFile = FilePath(DaemonNixFile)
+	MigrationsFile = FilePath(MigrationsFile)
+}
+
 // LineByLineReplace will process all lines in the given file running all Replacers against each line.
+//
 // NOTE: the Replacers will be run in the order they appear in the slice
 func LineByLineReplace(filename string, replacers []Replacer) error {
 	fileMutex.Lock()
@@ -76,4 +101,13 @@ func LineByLineReplace(filename string, replacers []Replacer) error {
 	}
 
 	return nil
+}
+
+// FilePath cleans the given path and makes it a local path by prefixing a "./tmp/" if
+// the draft env is "test".
+func FilePath(path string) string {
+	if chassis.GetConfig().Env() == "test" {
+		path = filepath.Join(".", "tmp", path)
+	}
+	return filepath.Clean(path)
 }

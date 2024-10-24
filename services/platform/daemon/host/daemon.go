@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	daemonNixFile    = "/etc/nixos/home-cloud/daemon/default.nix"
 	versionPrefix    = "  version = \""
 	vendorHashPrefix = "  vendorHash = \""
 	srcHashPrefix    = "    hash = \""
@@ -28,7 +27,7 @@ var (
 )
 
 func GetDaemonVersion(logger chassis.Logger) (*v1.CurrentDaemonVersion, error) {
-	f, err := os.Open(daemonNixFile)
+	f, err := os.Open(DaemonNixFile)
 	if err != nil {
 		logger.WithError(err).Error("failed to read daemon nix file")
 		return nil, err
@@ -90,7 +89,7 @@ func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.Cha
 		}
 	)
 
-	err = LineByLineReplace(daemonNixFile, replacers)
+	err = LineByLineReplace(DaemonNixFile, replacers)
 	if err != nil {
 		logger.WithError(err).Error("failed to replace version")
 		return err
