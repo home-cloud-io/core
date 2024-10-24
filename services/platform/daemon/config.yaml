@@ -4,6 +4,7 @@ service:
   network:
     port: 9000
     bind_address: localhost
+  env: test
 
 daemon:
   server: http://localhost:8000

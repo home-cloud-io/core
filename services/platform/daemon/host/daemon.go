@@ -1,4 +1,4 @@
-package versioning
+package host
 
 import (
 	"bufio"
@@ -9,12 +9,12 @@ import (
 	"strings"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
 )
 
 const (
-	daemonNixFile    = "/etc/nixos/home-cloud/daemon/default.nix"
 	versionPrefix    = "  version = \""
 	vendorHashPrefix = "  vendorHash = \""
 	srcHashPrefix    = "    hash = \""
@@ -27,7 +27,7 @@ var (
 )
 
 func GetDaemonVersion(logger chassis.Logger) (*v1.CurrentDaemonVersion, error) {
-	f, err := os.Open(daemonNixFile)
+	f, err := os.Open(DaemonNixFile)
 	if err != nil {
 		logger.WithError(err).Error("failed to read daemon nix file")
 		return nil, err
@@ -66,7 +66,7 @@ func GetDaemonVersion(logger chassis.Logger) (*v1.CurrentDaemonVersion, error) {
 func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.ChangeDaemonVersionCommand) error {
 	var (
 		err       error
-		replacers = []replacer{
+		replacers = []Replacer{
 			func(line string) string {
 				if strings.Contains(line, "version =") {
 					line = fmt.Sprintf("  version = \"%s\";", def.Version)
@@ -89,7 +89,7 @@ func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.Cha
 		}
 	)
 
-	err = lineByLineReplace(daemonNixFile, replacers)
+	err = LineByLineReplace(DaemonNixFile, replacers)
 	if err != nil {
 		logger.WithError(err).Error("failed to replace version")
 		return err

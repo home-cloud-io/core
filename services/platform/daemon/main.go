@@ -12,10 +12,14 @@ func main() {
 		logger = zerolog.New()
 		mdns   = host.NewDNSPublisher(logger)
 		client = communicate.NewClient(logger, mdns)
+		migrator = host.NewMigrator(logger)
 	)
 
-	defer chassis.New(logger).
+	runtime := chassis.New(logger).
 		WithRunner(client.Listen).
 		WithRunner(mdns.Start).
-		Start()
+		WithRunner(migrator.Migrate)
+	defer runtime.Start()
+
+	host.ConfigureFilePaths(logger)
 }
