@@ -51,7 +51,7 @@ function StoreEntry({events = [], app}) {
   if (events.length > 0) {
     const latestEvent = events.at(-1)["appInstalled"];
     if (latestEvent && latestEvent.name === app.name) {
-        if (status === AppInstallStatus.INSTALLING) {
+        if (status != AppInstallStatus.INSTALLED) {
           setStatus(AppInstallStatus.INSTALLED);
         }
     }
