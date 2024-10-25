@@ -3,6 +3,7 @@ package host
 import (
 	"errors"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -123,6 +124,12 @@ func m1(logger chassis.Logger) error {
 	replacers = append(replacers, func(line string) string {
 		if line == "  - pods" {
 			line = "  - \"*\""
+		}
+		return line
+	})
+	replacers = append(replacers, func(line string) string {
+		if strings.Contains(line, "read-pods") {
+			line = strings.ReplaceAll(line, "read-pods", "read-all")
 		}
 		return line
 	})
