@@ -10,13 +10,13 @@ import (
 
 var (
 	files = map[string]string{
-		"auto-install/home-cloud/daemon/config.yaml": "./tmp/etc/home-cloud/config.yaml",
-		// "auto-install/home-cloud/daemon/migrations.yaml": "./tmp/etc/home-cloud/migrations.yaml",
-		"auto-install/home-cloud/daemon/default.nix": "./tmp/etc/nixos/home-cloud/daemon/default.nix",
-		"auto-install/configuration.nix":             "./tmp/etc/nixos/configuration.nix",
-		"auto-install/home-cloud/draft.yaml":         "./tmp/var/lib/rancher/k3s/server/manifests/draft.yaml",
-		"auto-install/home-cloud/operator.yaml":      "./tmp/var/lib/rancher/k3s/server/manifests/operator.yaml",
-		"auto-install/home-cloud/server.yaml":        "./tmp/var/lib/rancher/k3s/server/manifests/server.yaml",
+		"auto-install/home-cloud/daemon/config.yaml":     "./tmp/etc/home-cloud/config.yaml",
+		"auto-install/home-cloud/daemon/migrations.yaml": "./tmp/etc/home-cloud/migrations.yaml",
+		"auto-install/home-cloud/daemon/default.nix":     "./tmp/etc/nixos/home-cloud/daemon/default.nix",
+		"auto-install/configuration.nix":                 "./tmp/etc/nixos/configuration.nix",
+		"auto-install/home-cloud/draft.yaml":             "./tmp/var/lib/rancher/k3s/server/manifests/draft.yaml",
+		"auto-install/home-cloud/operator.yaml":          "./tmp/var/lib/rancher/k3s/server/manifests/operator.yaml",
+		"auto-install/home-cloud/server.yaml":            "./tmp/var/lib/rancher/k3s/server/manifests/server.yaml",
 	}
 )
 
