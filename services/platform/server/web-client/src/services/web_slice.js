@@ -11,6 +11,8 @@ export const AppInstallStatus = Object.freeze({
     DEFAULT: 'default',
     INSTALLING: 'installing',
     INSTALLED: 'installed',
+    UNINSTALLING: 'uninstalling',
+    UNINSTALLED: 'uninstalled',
     ERROR: 'error',
 });
 

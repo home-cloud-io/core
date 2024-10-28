@@ -1,21 +1,31 @@
-package versioning
+package host
 
 import (
 	"context"
-	"fmt"
 	"os/exec"
-	"strings"
+	"sync"
+	"syscall"
 
 	"github.com/home-cloud-io/core/services/platform/daemon/execute"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
-const (
-	nixosConfigFile = "/etc/nixos/configuration.nix"
+var (
+	// osMutex makes sure we don't run nixos commands concurrently
+	osMutex = sync.Mutex{}
 )
 
 func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error) {
+	osMutex.Lock()
+	defer osMutex.Unlock()
+
+	config := chassis.GetConfig()
+	if config.Env() == "test" {
+		logger.Info("mocking os version diff")
+		return "fake os version diff", nil
+	}
+
 	var (
 		cmd    *exec.Cmd
 		output string
@@ -54,6 +64,15 @@ func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error
 
 // NOTE: must call this after calling GetOSVersionDiff if you want to perform a channel update.
 func RebuildAndSwitchOS(ctx context.Context, logger chassis.Logger) error {
+	osMutex.Lock()
+	defer osMutex.Unlock()
+
+	config := chassis.GetConfig()
+	if config.Env() == "test" {
+		logger.Info("mocking nixos rebuild")
+		return nil
+	}
+
 	var (
 		cmd *exec.Cmd
 		err error
@@ -61,38 +80,15 @@ func RebuildAndSwitchOS(ctx context.Context, logger chassis.Logger) error {
 
 	logger.Info("building and switching to updated nixos")
 	cmd = exec.Command("nixos-rebuild", "switch")
-	err = execute.ExecuteCommandAndRelease(ctx, cmd)
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nixos-rebuild switch`")
 		return err
 	}
-	logger.Info("os update command issued to run in the background")
-
-	return nil
-}
-
-func SetTimeZone(ctx context.Context, logger chassis.Logger, timeZone string) error {
-	var (
-		replacers = []replacer{
-			func(line string) string {
-				if strings.HasPrefix(line, "  time.timeZone =") {
-					return fmt.Sprintf("  time.timeZone = \"%s\";", timeZone)
-				}
-				return line
-			},
-		}
-	)
-
-	logger.Info("setting time zone")
-	err := lineByLineReplace(nixosConfigFile, replacers)
-	if err != nil {
-		return err
-	}
-
-	err = RebuildAndSwitchOS(ctx, logger)
-	if err != nil {
-		return err
-	}
+	logger.Info("nixos rebuild command completed")
 
 	return nil
 }

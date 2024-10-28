@@ -23,8 +23,6 @@ export const serverRPCService = createApi({
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
       ) {
         console.log("setting up events cache")
-        // create a stream when the cache subscription starts
-        // const client = createCallbackClient(WebService, web_service_transport);
         try {
           // wait for the initial query to resolve before proceeding
           await cacheDataLoaded
@@ -114,7 +112,12 @@ export const serverRPCService = createApi({
     }),
     updateApp: builder.mutation({
       queryFn: async (req) => {
-        return client.updateApp(req);
+        try {
+          const res = await client.updateApp(req);
+          return { data: res.toJson() };
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
       },
     }),
     // TODO: Add remaining endpoints here
@@ -188,7 +191,7 @@ export const serverRPCService = createApi({
 
           return { data: apps };
         } catch (error) {
-          return { error };
+          return { error: error.rawMessage };
         }
       },
     }),

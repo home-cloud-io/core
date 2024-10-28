@@ -62,7 +62,7 @@ func NewClient(logger chassis.Logger) Client {
 	config := chassis.GetConfig()
 	kubeConfig, err := clientcmd.BuildConfigFromFlags(config.GetString("server.k8s.master_url"), config.GetString("server.k8s.config_path"))
 	if err != nil {
-		logger.WithError(err).Error("failed to read kube config")
+		logger.WithError(err).Panic("failed to read kube config")
 	}
 
 	c, err := crclient.New(kubeConfig, crclient.Options{})
@@ -177,8 +177,18 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 		}
 
 		for _, pod := range pods.Items {
-			// if any pod isn't in running status mark app as unhealthy and break
-			if pod.Status.Phase != corev1.PodRunning {
+			ready := false
+			// look through all conditions for the PodReady condition
+			for _, condition := range pod.Status.Conditions {
+				if condition.Type == corev1.PodReady {
+					if condition.Status == corev1.ConditionTrue {
+						ready = true
+					}
+					break
+				}
+			}
+			// if any pod isn't ready, mark app as unhealthy and break
+			if !ready {
 				checks[index].Status = webv1.AppStatus_APP_STATUS_UNHEALTHY
 				break
 			}

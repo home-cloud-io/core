@@ -5,8 +5,7 @@ import { useGetAppStorageQuery, useGetEventsQuery } from '../../services/web_rpc
 import * as Config from '../../utils/config';
 import { StatusLabel } from '../Home/index';
 import { v4 as uuidv4 } from 'uuid';
-
-const loading = require('../../assets/loading.gif');
+import { SubmitButton } from '../../elements/buttons';
 
 export default function UploadPage() {
   const { data: events } = useGetEventsQuery();
@@ -28,7 +27,7 @@ export default function UploadPage() {
         ) : error ? (
           <p>Error: {error}</p>
         ) : (
-          <UploadForm events={events} apps={data} />
+          <UploadForm events={events} apps={data || []} />
         )}
       </div>
     </div>
@@ -72,7 +71,7 @@ function UploadForm({events = [], apps}) {
       <iframe name="dummyframe" id="dummyframe" style={{ display: 'none' }} ></iframe>
       <form
         className="row g-3"
-        action={`${Config.BASE_URL}/upload-file`}
+        action={`${Config.BASE_URL}/api/upload`}
         method="post"
         encType="multipart/form-data"
         target="dummyframe"
@@ -155,12 +154,7 @@ function UploadForm({events = [], apps}) {
           />
         </div>
 
-        <div className="container" display="inline-block" >
-        </div>
-
-        <div className="container" display="inline-block" >
-          { state.status === FileUploadStatus.UPLOADING ? <LoadingIcon/> : <SubmitButton/> }
-        </div>
+        <SubmitButton text="Upload" loading={state.status === FileUploadStatus.UPLOADING}/>
 
         { state.status === FileUploadStatus.COMPLETE &&
           <StatusLabel text="Success" color="#28e053"/>
@@ -184,28 +178,4 @@ const HelpIcon = () => {
       </g>
     </svg>
   )
-}
-
-const LoadingIcon = () => {
-  return (
-    <img
-      src={loading}
-      width="32"
-      height="32"
-      style={{ float: 'right' }}
-    />
-  );
-}
-
-const SubmitButton = () => {
-  return (
-    <div className="col-12">
-      <input
-        style={{ float: 'right' }}
-        className="btn btn-outline-primary"
-        type="submit"
-        value="Upload"
-      />
-    </div>
-  );
 }

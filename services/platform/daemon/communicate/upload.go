@@ -8,17 +8,15 @@ import (
 	"path/filepath"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	"github.com/home-cloud-io/core/services/platform/daemon/host"
 	"github.com/steady-bytes/draft/pkg/chassis"
-)
-
-const (
-	chunkPath     = "/etc/daemon/tmp"
 )
 
 func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 	switch def.Data.(type) {
 	case *v1.UploadFileRequest_Info:
 		info := def.GetInfo()
+		info.FilePath = host.FilePath(info.FilePath)
 		log := c.logger.WithFields(chassis.Fields{
 			"file_id":   info.FileId,
 			"file_path": info.FilePath,
@@ -36,7 +34,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		}
 
 		// make temporary chunk upload directory
-		err := os.MkdirAll(filepath.Join(chunkPath, info.FileId), 0777)
+		err := os.MkdirAll(filepath.Join(host.ChunkPath, info.FileId), 0777)
 		if err != nil {
 			log.WithError(err).Error("failed to create temp directory for file upload")
 			return
@@ -71,7 +69,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		})
 
 		// write chunk as temp file
-		fileName := filepath.Join(chunkPath, meta.id, fmt.Sprintf("chunk.%d", chunk.Index))
+		fileName := filepath.Join(host.ChunkPath, meta.id, fmt.Sprintf("chunk.%d", chunk.Index))
 		err := os.WriteFile(fileName, chunk.Data, 0666)
 		if err != nil {
 			log.WithError(err).Error("failed to write uploaded file chunk")
@@ -184,7 +182,7 @@ func (c *client) reconstructFile(logger chassis.Logger, metadata fileMeta) error
 	}
 
 	// remove the chunk file directory
-	err = os.Remove(filepath.Join(chunkPath, metadata.id))
+	err = os.Remove(filepath.Join(host.ChunkPath, metadata.id))
 	if err != nil {
 		logger.WithError(err).Error("failed to remove chunk directory")
 	}

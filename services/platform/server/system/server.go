@@ -73,6 +73,8 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 			h.broadcaster.Send(message.GetUploadFileChunkCompleted())
 		case *v1.DaemonMessage_SystemStats:
 			CurrentStats = message.GetSystemStats()
+		case *v1.DaemonMessage_SettingsSaved:
+			h.broadcaster.Send(message.GetSettingsSaved())
 		default:
 			h.logger.WithField("message", message).Warn("unknown message type received")
 		}

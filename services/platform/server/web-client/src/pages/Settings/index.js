@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
+import { SubmitButton } from '../../elements/buttons';
 
 export default function SettingsPage() {
   const [shutdownHost, shutdownResult] = useShutdownHostMutation();
@@ -80,7 +81,7 @@ export default function SettingsPage() {
           <p>Error: {error.message}</p>
         ) : (
           <div>
-            <DeviceSettings settings={data} saveSettings={saveSettings} />
+            <DeviceSettings settings={data} saveSettings={saveSettings} disable={result.isLoading} />
           </div>
         )}
       </div>
@@ -102,16 +103,18 @@ export default function SettingsPage() {
   );
 }
 
-function DeviceSettings({ settings, saveSettings }) {
+function DeviceSettings({ settings, saveSettings, disable }) {
   const [isFormDirty, setFormDirty] = useState(false);
   const [isTimezoneValid, setTimezoneValidity] = useState(true);
   const [isUsernameValid, setUsernameValidity] = useState(true);
   const [isPasswordValid, setPasswordValidity] = useState(true);
   const [autoUpdateApps, setAutoUpdateApps] = useState(true);
   const [autoUpdateOs, setAutoUpdateOs] = useState(true);
+  const [enableSsh, setEnableSsh] = useState(false);
   const [username, setUsername] = useState('temp');
   const [password, setPassword] = useState('');
   const [timezone, setTimezone] = useState('America/Chicago');
+  const [sshKeys, setSshKeys] = useState([]);
 
   // effect runs on component mount
   useEffect(() => {
@@ -119,6 +122,10 @@ function DeviceSettings({ settings, saveSettings }) {
     setAutoUpdateApps(settings.autoUpdateApps);
     setAutoUpdateOs(settings.autoUpdateOs);
     setUsername(settings.adminUser.username);
+    setEnableSsh(settings.enableSsh)
+    if (settings.trustedSshKeys) {
+      setSshKeys(settings.trustedSshKeys)
+    }
   }, [settings]);
 
   const handleSubmit = (e) => {
@@ -132,9 +139,10 @@ function DeviceSettings({ settings, saveSettings }) {
         timezone: timezone,
         autoUpdateApps: autoUpdateApps,
         autoUpdateOs: autoUpdateOs,
+        enableSsh: enableSsh,
+        trustedSshKeys: sshKeys,
       },
     });
-    // refetch();
   };
 
   const handleSetTimezone = (e) => {
@@ -175,6 +183,14 @@ function DeviceSettings({ settings, saveSettings }) {
       setPasswordValidity(true);
     }
   };
+
+  const handleSshKeyChange = (e) => {
+    let keys = e.target.value.split('\n');
+    if (keys.length === 1 && keys[0] === '') {
+      keys = [];
+    }
+    setSshKeys(keys);
+  }
 
   return (
     <div className="tab-pane fade show active">
@@ -251,46 +267,70 @@ function DeviceSettings({ settings, saveSettings }) {
 
         <div className="col-12">
           <div className="form-check form-switch form-check-reverse">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              role="switch"
-              value="autoUpdateApps"
-              checked={autoUpdateApps ? true : false}
-              onChange={() => setAutoUpdateApps(!autoUpdateApps)}
-            />
             <label className="form-check-label">
               Automatically update applications
+              <input
+                className="form-check-input"
+                type="checkbox"
+                role="switch"
+                value="autoUpdateApps"
+                checked={autoUpdateApps ? true : false}
+                onChange={() => setAutoUpdateApps(!autoUpdateApps)}
+              />
             </label>
           </div>
         </div>
 
         <div className="col-12">
           <div className="form-check form-switch form-check-reverse">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              role="switch"
-              value="autoUpdateOs"
-              checked={autoUpdateOs ? true : false}
-              onChange={() => setAutoUpdateOs(!autoUpdateOs)}
-            />
             <label className="form-check-label">
               Automatically update server
+              <input
+                className="form-check-input"
+                type="checkbox"
+                role="switch"
+                value="autoUpdateOs"
+                checked={autoUpdateOs ? true : false}
+                onChange={() => setAutoUpdateOs(!autoUpdateOs)}
+              />
             </label>
           </div>
         </div>
 
         <div className="col-12">
-          <button
-            style={{ float: 'right' }}
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={(e) => handleSubmit(e)}
-          >
-            Save
-          </button>
+          <div className="form-check form-switch form-check-reverse">
+            <label className="form-check-label">
+              Enable SSH access
+              <input
+                className="form-check-input"
+                type="checkbox"
+                role="switch"
+                value="enableSsh"
+                checked={enableSsh ? true : false}
+                onChange={() => setEnableSsh(!enableSsh)}
+              />
+            </label>
+          </div>
         </div>
+
+        { enableSsh &&
+          <div className="col-12">
+            <label className="form-check-label">
+              Input trusted SSH keys one per line (optional)
+              <div>
+                <textarea
+                  className="form-textarea"
+                  cols="40"
+                  rows="5"
+                  value={sshKeys.join('\n')}
+                  onChange={(e) => handleSshKeyChange(e)}
+                  />
+              </div>
+            </label>
+          </div>
+        }
+
+        <SubmitButton text="Save" loading={disable} onClick={handleSubmit} />
       </form>
     </div>
   );
