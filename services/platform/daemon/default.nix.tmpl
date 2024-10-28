@@ -1,0 +1,22 @@
+with import <nixpkgs> {};
+
+buildGoModule rec {
+  pname = "home-cloud-daemon";
+  version = "__VERSION__";
+  vendorHash = "";
+
+  meta = with lib; {
+    description = "Home Cloud Host Daemon";
+    homepage = "https://github.com/home-cloud-io/core";
+    license = licenses.asl20;
+    platforms = platforms.linux;
+    maintainers = [ maintainers.jgkawell ];
+  };
+
+  src = fetchFromGitHub {
+    owner = "home-cloud-io";
+    repo = "core";
+    rev = "__REVISION__";
+    hash = "";
+  } + "/services/platform/daemon";
+}
