@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - services/**
-      - Dockerfile
 
 env:
   REGISTRY: ${{ vars.REGISTRY || 'ghcr.io' }}
