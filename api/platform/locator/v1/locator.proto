@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package platform.locator.v1;
+
+option go_package = "github.com/home-cloud-io/core/api/platform/locator/v1";
+
+service LocatorService {
+  // Register registers the Home Cloud server to begin synchronization with the locator server
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+  // Locate asks the Locator server to return the location of the Home Cloud server referenced by the provided server_id
+  rpc Locate(LocateRequest) returns (LocateResponse) {}
+  // Connect establishes a stream between a Home Cloud server which negotiates location information for clients calling Locate
+  rpc Connect(stream ServerMessage) returns (stream LocatorMessage) {}
+}
+
+// REGISTER
+
+message RegisterRequest {
+  string account_token = 1;
+  string server_id = 2;
+}
+message RegisterResponse {
+  string refresh_token = 1;
+  string access_token = 2;
+}
+
+// LOOKUP
+
+message LocateRequest {
+  string server_id = 1;
+  // body is of type LocateRequestBody
+  EncryptedMessage body = 2;
+}
+message LocateRequestBody {
+  string server_id = 1;
+}
+message LocateResponse {
+  // body is of type LocateResponseBody
+  EncryptedMessage body = 1;
+}
+message LocateResponseBody {
+  string address = 1;
+  uint32 port = 2;
+}
+
+// CONNECT
+
+message ServerMessage {
+  string access_token = 1;
+  oneof body {
+    Initialize initialize = 2;
+    Accept accept = 3;
+    Reject reject = 4;
+  }
+}
+message Initialize {
+  string server_id = 1;
+}
+message Accept {
+  string request_id = 1;
+  // body is of type LocateResponseBody
+  EncryptedMessage body = 2;
+}
+message Reject {
+  string request_id = 1;
+}
+// LocatorMessage prompts the server to send a valid address and port for a client connection.
+// The server can choose to accept or reject the locate request.
+message LocatorMessage {
+  oneof body {
+    Locate locate = 1;
+  }
+}
+message Locate {
+  string request_id = 1;
+  // body is of type LocateRequestBody
+  EncryptedMessage body = 2;
+}
+
+message EncryptedMessage {
+  string public_key = 1;
+  // body is an encrypted protobuf message that can be decrypted using the given public key
+  bytes body = 2;
+}
