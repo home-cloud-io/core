@@ -5,6 +5,7 @@ This repository contains the core components that make up the Home Cloud platfor
 - **Server**: the primary service that manages users, settings, and hosts the web interface
 - **Operator**: a Kubernetes operator responsible for managing user application lifecycle
 - **Daemon**: a system service that manages NixOS configuration and low-level host commands (like reboots)
+- **Locator**: a zero-trust service discovery engine to enable remote access to Home Cloud servers when not at home
 
 ## Getting Started
 
