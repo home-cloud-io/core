@@ -21,8 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// LocatorName is the fully-qualified name of the Locator service.
-	LocatorName = "platform.locator.v1.Locator"
+	// LocatorServiceName is the fully-qualified name of the LocatorService service.
+	LocatorServiceName = "platform.locator.v1.LocatorService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,24 +33,24 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// LocatorRegisterProcedure is the fully-qualified name of the Locator's Register RPC.
-	LocatorRegisterProcedure = "/platform.locator.v1.Locator/Register"
-	// LocatorLocateProcedure is the fully-qualified name of the Locator's Locate RPC.
-	LocatorLocateProcedure = "/platform.locator.v1.Locator/Locate"
-	// LocatorConnectProcedure is the fully-qualified name of the Locator's Connect RPC.
-	LocatorConnectProcedure = "/platform.locator.v1.Locator/Connect"
+	// LocatorServiceRegisterProcedure is the fully-qualified name of the LocatorService's Register RPC.
+	LocatorServiceRegisterProcedure = "/platform.locator.v1.LocatorService/Register"
+	// LocatorServiceLocateProcedure is the fully-qualified name of the LocatorService's Locate RPC.
+	LocatorServiceLocateProcedure = "/platform.locator.v1.LocatorService/Locate"
+	// LocatorServiceConnectProcedure is the fully-qualified name of the LocatorService's Connect RPC.
+	LocatorServiceConnectProcedure = "/platform.locator.v1.LocatorService/Connect"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	locatorServiceDescriptor        = v1.File_platform_locator_v1_locator_proto.Services().ByName("Locator")
-	locatorRegisterMethodDescriptor = locatorServiceDescriptor.Methods().ByName("Register")
-	locatorLocateMethodDescriptor   = locatorServiceDescriptor.Methods().ByName("Locate")
-	locatorConnectMethodDescriptor  = locatorServiceDescriptor.Methods().ByName("Connect")
+	locatorServiceServiceDescriptor        = v1.File_platform_locator_v1_locator_proto.Services().ByName("LocatorService")
+	locatorServiceRegisterMethodDescriptor = locatorServiceServiceDescriptor.Methods().ByName("Register")
+	locatorServiceLocateMethodDescriptor   = locatorServiceServiceDescriptor.Methods().ByName("Locate")
+	locatorServiceConnectMethodDescriptor  = locatorServiceServiceDescriptor.Methods().ByName("Connect")
 )
 
-// LocatorClient is a client for the platform.locator.v1.Locator service.
-type LocatorClient interface {
+// LocatorServiceClient is a client for the platform.locator.v1.LocatorService service.
+type LocatorServiceClient interface {
 	// Register registers the Home Cloud server to begin synchronization with the locator server
 	Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error)
 	// Locate asks the Locator server to return the location of the Home Cloud server referenced by the provided server_id
@@ -59,61 +59,61 @@ type LocatorClient interface {
 	Connect(context.Context) *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage]
 }
 
-// NewLocatorClient constructs a client for the platform.locator.v1.Locator service. By default, it
-// uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses, and sends
-// uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or
-// connect.WithGRPCWeb() options.
+// NewLocatorServiceClient constructs a client for the platform.locator.v1.LocatorService service.
+// By default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped
+// responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewLocatorClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) LocatorClient {
+func NewLocatorServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) LocatorServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	return &locatorClient{
+	return &locatorServiceClient{
 		register: connect.NewClient[v1.RegisterRequest, v1.RegisterResponse](
 			httpClient,
-			baseURL+LocatorRegisterProcedure,
-			connect.WithSchema(locatorRegisterMethodDescriptor),
+			baseURL+LocatorServiceRegisterProcedure,
+			connect.WithSchema(locatorServiceRegisterMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		locate: connect.NewClient[v1.LocateRequest, v1.LocateResponse](
 			httpClient,
-			baseURL+LocatorLocateProcedure,
-			connect.WithSchema(locatorLocateMethodDescriptor),
+			baseURL+LocatorServiceLocateProcedure,
+			connect.WithSchema(locatorServiceLocateMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		connect: connect.NewClient[v1.ServerMessage, v1.LocatorMessage](
 			httpClient,
-			baseURL+LocatorConnectProcedure,
-			connect.WithSchema(locatorConnectMethodDescriptor),
+			baseURL+LocatorServiceConnectProcedure,
+			connect.WithSchema(locatorServiceConnectMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// locatorClient implements LocatorClient.
-type locatorClient struct {
+// locatorServiceClient implements LocatorServiceClient.
+type locatorServiceClient struct {
 	register *connect.Client[v1.RegisterRequest, v1.RegisterResponse]
 	locate   *connect.Client[v1.LocateRequest, v1.LocateResponse]
 	connect  *connect.Client[v1.ServerMessage, v1.LocatorMessage]
 }
 
-// Register calls platform.locator.v1.Locator.Register.
-func (c *locatorClient) Register(ctx context.Context, req *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error) {
+// Register calls platform.locator.v1.LocatorService.Register.
+func (c *locatorServiceClient) Register(ctx context.Context, req *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error) {
 	return c.register.CallUnary(ctx, req)
 }
 
-// Locate calls platform.locator.v1.Locator.Locate.
-func (c *locatorClient) Locate(ctx context.Context, req *connect.Request[v1.LocateRequest]) (*connect.Response[v1.LocateResponse], error) {
+// Locate calls platform.locator.v1.LocatorService.Locate.
+func (c *locatorServiceClient) Locate(ctx context.Context, req *connect.Request[v1.LocateRequest]) (*connect.Response[v1.LocateResponse], error) {
 	return c.locate.CallUnary(ctx, req)
 }
 
-// Connect calls platform.locator.v1.Locator.Connect.
-func (c *locatorClient) Connect(ctx context.Context) *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage] {
+// Connect calls platform.locator.v1.LocatorService.Connect.
+func (c *locatorServiceClient) Connect(ctx context.Context) *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage] {
 	return c.connect.CallBidiStream(ctx)
 }
 
-// LocatorHandler is an implementation of the platform.locator.v1.Locator service.
-type LocatorHandler interface {
+// LocatorServiceHandler is an implementation of the platform.locator.v1.LocatorService service.
+type LocatorServiceHandler interface {
 	// Register registers the Home Cloud server to begin synchronization with the locator server
 	Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error)
 	// Locate asks the Locator server to return the location of the Home Cloud server referenced by the provided server_id
@@ -122,55 +122,55 @@ type LocatorHandler interface {
 	Connect(context.Context, *connect.BidiStream[v1.ServerMessage, v1.LocatorMessage]) error
 }
 
-// NewLocatorHandler builds an HTTP handler from the service implementation. It returns the path on
-// which to mount the handler and the handler itself.
+// NewLocatorServiceHandler builds an HTTP handler from the service implementation. It returns the
+// path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewLocatorHandler(svc LocatorHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	locatorRegisterHandler := connect.NewUnaryHandler(
-		LocatorRegisterProcedure,
+func NewLocatorServiceHandler(svc LocatorServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	locatorServiceRegisterHandler := connect.NewUnaryHandler(
+		LocatorServiceRegisterProcedure,
 		svc.Register,
-		connect.WithSchema(locatorRegisterMethodDescriptor),
+		connect.WithSchema(locatorServiceRegisterMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	locatorLocateHandler := connect.NewUnaryHandler(
-		LocatorLocateProcedure,
+	locatorServiceLocateHandler := connect.NewUnaryHandler(
+		LocatorServiceLocateProcedure,
 		svc.Locate,
-		connect.WithSchema(locatorLocateMethodDescriptor),
+		connect.WithSchema(locatorServiceLocateMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	locatorConnectHandler := connect.NewBidiStreamHandler(
-		LocatorConnectProcedure,
+	locatorServiceConnectHandler := connect.NewBidiStreamHandler(
+		LocatorServiceConnectProcedure,
 		svc.Connect,
-		connect.WithSchema(locatorConnectMethodDescriptor),
+		connect.WithSchema(locatorServiceConnectMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/platform.locator.v1.Locator/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/platform.locator.v1.LocatorService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case LocatorRegisterProcedure:
-			locatorRegisterHandler.ServeHTTP(w, r)
-		case LocatorLocateProcedure:
-			locatorLocateHandler.ServeHTTP(w, r)
-		case LocatorConnectProcedure:
-			locatorConnectHandler.ServeHTTP(w, r)
+		case LocatorServiceRegisterProcedure:
+			locatorServiceRegisterHandler.ServeHTTP(w, r)
+		case LocatorServiceLocateProcedure:
+			locatorServiceLocateHandler.ServeHTTP(w, r)
+		case LocatorServiceConnectProcedure:
+			locatorServiceConnectHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedLocatorHandler returns CodeUnimplemented from all methods.
-type UnimplementedLocatorHandler struct{}
+// UnimplementedLocatorServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedLocatorServiceHandler struct{}
 
-func (UnimplementedLocatorHandler) Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.locator.v1.Locator.Register is not implemented"))
+func (UnimplementedLocatorServiceHandler) Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.locator.v1.LocatorService.Register is not implemented"))
 }
 
-func (UnimplementedLocatorHandler) Locate(context.Context, *connect.Request[v1.LocateRequest]) (*connect.Response[v1.LocateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.locator.v1.Locator.Locate is not implemented"))
+func (UnimplementedLocatorServiceHandler) Locate(context.Context, *connect.Request[v1.LocateRequest]) (*connect.Response[v1.LocateResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.locator.v1.LocatorService.Locate is not implemented"))
 }
 
-func (UnimplementedLocatorHandler) Connect(context.Context, *connect.BidiStream[v1.ServerMessage, v1.LocatorMessage]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("platform.locator.v1.Locator.Connect is not implemented"))
+func (UnimplementedLocatorServiceHandler) Connect(context.Context, *connect.BidiStream[v1.ServerMessage, v1.LocatorMessage]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("platform.locator.v1.LocatorService.Connect is not implemented"))
 }

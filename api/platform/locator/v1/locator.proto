@@ -4,7 +4,7 @@ package platform.locator.v1;
 
 option go_package = "github.com/home-cloud-io/core/api/platform/locator/v1";
 
-service Locator {
+service LocatorService {
   // Register registers the Home Cloud server to begin synchronization with the locator server
   rpc Register(RegisterRequest) returns (RegisterResponse) {}
   // Locate asks the Locator server to return the location of the Home Cloud server referenced by the provided server_id

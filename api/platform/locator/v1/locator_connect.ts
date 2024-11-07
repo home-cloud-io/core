@@ -7,15 +7,15 @@ import { LocateRequest, LocateResponse, LocatorMessage, RegisterRequest, Registe
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
- * @generated from service platform.locator.v1.Locator
+ * @generated from service platform.locator.v1.LocatorService
  */
-export const Locator = {
-  typeName: "platform.locator.v1.Locator",
+export const LocatorService = {
+  typeName: "platform.locator.v1.LocatorService",
   methods: {
     /**
      * Register registers the Home Cloud server to begin synchronization with the locator server
      *
-     * @generated from rpc platform.locator.v1.Locator.Register
+     * @generated from rpc platform.locator.v1.LocatorService.Register
      */
     register: {
       name: "Register",
@@ -26,7 +26,7 @@ export const Locator = {
     /**
      * Locate asks the Locator server to return the location of the Home Cloud server referenced by the provided server_id
      *
-     * @generated from rpc platform.locator.v1.Locator.Locate
+     * @generated from rpc platform.locator.v1.LocatorService.Locate
      */
     locate: {
       name: "Locate",
@@ -37,7 +37,7 @@ export const Locator = {
     /**
      * Connect establishes a stream between a Home Cloud server which negotiates location information for clients calling Locate
      *
-     * @generated from rpc platform.locator.v1.Locator.Connect
+     * @generated from rpc platform.locator.v1.LocatorService.Connect
      */
     connect: {
       name: "Connect",
