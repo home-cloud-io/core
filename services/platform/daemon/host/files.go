@@ -20,6 +20,7 @@ var (
 	ChunkPath            = "/etc/daemon/tmp"
 	ConfigFile           = "/etc/home-cloud/config.yaml"
 	MigrationsFile       = "/etc/home-cloud/migrations.yaml"
+	WireguardKeyPath     = "/etc/home-cloud/wireguard-keys"
 	NixosConfigFile      = "/etc/nixos/configuration.nix"
 	NetworkingConfigFile = "/etc/nixos/config/networking.json"
 	DaemonNixFile        = "/etc/nixos/home-cloud/daemon/default.nix"
@@ -39,6 +40,7 @@ func ConfigureFilePaths(logger chassis.Logger) {
 	ChunkPath = FilePath(ChunkPath)
 	ConfigFile = FilePath(ConfigFile)
 	MigrationsFile = FilePath(MigrationsFile)
+	WireguardKeyPath = FilePath(WireguardKeyPath)
 	NixosConfigFile = FilePath(NixosConfigFile)
 	NetworkingConfigFile = FilePath(NetworkingConfigFile)
 	DaemonNixFile = FilePath(DaemonNixFile)
