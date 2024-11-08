@@ -20,8 +20,9 @@ var (
 	ChunkPath            = "/etc/daemon/tmp"
 	ConfigFile           = "/etc/home-cloud/config.yaml"
 	MigrationsFile       = "/etc/home-cloud/migrations.yaml"
-	DaemonNixFile        = "/etc/nixos/home-cloud/daemon/default.nix"
 	NixosConfigFile      = "/etc/nixos/configuration.nix"
+	NetworkingConfigFile = "/etc/nixos/config/networking.json"
+	DaemonNixFile        = "/etc/nixos/home-cloud/daemon/default.nix"
 	DraftManifestFile    = "/var/lib/rancher/k3s/server/manifests/draft.yaml"
 	OperatorManifestFile = "/var/lib/rancher/k3s/server/manifests/operator.yaml"
 	ServerManifestFile   = "/var/lib/rancher/k3s/server/manifests/server.yaml"
@@ -35,13 +36,15 @@ var (
 
 func ConfigureFilePaths(logger chassis.Logger) {
 	logger.Info("configuring file paths")
+	ChunkPath = FilePath(ChunkPath)
+	ConfigFile = FilePath(ConfigFile)
+	MigrationsFile = FilePath(MigrationsFile)
 	NixosConfigFile = FilePath(NixosConfigFile)
+	NetworkingConfigFile = FilePath(NetworkingConfigFile)
+	DaemonNixFile = FilePath(DaemonNixFile)
 	DraftManifestFile = FilePath(DraftManifestFile)
 	OperatorManifestFile = FilePath(OperatorManifestFile)
 	ServerManifestFile = FilePath(ServerManifestFile)
-	ChunkPath = FilePath(ChunkPath)
-	DaemonNixFile = FilePath(DaemonNixFile)
-	MigrationsFile = FilePath(MigrationsFile)
 }
 
 // LineByLineReplace will process all lines in the given file running all Replacers against each line.

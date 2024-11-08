@@ -169,6 +169,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.uploadFile(ctx, message.GetUploadFileRequest())
 		case *v1.ServerMessage_SaveSettingsCommand:
 			go c.saveSettings(ctx, message.GetSaveSettingsCommand())
+		case *v1.ServerMessage_EnableWireguardCommand:
+			go c.enableWireguard(ctx, message.GetEnableWireguardCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
