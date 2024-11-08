@@ -320,6 +320,30 @@ func (h *rpcHandler) GetAppStorage(ctx context.Context, request *connect.Request
 	return connect.NewResponse(&v1.GetAppStorageResponse{Apps: appsStorage}), nil
 }
 
+func (h *rpcHandler) EnableSecureTunnelling(ctx context.Context, request *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error) {
+	h.logger.Info("enabling secure tunnelling")
+
+	err := h.sctl.EnableWireguard(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to enable secure tunnelling")
+		return nil, errors.New("failed to enable secure tunnelling")
+	}
+
+	return connect.NewResponse(&v1.EnableSecureTunnellingResponse{}), nil
+}
+
+func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error) {
+	h.logger.Info("disabling secure tunnelling")
+
+	err := h.sctl.DisableWireguard(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to disable secure tunnelling")
+		return nil, errors.New("failed to disable secure tunnelling")
+	}
+
+	return connect.NewResponse(&v1.DisableSecureTunnellingResponse{}), nil
+}
+
 func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {
 	h.logger.Info("establishing client stream")
 	id := events.AddStream(stream)

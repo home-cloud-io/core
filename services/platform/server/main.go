@@ -37,6 +37,8 @@ func main() {
 		go actl.AutoUpdate(logger)
 		go sctl.AutoUpdateOS(logger)
 		go sctl.AutoUpdateContainers(logger)
+		// TODO: need a new method that finds all locators in blueprint and creates background threads for each
+		// go locator.Connect(logger)
 	}
 
 	defer chassis.New(logger).
