@@ -89,7 +89,7 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 	config.Wireguard.Interfaces[def.Interface.Name] = WireguardInterface{
 		IPs:            def.Interface.Ips,
 		ListenPort:     def.Interface.ListenPort,
-		PrivateKeyFile: def.Interface.PrivateKeyFile,
+		PrivateKeyFile: wireguardKeyPath(def.Interface.Name) + "/private",
 		Peers:          peers,
 	}
 
