@@ -447,6 +447,58 @@ export const AppStorage = proto3.makeMessageType(
 );
 
 /**
+ * @generated from message platform.server.v1.EnableSecureTunnellingRequest
+ */
+export const EnableSecureTunnellingRequest = proto3.makeMessageType(
+  "platform.server.v1.EnableSecureTunnellingRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.EnableSecureTunnellingResponse
+ */
+export const EnableSecureTunnellingResponse = proto3.makeMessageType(
+  "platform.server.v1.EnableSecureTunnellingResponse",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.DisableSecureTunnellingRequest
+ */
+export const DisableSecureTunnellingRequest = proto3.makeMessageType(
+  "platform.server.v1.DisableSecureTunnellingRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.DisableSecureTunnellingResponse
+ */
+export const DisableSecureTunnellingResponse = proto3.makeMessageType(
+  "platform.server.v1.DisableSecureTunnellingResponse",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.RegisterToLocatorRequest
+ */
+export const RegisterToLocatorRequest = proto3.makeMessageType(
+  "platform.server.v1.RegisterToLocatorRequest",
+  () => [
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.RegisterToLocatorResponse
+ */
+export const RegisterToLocatorResponse = proto3.makeMessageType(
+  "platform.server.v1.RegisterToLocatorResponse",
+  () => [
+    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
  * @generated from message platform.server.v1.Apps
  */
 export const Apps = proto3.makeMessageType(
@@ -558,6 +610,29 @@ export const DeviceSettings = proto3.makeMessageType(
     { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 5, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 6, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 7, name: "locator_settings", kind: "message", T: LocatorSettings },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.LocatorSettings
+ */
+export const LocatorSettings = proto3.makeMessageType(
+  "platform.server.v1.LocatorSettings",
+  () => [
+    { no: 2, name: "locators", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Locator} },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.Locator
+ */
+export const Locator = proto3.makeMessageType(
+  "platform.server.v1.Locator",
+  () => [
+    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

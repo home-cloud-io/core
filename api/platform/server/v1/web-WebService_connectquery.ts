@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
  * Shutdown the host machine running Home Cloud
@@ -305,6 +305,54 @@ export const getAppStorage = {
   kind: MethodKind.Unary,
   I: GetAppStorageRequest,
   O: GetAppStorageResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * Enables the remote access feature
+ *
+ * @generated from rpc platform.server.v1.WebService.EnableSecureTunnelling
+ */
+export const enableSecureTunnelling = {
+  localName: "enableSecureTunnelling",
+  name: "EnableSecureTunnelling",
+  kind: MethodKind.Unary,
+  I: EnableSecureTunnellingRequest,
+  O: EnableSecureTunnellingResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * Disables the remote access feature
+ *
+ * @generated from rpc platform.server.v1.WebService.DisableSecureTunnelling
+ */
+export const disableSecureTunnelling = {
+  localName: "disableSecureTunnelling",
+  name: "DisableSecureTunnelling",
+  kind: MethodKind.Unary,
+  I: DisableSecureTunnellingRequest,
+  O: DisableSecureTunnellingResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * Register the server with the given Locator service
+ *
+ * @generated from rpc platform.server.v1.WebService.RegisterToLocator
+ */
+export const registerToLocator = {
+  localName: "registerToLocator",
+  name: "RegisterToLocator",
+  kind: MethodKind.Unary,
+  I: RegisterToLocatorRequest,
+  O: RegisterToLocatorResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

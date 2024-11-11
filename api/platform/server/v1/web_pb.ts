@@ -1716,6 +1716,206 @@ export class AppStorage extends Message<AppStorage> {
 }
 
 /**
+ * @generated from message platform.server.v1.EnableSecureTunnellingRequest
+ */
+export class EnableSecureTunnellingRequest extends Message<EnableSecureTunnellingRequest> {
+  constructor(data?: PartialMessage<EnableSecureTunnellingRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.EnableSecureTunnellingRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EnableSecureTunnellingRequest {
+    return new EnableSecureTunnellingRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EnableSecureTunnellingRequest {
+    return new EnableSecureTunnellingRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EnableSecureTunnellingRequest {
+    return new EnableSecureTunnellingRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: EnableSecureTunnellingRequest | PlainMessage<EnableSecureTunnellingRequest> | undefined, b: EnableSecureTunnellingRequest | PlainMessage<EnableSecureTunnellingRequest> | undefined): boolean {
+    return proto3.util.equals(EnableSecureTunnellingRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.EnableSecureTunnellingResponse
+ */
+export class EnableSecureTunnellingResponse extends Message<EnableSecureTunnellingResponse> {
+  constructor(data?: PartialMessage<EnableSecureTunnellingResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.EnableSecureTunnellingResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EnableSecureTunnellingResponse {
+    return new EnableSecureTunnellingResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EnableSecureTunnellingResponse {
+    return new EnableSecureTunnellingResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EnableSecureTunnellingResponse {
+    return new EnableSecureTunnellingResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: EnableSecureTunnellingResponse | PlainMessage<EnableSecureTunnellingResponse> | undefined, b: EnableSecureTunnellingResponse | PlainMessage<EnableSecureTunnellingResponse> | undefined): boolean {
+    return proto3.util.equals(EnableSecureTunnellingResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DisableSecureTunnellingRequest
+ */
+export class DisableSecureTunnellingRequest extends Message<DisableSecureTunnellingRequest> {
+  constructor(data?: PartialMessage<DisableSecureTunnellingRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DisableSecureTunnellingRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DisableSecureTunnellingRequest {
+    return new DisableSecureTunnellingRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DisableSecureTunnellingRequest {
+    return new DisableSecureTunnellingRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DisableSecureTunnellingRequest {
+    return new DisableSecureTunnellingRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DisableSecureTunnellingRequest | PlainMessage<DisableSecureTunnellingRequest> | undefined, b: DisableSecureTunnellingRequest | PlainMessage<DisableSecureTunnellingRequest> | undefined): boolean {
+    return proto3.util.equals(DisableSecureTunnellingRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DisableSecureTunnellingResponse
+ */
+export class DisableSecureTunnellingResponse extends Message<DisableSecureTunnellingResponse> {
+  constructor(data?: PartialMessage<DisableSecureTunnellingResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DisableSecureTunnellingResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DisableSecureTunnellingResponse {
+    return new DisableSecureTunnellingResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DisableSecureTunnellingResponse {
+    return new DisableSecureTunnellingResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DisableSecureTunnellingResponse {
+    return new DisableSecureTunnellingResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DisableSecureTunnellingResponse | PlainMessage<DisableSecureTunnellingResponse> | undefined, b: DisableSecureTunnellingResponse | PlainMessage<DisableSecureTunnellingResponse> | undefined): boolean {
+    return proto3.util.equals(DisableSecureTunnellingResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.RegisterToLocatorRequest
+ */
+export class RegisterToLocatorRequest extends Message<RegisterToLocatorRequest> {
+  /**
+   * TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
+   *
+   * @generated from field: string locator_address = 1;
+   */
+  locatorAddress = "";
+
+  constructor(data?: PartialMessage<RegisterToLocatorRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.RegisterToLocatorRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterToLocatorRequest {
+    return new RegisterToLocatorRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterToLocatorRequest {
+    return new RegisterToLocatorRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterToLocatorRequest {
+    return new RegisterToLocatorRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RegisterToLocatorRequest | PlainMessage<RegisterToLocatorRequest> | undefined, b: RegisterToLocatorRequest | PlainMessage<RegisterToLocatorRequest> | undefined): boolean {
+    return proto3.util.equals(RegisterToLocatorRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.RegisterToLocatorResponse
+ */
+export class RegisterToLocatorResponse extends Message<RegisterToLocatorResponse> {
+  /**
+   * @generated from field: string server_id = 1;
+   */
+  serverId = "";
+
+  constructor(data?: PartialMessage<RegisterToLocatorResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.RegisterToLocatorResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterToLocatorResponse {
+    return new RegisterToLocatorResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterToLocatorResponse {
+    return new RegisterToLocatorResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterToLocatorResponse {
+    return new RegisterToLocatorResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RegisterToLocatorResponse | PlainMessage<RegisterToLocatorResponse> | undefined, b: RegisterToLocatorResponse | PlainMessage<RegisterToLocatorResponse> | undefined): boolean {
+    return proto3.util.equals(RegisterToLocatorResponse, a, b);
+  }
+}
+
+/**
  * @generated from message platform.server.v1.Apps
  */
 export class Apps extends Message<Apps> {
@@ -2141,6 +2341,11 @@ export class DeviceSettings extends Message<DeviceSettings> {
    */
   trustedSshKeys: string[] = [];
 
+  /**
+   * @generated from field: platform.server.v1.LocatorSettings locator_settings = 7;
+   */
+  locatorSettings?: LocatorSettings;
+
   constructor(data?: PartialMessage<DeviceSettings>) {
     super();
     proto3.util.initPartial(data, this);
@@ -2155,6 +2360,7 @@ export class DeviceSettings extends Message<DeviceSettings> {
     { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 5, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 6, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 7, name: "locator_settings", kind: "message", T: LocatorSettings },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeviceSettings {
@@ -2171,6 +2377,105 @@ export class DeviceSettings extends Message<DeviceSettings> {
 
   static equals(a: DeviceSettings | PlainMessage<DeviceSettings> | undefined, b: DeviceSettings | PlainMessage<DeviceSettings> | undefined): boolean {
     return proto3.util.equals(DeviceSettings, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.LocatorSettings
+ */
+export class LocatorSettings extends Message<LocatorSettings> {
+  /**
+   * locators is a map of unique Home Cloud server IDs to locators the server will connect to
+   * This map structure enables a Home Cloud server to connect with the same Locator server multiple times
+   * in order to share multiple different Wireguard tunnels (interfaces). For example, the server could use one tunnel
+   * for trusted mobile clients and another tunnel for server-to-server federation.
+   *
+   * @generated from field: map<string, platform.server.v1.Locator> locators = 2;
+   */
+  locators: { [key: string]: Locator } = {};
+
+  constructor(data?: PartialMessage<LocatorSettings>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.LocatorSettings";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 2, name: "locators", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Locator} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorSettings {
+    return new LocatorSettings().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LocatorSettings {
+    return new LocatorSettings().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LocatorSettings {
+    return new LocatorSettings().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LocatorSettings | PlainMessage<LocatorSettings> | undefined, b: LocatorSettings | PlainMessage<LocatorSettings> | undefined): boolean {
+    return proto3.util.equals(LocatorSettings, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.Locator
+ */
+export class Locator extends Message<Locator> {
+  /**
+   * server_id is the globally unique identifier for the Home Cloud server instance
+   * it is used by clients as part of the locator query
+   *
+   * @generated from field: string server_id = 1;
+   */
+  serverId = "";
+
+  /**
+   * address is the full web address (e.g. https://locator.home-cloud.io) of the locator server
+   *
+   * @generated from field: string address = 2;
+   */
+  address = "";
+
+  /**
+   * wireguard_interface is the internal wireguard instance to share the connection information
+   * of through this locator
+   *
+   * @generated from field: string wireguard_interface = 3;
+   */
+  wireguardInterface = "";
+
+  constructor(data?: PartialMessage<Locator>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.Locator";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Locator {
+    return new Locator().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Locator {
+    return new Locator().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Locator {
+    return new Locator().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Locator | PlainMessage<Locator> | undefined, b: Locator | PlainMessage<Locator> | undefined): boolean {
+    return proto3.util.equals(Locator, a, b);
   }
 }
 
