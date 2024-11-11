@@ -23,6 +23,8 @@ var (
 	WireguardKeyPath     = "/etc/home-cloud/wireguard-keys"
 	NixosConfigFile      = "/etc/nixos/configuration.nix"
 	NetworkingConfigFile = "/etc/nixos/config/networking.json"
+	ServicesConfigFile   = "/etc/nixos/config/services.json"
+	TimeConfigFile       = "/etc/nixos/config/time.json"
 	DaemonNixFile        = "/etc/nixos/home-cloud/daemon/default.nix"
 	DraftManifestFile    = "/var/lib/rancher/k3s/server/manifests/draft.yaml"
 	OperatorManifestFile = "/var/lib/rancher/k3s/server/manifests/operator.yaml"
@@ -43,6 +45,8 @@ func ConfigureFilePaths(logger chassis.Logger) {
 	WireguardKeyPath = FilePath(WireguardKeyPath)
 	NixosConfigFile = FilePath(NixosConfigFile)
 	NetworkingConfigFile = FilePath(NetworkingConfigFile)
+	ServicesConfigFile = FilePath(ServicesConfigFile)
+	TimeConfigFile = FilePath(TimeConfigFile)
 	DaemonNixFile = FilePath(DaemonNixFile)
 	DraftManifestFile = FilePath(DraftManifestFile)
 	OperatorManifestFile = FilePath(OperatorManifestFile)
