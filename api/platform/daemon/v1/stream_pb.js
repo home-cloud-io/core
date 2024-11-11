@@ -5,6 +5,7 @@
 
 import { proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "./system_pb.js";
+import { WireguardInterface } from "./wireguard_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -21,6 +22,8 @@ export const DaemonMessage = proto3.makeMessageType(
     { no: 7, name: "upload_file_ready", kind: "message", T: UploadFileReady, oneof: "message" },
     { no: 8, name: "upload_file_chunk_completed", kind: "message", T: UploadFileChunkCompleted, oneof: "message" },
     { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
+    { no: 10, name: "wireguard_interface_added", kind: "message", T: WireguardInterfaceAdded, oneof: "message" },
+    { no: 11, name: "wireguard_interface_removed", kind: "message", T: WireguardInterfaceRemoved, oneof: "message" },
   ],
 );
 
@@ -45,6 +48,8 @@ export const ServerMessage = proto3.makeMessageType(
     { no: 13, name: "initialize_device_command", kind: "message", T: InitializeDeviceCommand, oneof: "message" },
     { no: 14, name: "upload_file_request", kind: "message", T: UploadFileRequest, oneof: "message" },
     { no: 15, name: "save_settings_command", kind: "message", T: SaveSettingsCommand, oneof: "message" },
+    { no: 16, name: "add_wireguard_interface", kind: "message", T: AddWireguardInterface, oneof: "message" },
+    { no: 17, name: "remove_wireguard_interface", kind: "message", T: RemoveWireguardInterface, oneof: "message" },
   ],
 );
 
@@ -146,6 +151,26 @@ export const UploadFileChunkCompleted = proto3.makeMessageType(
  */
 export const SettingsSaved = proto3.makeMessageType(
   "platform.daemon.v1.SettingsSaved",
+  () => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.WireguardInterfaceAdded
+ */
+export const WireguardInterfaceAdded = proto3.makeMessageType(
+  "platform.daemon.v1.WireguardInterfaceAdded",
+  () => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.WireguardInterfaceRemoved
+ */
+export const WireguardInterfaceRemoved = proto3.makeMessageType(
+  "platform.daemon.v1.WireguardInterfaceRemoved",
   () => [
     { no: 16, name: "error", kind: "message", T: DaemonError },
   ],
@@ -344,6 +369,26 @@ export const SaveSettingsCommand = proto3.makeMessageType(
     { no: 2, name: "time_zone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 4, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.AddWireguardInterface
+ */
+export const AddWireguardInterface = proto3.makeMessageType(
+  "platform.daemon.v1.AddWireguardInterface",
+  () => [
+    { no: 1, name: "interface", kind: "message", T: WireguardInterface },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.RemoveWireguardInterface
+ */
+export const RemoveWireguardInterface = proto3.makeMessageType(
+  "platform.daemon.v1.RemoveWireguardInterface",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

@@ -84,6 +84,15 @@ const (
 	// WebServiceGetAppStorageProcedure is the fully-qualified name of the WebService's GetAppStorage
 	// RPC.
 	WebServiceGetAppStorageProcedure = "/platform.server.v1.WebService/GetAppStorage"
+	// WebServiceEnableSecureTunnellingProcedure is the fully-qualified name of the WebService's
+	// EnableSecureTunnelling RPC.
+	WebServiceEnableSecureTunnellingProcedure = "/platform.server.v1.WebService/EnableSecureTunnelling"
+	// WebServiceDisableSecureTunnellingProcedure is the fully-qualified name of the WebService's
+	// DisableSecureTunnelling RPC.
+	WebServiceDisableSecureTunnellingProcedure = "/platform.server.v1.WebService/DisableSecureTunnelling"
+	// WebServiceRegisterToLocatorProcedure is the fully-qualified name of the WebService's
+	// RegisterToLocator RPC.
+	WebServiceRegisterToLocatorProcedure = "/platform.server.v1.WebService/RegisterToLocator"
 	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
 	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
 )
@@ -110,6 +119,9 @@ var (
 	webServiceGetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("GetDeviceSettings")
 	webServiceSetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("SetDeviceSettings")
 	webServiceGetAppStorageMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("GetAppStorage")
+	webServiceEnableSecureTunnellingMethodDescriptor   = webServiceServiceDescriptor.Methods().ByName("EnableSecureTunnelling")
+	webServiceDisableSecureTunnellingMethodDescriptor  = webServiceServiceDescriptor.Methods().ByName("DisableSecureTunnelling")
+	webServiceRegisterToLocatorMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("RegisterToLocator")
 	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
 )
 
@@ -153,6 +165,12 @@ type WebServiceClient interface {
 	SetDeviceSettings(context.Context, *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error)
 	// Get all installed app storage volumes
 	GetAppStorage(context.Context, *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error)
+	// Enables the remote access feature
+	EnableSecureTunnelling(context.Context, *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error)
+	// Disables the remote access feature
+	DisableSecureTunnelling(context.Context, *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error)
+	// Register the server with the given Locator service
+	RegisterToLocator(context.Context, *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
 }
@@ -281,6 +299,24 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceGetAppStorageMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		enableSecureTunnelling: connect.NewClient[v1.EnableSecureTunnellingRequest, v1.EnableSecureTunnellingResponse](
+			httpClient,
+			baseURL+WebServiceEnableSecureTunnellingProcedure,
+			connect.WithSchema(webServiceEnableSecureTunnellingMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		disableSecureTunnelling: connect.NewClient[v1.DisableSecureTunnellingRequest, v1.DisableSecureTunnellingResponse](
+			httpClient,
+			baseURL+WebServiceDisableSecureTunnellingProcedure,
+			connect.WithSchema(webServiceDisableSecureTunnellingMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		registerToLocator: connect.NewClient[v1.RegisterToLocatorRequest, v1.RegisterToLocatorResponse](
+			httpClient,
+			baseURL+WebServiceRegisterToLocatorProcedure,
+			connect.WithSchema(webServiceRegisterToLocatorMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		subscribe: connect.NewClient[v1.SubscribeRequest, v1.ServerEvent](
 			httpClient,
 			baseURL+WebServiceSubscribeProcedure,
@@ -311,6 +347,9 @@ type webServiceClient struct {
 	getDeviceSettings        *connect.Client[v1.GetDeviceSettingsRequest, v1.GetDeviceSettingsResponse]
 	setDeviceSettings        *connect.Client[v1.SetDeviceSettingsRequest, v1.SetDeviceSettingsResponse]
 	getAppStorage            *connect.Client[v1.GetAppStorageRequest, v1.GetAppStorageResponse]
+	enableSecureTunnelling   *connect.Client[v1.EnableSecureTunnellingRequest, v1.EnableSecureTunnellingResponse]
+	disableSecureTunnelling  *connect.Client[v1.DisableSecureTunnellingRequest, v1.DisableSecureTunnellingResponse]
+	registerToLocator        *connect.Client[v1.RegisterToLocatorRequest, v1.RegisterToLocatorResponse]
 	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
 }
 
@@ -409,6 +448,21 @@ func (c *webServiceClient) GetAppStorage(ctx context.Context, req *connect.Reque
 	return c.getAppStorage.CallUnary(ctx, req)
 }
 
+// EnableSecureTunnelling calls platform.server.v1.WebService.EnableSecureTunnelling.
+func (c *webServiceClient) EnableSecureTunnelling(ctx context.Context, req *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error) {
+	return c.enableSecureTunnelling.CallUnary(ctx, req)
+}
+
+// DisableSecureTunnelling calls platform.server.v1.WebService.DisableSecureTunnelling.
+func (c *webServiceClient) DisableSecureTunnelling(ctx context.Context, req *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error) {
+	return c.disableSecureTunnelling.CallUnary(ctx, req)
+}
+
+// RegisterToLocator calls platform.server.v1.WebService.RegisterToLocator.
+func (c *webServiceClient) RegisterToLocator(ctx context.Context, req *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
+	return c.registerToLocator.CallUnary(ctx, req)
+}
+
 // Subscribe calls platform.server.v1.WebService.Subscribe.
 func (c *webServiceClient) Subscribe(ctx context.Context, req *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error) {
 	return c.subscribe.CallServerStream(ctx, req)
@@ -454,6 +508,12 @@ type WebServiceHandler interface {
 	SetDeviceSettings(context.Context, *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error)
 	// Get all installed app storage volumes
 	GetAppStorage(context.Context, *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error)
+	// Enables the remote access feature
+	EnableSecureTunnelling(context.Context, *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error)
+	// Disables the remote access feature
+	DisableSecureTunnelling(context.Context, *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error)
+	// Register the server with the given Locator service
+	RegisterToLocator(context.Context, *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
 }
@@ -578,6 +638,24 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceGetAppStorageMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceEnableSecureTunnellingHandler := connect.NewUnaryHandler(
+		WebServiceEnableSecureTunnellingProcedure,
+		svc.EnableSecureTunnelling,
+		connect.WithSchema(webServiceEnableSecureTunnellingMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	webServiceDisableSecureTunnellingHandler := connect.NewUnaryHandler(
+		WebServiceDisableSecureTunnellingProcedure,
+		svc.DisableSecureTunnelling,
+		connect.WithSchema(webServiceDisableSecureTunnellingMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	webServiceRegisterToLocatorHandler := connect.NewUnaryHandler(
+		WebServiceRegisterToLocatorProcedure,
+		svc.RegisterToLocator,
+		connect.WithSchema(webServiceRegisterToLocatorMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	webServiceSubscribeHandler := connect.NewServerStreamHandler(
 		WebServiceSubscribeProcedure,
 		svc.Subscribe,
@@ -624,6 +702,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceSetDeviceSettingsHandler.ServeHTTP(w, r)
 		case WebServiceGetAppStorageProcedure:
 			webServiceGetAppStorageHandler.ServeHTTP(w, r)
+		case WebServiceEnableSecureTunnellingProcedure:
+			webServiceEnableSecureTunnellingHandler.ServeHTTP(w, r)
+		case WebServiceDisableSecureTunnellingProcedure:
+			webServiceDisableSecureTunnellingHandler.ServeHTTP(w, r)
+		case WebServiceRegisterToLocatorProcedure:
+			webServiceRegisterToLocatorHandler.ServeHTTP(w, r)
 		case WebServiceSubscribeProcedure:
 			webServiceSubscribeHandler.ServeHTTP(w, r)
 		default:
@@ -709,6 +793,18 @@ func (UnimplementedWebServiceHandler) SetDeviceSettings(context.Context, *connec
 
 func (UnimplementedWebServiceHandler) GetAppStorage(context.Context, *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetAppStorage is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) EnableSecureTunnelling(context.Context, *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.EnableSecureTunnelling is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) DisableSecureTunnelling(context.Context, *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.DisableSecureTunnelling is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) RegisterToLocator(context.Context, *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.RegisterToLocator is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {

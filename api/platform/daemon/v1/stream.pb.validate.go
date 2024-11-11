@@ -427,6 +427,88 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_WireguardInterfaceAdded:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetWireguardInterfaceAdded()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "WireguardInterfaceAdded",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "WireguardInterfaceAdded",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetWireguardInterfaceAdded()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "WireguardInterfaceAdded",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *DaemonMessage_WireguardInterfaceRemoved:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetWireguardInterfaceRemoved()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "WireguardInterfaceRemoved",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "WireguardInterfaceRemoved",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetWireguardInterfaceRemoved()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "WireguardInterfaceRemoved",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -1141,6 +1223,88 @@ func (m *ServerMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
 					field:  "SaveSettingsCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_AddWireguardInterface:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAddWireguardInterface()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "AddWireguardInterface",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "AddWireguardInterface",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAddWireguardInterface()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "AddWireguardInterface",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_RemoveWireguardInterface:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRemoveWireguardInterface()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RemoveWireguardInterface",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RemoveWireguardInterface",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRemoveWireguardInterface()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "RemoveWireguardInterface",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2263,6 +2427,268 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SettingsSavedValidationError{}
+
+// Validate checks the field values on WireguardInterfaceAdded with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WireguardInterfaceAdded) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WireguardInterfaceAdded with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WireguardInterfaceAddedMultiError, or nil if none found.
+func (m *WireguardInterfaceAdded) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WireguardInterfaceAdded) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WireguardInterfaceAddedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WireguardInterfaceAddedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WireguardInterfaceAddedValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return WireguardInterfaceAddedMultiError(errors)
+	}
+
+	return nil
+}
+
+// WireguardInterfaceAddedMultiError is an error wrapping multiple validation
+// errors returned by WireguardInterfaceAdded.ValidateAll() if the designated
+// constraints aren't met.
+type WireguardInterfaceAddedMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WireguardInterfaceAddedMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WireguardInterfaceAddedMultiError) AllErrors() []error { return m }
+
+// WireguardInterfaceAddedValidationError is the validation error returned by
+// WireguardInterfaceAdded.Validate if the designated constraints aren't met.
+type WireguardInterfaceAddedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WireguardInterfaceAddedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WireguardInterfaceAddedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WireguardInterfaceAddedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WireguardInterfaceAddedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WireguardInterfaceAddedValidationError) ErrorName() string {
+	return "WireguardInterfaceAddedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WireguardInterfaceAddedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWireguardInterfaceAdded.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WireguardInterfaceAddedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WireguardInterfaceAddedValidationError{}
+
+// Validate checks the field values on WireguardInterfaceRemoved with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WireguardInterfaceRemoved) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WireguardInterfaceRemoved with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WireguardInterfaceRemovedMultiError, or nil if none found.
+func (m *WireguardInterfaceRemoved) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WireguardInterfaceRemoved) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WireguardInterfaceRemovedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WireguardInterfaceRemovedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WireguardInterfaceRemovedValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return WireguardInterfaceRemovedMultiError(errors)
+	}
+
+	return nil
+}
+
+// WireguardInterfaceRemovedMultiError is an error wrapping multiple validation
+// errors returned by WireguardInterfaceRemoved.ValidateAll() if the
+// designated constraints aren't met.
+type WireguardInterfaceRemovedMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WireguardInterfaceRemovedMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WireguardInterfaceRemovedMultiError) AllErrors() []error { return m }
+
+// WireguardInterfaceRemovedValidationError is the validation error returned by
+// WireguardInterfaceRemoved.Validate if the designated constraints aren't met.
+type WireguardInterfaceRemovedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WireguardInterfaceRemovedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WireguardInterfaceRemovedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WireguardInterfaceRemovedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WireguardInterfaceRemovedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WireguardInterfaceRemovedValidationError) ErrorName() string {
+	return "WireguardInterfaceRemovedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WireguardInterfaceRemovedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWireguardInterfaceRemoved.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WireguardInterfaceRemovedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WireguardInterfaceRemovedValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -4211,3 +4637,238 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SaveSettingsCommandValidationError{}
+
+// Validate checks the field values on AddWireguardInterface with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddWireguardInterface) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddWireguardInterface with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddWireguardInterfaceMultiError, or nil if none found.
+func (m *AddWireguardInterface) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddWireguardInterface) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInterface()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddWireguardInterfaceValidationError{
+					field:  "Interface",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddWireguardInterfaceValidationError{
+					field:  "Interface",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInterface()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddWireguardInterfaceValidationError{
+				field:  "Interface",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddWireguardInterfaceMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddWireguardInterfaceMultiError is an error wrapping multiple validation
+// errors returned by AddWireguardInterface.ValidateAll() if the designated
+// constraints aren't met.
+type AddWireguardInterfaceMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddWireguardInterfaceMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddWireguardInterfaceMultiError) AllErrors() []error { return m }
+
+// AddWireguardInterfaceValidationError is the validation error returned by
+// AddWireguardInterface.Validate if the designated constraints aren't met.
+type AddWireguardInterfaceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddWireguardInterfaceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddWireguardInterfaceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddWireguardInterfaceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddWireguardInterfaceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddWireguardInterfaceValidationError) ErrorName() string {
+	return "AddWireguardInterfaceValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddWireguardInterfaceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddWireguardInterface.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddWireguardInterfaceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddWireguardInterfaceValidationError{}
+
+// Validate checks the field values on RemoveWireguardInterface with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RemoveWireguardInterface) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RemoveWireguardInterface with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RemoveWireguardInterfaceMultiError, or nil if none found.
+func (m *RemoveWireguardInterface) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RemoveWireguardInterface) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return RemoveWireguardInterfaceMultiError(errors)
+	}
+
+	return nil
+}
+
+// RemoveWireguardInterfaceMultiError is an error wrapping multiple validation
+// errors returned by RemoveWireguardInterface.ValidateAll() if the designated
+// constraints aren't met.
+type RemoveWireguardInterfaceMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RemoveWireguardInterfaceMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RemoveWireguardInterfaceMultiError) AllErrors() []error { return m }
+
+// RemoveWireguardInterfaceValidationError is the validation error returned by
+// RemoveWireguardInterface.Validate if the designated constraints aren't met.
+type RemoveWireguardInterfaceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RemoveWireguardInterfaceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RemoveWireguardInterfaceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RemoveWireguardInterfaceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RemoveWireguardInterfaceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RemoveWireguardInterfaceValidationError) ErrorName() string {
+	return "RemoveWireguardInterfaceValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RemoveWireguardInterfaceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRemoveWireguardInterface.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RemoveWireguardInterfaceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RemoveWireguardInterfaceValidationError{}

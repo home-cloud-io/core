@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package platform.daemon.v1;
+
+option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
+
+message WireguardConfig {
+  map<string, WireguardInterface> interfaces = 1;
+}
+
+message WireguardInterface {
+  string id = 1;
+  string name = 2;
+  string private_key = 3;
+  repeated string ips = 4;
+  uint32 listen_port = 5;
+  repeated WireguardPeer peers = 6;
+}
+
+message WireguardPeer {
+  string public_key = 1;
+  repeated string allowed_ips = 2;
+}

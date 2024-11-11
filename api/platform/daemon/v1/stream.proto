@@ -5,6 +5,7 @@ package platform.daemon.v1;
 option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
 
 import "platform/daemon/v1/system.proto";
+import "platform/daemon/v1/wireguard.proto";
 
 service DaemonStreamService {
   rpc Communicate(stream DaemonMessage) returns (stream ServerMessage) {}
@@ -22,6 +23,8 @@ message DaemonMessage {
     UploadFileReady upload_file_ready = 7;
     UploadFileChunkCompleted upload_file_chunk_completed = 8;
     SettingsSaved settings_saved = 9;
+    WireguardInterfaceAdded wireguard_interface_added = 10;
+    WireguardInterfaceRemoved wireguard_interface_removed = 11;
   }
 }
 
@@ -45,6 +48,8 @@ message ServerMessage {
     InitializeDeviceCommand initialize_device_command = 13;
     UploadFileRequest upload_file_request = 14;
     SaveSettingsCommand save_settings_command = 15;
+    AddWireguardInterface add_wireguard_interface = 16;
+    RemoveWireguardInterface remove_wireguard_interface = 17;
   }
 }
 
@@ -94,6 +99,14 @@ message UploadFileChunkCompleted {
 }
 
 message SettingsSaved {
+  DaemonError error = 16;
+}
+
+message WireguardInterfaceAdded {
+  DaemonError error = 16;
+}
+
+message WireguardInterfaceRemoved {
   DaemonError error = 16;
 }
 
@@ -179,9 +192,17 @@ message FileDone {
 }
 
 message SaveSettingsCommand {
-  // time_zone must be a valid TZ identifier from: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   string admin_password = 1;
+  // time_zone must be a valid TZ identifier from: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   string time_zone = 2;
   bool enable_ssh = 3;
   repeated string trusted_ssh_keys = 4;
+}
+
+message AddWireguardInterface {
+  platform.daemon.v1.WireguardInterface interface = 1;
+}
+
+message RemoveWireguardInterface {
+  string name = 1;
 }
