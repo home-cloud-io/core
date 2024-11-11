@@ -354,7 +354,7 @@ func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *conne
 func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
 	h.logger.Info("registering to locator")
 
-	err := h.lctl.AddLocator(ctx, request.Msg.LocatorAddress, "wg0")
+	err := h.lctl.AddLocator(ctx, request.Msg.LocatorAddress, system.DefaultWireguardInterface)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to add locator")
 		return nil, fmt.Errorf("failed to add locator")

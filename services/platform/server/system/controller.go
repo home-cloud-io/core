@@ -135,6 +135,10 @@ const (
 	daemonTagPath                    = "refs/tags/services/platform/daemon/"
 	osAutoUpdateCronConfigKey        = "server.updates.os_auto_update_cron"
 	containerAutoUpdateCronConfigKey = "server.updates.containers_auto_update_cron"
+
+	// Currently only a single interface is supported and defaults to this value. In the future we
+	// will probably want to support multiple interfaces (e.g. one for trusted mobile clients and another for federated servers)
+	DefaultWireguardInterface = "wg0"
 )
 
 // DAEMON
@@ -425,15 +429,15 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	// create wireguard config
 	config = &dv1.WireguardConfig{
 		Interfaces: map[string]*dv1.WireguardInterface{
-			"wg0": &dv1.WireguardInterface{
+			DefaultWireguardInterface: &dv1.WireguardInterface{
 				Id:         uuid.New().String(),
-				Name:       "wg0",
+				Name:       DefaultWireguardInterface,
 				PrivateKey: key.String(),
 				Ips: []string{
 					"10.100.0.1/24",
 				},
-				ListenPort:     51820,
-				Peers:          []*dv1.WireguardPeer{},
+				ListenPort: 51820,
+				Peers:      []*dv1.WireguardPeer{},
 			},
 		},
 	}
@@ -459,7 +463,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardInterface{
 			AddWireguardInterface: &dv1.AddWireguardInterface{
-				Interface: config.Interfaces["wg0"],
+				Interface: config.Interfaces[DefaultWireguardInterface],
 			},
 		},
 	})
@@ -506,7 +510,7 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RemoveWireguardInterface{
 			RemoveWireguardInterface: &dv1.RemoveWireguardInterface{
-				Name: "wg0",
+				Name: DefaultWireguardInterface,
 			},
 		},
 	})
