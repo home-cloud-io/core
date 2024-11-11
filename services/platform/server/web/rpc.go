@@ -11,6 +11,7 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
+	"github.com/home-cloud-io/core/services/platform/server/locator"
 	"github.com/home-cloud-io/core/services/platform/server/system"
 
 	"connectrpc.com/connect"
@@ -27,6 +28,7 @@ type (
 		logger chassis.Logger
 		actl   apps.Controller
 		sctl   system.Controller
+		lctl   locator.Controller
 	}
 )
 
@@ -36,11 +38,12 @@ const (
 	ErrFailedToLogin      = "failed to login"
 )
 
-func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Rpc {
+func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller, lctl locator.Controller) Rpc {
 	return &rpcHandler{
 		logger,
 		actl,
 		sctl,
+		lctl,
 	}
 }
 
@@ -335,6 +338,10 @@ func (h *rpcHandler) EnableSecureTunnelling(ctx context.Context, request *connec
 func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error) {
 	h.logger.Info("disabling secure tunnelling")
 
+	// remove all locator connections first
+	h.lctl.RemoveAll()
+
+	// now, disable wireguard on the host system
 	err := h.sctl.DisableWireguard(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to disable secure tunnelling")
@@ -342,6 +349,18 @@ func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *conne
 	}
 
 	return connect.NewResponse(&v1.DisableSecureTunnellingResponse{}), nil
+}
+
+func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
+	h.logger.Info("registering to locator")
+
+	err := h.lctl.AddLocator(ctx, request.Msg.LocatorAddress, "wg0")
+	if err != nil {
+		h.logger.WithError(err).Error("failed to add locator")
+		return nil, fmt.Errorf("failed to add locator")
+	}
+
+	return connect.NewResponse(&v1.RegisterToLocatorResponse{}), nil
 }
 
 func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {

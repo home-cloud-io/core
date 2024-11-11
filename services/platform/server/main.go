@@ -7,6 +7,7 @@ import (
 	"github.com/home-cloud-io/core/services/platform/server/async"
 	"github.com/home-cloud-io/core/services/platform/server/internal"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
+	"github.com/home-cloud-io/core/services/platform/server/locator"
 	"github.com/home-cloud-io/core/services/platform/server/system"
 	"github.com/home-cloud-io/core/services/platform/server/web"
 
@@ -25,7 +26,8 @@ func main() {
 		daemonRPC   = system.New(logger, broadcaster)
 		actl        = apps.NewController(logger)
 		sctl        = system.NewController(logger, broadcaster)
-		webRPC      = web.New(logger, actl, sctl)
+		lctl        = locator.NewController(logger)
+		webRPC      = web.New(logger, actl, sctl, lctl)
 		webHTTP     = web.NewHttp(logger, actl, sctl)
 		internalRPC = internal.New(logger, sctl)
 	)
@@ -37,8 +39,7 @@ func main() {
 		go actl.AutoUpdate(logger)
 		go sctl.AutoUpdateOS(logger)
 		go sctl.AutoUpdateContainers(logger)
-		// TODO: need a new method that finds all locators in blueprint and creates background threads for each
-		// go locator.Connect(logger)
+		go lctl.Load()
 	}
 
 	defer chassis.New(logger).

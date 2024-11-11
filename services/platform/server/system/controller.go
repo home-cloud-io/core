@@ -21,6 +21,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 	kvv1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -425,13 +426,13 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	config = &dv1.WireguardConfig{
 		Interfaces: map[string]*dv1.WireguardInterface{
 			"wg0": &dv1.WireguardInterface{
+				Id:         uuid.New().String(),
 				Name:       "wg0",
 				PrivateKey: key.String(),
 				Ips: []string{
 					"10.100.0.1/24",
 				},
 				ListenPort:     51820,
-				PrivateKeyFile: "/etc/home-cloud/wireguard-keys/private",
 				Peers:          []*dv1.WireguardPeer{},
 			},
 		},
@@ -625,7 +626,7 @@ func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings,
 	settings := &v1.DeviceSettings{}
 	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
-		return nil, errors.New(ErrFailedToGetSettings)
+		return nil, err
 	}
 
 	settings.AdminUser.Password = "" // don't return the password
