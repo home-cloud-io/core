@@ -4,22 +4,22 @@ go 1.23.0
 
 toolchain go1.23.2
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
 // replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 
-replace github.com/steady-bytes/draft/api => ../../../../../steady-bytes/draft/api
+// replace github.com/steady-bytes/draft/api => ../../../../../steady-bytes/draft/api
 
 require (
 	connectrpc.com/connect v1.16.2
 	github.com/containers/image/v5 v5.32.2
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.4.21
+	github.com/home-cloud-io/core/api v0.4.22
 	github.com/home-cloud-io/core/services/platform/operator v0.0.2
 	github.com/netbirdio/netbird v0.30.3
 	github.com/robfig/cron/v3 v3.0.0
-	github.com/steady-bytes/draft/api v0.3.2
+	github.com/steady-bytes/draft/api v0.6.1
 	github.com/steady-bytes/draft/pkg/chassis v0.3.4
 	github.com/steady-bytes/draft/pkg/loggers v0.2.1
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
