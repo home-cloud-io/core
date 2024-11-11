@@ -29,9 +29,17 @@ type (
 		Peers      []wgtypes.Key
 	}
 	Controller interface {
+		// Load will load all saved Locators from blueprint and create background connections to them.
+		// Meant to be called at service startup.
 		Load()
+		// AddLocator will start a background connection to the given Locator and will serve up connection
+		// information to locate requests from that Locator on the given interface. The Locator connection
+		// can be killed by calling RemoveLocator or RemoveAll
 		AddLocator(ctx context.Context, locatorAddress string, wgInterface string) error
-		RemoveLocator(locatorAddress string)
+		// RemoveLocator will remove a background Locator connection that was started through Load or
+		// AddLocator and will delete it from blueprint.
+		RemoveLocator(serverId string)
+		// RemoveAll will remove all background Locator connections and delete them from blueprint.
 		RemoveAll()
 	}
 	controller struct {
@@ -157,18 +165,18 @@ func (m *controller) AddLocator(ctx context.Context, locatorAddress string, wgIn
 	return nil
 }
 
-func (m *controller) RemoveLocator(locatorAddress string) {
-	l, ok := m.locators[locatorAddress]
+func (m *controller) RemoveLocator(serverId string) {
+	l, ok := m.locators[serverId]
 	if !ok {
 		return
 	}
 	l.cancel()
-	delete(m.locators, locatorAddress)
+	delete(m.locators, serverId)
 }
 
 func (m *controller) RemoveAll() {
-	for address, _ := range m.locators {
-		m.RemoveLocator(address)
+	for serverId, _ := range m.locators {
+		m.RemoveLocator(serverId)
 	}
 }
 
