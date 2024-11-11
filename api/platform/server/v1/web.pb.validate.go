@@ -4949,6 +4949,667 @@ var _ interface {
 	ErrorName() string
 } = AppStorageValidationError{}
 
+// Validate checks the field values on EnableSecureTunnellingRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *EnableSecureTunnellingRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on EnableSecureTunnellingRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// EnableSecureTunnellingRequestMultiError, or nil if none found.
+func (m *EnableSecureTunnellingRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *EnableSecureTunnellingRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return EnableSecureTunnellingRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// EnableSecureTunnellingRequestMultiError is an error wrapping multiple
+// validation errors returned by EnableSecureTunnellingRequest.ValidateAll()
+// if the designated constraints aren't met.
+type EnableSecureTunnellingRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m EnableSecureTunnellingRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m EnableSecureTunnellingRequestMultiError) AllErrors() []error { return m }
+
+// EnableSecureTunnellingRequestValidationError is the validation error
+// returned by EnableSecureTunnellingRequest.Validate if the designated
+// constraints aren't met.
+type EnableSecureTunnellingRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EnableSecureTunnellingRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EnableSecureTunnellingRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EnableSecureTunnellingRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EnableSecureTunnellingRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EnableSecureTunnellingRequestValidationError) ErrorName() string {
+	return "EnableSecureTunnellingRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EnableSecureTunnellingRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEnableSecureTunnellingRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EnableSecureTunnellingRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EnableSecureTunnellingRequestValidationError{}
+
+// Validate checks the field values on EnableSecureTunnellingResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *EnableSecureTunnellingResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on EnableSecureTunnellingResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// EnableSecureTunnellingResponseMultiError, or nil if none found.
+func (m *EnableSecureTunnellingResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *EnableSecureTunnellingResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return EnableSecureTunnellingResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// EnableSecureTunnellingResponseMultiError is an error wrapping multiple
+// validation errors returned by EnableSecureTunnellingResponse.ValidateAll()
+// if the designated constraints aren't met.
+type EnableSecureTunnellingResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m EnableSecureTunnellingResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m EnableSecureTunnellingResponseMultiError) AllErrors() []error { return m }
+
+// EnableSecureTunnellingResponseValidationError is the validation error
+// returned by EnableSecureTunnellingResponse.Validate if the designated
+// constraints aren't met.
+type EnableSecureTunnellingResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EnableSecureTunnellingResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EnableSecureTunnellingResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EnableSecureTunnellingResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EnableSecureTunnellingResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EnableSecureTunnellingResponseValidationError) ErrorName() string {
+	return "EnableSecureTunnellingResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EnableSecureTunnellingResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEnableSecureTunnellingResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EnableSecureTunnellingResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EnableSecureTunnellingResponseValidationError{}
+
+// Validate checks the field values on DisableSecureTunnellingRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DisableSecureTunnellingRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DisableSecureTunnellingRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// DisableSecureTunnellingRequestMultiError, or nil if none found.
+func (m *DisableSecureTunnellingRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DisableSecureTunnellingRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DisableSecureTunnellingRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DisableSecureTunnellingRequestMultiError is an error wrapping multiple
+// validation errors returned by DisableSecureTunnellingRequest.ValidateAll()
+// if the designated constraints aren't met.
+type DisableSecureTunnellingRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DisableSecureTunnellingRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DisableSecureTunnellingRequestMultiError) AllErrors() []error { return m }
+
+// DisableSecureTunnellingRequestValidationError is the validation error
+// returned by DisableSecureTunnellingRequest.Validate if the designated
+// constraints aren't met.
+type DisableSecureTunnellingRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DisableSecureTunnellingRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DisableSecureTunnellingRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DisableSecureTunnellingRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DisableSecureTunnellingRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DisableSecureTunnellingRequestValidationError) ErrorName() string {
+	return "DisableSecureTunnellingRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DisableSecureTunnellingRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDisableSecureTunnellingRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DisableSecureTunnellingRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DisableSecureTunnellingRequestValidationError{}
+
+// Validate checks the field values on DisableSecureTunnellingResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DisableSecureTunnellingResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DisableSecureTunnellingResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// DisableSecureTunnellingResponseMultiError, or nil if none found.
+func (m *DisableSecureTunnellingResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DisableSecureTunnellingResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DisableSecureTunnellingResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DisableSecureTunnellingResponseMultiError is an error wrapping multiple
+// validation errors returned by DisableSecureTunnellingResponse.ValidateAll()
+// if the designated constraints aren't met.
+type DisableSecureTunnellingResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DisableSecureTunnellingResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DisableSecureTunnellingResponseMultiError) AllErrors() []error { return m }
+
+// DisableSecureTunnellingResponseValidationError is the validation error
+// returned by DisableSecureTunnellingResponse.Validate if the designated
+// constraints aren't met.
+type DisableSecureTunnellingResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DisableSecureTunnellingResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DisableSecureTunnellingResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DisableSecureTunnellingResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DisableSecureTunnellingResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DisableSecureTunnellingResponseValidationError) ErrorName() string {
+	return "DisableSecureTunnellingResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DisableSecureTunnellingResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDisableSecureTunnellingResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DisableSecureTunnellingResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DisableSecureTunnellingResponseValidationError{}
+
+// Validate checks the field values on RegisterToLocatorRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RegisterToLocatorRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RegisterToLocatorRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RegisterToLocatorRequestMultiError, or nil if none found.
+func (m *RegisterToLocatorRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RegisterToLocatorRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if err := m._validateHostname(m.GetLocatorAddress()); err != nil {
+		if ip := net.ParseIP(m.GetLocatorAddress()); ip == nil {
+			err := RegisterToLocatorRequestValidationError{
+				field:  "LocatorAddress",
+				reason: "value must be a valid hostname, or ip address",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+	}
+
+	if len(errors) > 0 {
+		return RegisterToLocatorRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+func (m *RegisterToLocatorRequest) _validateHostname(host string) error {
+	s := strings.ToLower(strings.TrimSuffix(host, "."))
+
+	if len(host) > 253 {
+		return errors.New("hostname cannot exceed 253 characters")
+	}
+
+	for _, part := range strings.Split(s, ".") {
+		if l := len(part); l == 0 || l > 63 {
+			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
+		}
+
+		if part[0] == '-' {
+			return errors.New("hostname parts cannot begin with hyphens")
+		}
+
+		if part[len(part)-1] == '-' {
+			return errors.New("hostname parts cannot end with hyphens")
+		}
+
+		for _, r := range part {
+			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
+				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
+			}
+		}
+	}
+
+	return nil
+}
+
+// RegisterToLocatorRequestMultiError is an error wrapping multiple validation
+// errors returned by RegisterToLocatorRequest.ValidateAll() if the designated
+// constraints aren't met.
+type RegisterToLocatorRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RegisterToLocatorRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RegisterToLocatorRequestMultiError) AllErrors() []error { return m }
+
+// RegisterToLocatorRequestValidationError is the validation error returned by
+// RegisterToLocatorRequest.Validate if the designated constraints aren't met.
+type RegisterToLocatorRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegisterToLocatorRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegisterToLocatorRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegisterToLocatorRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegisterToLocatorRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegisterToLocatorRequestValidationError) ErrorName() string {
+	return "RegisterToLocatorRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RegisterToLocatorRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRegisterToLocatorRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegisterToLocatorRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegisterToLocatorRequestValidationError{}
+
+// Validate checks the field values on RegisterToLocatorResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RegisterToLocatorResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RegisterToLocatorResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RegisterToLocatorResponseMultiError, or nil if none found.
+func (m *RegisterToLocatorResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RegisterToLocatorResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ServerId
+
+	if len(errors) > 0 {
+		return RegisterToLocatorResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// RegisterToLocatorResponseMultiError is an error wrapping multiple validation
+// errors returned by RegisterToLocatorResponse.ValidateAll() if the
+// designated constraints aren't met.
+type RegisterToLocatorResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RegisterToLocatorResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RegisterToLocatorResponseMultiError) AllErrors() []error { return m }
+
+// RegisterToLocatorResponseValidationError is the validation error returned by
+// RegisterToLocatorResponse.Validate if the designated constraints aren't met.
+type RegisterToLocatorResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegisterToLocatorResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegisterToLocatorResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegisterToLocatorResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegisterToLocatorResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegisterToLocatorResponseValidationError) ErrorName() string {
+	return "RegisterToLocatorResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RegisterToLocatorResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRegisterToLocatorResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegisterToLocatorResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegisterToLocatorResponseValidationError{}
+
 // Validate checks the field values on Apps with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
 // encountered is returned, or nil if there are no violations.
@@ -5965,6 +6626,35 @@ func (m *DeviceSettings) validate(all bool) error {
 
 	// no validation rules for EnableSsh
 
+	if all {
+		switch v := interface{}(m.GetLocatorSettings()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DeviceSettingsValidationError{
+					field:  "LocatorSettings",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DeviceSettingsValidationError{
+					field:  "LocatorSettings",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLocatorSettings()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeviceSettingsValidationError{
+				field:  "LocatorSettings",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return DeviceSettingsMultiError(errors)
 	}
@@ -6042,6 +6732,256 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeviceSettingsValidationError{}
+
+// Validate checks the field values on LocatorSettings with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *LocatorSettings) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LocatorSettings with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LocatorSettingsMultiError, or nil if none found.
+func (m *LocatorSettings) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LocatorSettings) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	{
+		sorted_keys := make([]string, len(m.GetLocators()))
+		i := 0
+		for key := range m.GetLocators() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetLocators()[key]
+			_ = val
+
+			// no validation rules for Locators[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, LocatorSettingsValidationError{
+							field:  fmt.Sprintf("Locators[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, LocatorSettingsValidationError{
+							field:  fmt.Sprintf("Locators[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return LocatorSettingsValidationError{
+						field:  fmt.Sprintf("Locators[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return LocatorSettingsMultiError(errors)
+	}
+
+	return nil
+}
+
+// LocatorSettingsMultiError is an error wrapping multiple validation errors
+// returned by LocatorSettings.ValidateAll() if the designated constraints
+// aren't met.
+type LocatorSettingsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LocatorSettingsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LocatorSettingsMultiError) AllErrors() []error { return m }
+
+// LocatorSettingsValidationError is the validation error returned by
+// LocatorSettings.Validate if the designated constraints aren't met.
+type LocatorSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LocatorSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LocatorSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LocatorSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LocatorSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LocatorSettingsValidationError) ErrorName() string { return "LocatorSettingsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LocatorSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLocatorSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LocatorSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LocatorSettingsValidationError{}
+
+// Validate checks the field values on Locator with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Locator) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Locator with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in LocatorMultiError, or nil if none found.
+func (m *Locator) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Locator) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ServerId
+
+	// no validation rules for Address
+
+	// no validation rules for WireguardInterface
+
+	if len(errors) > 0 {
+		return LocatorMultiError(errors)
+	}
+
+	return nil
+}
+
+// LocatorMultiError is an error wrapping multiple validation errors returned
+// by Locator.ValidateAll() if the designated constraints aren't met.
+type LocatorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LocatorMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LocatorMultiError) AllErrors() []error { return m }
+
+// LocatorValidationError is the validation error returned by Locator.Validate
+// if the designated constraints aren't met.
+type LocatorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LocatorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LocatorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LocatorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LocatorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LocatorValidationError) ErrorName() string { return "LocatorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LocatorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLocator.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LocatorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LocatorValidationError{}
 
 // Validate checks the field values on DiskStats with the rules defined in the
 // proto definition for this message. If any rules are violated, the first

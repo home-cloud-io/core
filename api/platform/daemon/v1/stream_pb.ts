@@ -6,6 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "./system_pb.js";
+import { WireguardInterface } from "./wireguard_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -70,6 +71,18 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: SettingsSaved;
     case: "settingsSaved";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.WireguardInterfaceAdded wireguard_interface_added = 10;
+     */
+    value: WireguardInterfaceAdded;
+    case: "wireguardInterfaceAdded";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.WireguardInterfaceRemoved wireguard_interface_removed = 11;
+     */
+    value: WireguardInterfaceRemoved;
+    case: "wireguardInterfaceRemoved";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -89,6 +102,8 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 7, name: "upload_file_ready", kind: "message", T: UploadFileReady, oneof: "message" },
     { no: 8, name: "upload_file_chunk_completed", kind: "message", T: UploadFileChunkCompleted, oneof: "message" },
     { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
+    { no: 10, name: "wireguard_interface_added", kind: "message", T: WireguardInterfaceAdded, oneof: "message" },
+    { no: 11, name: "wireguard_interface_removed", kind: "message", T: WireguardInterfaceRemoved, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -211,6 +226,18 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: SaveSettingsCommand;
     case: "saveSettingsCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.AddWireguardInterface add_wireguard_interface = 16;
+     */
+    value: AddWireguardInterface;
+    case: "addWireguardInterface";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.RemoveWireguardInterface remove_wireguard_interface = 17;
+     */
+    value: RemoveWireguardInterface;
+    case: "removeWireguardInterface";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -236,6 +263,8 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 13, name: "initialize_device_command", kind: "message", T: InitializeDeviceCommand, oneof: "message" },
     { no: 14, name: "upload_file_request", kind: "message", T: UploadFileRequest, oneof: "message" },
     { no: 15, name: "save_settings_command", kind: "message", T: SaveSettingsCommand, oneof: "message" },
+    { no: 16, name: "add_wireguard_interface", kind: "message", T: AddWireguardInterface, oneof: "message" },
+    { no: 17, name: "remove_wireguard_interface", kind: "message", T: RemoveWireguardInterface, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -615,6 +644,80 @@ export class SettingsSaved extends Message<SettingsSaved> {
 
   static equals(a: SettingsSaved | PlainMessage<SettingsSaved> | undefined, b: SettingsSaved | PlainMessage<SettingsSaved> | undefined): boolean {
     return proto3.util.equals(SettingsSaved, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.WireguardInterfaceAdded
+ */
+export class WireguardInterfaceAdded extends Message<WireguardInterfaceAdded> {
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
+  constructor(data?: PartialMessage<WireguardInterfaceAdded>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.WireguardInterfaceAdded";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardInterfaceAdded {
+    return new WireguardInterfaceAdded().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WireguardInterfaceAdded {
+    return new WireguardInterfaceAdded().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WireguardInterfaceAdded {
+    return new WireguardInterfaceAdded().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WireguardInterfaceAdded | PlainMessage<WireguardInterfaceAdded> | undefined, b: WireguardInterfaceAdded | PlainMessage<WireguardInterfaceAdded> | undefined): boolean {
+    return proto3.util.equals(WireguardInterfaceAdded, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.WireguardInterfaceRemoved
+ */
+export class WireguardInterfaceRemoved extends Message<WireguardInterfaceRemoved> {
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
+  constructor(data?: PartialMessage<WireguardInterfaceRemoved>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.WireguardInterfaceRemoved";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardInterfaceRemoved {
+    return new WireguardInterfaceRemoved().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WireguardInterfaceRemoved {
+    return new WireguardInterfaceRemoved().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WireguardInterfaceRemoved {
+    return new WireguardInterfaceRemoved().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WireguardInterfaceRemoved | PlainMessage<WireguardInterfaceRemoved> | undefined, b: WireguardInterfaceRemoved | PlainMessage<WireguardInterfaceRemoved> | undefined): boolean {
+    return proto3.util.equals(WireguardInterfaceRemoved, a, b);
   }
 }
 
@@ -1283,13 +1386,13 @@ export class FileDone extends Message<FileDone> {
  */
 export class SaveSettingsCommand extends Message<SaveSettingsCommand> {
   /**
-   * time_zone must be a valid TZ identifier from: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-   *
    * @generated from field: string admin_password = 1;
    */
   adminPassword = "";
 
   /**
+   * time_zone must be a valid TZ identifier from: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+   *
    * @generated from field: string time_zone = 2;
    */
   timeZone = "";
@@ -1332,6 +1435,80 @@ export class SaveSettingsCommand extends Message<SaveSettingsCommand> {
 
   static equals(a: SaveSettingsCommand | PlainMessage<SaveSettingsCommand> | undefined, b: SaveSettingsCommand | PlainMessage<SaveSettingsCommand> | undefined): boolean {
     return proto3.util.equals(SaveSettingsCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.AddWireguardInterface
+ */
+export class AddWireguardInterface extends Message<AddWireguardInterface> {
+  /**
+   * @generated from field: platform.daemon.v1.WireguardInterface interface = 1;
+   */
+  interface?: WireguardInterface;
+
+  constructor(data?: PartialMessage<AddWireguardInterface>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.AddWireguardInterface";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "interface", kind: "message", T: WireguardInterface },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddWireguardInterface {
+    return new AddWireguardInterface().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AddWireguardInterface {
+    return new AddWireguardInterface().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AddWireguardInterface {
+    return new AddWireguardInterface().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AddWireguardInterface | PlainMessage<AddWireguardInterface> | undefined, b: AddWireguardInterface | PlainMessage<AddWireguardInterface> | undefined): boolean {
+    return proto3.util.equals(AddWireguardInterface, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.RemoveWireguardInterface
+ */
+export class RemoveWireguardInterface extends Message<RemoveWireguardInterface> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  constructor(data?: PartialMessage<RemoveWireguardInterface>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.RemoveWireguardInterface";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RemoveWireguardInterface {
+    return new RemoveWireguardInterface().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RemoveWireguardInterface {
+    return new RemoveWireguardInterface().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RemoveWireguardInterface {
+    return new RemoveWireguardInterface().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RemoveWireguardInterface | PlainMessage<RemoveWireguardInterface> | undefined, b: RemoveWireguardInterface | PlainMessage<RemoveWireguardInterface> | undefined): boolean {
+    return proto3.util.equals(RemoveWireguardInterface, a, b);
   }
 }
 
