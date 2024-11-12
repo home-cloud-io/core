@@ -105,7 +105,7 @@ func (c *client) Listen() {
 			c.logger.WithError(err).Error("stream failure")
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(5 * time.Second)
 		retries++
 	}
 }
