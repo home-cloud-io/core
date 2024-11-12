@@ -35,16 +35,16 @@ type (
 		// AddLocator will start a background connection to the given Locator and will serve up connection
 		// information to locate requests from that Locator on the given interface. The Locator connection
 		// can be killed by calling RemoveLocator or RemoveAll
-		AddLocator(ctx context.Context, locatorAddress string, wgInterface string) error
+		AddLocator(ctx context.Context, locatorAddress string, wgInterface string) (id string, err error)
 		// RemoveLocator will remove a background Locator connection that was started through Load or
 		// AddLocator and will delete it from blueprint.
-		RemoveLocator(ctx context.Context, serverId string) error
+		RemoveLocator(ctx context.Context, locatorAddress string, serverId string) error
 		// Disable will remove all background Locator connections and delete them from blueprint.
 		Disable(ctx context.Context) error
 	}
 	controller struct {
 		logger chassis.Logger
-		// map of unique serverId to locator
+		// map of unique keys ("serverId@locatorAddress") to locator
 		locators map[string]locator
 	}
 	locator struct {
@@ -90,7 +90,7 @@ func (m *controller) Load() {
 
 		// save locator information in memory
 		ctx, cancel := context.WithCancel(context.Background())
-		m.locators[l.ServerId] = locator{
+		m.locators[locatorKey(l.Address, l.ServerId)] = locator{
 			serverId: l.ServerId,
 			address:  l.Address,
 			cancel:   cancel,
@@ -102,47 +102,46 @@ func (m *controller) Load() {
 
 }
 
-func (m *controller) AddLocator(ctx context.Context, locatorAddress string, wgInterface string) error {
-
-	// check if locator already exists in blueprint and reject if so
-	settings := &sv1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		return err
-	}
-	settings.LocatorSettings.Enabled = true
-	if settings.LocatorSettings.Locators == nil {
-		settings.LocatorSettings.Locators = make(map[string]*sv1.Locator)
-	}
-	for _, l := range settings.LocatorSettings.Locators {
-		if l.Address == locatorAddress && l.WireguardInterface == wgInterface {
-			return fmt.Errorf("requested locator with the same interface name is already registered")
-		}
-	}
+func (m *controller) AddLocator(ctx context.Context, locatorAddress string, wgInterface string) (string, error) {
 
 	// get the server's wireguard wgConfig
 	wgConfig := &dv1.WireguardConfig{}
-	err = kvclient.Get(ctx, kvclient.WIREGUARD_CONFIG_KEY, wgConfig)
+	err := kvclient.Get(ctx, kvclient.WIREGUARD_CONFIG_KEY, wgConfig)
 	if err != nil {
 		m.logger.WithError(err).Error("failed to get wireguard config")
-		return err
+		return "", err
 	}
 
 	// make sure the underlying wireguard interface exists
 	inf, ok := wgConfig.Interfaces[wgInterface]
 	if !ok {
-		return fmt.Errorf("failed to get wireguard interface from config")
+		return "", fmt.Errorf("failed to get wireguard interface from config")
+	}
+
+	// check if locator already exists in blueprint and reject if so
+	settings := &sv1.DeviceSettings{}
+	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return "", err
+	}
+	settings.LocatorSettings.Enabled = true
+	if settings.LocatorSettings.Locators == nil {
+		settings.LocatorSettings.Locators = make(map[string]*sv1.Locator)
+	}
+	_, ok = settings.LocatorSettings.Locators[locatorKey(locatorAddress, inf.Id)]
+	if ok {
+		return "", fmt.Errorf("requested locator with the same interface name is already registered")
 	}
 
 	// make sure the locator connection doesn't already exist
-	_, ok = m.locators[inf.Id]
+	_, ok = m.locators[locatorKey(locatorAddress, inf.Id)]
 	if ok {
-		return fmt.Errorf("the requested locator address is already in use")
+		return "", fmt.Errorf("the requested locator address is already in use")
 	}
 
 	// save locator information in memory
 	ctx, cancel := context.WithCancel(context.Background())
-	m.locators[inf.Id] = locator{
+	m.locators[locatorKey(locatorAddress, inf.Id)] = locator{
 		serverId: inf.Id,
 		address:  locatorAddress,
 		cancel:   cancel,
@@ -152,26 +151,26 @@ func (m *controller) AddLocator(ctx context.Context, locatorAddress string, wgIn
 	go connectToLocator(ctx, m.logger, locatorAddress, inf.Id, inf.Name)
 
 	// save locator to blueprint
-	settings.LocatorSettings.Locators[inf.Id] = &sv1.Locator{
+	settings.LocatorSettings.Locators[locatorKey(locatorAddress, inf.Id)] = &sv1.Locator{
 		ServerId:           inf.Id,
 		Address:            locatorAddress,
 		WireguardInterface: inf.Name,
 	}
 	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
-		return fmt.Errorf("failed to save settings")
+		return "", fmt.Errorf("failed to save settings")
 	}
 
-	return nil
+	return inf.Id, nil
 }
 
-func (m *controller) RemoveLocator(ctx context.Context, serverId string) error {
-	l, ok := m.locators[serverId]
+func (m *controller) RemoveLocator(ctx context.Context, locatorAddress string, serverId string) error {
+	l, ok := m.locators[locatorKey(locatorAddress, serverId)]
 	if !ok {
 		return fmt.Errorf("locator not found in current connections")
 	}
 	l.cancel()
-	delete(m.locators, serverId)
+	delete(m.locators, locatorKey(locatorAddress, serverId))
 
 	// delete from blueprint
 	settings := &sv1.DeviceSettings{}
@@ -179,7 +178,7 @@ func (m *controller) RemoveLocator(ctx context.Context, serverId string) error {
 	if err != nil {
 		return err
 	}
-	delete(settings.LocatorSettings.Locators, serverId)
+	delete(settings.LocatorSettings.Locators, locatorKey(locatorAddress, serverId))
 	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
 		return fmt.Errorf("failed to save settings")
@@ -189,8 +188,8 @@ func (m *controller) RemoveLocator(ctx context.Context, serverId string) error {
 }
 
 func (m *controller) Disable(ctx context.Context) error {
-	for serverId, _ := range m.locators {
-		err := m.RemoveLocator(ctx, serverId)
+	for _, l := range m.locators {
+		err := m.RemoveLocator(ctx, l.address, l.serverId)
 		if err != nil {
 			return err
 		}
@@ -375,6 +374,10 @@ func parseConfig(c *dv1.WireguardInterface) (config WireGuardConfig, err error) 
 	}
 
 	return config, nil
+}
+
+func locatorKey(locatorAddress, serverId string) string {
+	return fmt.Sprintf("%s@%s", serverId, locatorAddress)
 }
 
 // TODO: replace with secure client and only use this one when running locally during development

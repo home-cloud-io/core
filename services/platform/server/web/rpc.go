@@ -16,6 +16,8 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type (
@@ -358,21 +360,28 @@ func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *conne
 }
 
 func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
-	h.logger.Info("registering to locator")
+	h.logger.WithField("msg", request.Msg).Info("registering to locator")
 
-	err := h.lctl.AddLocator(ctx, request.Msg.LocatorAddress, system.DefaultWireguardInterface)
+	if err := request.Msg.ValidateAll(); err != nil {
+		h.logger.WithError(err).Error("invalid request")
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	id, err := h.lctl.AddLocator(ctx, request.Msg.LocatorAddress, system.DefaultWireguardInterface)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to add locator")
 		return nil, fmt.Errorf("failed to add locator")
 	}
 
-	return connect.NewResponse(&v1.RegisterToLocatorResponse{}), nil
+	return connect.NewResponse(&v1.RegisterToLocatorResponse{
+		ServerId: id,
+	}), nil
 }
 
 func (h *rpcHandler) DeregisterFromLocator(ctx context.Context, request *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error) {
 	h.logger.Info("deregistering from locator")
 
-	err := h.lctl.RemoveLocator(ctx, request.Msg.ServerId)
+	err := h.lctl.RemoveLocator(ctx, request.Msg.LocatorAddress, request.Msg.ServerId)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to remove locator")
 		return nil, fmt.Errorf("failed to remove locator")
