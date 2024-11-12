@@ -5,7 +5,13 @@ import {
   useRestartHostMutation,
   useGetDeviceSettingsQuery,
   useSetDeviceSettingsMutation,
+  useEnableSecureTunnellingMutation,
+  useDisableSecureTunnellingMutation,
+  useRegisterToLocatorMutation,
+  useDeregisterFromLocatorMutation,
 } from '../../services/web_rpc';
+import Button from 'react-bootstrap/Button';
+import Dropdown from 'react-bootstrap/Dropdown';
 import { useState, useEffect } from 'react';
 
 import Toast from 'react-bootstrap/Toast';
@@ -16,6 +22,10 @@ export default function SettingsPage() {
   const [shutdownHost, shutdownResult] = useShutdownHostMutation();
   const [restartHost, restartResult] = useRestartHostMutation();
   const [saveSettings, result] = useSetDeviceSettingsMutation();
+  const [enableSecureTunnelling] = useEnableSecureTunnellingMutation();
+  const [disableSecureTunnelling] = useDisableSecureTunnellingMutation();
+  const [registerToLocator] = useRegisterToLocatorMutation();
+  const [deregisterFromLocator] = useDeregisterFromLocatorMutation();
   const { data, error, isLoading } = useGetDeviceSettingsQuery();
 
   // TODO: make this way better
@@ -28,52 +38,26 @@ export default function SettingsPage() {
     return <div>Error: {error.message}</div>;
   }
 
-  const headerStyles = {
-    paddingTop: '.75rem',
-    paddingBottom: '1rem',
-  };
-
   return (
     <div>
       <div className="my-3 p-3 bg-body rounded shadow-sm">
         <div className="float-end">
           <div className="dropdown">
-            <button
-              className="btn btn-secondary dropdown-toggle"
-              type="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                className="bi bi-power"
-                viewBox="0 0 16 16"
-              >
-                <path d="M7.5 1v7h1V1z" />
-                <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812" />
-              </svg>
-            </button>
-            <ul className="dropdown-menu">
-              <li>
-                <a className="dropdown-item" onClick={() => shutdownHost()}>
+            <Dropdown>
+              <Dropdown.Toggle variant="danger" id="dropdown-basic">
+                Power
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => shutdownHost()}>
                   Shutdown
-                </a>
-              </li>
-              <li>
-                <a className="dropdown-item" onClick={() => restartHost()}>
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => restartHost()}>
                   Restart
-                </a>
-              </li>
-            </ul>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
         </div>
-
-        <h6 className="border-bottom" style={headerStyles}>
-          Server Settings
-        </h6>
 
         {isLoading ? (
           <p>Loading...</p>
@@ -81,7 +65,25 @@ export default function SettingsPage() {
           <p>Error: {error.message}</p>
         ) : (
           <div>
-            <DeviceSettings settings={data} saveSettings={saveSettings} disable={result.isLoading} />
+            <h4 className="header border-bottom">
+              <b>Server Settings</b>
+            </h4>
+            <DeviceSettings
+              settings={data}
+              saveSettings={saveSettings}
+              disable={result.isLoading}
+            />
+            <h4 className="header border-bottom">
+              <b>On the Go Settings</b>
+            </h4>
+            <OnTheGoSettings
+              settings={data}
+              enableSecureTunnelling={enableSecureTunnelling}
+              disableSecureTunnelling={disableSecureTunnelling}
+              registerToLocator={registerToLocator}
+              deregisterFromLocator={deregisterFromLocator}
+              disable={result.isLoading}
+            />
           </div>
         )}
       </div>
@@ -122,9 +124,9 @@ function DeviceSettings({ settings, saveSettings, disable }) {
     setAutoUpdateApps(settings.autoUpdateApps);
     setAutoUpdateOs(settings.autoUpdateOs);
     setUsername(settings.adminUser.username);
-    setEnableSsh(settings.enableSsh)
+    setEnableSsh(settings.enableSsh);
     if (settings.trustedSshKeys) {
-      setSshKeys(settings.trustedSshKeys)
+      setSshKeys(settings.trustedSshKeys);
     }
   }, [settings]);
 
@@ -190,7 +192,7 @@ function DeviceSettings({ settings, saveSettings, disable }) {
       keys = [];
     }
     setSshKeys(keys);
-  }
+  };
 
   return (
     <div className="tab-pane fade show active">
@@ -313,7 +315,7 @@ function DeviceSettings({ settings, saveSettings, disable }) {
           </div>
         </div>
 
-        { enableSsh &&
+        {enableSsh && (
           <div className="col-12">
             <label className="form-check-label">
               Input trusted SSH keys one per line (optional)
@@ -324,14 +326,69 @@ function DeviceSettings({ settings, saveSettings, disable }) {
                   rows="5"
                   value={sshKeys.join('\n')}
                   onChange={(e) => handleSshKeyChange(e)}
-                  />
+                />
               </div>
             </label>
           </div>
-        }
+        )}
 
         <SubmitButton text="Save" loading={disable} onClick={handleSubmit} />
       </form>
+    </div>
+  );
+}
+
+function OnTheGoSettings({
+  settings,
+  enableSecureTunnelling,
+  disableSecureTunnelling,
+  registerToLocator,
+  deregisterFromLocator,
+  disable,
+}) {
+  const [enableOnTheGo, setEnableOnTheGo] = useState(false);
+  const [locators, setLocators] = useState([]);
+
+  // effect runs on component mount
+  useEffect(() => {
+    if (settings.locatorSettings) {
+      setEnableOnTheGo(settings.locatorSettings.enabled);
+      if (settings.locatorSettings.locators) {
+        setLocators(
+          Object.keys(settings.locatorSettings.locators).map(
+            (k) => settings.locatorSettings.locators[k].address
+          )
+        );
+      }
+    }
+  }, [settings]);
+
+  const handleEnable = () => {
+    enableSecureTunnelling();
+    setEnableOnTheGo(true);
+  };
+
+  const handleDisable = () => {
+    disableSecureTunnelling();
+    setEnableOnTheGo(false);
+  };
+
+  return (
+    <div>
+      <div>
+        <div>
+          {!enableOnTheGo && (
+            <Button onClick={() => handleEnable()}>Enable</Button>
+          )}
+          {enableOnTheGo && (
+            <Button variant="warning" onClick={() => handleDisable()}>
+              Disable
+            </Button>
+          )}
+        </div>
+
+        <div>{enableOnTheGo && <p>Registered Locators: {locators}</p>}</div>
+      </div>
     </div>
   );
 }

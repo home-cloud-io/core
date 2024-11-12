@@ -11,9 +11,7 @@ export const store = configureStore({
     [serverRPCService.reducerPath]: serverRPCService.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([
-      serverRPCService.middleware,
-    ]),
-})
+    getDefaultMiddleware().concat([serverRPCService.middleware]),
+});
 
-setupListeners(store.dispatch)
+setupListeners(store.dispatch);

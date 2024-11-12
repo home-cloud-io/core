@@ -5,7 +5,6 @@ import { WebService } from 'api/platform/server/v1/web_connect';
 import { setUserSettings } from './user_slice';
 import * as Config from '../utils/config';
 
-
 export const web_service_transport = createConnectTransport({
   baseUrl: Config.BASE_URL,
 });
@@ -22,21 +21,21 @@ export const serverRPCService = createApi({
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
       ) {
-        console.log("setting up events cache")
+        console.log('setting up events cache');
         try {
           // wait for the initial query to resolve before proceeding
-          await cacheDataLoaded
+          await cacheDataLoaded;
 
-          const listen = async function(){
+          const listen = async function () {
             try {
               // when data is received from the stream to the server,
               // if it is a message and for the appropriate channel,
               // update our query result with the received message
               for await (const event of client.subscribe({})) {
                 // ignore heartbeats
-                if (event.event.case === "heartbeat") {
-                  console.log("heartbeat")
-                  continue
+                if (event.event.case === 'heartbeat') {
+                  console.log('heartbeat');
+                  continue;
                 }
 
                 const data = event.toJson();
@@ -45,18 +44,18 @@ export const serverRPCService = createApi({
                 });
               }
             } catch (err) {
-              console.warn("stream failed")
+              console.warn('stream failed');
             }
-          }
-          listen()
-          console.log("listening to event stream")
+          };
+          listen();
+          console.log('listening to event stream');
         } catch (err) {
           // no-op in case `cacheEntryRemoved` resolves before `cacheDataLoaded`,
           // in which case `cacheDataLoaded` will throw
-          console.warn("subscription failed for cache: ", err)
+          console.warn('subscription failed for cache: ', err);
         }
         // cacheEntryRemoved will resolve when the cache subscription is no longer active
-        await cacheEntryRemoved
+        await cacheEntryRemoved;
         // perform cleanup steps once the `cacheEntryRemoved` promise resolves
         // client.close()
       },
@@ -82,13 +81,13 @@ export const serverRPCService = createApi({
       },
     }),
     installApp: builder.mutation({
-      queryFn: async ({app}) => {
+      queryFn: async ({ app }) => {
         const req = {
-            repo: 'home-cloud-io.github.io/store',
-            chart: app.name,
-            release: `${app.name}`,
-            version: app.version,
-        }
+          repo: 'home-cloud-io.github.io/store',
+          chart: app.name,
+          release: `${app.name}`,
+          version: app.version,
+        };
 
         try {
           const res = await client.installApp(req);
@@ -151,6 +150,46 @@ export const serverRPCService = createApi({
         }
       },
     }),
+    enableSecureTunnelling: builder.mutation({
+      queryFn: async (req) => {
+        try {
+          const res = await client.enableSecureTunnelling(req);
+          return {};
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
+      },
+    }),
+    disableSecureTunnelling: builder.mutation({
+      queryFn: async (req) => {
+        try {
+          const res = await client.disableSecureTunnelling(req);
+          return {};
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
+      },
+    }),
+    registerToLocator: builder.mutation({
+      queryFn: async (req) => {
+        try {
+          const res = await client.registerToLocator(req);
+          return {};
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
+      },
+    }),
+    deregisterFromLocator: builder.mutation({
+      queryFn: async (req) => {
+        try {
+          const res = await client.deregisterFromLocator(req);
+          return {};
+        } catch (error) {
+          return { error: error.rawMessage };
+        }
+      },
+    }),
     login: builder.mutation({
       queryFn: async (req, store) => {
         try {
@@ -170,7 +209,7 @@ export const serverRPCService = createApi({
           const resInstalled = await client.appsHealthCheck({});
           const resStore = await client.getAppsInStore({});
 
-          const apps = []
+          const apps = [];
           for (const storeApp of resStore.apps) {
             let app = {
               name: storeApp.name,
@@ -183,7 +222,7 @@ export const serverRPCService = createApi({
             for (const installedApp of resInstalled.checks) {
               if (storeApp.name === installedApp.name) {
                 app.installed = true;
-                break
+                break;
               }
             }
             apps.push(app);
@@ -247,6 +286,10 @@ export const {
   useGetIsDeviceSetupQuery,
   useInitDeviceMutation,
   useSetDeviceSettingsMutation,
+  useEnableSecureTunnellingMutation,
+  useDisableSecureTunnellingMutation,
+  useRegisterToLocatorMutation,
+  useDeregisterFromLocatorMutation,
   useLoginMutation,
   useGetAppStoreEntitiesQuery,
   useGetAppsHealthCheckQuery,

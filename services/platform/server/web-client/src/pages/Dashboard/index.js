@@ -1,15 +1,15 @@
-import * as React from "react";
-import { Routes, Route } from "react-router-dom";
+import * as React from 'react';
+import { Routes, Route } from 'react-router-dom';
 
-import Login from "../Login";
-import DefaultLayout from "../DefaultLayout";
-import DeviceOnboardPage from "../Device/Onboard";
-import AppStorePage from "../AppStore";
-import HomePage from "../Home";
-import SettingsPage from "../Settings";
-import UploadPage from "../Upload";
+import DefaultLayout from '../DefaultLayout';
+import DeviceOnboardPage from '../Device/Onboard';
+import AppStorePage from '../AppStore';
+import HomePage from '../Home';
+import SettingsPage from '../Settings';
+import UploadPage from '../Upload';
+import Button from 'react-bootstrap/Button';
 
-import {useGetIsDeviceSetupQuery} from "../../services/web_rpc";
+import { useGetIsDeviceSetupQuery } from '../../services/web_rpc';
 
 export default function DashboardPage() {
   const { data, error, isLoading } = useGetIsDeviceSetupQuery();
@@ -25,7 +25,7 @@ export default function DashboardPage() {
   }
 
   // if the device is not setup, redirect to the onboarding page
-  if (!isLoading && data.isDeviceSetup === false) {
+  if (data.isDeviceSetup === false) {
     // TODO: refine this to use the react-router-dom redirect if possible
     window.history.pushState({}, '', '/getting-started');
     return <DeviceOnboardPage />;
@@ -34,15 +34,14 @@ export default function DashboardPage() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<DefaultLayout />} >
+        <Route path="/" element={<DefaultLayout />}>
           <Route path="home" element={<HomePage />} />
           <Route path="store" element={<AppStorePage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="upload" element={<UploadPage />} />
         </Route>
 
-        <Route path="getting-started" element={<DeviceOnboardPage/>} />
-        <Route path="login" element={<Login/>} />
+        <Route path="getting-started" element={<DeviceOnboardPage />} />
       </Routes>
     </>
   );

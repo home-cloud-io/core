@@ -9,7 +9,7 @@ export function SubmitButton({ text, loading, onClick }) {
       {callback && (
         <input
           style={{ float: 'right' }}
-          className="btn btn-outline-primary"
+          className="btn btn-primary"
           type="submit"
           value={text}
           disabled={loading}
@@ -19,7 +19,7 @@ export function SubmitButton({ text, loading, onClick }) {
       {!callback && (
         <input
           style={{ float: 'right' }}
-          className="btn btn-outline-primary"
+          className="btn btn-primary"
           type="submit"
           value={text}
           disabled={loading}

@@ -1,34 +1,38 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate, redirect } from 'react-router-dom';
-
+import Button from 'react-bootstrap/Button';
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
+import { setUser } from '../../services/web_slice';
+import {
+  useInitDeviceMutation,
+  useGetIsDeviceSetupQuery,
+} from '../../services/web_rpc';
 
-import { setUser } from "../../services/web_slice";
-import { useInitDeviceMutation, useGetIsDeviceSetupQuery } from "../../services/web_rpc";
-
-import "./DeviceOnboard.css";
+const logo = require('../../assets/logo.png');
 
 function Welcome({ navigate }) {
   return (
     <div className="tab-pane fade show active">
-      <h3>Welcome to Home Cloud!</h3>
-      <p>The easy-to-use solution that enables you to say goodbye to the high-cost, privacy nightmare of Big Tech services so that you can finally take back control over your digital life!</p>
+      <img className="center-img" src={logo} width={106} height={58} />
+      <h3 className="center">Welcome to Home Cloud!</h3>
+      <p className="center">
+        We'll walk you through a couple simple steps to get started. You'll be
+        up and running in just a couple of minutes!
+      </p>
 
       <div className="col-12">
-        <button 
-          style={{float:"right"}}
-          className="btn btn-outline-primary"
-          type="button"
-          onClick={() => navigate(1)}>Next</button>
+        <Button style={{ float: 'right' }} onClick={() => navigate(1)}>
+          Get Started
+        </Button>
       </div>
     </div>
   );
 }
 
-function UserSetup({ navigate, setUsername, setPassword, username, password}) {
+function UserSetup({ navigate, setUsername, setPassword, username, password }) {
   const dispatch = useDispatch();
   const [isFormDirty, setFormDirty] = useState(false);
   const [isUsernameValid, setUsernameValidity] = useState(false);
@@ -61,7 +65,7 @@ function UserSetup({ navigate, setUsername, setPassword, username, password}) {
     } else {
       return;
     }
-  }
+  };
 
   const handleUsernameChange = (e) => {
     e.preventDefault();
@@ -73,8 +77,8 @@ function UserSetup({ navigate, setUsername, setPassword, username, password}) {
       setUsernameValidity(false);
     } else {
       setUsernameValidity(true);
-    } 
-  }
+    }
+  };
 
   const handlePasswordChange = (e) => {
     e.preventDefault();
@@ -87,64 +91,98 @@ function UserSetup({ navigate, setUsername, setPassword, username, password}) {
     } else {
       setPasswordValidity(true);
     }
-  }
+  };
 
   return (
     <div className="tab-pane fade show active">
-      <p>Setup the default administrative user. Don't worry you can always change it later.</p>
+      <p>
+        Setup the default administrative user. Don't worry you can always change
+        it later.
+      </p>
       <form className="row g-3 needs-validation">
-          <div className="col-12">
-            <label className="form-label" htmlFor="usernameValidation">Username</label>
-            <input
-              id="usernameValidation"
-              className={`form-control ${isFormDirty ? (isUsernameValid ? "is-valid" : "is-invalid") : ""}`}
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={e => handleUsernameChange(e)}
-              required />
+        <div className="col-12">
+          <label className="form-label" htmlFor="usernameValidation">
+            Username
+          </label>
+          <input
+            id="usernameValidation"
+            className={`form-control ${
+              isFormDirty ? (isUsernameValid ? 'is-valid' : 'is-invalid') : ''
+            }`}
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => handleUsernameChange(e)}
+            required
+          />
 
-            <div className={`invalid-feedback ${isFormDirty ? (isUsernameValid ? "d-none" : "") : ""}`}>Username must be at least 4 characters long</div>
+          <div
+            className={`invalid-feedback ${
+              isFormDirty ? (isUsernameValid ? 'd-none' : '') : ''
+            }`}
+          >
+            Username must be at least 4 characters long
           </div>
+        </div>
 
-          <div className="col-12">
-            <input
-              className={`form-control ${isFormDirty ? (isPasswordValid ? "is-valid" : "is-invalid") : ""}`}
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={e => handlePasswordChange(e)} />
+        <div className="col-12">
+          <input
+            className={`form-control ${
+              isFormDirty ? (isPasswordValid ? 'is-valid' : 'is-invalid') : ''
+            }`}
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => handlePasswordChange(e)}
+          />
 
-            <div className={`invalid-feedback ${isFormDirty ? (isPasswordValid ? "d-none" : ""): ""}`}>Password must be at least 4 characters long</div>
+          <div
+            className={`invalid-feedback ${
+              isFormDirty ? (isPasswordValid ? 'd-none' : '') : ''
+            }`}
+          >
+            Password must be at least 4 characters long
           </div>
+        </div>
 
-          <div className="col-12">
-            <button 
-              style={{float:"left"}}
-              className="btn btn-outline-primary"
-              type="button"
-              onClick={() => navigate(0)}>Back</button>
+        <div className="col-12">
+          <Button
+            style={{ float: 'left' }}
+            variant="secondary"
+            onClick={() => navigate(0)}
+          >
+            Back
+          </Button>
 
-            <button 
-              style={{float:"right"}}
-              className="btn btn-outline-primary"
-              type="button"
-              onClick={(evt) => handleSubmit(evt)}>Next</button>
-          </div>
-
+          <Button
+            style={{ float: 'right' }}
+            onClick={(evt) => handleSubmit(evt)}
+          >
+            Next
+          </Button>
+        </div>
       </form>
     </div>
   );
 }
 
-function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApps, setAutoUpdateOs, timezone, autoUpdateApps, autoUpdateOs }) {
+function DeviceSettings({
+  navigate,
+  useInitDevice,
+  setTimezone,
+  setAutoUpdateApps,
+  setAutoUpdateOs,
+  timezone,
+  autoUpdateApps,
+  autoUpdateOs,
+}) {
   const [isFormDirty, setFormDirty] = useState(false);
   const [isTimezoneValid, setTimezoneValidity] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     useInitDevice();
-  }
+  };
 
   const handleSetTimezone = (e) => {
     e.preventDefault();
@@ -152,79 +190,101 @@ function DeviceSettings({ navigate, useInitDevice, setTimezone, setAutoUpdateApp
     setFormDirty(true);
     setTimezone(timezone);
 
-    if (timezone === "NONE") {
+    if (timezone === 'NONE') {
       setTimezoneValidity(false);
     } else {
       setTimezoneValidity(true);
     }
-  }
+  };
 
   return (
     <div className="tab-pane fade show active">
       <p>Configure the server</p>
 
       <form className="row g-3">
-        <div className="col-12"> 
+        <div className="col-12">
           <select
-            className={`form-select ${isFormDirty ? (isTimezoneValid ? "is-valid" : "is-invalid"): ""}`}
+            className={`form-select ${
+              isFormDirty ? (isTimezoneValid ? 'is-valid' : 'is-invalid') : ''
+            }`}
             value={timezone}
-            onChange={e => handleSetTimezone(e)}>
-              <option disabled value="NONE">Select a timezone...</option>
-              <option value="America/New_York">Eastern (US)</option>
-              <option value="America/Chicago">Central (US)</option>
-              <option value="America/Denver">Mountain (US)</option>
-              <option value="America/Los_Angeles">Pacific (US)</option>
+            onChange={(e) => handleSetTimezone(e)}
+          >
+            <option disabled value="NONE">
+              Select a timezone...
+            </option>
+            <option value="America/New_York">Eastern (US)</option>
+            <option value="America/Chicago">Central (US)</option>
+            <option value="America/Denver">Mountain (US)</option>
+            <option value="America/Los_Angeles">Pacific (US)</option>
           </select>
 
-          <div className={`invalid-feedback ${isFormDirty ? (isTimezoneValid? "d-none" : ""): ""}`}>Please select a valid timezone</div>
-        </div> 
-
-        <div className="col-12">
-          {/* TODO: enable this when it's configurable later on */}
-          <div className="form-check form-switch form-check-reverse" hidden={true}>
-            <input 
-              className="form-check-input"
-              type="checkbox"
-              role="switch"
-              value="true"
-              checked={autoUpdateApps}
-              onChange={e => setAutoUpdateApps(e.target.value)}/>
-            <label className="form-check-label">Automatically update applications</label>
+          <div
+            className={`invalid-feedback ${
+              isFormDirty ? (isTimezoneValid ? 'd-none' : '') : ''
+            }`}
+          >
+            Please select a valid timezone
           </div>
         </div>
 
         <div className="col-12">
           {/* TODO: enable this when it's configurable later on */}
-          <div className="form-check form-switch form-check-reverse" hidden={true}>
+          <div
+            className="form-check form-switch form-check-reverse"
+            hidden={true}
+          >
+            <input
+              className="form-check-input"
+              type="checkbox"
+              role="switch"
+              value="true"
+              checked={autoUpdateApps}
+              onChange={(e) => setAutoUpdateApps(e.target.value)}
+            />
+            <label className="form-check-label">
+              Automatically update applications
+            </label>
+          </div>
+        </div>
+
+        <div className="col-12">
+          {/* TODO: enable this when it's configurable later on */}
+          <div
+            className="form-check form-switch form-check-reverse"
+            hidden={true}
+          >
             <input
               className="form-check-input"
               type="checkbox"
               role="switch"
               value="true"
               checked={autoUpdateOs}
-              onChange={e => setAutoUpdateOs(e.target.value)} />
-            <label className="form-check-label">Automatically update server</label>
+              onChange={(e) => setAutoUpdateOs(e.target.value)}
+            />
+            <label className="form-check-label">
+              Automatically update server
+            </label>
           </div>
         </div>
 
         <div className="col-12">
-          <button 
-            style={{float:"left"}}
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={() => navigate(1)}>Back</button>
+          <Button
+            variant="secondary"
+            style={{ float: 'left' }}
+            onClick={() => navigate(1)}
+          >
+            Back
+          </Button>
 
-          <button 
-            style={{float:"right"}}
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={e => handleSubmit(e)}>Next</button>
+          <Button style={{ float: 'right' }} onClick={(e) => handleSubmit(e)}>
+            Finish
+          </Button>
         </div>
-
       </form>
     </div>
   );
-} 
+}
 
 export default function DeviceOnboardPage() {
   const navigate = useNavigate();
@@ -232,9 +292,9 @@ export default function DeviceOnboardPage() {
   const { data, error, isLoading, refetch } = useGetIsDeviceSetupQuery();
 
   const [pageNum, setValue] = useState(0);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [timezone, setTimezone] = useState("NONE");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [timezone, setTimezone] = useState('NONE');
   const [autoUpdateApps, setAutoUpdateApps] = useState(true);
   const [autoUpdateOs, setAutoUpdateOs] = useState(true);
 
@@ -244,42 +304,55 @@ export default function DeviceOnboardPage() {
         navigate('/store');
       }
     }
-  })
+  });
 
   const handleClick = (val) => setValue(val);
 
   const initServer = () => {
-      const res = initDevice({
-        username: username,
-        password: password,
-        timezone: timezone,
-        autoUpdateApps: autoUpdateApps,
-        autoUpdateOs: autoUpdateOs,
-      })
-      refetch()
-  }
+    const res = initDevice({
+      username: username,
+      password: password,
+      timezone: timezone,
+      autoUpdateApps: autoUpdateApps,
+      autoUpdateOs: autoUpdateOs,
+    });
+    refetch();
+  };
 
   return (
     <div>
-
       <div className="container card shadow d-flex justify-content-center">
         <div className="tab-content" id="pills-tabContent p-3">
-          {pageNum == 0 && <Welcome navigate={handleClick}/>}
-          {pageNum == 1 && <UserSetup navigate={handleClick} setUsername={setUsername} setPassword={setPassword} username={username} password={password} />}
-          {pageNum == 2 && <DeviceSettings
-            navigate={handleClick}
-            useInitDevice={initServer}
-            setTimezone={setTimezone}
-            setAutoUpdateApps={setAutoUpdateApps} 
-            setAutoUpdateOs={setAutoUpdateOs}
-            timezone={timezone}
-            autoUpdateApps={autoUpdateApps}
-            autoUpdateOs={autoUpdateOs} 
-            />}
+          {pageNum == 0 && <Welcome navigate={handleClick} />}
+          {pageNum == 1 && (
+            <UserSetup
+              navigate={handleClick}
+              setUsername={setUsername}
+              setPassword={setPassword}
+              username={username}
+              password={password}
+            />
+          )}
+          {pageNum == 2 && (
+            <DeviceSettings
+              navigate={handleClick}
+              useInitDevice={initServer}
+              setTimezone={setTimezone}
+              setAutoUpdateApps={setAutoUpdateApps}
+              setAutoUpdateOs={setAutoUpdateOs}
+              timezone={timezone}
+              autoUpdateApps={autoUpdateApps}
+              autoUpdateOs={autoUpdateOs}
+            />
+          )}
         </div>
       </div>
 
-      <ToastContainer className="p-3" position="bottom-center" style={{zIndex: 1}}>
+      <ToastContainer
+        className="p-3"
+        position="bottom-center"
+        style={{ zIndex: 1 }}
+      >
         <Toast show={result.isError} onClose={() => result.reset()}>
           <Toast.Header>
             <strong className="me-auto">Server Error</strong>
@@ -288,7 +361,6 @@ export default function DeviceOnboardPage() {
           <Toast.Body>{result.error}</Toast.Body>
         </Toast>
       </ToastContainer>
-
     </div>
   );
 }
