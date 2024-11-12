@@ -15,7 +15,7 @@ require (
 	github.com/containers/image/v5 v5.32.2
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.4.22
+	github.com/home-cloud-io/core/api v0.4.23
 	github.com/home-cloud-io/core/services/platform/operator v0.0.2
 	github.com/netbirdio/netbird v0.30.3
 	github.com/robfig/cron/v3 v3.0.0
@@ -27,6 +27,7 @@ require (
 	golang.org/x/net v0.30.0
 	golang.org/x/sync v0.8.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
+	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 	k8s.io/api v0.30.3
 	k8s.io/apimachinery v0.30.3
@@ -151,7 +152,6 @@ require (
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
-	google.golang.org/grpc v1.65.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
