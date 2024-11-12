@@ -249,6 +249,9 @@ func (h *rpcHandler) InitializeDevice(ctx context.Context, request *connect.Requ
 		Timezone:       msg.GetTimezone(),
 		AutoUpdateApps: msg.GetAutoUpdateApps(),
 		AutoUpdateOs:   msg.GetAutoUpdateOs(),
+		LocatorSettings: &v1.LocatorSettings{
+			Enabled: false,
+		},
 	}
 
 	err := h.sctl.InitializeDevice(ctx, h.logger, deviceSettings)
@@ -338,11 +341,14 @@ func (h *rpcHandler) EnableSecureTunnelling(ctx context.Context, request *connec
 func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error) {
 	h.logger.Info("disabling secure tunnelling")
 
-	// remove all locator connections first
-	h.lctl.RemoveAll()
+	// disable locater controller (which closes all active connections)
+	err := h.lctl.Disable(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	// now, disable wireguard on the host system
-	err := h.sctl.DisableWireguard(ctx, h.logger)
+	err = h.sctl.DisableWireguard(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to disable secure tunnelling")
 		return nil, errors.New("failed to disable secure tunnelling")
@@ -361,6 +367,18 @@ func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Req
 	}
 
 	return connect.NewResponse(&v1.RegisterToLocatorResponse{}), nil
+}
+
+func (h *rpcHandler) DeregisterFromLocator(ctx context.Context, request *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error) {
+	h.logger.Info("deregistering from locator")
+
+	err := h.lctl.RemoveLocator(ctx, request.Msg.ServerId)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to remove locator")
+		return nil, fmt.Errorf("failed to remove locator")
+	}
+
+	return connect.NewResponse(&v1.DeregisterFromLocatorResponse{}), nil
 }
 
 func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {

@@ -481,6 +481,21 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 		return err
 	}
 
+	// enable feature in blueprint
+	settings := &v1.DeviceSettings{}
+	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return err
+	}
+	settings.LocatorSettings = &v1.LocatorSettings{
+		Enabled:  true,
+		Locators: make(map[string]*v1.Locator),
+	}
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return fmt.Errorf("failed to save settings")
+	}
+
 	return nil
 }
 

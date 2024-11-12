@@ -38,9 +38,9 @@ type (
 		AddLocator(ctx context.Context, locatorAddress string, wgInterface string) error
 		// RemoveLocator will remove a background Locator connection that was started through Load or
 		// AddLocator and will delete it from blueprint.
-		RemoveLocator(serverId string)
-		// RemoveAll will remove all background Locator connections and delete them from blueprint.
-		RemoveAll()
+		RemoveLocator(ctx context.Context, serverId string) error
+		// Disable will remove all background Locator connections and delete them from blueprint.
+		Disable(ctx context.Context) error
 	}
 	controller struct {
 		logger chassis.Logger
@@ -72,7 +72,8 @@ func (m *controller) Load() {
 	settings := &sv1.DeviceSettings{}
 	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
-		panic(err)
+		m.logger.WithError(err).Warn("faied to get device settings when loading locators")
+		return
 	}
 
 	// nothing to do if there are no locator settings
@@ -109,10 +110,9 @@ func (m *controller) AddLocator(ctx context.Context, locatorAddress string, wgIn
 	if err != nil {
 		return err
 	}
-	if settings.LocatorSettings == nil {
-		settings.LocatorSettings = &sv1.LocatorSettings{
-			Locators: make(map[string]*sv1.Locator),
-		}
+	settings.LocatorSettings.Enabled = true
+	if settings.LocatorSettings.Locators == nil {
+		settings.LocatorSettings.Locators = make(map[string]*sv1.Locator)
 	}
 	for _, l := range settings.LocatorSettings.Locators {
 		if l.Address == locatorAddress && l.WireguardInterface == wgInterface {
@@ -165,19 +165,50 @@ func (m *controller) AddLocator(ctx context.Context, locatorAddress string, wgIn
 	return nil
 }
 
-func (m *controller) RemoveLocator(serverId string) {
+func (m *controller) RemoveLocator(ctx context.Context, serverId string) error {
 	l, ok := m.locators[serverId]
 	if !ok {
-		return
+		return fmt.Errorf("locator not found in current connections")
 	}
 	l.cancel()
 	delete(m.locators, serverId)
+
+	// delete from blueprint
+	settings := &sv1.DeviceSettings{}
+	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return err
+	}
+	delete(settings.LocatorSettings.Locators, serverId)
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return fmt.Errorf("failed to save settings")
+	}
+
+	return nil
 }
 
-func (m *controller) RemoveAll() {
+func (m *controller) Disable(ctx context.Context) error {
 	for serverId, _ := range m.locators {
-		m.RemoveLocator(serverId)
+		err := m.RemoveLocator(ctx, serverId)
+		if err != nil {
+			return err
+		}
 	}
+
+	// disable feature in blueprint
+	settings := &sv1.DeviceSettings{}
+	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return err
+	}
+	settings.LocatorSettings.Enabled = false
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return fmt.Errorf("failed to save settings")
+	}
+
+	return nil
 }
 
 func connectToLocator(ctx context.Context, logger chassis.Logger, locatorAddress, serverId, wgInterface string) {
