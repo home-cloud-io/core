@@ -499,6 +499,25 @@ export const RegisterToLocatorResponse = proto3.makeMessageType(
 );
 
 /**
+ * @generated from message platform.server.v1.DeregisterFromLocatorRequest
+ */
+export const DeregisterFromLocatorRequest = proto3.makeMessageType(
+  "platform.server.v1.DeregisterFromLocatorRequest",
+  () => [
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DeregisterFromLocatorResponse
+ */
+export const DeregisterFromLocatorResponse = proto3.makeMessageType(
+  "platform.server.v1.DeregisterFromLocatorResponse",
+  [],
+);
+
+/**
  * @generated from message platform.server.v1.Apps
  */
 export const Apps = proto3.makeMessageType(
@@ -620,6 +639,7 @@ export const DeviceSettings = proto3.makeMessageType(
 export const LocatorSettings = proto3.makeMessageType(
   "platform.server.v1.LocatorSettings",
   () => [
+    { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "locators", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Locator} },
   ],
 );

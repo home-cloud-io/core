@@ -1916,6 +1916,80 @@ export class RegisterToLocatorResponse extends Message<RegisterToLocatorResponse
 }
 
 /**
+ * @generated from message platform.server.v1.DeregisterFromLocatorRequest
+ */
+export class DeregisterFromLocatorRequest extends Message<DeregisterFromLocatorRequest> {
+  /**
+   * @generated from field: string locator_address = 1;
+   */
+  locatorAddress = "";
+
+  /**
+   * @generated from field: string server_id = 2;
+   */
+  serverId = "";
+
+  constructor(data?: PartialMessage<DeregisterFromLocatorRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DeregisterFromLocatorRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeregisterFromLocatorRequest {
+    return new DeregisterFromLocatorRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeregisterFromLocatorRequest {
+    return new DeregisterFromLocatorRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeregisterFromLocatorRequest {
+    return new DeregisterFromLocatorRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeregisterFromLocatorRequest | PlainMessage<DeregisterFromLocatorRequest> | undefined, b: DeregisterFromLocatorRequest | PlainMessage<DeregisterFromLocatorRequest> | undefined): boolean {
+    return proto3.util.equals(DeregisterFromLocatorRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DeregisterFromLocatorResponse
+ */
+export class DeregisterFromLocatorResponse extends Message<DeregisterFromLocatorResponse> {
+  constructor(data?: PartialMessage<DeregisterFromLocatorResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DeregisterFromLocatorResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeregisterFromLocatorResponse {
+    return new DeregisterFromLocatorResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeregisterFromLocatorResponse {
+    return new DeregisterFromLocatorResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeregisterFromLocatorResponse {
+    return new DeregisterFromLocatorResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeregisterFromLocatorResponse | PlainMessage<DeregisterFromLocatorResponse> | undefined, b: DeregisterFromLocatorResponse | PlainMessage<DeregisterFromLocatorResponse> | undefined): boolean {
+    return proto3.util.equals(DeregisterFromLocatorResponse, a, b);
+  }
+}
+
+/**
  * @generated from message platform.server.v1.Apps
  */
 export class Apps extends Message<Apps> {
@@ -2385,6 +2459,11 @@ export class DeviceSettings extends Message<DeviceSettings> {
  */
 export class LocatorSettings extends Message<LocatorSettings> {
   /**
+   * @generated from field: bool enabled = 1;
+   */
+  enabled = false;
+
+  /**
    * locators is a map of unique Home Cloud server IDs to locators the server will connect to
    * This map structure enables a Home Cloud server to connect with the same Locator server multiple times
    * in order to share multiple different Wireguard tunnels (interfaces). For example, the server could use one tunnel
@@ -2402,6 +2481,7 @@ export class LocatorSettings extends Message<LocatorSettings> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.server.v1.LocatorSettings";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "locators", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Locator} },
   ]);
 

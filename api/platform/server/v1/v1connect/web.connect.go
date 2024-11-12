@@ -93,6 +93,9 @@ const (
 	// WebServiceRegisterToLocatorProcedure is the fully-qualified name of the WebService's
 	// RegisterToLocator RPC.
 	WebServiceRegisterToLocatorProcedure = "/platform.server.v1.WebService/RegisterToLocator"
+	// WebServiceDeregisterFromLocatorProcedure is the fully-qualified name of the WebService's
+	// DeregisterFromLocator RPC.
+	WebServiceDeregisterFromLocatorProcedure = "/platform.server.v1.WebService/DeregisterFromLocator"
 	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
 	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
 )
@@ -122,6 +125,7 @@ var (
 	webServiceEnableSecureTunnellingMethodDescriptor   = webServiceServiceDescriptor.Methods().ByName("EnableSecureTunnelling")
 	webServiceDisableSecureTunnellingMethodDescriptor  = webServiceServiceDescriptor.Methods().ByName("DisableSecureTunnelling")
 	webServiceRegisterToLocatorMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("RegisterToLocator")
+	webServiceDeregisterFromLocatorMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("DeregisterFromLocator")
 	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
 )
 
@@ -171,6 +175,8 @@ type WebServiceClient interface {
 	DisableSecureTunnelling(context.Context, *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error)
 	// Register the server with the given Locator service
 	RegisterToLocator(context.Context, *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error)
+	// Deregister the server from the given Locator service
+	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
 }
@@ -317,6 +323,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceRegisterToLocatorMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		deregisterFromLocator: connect.NewClient[v1.DeregisterFromLocatorRequest, v1.DeregisterFromLocatorResponse](
+			httpClient,
+			baseURL+WebServiceDeregisterFromLocatorProcedure,
+			connect.WithSchema(webServiceDeregisterFromLocatorMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		subscribe: connect.NewClient[v1.SubscribeRequest, v1.ServerEvent](
 			httpClient,
 			baseURL+WebServiceSubscribeProcedure,
@@ -350,6 +362,7 @@ type webServiceClient struct {
 	enableSecureTunnelling   *connect.Client[v1.EnableSecureTunnellingRequest, v1.EnableSecureTunnellingResponse]
 	disableSecureTunnelling  *connect.Client[v1.DisableSecureTunnellingRequest, v1.DisableSecureTunnellingResponse]
 	registerToLocator        *connect.Client[v1.RegisterToLocatorRequest, v1.RegisterToLocatorResponse]
+	deregisterFromLocator    *connect.Client[v1.DeregisterFromLocatorRequest, v1.DeregisterFromLocatorResponse]
 	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
 }
 
@@ -463,6 +476,11 @@ func (c *webServiceClient) RegisterToLocator(ctx context.Context, req *connect.R
 	return c.registerToLocator.CallUnary(ctx, req)
 }
 
+// DeregisterFromLocator calls platform.server.v1.WebService.DeregisterFromLocator.
+func (c *webServiceClient) DeregisterFromLocator(ctx context.Context, req *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error) {
+	return c.deregisterFromLocator.CallUnary(ctx, req)
+}
+
 // Subscribe calls platform.server.v1.WebService.Subscribe.
 func (c *webServiceClient) Subscribe(ctx context.Context, req *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error) {
 	return c.subscribe.CallServerStream(ctx, req)
@@ -514,6 +532,8 @@ type WebServiceHandler interface {
 	DisableSecureTunnelling(context.Context, *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error)
 	// Register the server with the given Locator service
 	RegisterToLocator(context.Context, *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error)
+	// Deregister the server from the given Locator service
+	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
 }
@@ -656,6 +676,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceRegisterToLocatorMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceDeregisterFromLocatorHandler := connect.NewUnaryHandler(
+		WebServiceDeregisterFromLocatorProcedure,
+		svc.DeregisterFromLocator,
+		connect.WithSchema(webServiceDeregisterFromLocatorMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	webServiceSubscribeHandler := connect.NewServerStreamHandler(
 		WebServiceSubscribeProcedure,
 		svc.Subscribe,
@@ -708,6 +734,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceDisableSecureTunnellingHandler.ServeHTTP(w, r)
 		case WebServiceRegisterToLocatorProcedure:
 			webServiceRegisterToLocatorHandler.ServeHTTP(w, r)
+		case WebServiceDeregisterFromLocatorProcedure:
+			webServiceDeregisterFromLocatorHandler.ServeHTTP(w, r)
 		case WebServiceSubscribeProcedure:
 			webServiceSubscribeHandler.ServeHTTP(w, r)
 		default:
@@ -805,6 +833,10 @@ func (UnimplementedWebServiceHandler) DisableSecureTunnelling(context.Context, *
 
 func (UnimplementedWebServiceHandler) RegisterToLocator(context.Context, *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.RegisterToLocator is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.DeregisterFromLocator is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {

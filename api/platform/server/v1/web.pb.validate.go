@@ -35,6 +35,9 @@ var (
 	_ = sort.Sort
 )
 
+// define the regex for a UUID once up-front
+var _web_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
 // Validate checks the field values on ShutdownHostRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -5383,51 +5386,10 @@ func (m *RegisterToLocatorRequest) validate(all bool) error {
 
 	var errors []error
 
-	if err := m._validateHostname(m.GetLocatorAddress()); err != nil {
-		if ip := net.ParseIP(m.GetLocatorAddress()); ip == nil {
-			err := RegisterToLocatorRequestValidationError{
-				field:  "LocatorAddress",
-				reason: "value must be a valid hostname, or ip address",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-	}
+	// no validation rules for LocatorAddress
 
 	if len(errors) > 0 {
 		return RegisterToLocatorRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-func (m *RegisterToLocatorRequest) _validateHostname(host string) error {
-	s := strings.ToLower(strings.TrimSuffix(host, "."))
-
-	if len(host) > 253 {
-		return errors.New("hostname cannot exceed 253 characters")
-	}
-
-	for _, part := range strings.Split(s, ".") {
-		if l := len(part); l == 0 || l > 63 {
-			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
-		}
-
-		if part[0] == '-' {
-			return errors.New("hostname parts cannot begin with hyphens")
-		}
-
-		if part[len(part)-1] == '-' {
-			return errors.New("hostname parts cannot end with hyphens")
-		}
-
-		for _, r := range part {
-			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
-			}
-		}
 	}
 
 	return nil
@@ -5528,10 +5490,28 @@ func (m *RegisterToLocatorResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for ServerId
+	if err := m._validateUuid(m.GetServerId()); err != nil {
+		err = RegisterToLocatorResponseValidationError{
+			field:  "ServerId",
+			reason: "value must be a valid UUID",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if len(errors) > 0 {
 		return RegisterToLocatorResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+func (m *RegisterToLocatorResponse) _validateUuid(uuid string) error {
+	if matched := _web_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
 	}
 
 	return nil
@@ -5609,6 +5589,234 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RegisterToLocatorResponseValidationError{}
+
+// Validate checks the field values on DeregisterFromLocatorRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeregisterFromLocatorRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeregisterFromLocatorRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeregisterFromLocatorRequestMultiError, or nil if none found.
+func (m *DeregisterFromLocatorRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeregisterFromLocatorRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for LocatorAddress
+
+	if err := m._validateUuid(m.GetServerId()); err != nil {
+		err = DeregisterFromLocatorRequestValidationError{
+			field:  "ServerId",
+			reason: "value must be a valid UUID",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return DeregisterFromLocatorRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+func (m *DeregisterFromLocatorRequest) _validateUuid(uuid string) error {
+	if matched := _web_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// DeregisterFromLocatorRequestMultiError is an error wrapping multiple
+// validation errors returned by DeregisterFromLocatorRequest.ValidateAll() if
+// the designated constraints aren't met.
+type DeregisterFromLocatorRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeregisterFromLocatorRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeregisterFromLocatorRequestMultiError) AllErrors() []error { return m }
+
+// DeregisterFromLocatorRequestValidationError is the validation error returned
+// by DeregisterFromLocatorRequest.Validate if the designated constraints
+// aren't met.
+type DeregisterFromLocatorRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeregisterFromLocatorRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeregisterFromLocatorRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeregisterFromLocatorRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeregisterFromLocatorRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeregisterFromLocatorRequestValidationError) ErrorName() string {
+	return "DeregisterFromLocatorRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeregisterFromLocatorRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeregisterFromLocatorRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeregisterFromLocatorRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeregisterFromLocatorRequestValidationError{}
+
+// Validate checks the field values on DeregisterFromLocatorResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeregisterFromLocatorResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeregisterFromLocatorResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// DeregisterFromLocatorResponseMultiError, or nil if none found.
+func (m *DeregisterFromLocatorResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeregisterFromLocatorResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeregisterFromLocatorResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeregisterFromLocatorResponseMultiError is an error wrapping multiple
+// validation errors returned by DeregisterFromLocatorResponse.ValidateAll()
+// if the designated constraints aren't met.
+type DeregisterFromLocatorResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeregisterFromLocatorResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeregisterFromLocatorResponseMultiError) AllErrors() []error { return m }
+
+// DeregisterFromLocatorResponseValidationError is the validation error
+// returned by DeregisterFromLocatorResponse.Validate if the designated
+// constraints aren't met.
+type DeregisterFromLocatorResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeregisterFromLocatorResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeregisterFromLocatorResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeregisterFromLocatorResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeregisterFromLocatorResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeregisterFromLocatorResponseValidationError) ErrorName() string {
+	return "DeregisterFromLocatorResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeregisterFromLocatorResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeregisterFromLocatorResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeregisterFromLocatorResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeregisterFromLocatorResponseValidationError{}
 
 // Validate checks the field values on Apps with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
@@ -6754,6 +6962,8 @@ func (m *LocatorSettings) validate(all bool) error {
 	}
 
 	var errors []error
+
+	// no validation rules for Enabled
 
 	{
 		sorted_keys := make([]string, len(m.GetLocators()))

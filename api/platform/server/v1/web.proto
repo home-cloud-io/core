@@ -52,6 +52,8 @@ service WebService {
   rpc DisableSecureTunnelling(DisableSecureTunnellingRequest) returns (DisableSecureTunnellingResponse) {}
   // Register the server with the given Locator service
   rpc RegisterToLocator(RegisterToLocatorRequest) returns (RegisterToLocatorResponse) {}
+  // Deregister the server from the given Locator service
+  rpc DeregisterFromLocator(DeregisterFromLocatorRequest) returns (DeregisterFromLocatorResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
@@ -231,12 +233,18 @@ message DisableSecureTunnellingRequest {}
 message DisableSecureTunnellingResponse {}
 
 message RegisterToLocatorRequest {
-  string locator_address = 1 [(validate.rules).string.address = true];
+  string locator_address = 1;
   // TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
 }
 message RegisterToLocatorResponse {
-  string server_id = 1;
+  string server_id = 1 [(validate.rules).string.uuid = true];
 }
+
+message DeregisterFromLocatorRequest {
+  string locator_address = 1;
+  string server_id = 2 [(validate.rules).string.uuid = true];
+}
+message DeregisterFromLocatorResponse {}
 
 //////////////////////////////////////////////////////////////////////////
 // MODELS
@@ -313,6 +321,7 @@ message DeviceSettings {
 }
 
 message LocatorSettings {
+  bool enabled = 1;
   // locators is a map of unique Home Cloud server IDs to locators the server will connect to
   // This map structure enables a Home Cloud server to connect with the same Locator server multiple times
   // in order to share multiple different Wireguard tunnels (interfaces). For example, the server could use one tunnel
