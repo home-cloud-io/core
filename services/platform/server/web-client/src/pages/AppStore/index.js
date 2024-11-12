@@ -79,10 +79,6 @@ function StoreEntry({ events = [], app }) {
     paddingLeft: '2rem',
   };
 
-  const btnStyles = {
-    marginTop: '-2.5rem',
-  };
-
   return (
     <div className="d-flex text-body-secondary pt-3">
       <div>

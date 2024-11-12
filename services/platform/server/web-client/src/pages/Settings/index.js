@@ -13,7 +13,6 @@ import {
 import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useState, useEffect } from 'react';
-
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 import { SubmitButton } from '../../elements/buttons';
@@ -198,6 +197,7 @@ function DeviceSettings({ settings, saveSettings, disable }) {
     <div className="tab-pane fade show active">
       <form className="row g-3">
         <div className="col-12">
+          <label className="form-label">Timezone</label>
           <select
             className={`form-select ${
               isFormDirty ? (isTimezoneValid ? 'is-valid' : 'is-invalid') : ''
@@ -224,7 +224,7 @@ function DeviceSettings({ settings, saveSettings, disable }) {
 
         <div className="col-12">
           <label className="form-label" htmlFor="usernameValidation">
-            Username
+            User
           </label>
           <input
             id="usernameValidation"
@@ -268,69 +268,61 @@ function DeviceSettings({ settings, saveSettings, disable }) {
         </div>
 
         <div className="col-12">
-          <div className="form-check form-switch form-check-reverse">
+          <label className="form-label">Updates</label>
+          <div className="form-check form-switch">
             <label className="form-check-label">
               Automatically update applications
-              <input
-                className="form-check-input"
-                type="checkbox"
-                role="switch"
-                value="autoUpdateApps"
-                checked={autoUpdateApps ? true : false}
-                onChange={() => setAutoUpdateApps(!autoUpdateApps)}
-              />
             </label>
+            <input
+              className="form-check-input"
+              type="checkbox"
+              role="switch"
+              value="autoUpdateApps"
+              checked={autoUpdateApps ? true : false}
+              onChange={() => setAutoUpdateApps(!autoUpdateApps)}
+            />
           </div>
-        </div>
-
-        <div className="col-12">
-          <div className="form-check form-switch form-check-reverse">
+          <div className="form-check form-switch">
             <label className="form-check-label">
               Automatically update server
-              <input
-                className="form-check-input"
-                type="checkbox"
-                role="switch"
-                value="autoUpdateOs"
-                checked={autoUpdateOs ? true : false}
-                onChange={() => setAutoUpdateOs(!autoUpdateOs)}
-              />
             </label>
+            <input
+              className="form-check-input"
+              type="checkbox"
+              role="switch"
+              value="autoUpdateOs"
+              checked={autoUpdateOs ? true : false}
+              onChange={() => setAutoUpdateOs(!autoUpdateOs)}
+            />
           </div>
         </div>
 
         <div className="col-12">
-          <div className="form-check form-switch form-check-reverse">
-            <label className="form-check-label">
-              Enable SSH access
-              <input
-                className="form-check-input"
-                type="checkbox"
-                role="switch"
-                value="enableSsh"
-                checked={enableSsh ? true : false}
-                onChange={() => setEnableSsh(!enableSsh)}
+          <label className="form-label">SSH</label>
+          <div className="form-check form-switch">
+            <label className="form-check-label">Enable SSH access</label>
+            <input
+              className="form-check-input"
+              type="checkbox"
+              role="switch"
+              value="enableSsh"
+              checked={enableSsh ? true : false}
+              onChange={() => setEnableSsh(!enableSsh)}
+            />
+          </div>
+          {enableSsh && (
+            <div>
+              <label className="form-check-label">
+                Input trusted SSH keys one per line (optional)
+              </label>
+              <textarea
+                className="form-textarea textarea-fill"
+                value={sshKeys.join('\n')}
+                onChange={(e) => handleSshKeyChange(e)}
               />
-            </label>
-          </div>
+            </div>
+          )}
         </div>
-
-        {enableSsh && (
-          <div className="col-12">
-            <label className="form-check-label">
-              Input trusted SSH keys one per line (optional)
-              <div>
-                <textarea
-                  className="form-textarea"
-                  cols="40"
-                  rows="5"
-                  value={sshKeys.join('\n')}
-                  onChange={(e) => handleSshKeyChange(e)}
-                />
-              </div>
-            </label>
-          </div>
-        )}
 
         <SubmitButton text="Save" loading={disable} onClick={handleSubmit} />
       </form>
@@ -347,6 +339,9 @@ function OnTheGoSettings({
   disable,
 }) {
   const [enableOnTheGo, setEnableOnTheGo] = useState(false);
+  const [locatorToAdd, setlocatorToAdd] = useState(
+    'https://locator.home-cloud.io'
+  );
   const [locators, setLocators] = useState([]);
 
   // effect runs on component mount
@@ -356,7 +351,7 @@ function OnTheGoSettings({
       if (settings.locatorSettings.locators) {
         setLocators(
           Object.keys(settings.locatorSettings.locators).map(
-            (k) => settings.locatorSettings.locators[k].address
+            (k) => settings.locatorSettings.locators[k]
           )
         );
       }
@@ -371,6 +366,41 @@ function OnTheGoSettings({
   const handleDisable = () => {
     disableSecureTunnelling();
     setEnableOnTheGo(false);
+    setLocators([]);
+  };
+
+  const handleRegister = async () => {
+    const { data, error } = await registerToLocator({
+      locatorAddress: locatorToAdd,
+    });
+    if (error) {
+      console.error(error);
+    } else {
+      setLocators((locators) => [
+        ...locators,
+        {
+          address: locatorToAdd,
+          serverId: data.serverId,
+          wireguardInterface: 'wg0',
+        },
+      ]);
+    }
+  };
+
+  const handleDeregister = ({ locator }) => {
+    setLocators(
+      locators.filter(function (l) {
+        return l.address != locator.address || l.serverId != locator.serverId;
+      })
+    );
+    deregisterFromLocator({
+      locatorAddress: locator.address,
+      serverId: locator.serverId,
+    });
+  };
+
+  const handleLocatorChange = (e) => {
+    setlocatorToAdd(e.target.value);
   };
 
   return (
@@ -378,16 +408,80 @@ function OnTheGoSettings({
       <div>
         <div>
           {!enableOnTheGo && (
-            <Button onClick={() => handleEnable()}>Enable</Button>
+            <div className="d-flex pt-4">
+              <Button onClick={() => handleEnable()}>Enable</Button>
+            </div>
           )}
           {enableOnTheGo && (
-            <Button variant="warning" onClick={() => handleDisable()}>
-              Disable
-            </Button>
+            <div>
+              <div className="d-flex pt-4">
+                <Button variant="warning" onClick={() => handleDisable()}>
+                  Disable
+                </Button>
+              </div>
+              <div className="d-flex pt-4">
+                <label className="form-check-label">
+                  Add Locator servers:
+                  <div className="d-flex">
+                    <input
+                      style={{ width: '300px' }}
+                      type="text"
+                      placeholder="Locator address"
+                      value={locatorToAdd}
+                      onChange={(e) => handleLocatorChange(e)}
+                      required
+                    />
+                    <Button variant="success" onClick={() => handleRegister()}>
+                      Add
+                    </Button>
+                  </div>
+                </label>
+              </div>
+            </div>
           )}
         </div>
 
-        <div>{enableOnTheGo && <p>Registered Locators: {locators}</p>}</div>
+        <div className="card">
+          {enableOnTheGo && (
+            <div className="border-bottom">Locator Servers:</div>
+          )}
+          {enableOnTheGo &&
+            locators.map((locator, index) => {
+              return (
+                <LocatorCard
+                  key={index}
+                  locator={locator}
+                  handle={handleDeregister}
+                />
+              );
+            })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LocatorCard({ locator, handle }) {
+  const rowStyles = {
+    paddingLeft: '2rem',
+  };
+
+  return (
+    <div className="d-flex text-body-secondary pt-4">
+      <div
+        className="pb-3 mb-0 small lh-sm border-bottom w-100 position-relative"
+        style={rowStyles}
+      >
+        <div className="d-flex justify-content-between">
+          <div className="text-gray-dark">
+            <strong>Server: </strong> {locator.address}
+            <br />
+            <strong>Identifier: </strong> {locator.serverId}
+          </div>
+          <Button variant="danger" onClick={() => handle({ locator })}>
+            Remove
+          </Button>
+        </div>
       </div>
     </div>
   );

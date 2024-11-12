@@ -41,6 +41,12 @@ a.active {
   text-align: center;
 }
 
+/* for trusted ssh keys */
+.textarea-fill {
+  width: 100%;
+  height: 100%;
+}
+
 .center-img {
   display: block;
   margin-left: auto;

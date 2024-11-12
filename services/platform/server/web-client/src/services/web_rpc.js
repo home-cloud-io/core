@@ -174,7 +174,7 @@ export const serverRPCService = createApi({
       queryFn: async (req) => {
         try {
           const res = await client.registerToLocator(req);
-          return {};
+          return { data: res.toJson() };
         } catch (error) {
           return { error: error.rawMessage };
         }
