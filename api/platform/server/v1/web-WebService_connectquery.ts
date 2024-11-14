@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
  * Shutdown the host machine running Home Cloud
@@ -369,6 +369,22 @@ export const deregisterFromLocator = {
   kind: MethodKind.Unary,
   I: DeregisterFromLocatorRequest,
   O: DeregisterFromLocatorResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * RegisterPeer is used to connect a client to the home-cloud overlate network
+ *
+ * @generated from rpc platform.server.v1.WebService.RegisterPeer
+ */
+export const registerPeer = {
+  localName: "registerPeer",
+  name: "RegisterPeer",
+  kind: MethodKind.Unary,
+  I: RegisterPeerRequest,
+  O: RegisterPeerResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

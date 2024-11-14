@@ -98,6 +98,8 @@ const (
 	WebServiceDeregisterFromLocatorProcedure = "/platform.server.v1.WebService/DeregisterFromLocator"
 	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
 	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
+	// WebServiceRegisterPeerProcedure is the fully-qualified name of the WebService's RegisterPeer RPC.
+	WebServiceRegisterPeerProcedure = "/platform.server.v1.WebService/RegisterPeer"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -127,6 +129,7 @@ var (
 	webServiceRegisterToLocatorMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("RegisterToLocator")
 	webServiceDeregisterFromLocatorMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("DeregisterFromLocator")
 	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
+	webServiceRegisterPeerMethodDescriptor             = webServiceServiceDescriptor.Methods().ByName("RegisterPeer")
 )
 
 // WebServiceClient is a client for the platform.server.v1.WebService service.
@@ -179,6 +182,8 @@ type WebServiceClient interface {
 	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
+	// RegisterPeer is used to connect a client to the home-cloud overlate network
+	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
 }
 
 // NewWebServiceClient constructs a client for the platform.server.v1.WebService service. By
@@ -335,6 +340,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceSubscribeMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		registerPeer: connect.NewClient[v1.RegisterPeerRequest, v1.RegisterPeerResponse](
+			httpClient,
+			baseURL+WebServiceRegisterPeerProcedure,
+			connect.WithSchema(webServiceRegisterPeerMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -364,6 +375,7 @@ type webServiceClient struct {
 	registerToLocator        *connect.Client[v1.RegisterToLocatorRequest, v1.RegisterToLocatorResponse]
 	deregisterFromLocator    *connect.Client[v1.DeregisterFromLocatorRequest, v1.DeregisterFromLocatorResponse]
 	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
+	registerPeer             *connect.Client[v1.RegisterPeerRequest, v1.RegisterPeerResponse]
 }
 
 // ShutdownHost calls platform.server.v1.WebService.ShutdownHost.
@@ -486,6 +498,11 @@ func (c *webServiceClient) Subscribe(ctx context.Context, req *connect.Request[v
 	return c.subscribe.CallServerStream(ctx, req)
 }
 
+// RegisterPeer calls platform.server.v1.WebService.RegisterPeer.
+func (c *webServiceClient) RegisterPeer(ctx context.Context, req *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
+	return c.registerPeer.CallUnary(ctx, req)
+}
+
 // WebServiceHandler is an implementation of the platform.server.v1.WebService service.
 type WebServiceHandler interface {
 	// Shutdown the host machine running Home Cloud
@@ -536,6 +553,8 @@ type WebServiceHandler interface {
 	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
+	// RegisterPeer is used to connect a client to the home-cloud overlate network
+	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
 }
 
 // NewWebServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -688,6 +707,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceSubscribeMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceRegisterPeerHandler := connect.NewUnaryHandler(
+		WebServiceRegisterPeerProcedure,
+		svc.RegisterPeer,
+		connect.WithSchema(webServiceRegisterPeerMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.server.v1.WebService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case WebServiceShutdownHostProcedure:
@@ -738,6 +763,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceDeregisterFromLocatorHandler.ServeHTTP(w, r)
 		case WebServiceSubscribeProcedure:
 			webServiceSubscribeHandler.ServeHTTP(w, r)
+		case WebServiceRegisterPeerProcedure:
+			webServiceRegisterPeerHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -841,4 +868,8 @@ func (UnimplementedWebServiceHandler) DeregisterFromLocator(context.Context, *co
 
 func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.Subscribe is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.RegisterPeer is not implemented"))
 }

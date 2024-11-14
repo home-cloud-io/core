@@ -19,6 +19,27 @@ export const AppStatus = proto3.makeEnum(
 );
 
 /**
+ * @generated from message platform.server.v1.RegisterPeerRequest
+ */
+export const RegisterPeerRequest = proto3.makeMessageType(
+  "platform.server.v1.RegisterPeerRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.RegisterPeerResponse
+ */
+export const RegisterPeerResponse = proto3.makeMessageType(
+  "platform.server.v1.RegisterPeerResponse",
+  () => [
+    { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
  * @generated from message platform.server.v1.ShutdownHostRequest
  */
 export const ShutdownHostRequest = proto3.makeMessageType(

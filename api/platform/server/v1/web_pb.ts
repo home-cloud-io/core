@@ -34,6 +34,92 @@ proto3.util.setEnumType(AppStatus, "platform.server.v1.AppStatus", [
 ]);
 
 /**
+ * @generated from message platform.server.v1.RegisterPeerRequest
+ */
+export class RegisterPeerRequest extends Message<RegisterPeerRequest> {
+  constructor(data?: PartialMessage<RegisterPeerRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.RegisterPeerRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterPeerRequest {
+    return new RegisterPeerRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterPeerRequest {
+    return new RegisterPeerRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterPeerRequest {
+    return new RegisterPeerRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RegisterPeerRequest | PlainMessage<RegisterPeerRequest> | undefined, b: RegisterPeerRequest | PlainMessage<RegisterPeerRequest> | undefined): boolean {
+    return proto3.util.equals(RegisterPeerRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.RegisterPeerResponse
+ */
+export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
+  /**
+   * @generated from field: string private_key = 1;
+   */
+  privateKey = "";
+
+  /**
+   * @generated from field: string public_key = 2;
+   */
+  publicKey = "";
+
+  /**
+   * @generated from field: string server_id = 3;
+   */
+  serverId = "";
+
+  /**
+   * @generated from field: string locator_url = 4;
+   */
+  locatorUrl = "";
+
+  constructor(data?: PartialMessage<RegisterPeerResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.RegisterPeerResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterPeerResponse {
+    return new RegisterPeerResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterPeerResponse {
+    return new RegisterPeerResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterPeerResponse {
+    return new RegisterPeerResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RegisterPeerResponse | PlainMessage<RegisterPeerResponse> | undefined, b: RegisterPeerResponse | PlainMessage<RegisterPeerResponse> | undefined): boolean {
+    return proto3.util.equals(RegisterPeerResponse, a, b);
+  }
+}
+
+/**
  * @generated from message platform.server.v1.ShutdownHostRequest
  */
 export class ShutdownHostRequest extends Message<ShutdownHostRequest> {
