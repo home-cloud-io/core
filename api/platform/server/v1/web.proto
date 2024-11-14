@@ -57,6 +57,17 @@ service WebService {
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
+
+  // RegisterPeer is used to connect a client to the home-cloud overlate network
+  rpc RegisterPeer(RegisterPeerRequest) returns (RegisterPeerResponse) {}
+}
+
+message RegisterPeerRequest {}
+message RegisterPeerResponse{
+  string private_key = 1;
+  string public_key = 2;
+  string server_id = 3;
+  string locator_url = 4;
 }
 
 message ShutdownHostRequest {}
