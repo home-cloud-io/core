@@ -64,10 +64,16 @@ service WebService {
 
 message RegisterPeerRequest {}
 message RegisterPeerResponse{
+  // client config
   string private_key = 1;
   string public_key = 2;
-  string server_id = 3;
-  string locator_url = 4;
+  repeated string addresses = 3;
+  repeated string dns_servers = 4;
+
+  // server config
+  string server_public_key = 5;
+  string server_id = 6;
+  string locator_url = 7;
 }
 
 message ShutdownHostRequest {}

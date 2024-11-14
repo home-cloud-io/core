@@ -166,6 +166,8 @@ func (m *RegisterPeerResponse) validate(all bool) error {
 
 	// no validation rules for PublicKey
 
+	// no validation rules for ServerPublicKey
+
 	// no validation rules for ServerId
 
 	// no validation rules for LocatorUrl

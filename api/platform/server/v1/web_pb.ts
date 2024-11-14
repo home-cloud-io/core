@@ -69,6 +69,8 @@ export class RegisterPeerRequest extends Message<RegisterPeerRequest> {
  */
 export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
   /**
+   * client config
+   *
    * @generated from field: string private_key = 1;
    */
   privateKey = "";
@@ -79,12 +81,29 @@ export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
   publicKey = "";
 
   /**
-   * @generated from field: string server_id = 3;
+   * @generated from field: repeated string addresses = 3;
+   */
+  addresses: string[] = [];
+
+  /**
+   * @generated from field: repeated string dns_servers = 4;
+   */
+  dnsServers: string[] = [];
+
+  /**
+   * server config
+   *
+   * @generated from field: string server_public_key = 5;
+   */
+  serverPublicKey = "";
+
+  /**
+   * @generated from field: string server_id = 6;
    */
   serverId = "";
 
   /**
-   * @generated from field: string locator_url = 4;
+   * @generated from field: string locator_url = 7;
    */
   locatorUrl = "";
 
@@ -98,8 +117,11 @@ export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterPeerResponse {

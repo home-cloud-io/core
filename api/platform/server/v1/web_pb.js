@@ -34,8 +34,11 @@ export const RegisterPeerResponse = proto3.makeMessageType(
   () => [
     { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
