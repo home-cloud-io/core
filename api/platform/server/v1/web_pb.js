@@ -43,6 +43,20 @@ export const RegisterPeerResponse = proto3.makeMessageType(
 );
 
 /**
+ * Model to store config in key/val store
+ *
+ * @generated from message platform.server.v1.PeerConfiguration
+ */
+export const PeerConfiguration = proto3.makeMessageType(
+  "platform.server.v1.PeerConfiguration",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
  * @generated from message platform.server.v1.ShutdownHostRequest
  */
 export const ShutdownHostRequest = proto3.makeMessageType(

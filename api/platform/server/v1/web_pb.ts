@@ -142,6 +142,57 @@ export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
 }
 
 /**
+ * Model to store config in key/val store
+ *
+ * @generated from message platform.server.v1.PeerConfiguration
+ */
+export class PeerConfiguration extends Message<PeerConfiguration> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string public_key = 2;
+   */
+  publicKey = "";
+
+  /**
+   * @generated from field: string private_key = 3;
+   */
+  privateKey = "";
+
+  constructor(data?: PartialMessage<PeerConfiguration>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.PeerConfiguration";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PeerConfiguration {
+    return new PeerConfiguration().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PeerConfiguration {
+    return new PeerConfiguration().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PeerConfiguration {
+    return new PeerConfiguration().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PeerConfiguration | PlainMessage<PeerConfiguration> | undefined, b: PeerConfiguration | PlainMessage<PeerConfiguration> | undefined): boolean {
+    return proto3.util.equals(PeerConfiguration, a, b);
+  }
+}
+
+/**
  * @generated from message platform.server.v1.ShutdownHostRequest
  */
 export class ShutdownHostRequest extends Message<ShutdownHostRequest> {

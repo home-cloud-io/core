@@ -76,6 +76,13 @@ message RegisterPeerResponse{
   string locator_url = 7;
 }
 
+// Model to store config in key/val store
+message PeerConfiguration {
+  string id = 1;
+  string public_key = 2;
+  string private_key = 3;
+}
+
 message ShutdownHostRequest {}
 
 message ShutdownHostResponse {}
