@@ -5,7 +5,7 @@ package platform.daemon.v1;
 option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
 
 message WireguardConfig {
-  map<string, WireguardInterface> interfaces = 1;
+  repeated WireguardInterface interfaces = 1;
 }
 
 message WireguardInterface {

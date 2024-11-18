@@ -18,7 +18,9 @@ plugins:
       - target=js
   - name: connect-query
     out: .
-    opt: target=ts
+    opt:
+      - target=ts
   - name: connect-query
     out: .
-    opt: target=js
+    opt:
+      - target=js
