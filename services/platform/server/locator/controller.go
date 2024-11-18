@@ -283,7 +283,7 @@ func authorizeLocate(ctx context.Context, logger chassis.Logger, wgInterface str
 		}
 	}
 	if interfaceConfig == nil {
-		logger.WithError(fmt.Errorf("wireguard interface [%s] does not exist in config")).Error("failed to get wireguard interface from config")
+		logger.WithError(fmt.Errorf("wireguard interface [%s] does not exist in config", wgInterface)).Error("failed to get wireguard interface from config")
 		reject(logger, locate.RequestId, stream)
 		return
 	}
