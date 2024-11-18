@@ -5383,51 +5383,10 @@ func (m *RegisterToLocatorRequest) validate(all bool) error {
 
 	var errors []error
 
-	if err := m._validateHostname(m.GetLocatorAddress()); err != nil {
-		if ip := net.ParseIP(m.GetLocatorAddress()); ip == nil {
-			err := RegisterToLocatorRequestValidationError{
-				field:  "LocatorAddress",
-				reason: "value must be a valid hostname, or ip address",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-	}
+	// no validation rules for LocatorAddress
 
 	if len(errors) > 0 {
 		return RegisterToLocatorRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-func (m *RegisterToLocatorRequest) _validateHostname(host string) error {
-	s := strings.ToLower(strings.TrimSuffix(host, "."))
-
-	if len(host) > 253 {
-		return errors.New("hostname cannot exceed 253 characters")
-	}
-
-	for _, part := range strings.Split(s, ".") {
-		if l := len(part); l == 0 || l > 63 {
-			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
-		}
-
-		if part[0] == '-' {
-			return errors.New("hostname parts cannot begin with hyphens")
-		}
-
-		if part[len(part)-1] == '-' {
-			return errors.New("hostname parts cannot end with hyphens")
-		}
-
-		for _, r := range part {
-			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
-			}
-		}
 	}
 
 	return nil
@@ -5528,7 +5487,34 @@ func (m *RegisterToLocatorResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for ServerId
+	if all {
+		switch v := interface{}(m.GetLocator()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RegisterToLocatorResponseValidationError{
+					field:  "Locator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RegisterToLocatorResponseValidationError{
+					field:  "Locator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLocator()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RegisterToLocatorResponseValidationError{
+				field:  "Locator",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return RegisterToLocatorResponseMultiError(errors)
@@ -5609,6 +5595,216 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RegisterToLocatorResponseValidationError{}
+
+// Validate checks the field values on DeregisterFromLocatorRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeregisterFromLocatorRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeregisterFromLocatorRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeregisterFromLocatorRequestMultiError, or nil if none found.
+func (m *DeregisterFromLocatorRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeregisterFromLocatorRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for LocatorAddress
+
+	if len(errors) > 0 {
+		return DeregisterFromLocatorRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeregisterFromLocatorRequestMultiError is an error wrapping multiple
+// validation errors returned by DeregisterFromLocatorRequest.ValidateAll() if
+// the designated constraints aren't met.
+type DeregisterFromLocatorRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeregisterFromLocatorRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeregisterFromLocatorRequestMultiError) AllErrors() []error { return m }
+
+// DeregisterFromLocatorRequestValidationError is the validation error returned
+// by DeregisterFromLocatorRequest.Validate if the designated constraints
+// aren't met.
+type DeregisterFromLocatorRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeregisterFromLocatorRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeregisterFromLocatorRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeregisterFromLocatorRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeregisterFromLocatorRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeregisterFromLocatorRequestValidationError) ErrorName() string {
+	return "DeregisterFromLocatorRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeregisterFromLocatorRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeregisterFromLocatorRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeregisterFromLocatorRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeregisterFromLocatorRequestValidationError{}
+
+// Validate checks the field values on DeregisterFromLocatorResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeregisterFromLocatorResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeregisterFromLocatorResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// DeregisterFromLocatorResponseMultiError, or nil if none found.
+func (m *DeregisterFromLocatorResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeregisterFromLocatorResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for LocatorAddress
+
+	if len(errors) > 0 {
+		return DeregisterFromLocatorResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeregisterFromLocatorResponseMultiError is an error wrapping multiple
+// validation errors returned by DeregisterFromLocatorResponse.ValidateAll()
+// if the designated constraints aren't met.
+type DeregisterFromLocatorResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeregisterFromLocatorResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeregisterFromLocatorResponseMultiError) AllErrors() []error { return m }
+
+// DeregisterFromLocatorResponseValidationError is the validation error
+// returned by DeregisterFromLocatorResponse.Validate if the designated
+// constraints aren't met.
+type DeregisterFromLocatorResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeregisterFromLocatorResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeregisterFromLocatorResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeregisterFromLocatorResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeregisterFromLocatorResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeregisterFromLocatorResponseValidationError) ErrorName() string {
+	return "DeregisterFromLocatorResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeregisterFromLocatorResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeregisterFromLocatorResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeregisterFromLocatorResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeregisterFromLocatorResponseValidationError{}
 
 // Validate checks the field values on Apps with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
@@ -5818,6 +6014,8 @@ func (m *App) validate(all bool) error {
 	// no validation rules for Annotations
 
 	// no validation rules for Readme
+
+	// no validation rules for Installed
 
 	if len(errors) > 0 {
 		return AppMultiError(errors)
@@ -6755,50 +6953,40 @@ func (m *LocatorSettings) validate(all bool) error {
 
 	var errors []error
 
-	{
-		sorted_keys := make([]string, len(m.GetLocators()))
-		i := 0
-		for key := range m.GetLocators() {
-			sorted_keys[i] = key
-			i++
-		}
-		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
-		for _, key := range sorted_keys {
-			val := m.GetLocators()[key]
-			_ = val
+	// no validation rules for Enabled
 
-			// no validation rules for Locators[key]
+	for idx, item := range m.GetLocators() {
+		_, _ = idx, item
 
-			if all {
-				switch v := interface{}(val).(type) {
-				case interface{ ValidateAll() error }:
-					if err := v.ValidateAll(); err != nil {
-						errors = append(errors, LocatorSettingsValidationError{
-							field:  fmt.Sprintf("Locators[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				case interface{ Validate() error }:
-					if err := v.Validate(); err != nil {
-						errors = append(errors, LocatorSettingsValidationError{
-							field:  fmt.Sprintf("Locators[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				}
-			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
-				if err := v.Validate(); err != nil {
-					return LocatorSettingsValidationError{
-						field:  fmt.Sprintf("Locators[%v]", key),
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LocatorSettingsValidationError{
+						field:  fmt.Sprintf("Locators[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
-					}
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LocatorSettingsValidationError{
+						field:  fmt.Sprintf("Locators[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
 				}
 			}
-
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LocatorSettingsValidationError{
+					field:  fmt.Sprintf("Locators[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
 		}
+
 	}
 
 	if len(errors) > 0 {
@@ -6900,11 +7088,41 @@ func (m *Locator) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for ServerId
-
 	// no validation rules for Address
 
-	// no validation rules for WireguardInterface
+	for idx, item := range m.GetConnections() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LocatorValidationError{
+						field:  fmt.Sprintf("Connections[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LocatorValidationError{
+						field:  fmt.Sprintf("Connections[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LocatorValidationError{
+					field:  fmt.Sprintf("Connections[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if len(errors) > 0 {
 		return LocatorMultiError(errors)
@@ -6983,47 +7201,46 @@ var _ interface {
 	ErrorName() string
 } = LocatorValidationError{}
 
-// Validate checks the field values on DiskStats with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *DiskStats) Validate() error {
+// Validate checks the field values on LocatorConnection with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *LocatorConnection) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on DiskStats with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in DiskStatsMultiError, or nil
-// if none found.
-func (m *DiskStats) ValidateAll() error {
+// ValidateAll checks the field values on LocatorConnection with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LocatorConnectionMultiError, or nil if none found.
+func (m *LocatorConnection) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *DiskStats) validate(all bool) error {
+func (m *LocatorConnection) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	// no validation rules for Total
+	// no validation rules for ServerId
 
-	// no validation rules for Used
-
-	// no validation rules for Free
+	// no validation rules for WireguardInterface
 
 	if len(errors) > 0 {
-		return DiskStatsMultiError(errors)
+		return LocatorConnectionMultiError(errors)
 	}
 
 	return nil
 }
 
-// DiskStatsMultiError is an error wrapping multiple validation errors returned
-// by DiskStats.ValidateAll() if the designated constraints aren't met.
-type DiskStatsMultiError []error
+// LocatorConnectionMultiError is an error wrapping multiple validation errors
+// returned by LocatorConnection.ValidateAll() if the designated constraints
+// aren't met.
+type LocatorConnectionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m DiskStatsMultiError) Error() string {
+func (m LocatorConnectionMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -7032,11 +7249,11 @@ func (m DiskStatsMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m DiskStatsMultiError) AllErrors() []error { return m }
+func (m LocatorConnectionMultiError) AllErrors() []error { return m }
 
-// DiskStatsValidationError is the validation error returned by
-// DiskStats.Validate if the designated constraints aren't met.
-type DiskStatsValidationError struct {
+// LocatorConnectionValidationError is the validation error returned by
+// LocatorConnection.Validate if the designated constraints aren't met.
+type LocatorConnectionValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -7044,22 +7261,24 @@ type DiskStatsValidationError struct {
 }
 
 // Field function returns field value.
-func (e DiskStatsValidationError) Field() string { return e.field }
+func (e LocatorConnectionValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e DiskStatsValidationError) Reason() string { return e.reason }
+func (e LocatorConnectionValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e DiskStatsValidationError) Cause() error { return e.cause }
+func (e LocatorConnectionValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e DiskStatsValidationError) Key() bool { return e.key }
+func (e LocatorConnectionValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e DiskStatsValidationError) ErrorName() string { return "DiskStatsValidationError" }
+func (e LocatorConnectionValidationError) ErrorName() string {
+	return "LocatorConnectionValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e DiskStatsValidationError) Error() string {
+func (e LocatorConnectionValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -7071,14 +7290,14 @@ func (e DiskStatsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sDiskStats.%s: %s%s",
+		"invalid %sLocatorConnection.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = DiskStatsValidationError{}
+var _ error = LocatorConnectionValidationError{}
 
 var _ interface {
 	Field() string
@@ -7086,7 +7305,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = DiskStatsValidationError{}
+} = LocatorConnectionValidationError{}
 
 // Validate checks the field values on User with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
@@ -7430,47 +7649,6 @@ func (m *ServerEvent) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerEventValidationError{
 					field:  "AppInstalled",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *ServerEvent_FileUploaded:
-		if v == nil {
-			err := ServerEventValidationError{
-				field:  "Event",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetFileUploaded()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, ServerEventValidationError{
-						field:  "FileUploaded",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, ServerEventValidationError{
-						field:  "FileUploaded",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetFileUploaded()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ServerEventValidationError{
-					field:  "FileUploaded",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -7862,109 +8040,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AppInstalledEventValidationError{}
-
-// Validate checks the field values on FileUploadedEvent with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *FileUploadedEvent) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on FileUploadedEvent with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// FileUploadedEventMultiError, or nil if none found.
-func (m *FileUploadedEvent) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *FileUploadedEvent) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Id
-
-	// no validation rules for Success
-
-	if len(errors) > 0 {
-		return FileUploadedEventMultiError(errors)
-	}
-
-	return nil
-}
-
-// FileUploadedEventMultiError is an error wrapping multiple validation errors
-// returned by FileUploadedEvent.ValidateAll() if the designated constraints
-// aren't met.
-type FileUploadedEventMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m FileUploadedEventMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m FileUploadedEventMultiError) AllErrors() []error { return m }
-
-// FileUploadedEventValidationError is the validation error returned by
-// FileUploadedEvent.Validate if the designated constraints aren't met.
-type FileUploadedEventValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e FileUploadedEventValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e FileUploadedEventValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e FileUploadedEventValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e FileUploadedEventValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e FileUploadedEventValidationError) ErrorName() string {
-	return "FileUploadedEventValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e FileUploadedEventValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sFileUploadedEvent.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = FileUploadedEventValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = FileUploadedEventValidationError{}

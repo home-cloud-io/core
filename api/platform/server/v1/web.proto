@@ -52,6 +52,8 @@ service WebService {
   rpc DisableSecureTunnelling(DisableSecureTunnellingRequest) returns (DisableSecureTunnellingResponse) {}
   // Register the server with the given Locator service
   rpc RegisterToLocator(RegisterToLocatorRequest) returns (RegisterToLocatorResponse) {}
+  // Deregister the server from the given Locator service
+  rpc DeregisterFromLocator(DeregisterFromLocatorRequest) returns (DeregisterFromLocatorResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
@@ -184,7 +186,6 @@ message InitializeDeviceRequest {
   string timezone = 3 [(validate.rules).string.min_len = 7];
   bool auto_update_apps = 4;
   bool auto_update_os = 5;
-  repeated string default_apps = 6;
 }
 
 message InitializeDeviceResponse {
@@ -231,11 +232,18 @@ message DisableSecureTunnellingRequest {}
 message DisableSecureTunnellingResponse {}
 
 message RegisterToLocatorRequest {
-  string locator_address = 1 [(validate.rules).string.address = true];
+  string locator_address = 1;
   // TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
 }
 message RegisterToLocatorResponse {
-  string server_id = 1;
+  Locator locator = 1;
+}
+
+message DeregisterFromLocatorRequest {
+  string locator_address = 1;
+}
+message DeregisterFromLocatorResponse {
+  string locator_address = 1;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -267,6 +275,8 @@ message App {
   // readme is not from the index but is added by the server from
   // the README.md of the chart.
   string readme = 14;
+  // installed denotes whether or not the app is installed on the server
+  bool installed = 15;
 }
 
 message AppDependency {
@@ -301,7 +311,6 @@ message AppStoreEntries {
 }
 
 // User settings for the device
-
 message DeviceSettings {
   User admin_user = 1 [(validate.rules).message.required = true];
   string timezone = 2 [(validate.rules).string.min_len = 7];
@@ -313,28 +322,24 @@ message DeviceSettings {
 }
 
 message LocatorSettings {
-  // locators is a map of unique Home Cloud server IDs to locators the server will connect to
-  // This map structure enables a Home Cloud server to connect with the same Locator server multiple times
-  // in order to share multiple different Wireguard tunnels (interfaces). For example, the server could use one tunnel
-  // for trusted mobile clients and another tunnel for server-to-server federation.
-  map<string, Locator> locators = 2;
+  bool enabled = 1;
+  repeated Locator locators = 2;
 }
 
 message Locator {
+  // address is the full web address (e.g. https://locator.home-cloud.io) of the locator server
+  string address = 1;
+  repeated LocatorConnection connections = 2;
+}
+
+message LocatorConnection {
   // server_id is the globally unique identifier for the Home Cloud server instance
   // it is used by clients as part of the locator query
   string server_id = 1;
-  // address is the full web address (e.g. https://locator.home-cloud.io) of the locator server
-  string address = 2;
   // wireguard_interface is the internal wireguard instance to share the connection information
   // of through this locator
-  string wireguard_interface = 3;
-}
+  string wireguard_interface = 2;
 
-message DiskStats {
-  int64 total = 1;
-  int64 used = 2;
-  int64 free = 3;
 }
 
 message User {
@@ -351,7 +356,6 @@ message ServerEvent {
     HeartbeatEvent heartbeat = 1;
     ErrorEvent error = 2;
     AppInstalledEvent app_installed = 3;
-    FileUploadedEvent file_uploaded = 4;
   }
 }
 
@@ -363,11 +367,4 @@ message ErrorEvent {
 
 message AppInstalledEvent {
   string name = 1;
-}
-
-// FileUploadedEvent is sent from the server to connected clients when a file upload completes
-message FileUploadedEvent {
-  string id = 1;
-  // true when the file upload was successful, false when it failed
-  bool success = 2;
 }
