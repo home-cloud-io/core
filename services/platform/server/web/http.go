@@ -2,13 +2,13 @@ package web
 
 import (
 	"bufio"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
 
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
 	"github.com/home-cloud-io/core/services/platform/server/system"
 
@@ -27,12 +27,10 @@ type (
 	}
 
 	uploadForm struct {
-		file             io.Reader
-		app              string
-		path             string
-		fileName         string
-		fileNameOverride string
-		id               string
+		file     io.Reader
+		volume   string
+		path     string
+		fileName string
 	}
 )
 
@@ -71,29 +69,18 @@ func (h *httpHandler) fileUploadHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	fileName := form.fileName
-	if form.fileNameOverride != "" {
-		fileName = form.fileNameOverride
-	}
-	fileName = filepath.Join(appRootPath, form.app, form.path, fileName)
+	id := base64.StdEncoding.EncodeToString([]byte(filepath.Join(form.volume, form.path, form.fileName)))
+	fileName := filepath.Join(appRootPath, form.volume, form.path, form.fileName)
 
 	h.logger.WithField("form", form).Info("received form")
-	id, err := h.sctl.UploadFileStream(ctx, h.logger, form.file, form.id, fileName)
+	id, err = h.sctl.UploadFileStream(ctx, h.logger, form.file, id, fileName)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to upload file")
-		sendEventToClient(h.logger, &v1.FileUploadedEvent{
-			Id:      id,
-			Success: false,
-		})
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	h.logger.Info("file upload complete")
-	sendEventToClient(h.logger, &v1.FileUploadedEvent{
-		Id:      id,
-		Success: true,
-	})
 }
 
 func readForm(reader *multipart.Reader) (uploadForm, error) {
@@ -112,44 +99,19 @@ func readForm(reader *multipart.Reader) (uploadForm, error) {
 			form.file = bufio.NewReader(part)
 			form.fileName = part.FileName()
 			return form, nil
-		case "app":
+		case "volume":
 			s, err := io.ReadAll(part)
 			if err != nil {
 				return uploadForm{}, err
 			}
-			form.app = string(s)
+			form.volume = string(s)
 		case "path":
 			s, err := io.ReadAll(part)
 			if err != nil {
 				return uploadForm{}, err
 			}
 			form.path = string(s)
-		case "file-name-override":
-			s, err := io.ReadAll(part)
-			if err != nil {
-				return uploadForm{}, err
-			}
-			form.fileNameOverride = string(s)
-		case "id":
-			s, err := io.ReadAll(part)
-			if err != nil {
-				return uploadForm{}, err
-			}
-			form.id = string(s)
 		}
 	}
 	return form, fmt.Errorf("no file provided in form")
-}
-
-func sendEventToClient(logger chassis.Logger, event *v1.FileUploadedEvent) {
-	err := events.Send(&v1.ServerEvent{
-		Event: &v1.ServerEvent_FileUploaded{
-			FileUploaded: event,
-		},
-	})
-	if err != nil {
-		logger.WithError(err).Error("failed to send file uploaded event to client")
-		return
-	}
-	logger.Info("sent uploaded event to client")
 }
