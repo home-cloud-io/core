@@ -120,6 +120,9 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 			return
 		}
 
+		// delete file meta
+		delete(c.fileMetas, done.FileId)
+
 		log.Info("completed saving file")
 
 	default:
