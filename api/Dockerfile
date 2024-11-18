@@ -14,9 +14,9 @@ RUN go install github.com/envoyproxy/protoc-gen-validate@v1.0.4
 RUN go install github.com/srikrsna/protoc-gen-gotag@v1.0.2
 
 # WEB
-RUN npm install typescript tsx
+RUN npm install typescript@"5.6.3" tsx@"4.19.2"
 RUN npm install @bufbuild/buf \
-    @bufbuild/protoc-gen-es@"^1.0.0" \
-    @bufbuild/protobuf@"^1.0.0" \
-    @connectrpc/protoc-gen-connect-es@"^1.0.0" \
-    @connectrpc/connect@"^1.0.0"
+    @bufbuild/protoc-gen-es@"1.10.0" \
+    @bufbuild/protobuf@"1.10.0" \
+    @connectrpc/protoc-gen-connect-es@"1.6.1" \
+    @connectrpc/connect@"1.6.1"
