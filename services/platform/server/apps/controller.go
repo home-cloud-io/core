@@ -94,7 +94,13 @@ func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.Ap
 		}
 	}
 
-	// get the readme for each app
+	healths, err := c.k8sclient.Healthcheck(ctx)
+	if err != nil {
+		logger.WithError(err).Error("failed to check installed app health during store query")
+		return nil, err
+	}
+
+	// add extra information not from the index (e.g. readme and installed flag)
 	for _, app := range apps {
 		resp, err := http.Get(fmt.Sprintf("%s/%s-%s/charts/%s/README.md", rawChartBaseUrl, app.Name, app.Version, app.Name))
 		if err != nil {
@@ -112,6 +118,12 @@ func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.Ap
 			}).WithError(err).Error("failed to read body of response while getting readme for app")
 		}
 		app.Readme = string(body)
+
+		for _, health := range healths {
+			if app.Name == health.Name {
+				app.Installed = true
+			}
+		}
 	}
 
 	// sort apps by name
