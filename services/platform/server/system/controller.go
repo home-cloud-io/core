@@ -428,8 +428,8 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 
 	// create wireguard config
 	config = &dv1.WireguardConfig{
-		Interfaces: map[string]*dv1.WireguardInterface{
-			DefaultWireguardInterface: &dv1.WireguardInterface{
+		Interfaces: []*dv1.WireguardInterface{
+			{
 				Id:         uuid.New().String(),
 				Name:       DefaultWireguardInterface,
 				PrivateKey: key.String(),
@@ -463,7 +463,8 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardInterface{
 			AddWireguardInterface: &dv1.AddWireguardInterface{
-				Interface: config.Interfaces[DefaultWireguardInterface],
+				// TODO: handle this better
+				Interface: config.Interfaces[0],
 			},
 		},
 	})
@@ -489,7 +490,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	}
 	settings.LocatorSettings = &v1.LocatorSettings{
 		Enabled:  true,
-		Locators: make(map[string]*v1.Locator),
+		Locators: make([]*v1.Locator, 0),
 	}
 	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
