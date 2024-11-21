@@ -23,6 +23,7 @@ const (
 	APP_STORE_ENTRIES_KEY       = "app_store_entries"
 	DEFAULT_DEVICE_SETTINGS_KEY = "device"
 	SEED_KEY                    = "secret_seed"
+	WIREGUARD_CONFIG_KEY        = "wireguard_config"
 )
 
 func Init() {
@@ -70,6 +71,26 @@ func Set(ctx context.Context, key string, value proto.Message) (string, error) {
 
 	// issue request
 	resp, err := clientSingleton.Set(ctx, connect.NewRequest(set))
+	if err != nil {
+		return "", err
+	}
+
+	return resp.Msg.Key, nil
+}
+
+func Delete(ctx context.Context, key string, value proto.Message) (string, error) {
+	// convert value to request
+	pb, err := anypb.New(value)
+	if err != nil {
+		return "", err
+	}
+	del := &v1.DeleteRequest{
+		Key:   key,
+		Value: pb,
+	}
+
+	// issue request
+	resp, err := clientSingleton.Delete(ctx, connect.NewRequest(del))
 	if err != nil {
 		return "", err
 	}

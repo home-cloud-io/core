@@ -50,7 +50,7 @@ func ExecuteCommand(ctx context.Context, cmd *exec.Cmd) error {
 		var err error
 		// if the command was launched as a new process group so that signals (e.g. SIGINT) are not sent to the child process
 		// then we should release the process instead of killing it
-		if cmd.SysProcAttr.Setpgid {
+		if cmd.SysProcAttr != nil && cmd.SysProcAttr.Setpgid {
 			err = cmd.Process.Release()
 		} else {
 			err = cmd.Process.Kill()

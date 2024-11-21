@@ -11,10 +11,13 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
+	"github.com/home-cloud-io/core/services/platform/server/locator"
 	"github.com/home-cloud-io/core/services/platform/server/system"
 
 	"connectrpc.com/connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type (
@@ -27,6 +30,7 @@ type (
 		logger chassis.Logger
 		actl   apps.Controller
 		sctl   system.Controller
+		lctl   locator.Controller
 	}
 )
 
@@ -36,11 +40,12 @@ const (
 	ErrFailedToLogin      = "failed to login"
 )
 
-func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Rpc {
+func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller, lctl locator.Controller) Rpc {
 	return &rpcHandler{
 		logger,
 		actl,
 		sctl,
+		lctl,
 	}
 }
 
@@ -246,6 +251,9 @@ func (h *rpcHandler) InitializeDevice(ctx context.Context, request *connect.Requ
 		Timezone:       msg.GetTimezone(),
 		AutoUpdateApps: msg.GetAutoUpdateApps(),
 		AutoUpdateOs:   msg.GetAutoUpdateOs(),
+		LocatorSettings: &v1.LocatorSettings{
+			Enabled: false,
+		},
 	}
 
 	err := h.sctl.InitializeDevice(ctx, h.logger, deviceSettings)
@@ -318,6 +326,70 @@ func (h *rpcHandler) GetAppStorage(ctx context.Context, request *connect.Request
 	}
 
 	return connect.NewResponse(&v1.GetAppStorageResponse{Apps: appsStorage}), nil
+}
+
+func (h *rpcHandler) EnableSecureTunnelling(ctx context.Context, request *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error) {
+	h.logger.Info("enabling secure tunnelling")
+
+	err := h.sctl.EnableWireguard(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to enable secure tunnelling")
+		return nil, errors.New("failed to enable secure tunnelling")
+	}
+
+	return connect.NewResponse(&v1.EnableSecureTunnellingResponse{}), nil
+}
+
+func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error) {
+	h.logger.Info("disabling secure tunnelling")
+
+	// disable locater controller (which closes all active connections)
+	err := h.lctl.Disable(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// now, disable wireguard on the host system
+	err = h.sctl.DisableWireguard(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to disable secure tunnelling")
+		return nil, errors.New("failed to disable secure tunnelling")
+	}
+
+	return connect.NewResponse(&v1.DisableSecureTunnellingResponse{}), nil
+}
+
+func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
+	h.logger.WithField("msg", request.Msg).Info("registering to locator")
+
+	if err := request.Msg.ValidateAll(); err != nil {
+		h.logger.WithError(err).Error("invalid request")
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	locator, err := h.lctl.AddLocator(ctx, request.Msg.LocatorAddress)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to add locator")
+		return nil, fmt.Errorf("failed to add locator")
+	}
+
+	return connect.NewResponse(&v1.RegisterToLocatorResponse{
+		Locator: locator,
+	}), nil
+}
+
+func (h *rpcHandler) DeregisterFromLocator(ctx context.Context, request *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error) {
+	h.logger.Info("deregistering from locator")
+
+	err := h.lctl.RemoveLocator(ctx, request.Msg.LocatorAddress)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to remove locator")
+		return nil, fmt.Errorf("failed to remove locator")
+	}
+
+	return connect.NewResponse(&v1.DeregisterFromLocatorResponse{
+		LocatorAddress: request.Msg.LocatorAddress,
+	}), nil
 }
 
 func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {

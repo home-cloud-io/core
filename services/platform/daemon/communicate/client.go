@@ -105,7 +105,7 @@ func (c *client) Listen() {
 			c.logger.WithError(err).Error("stream failure")
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(5 * time.Second)
 		retries++
 	}
 }
@@ -169,6 +169,10 @@ func (c *client) listen(ctx context.Context) error {
 			go c.uploadFile(ctx, message.GetUploadFileRequest())
 		case *v1.ServerMessage_SaveSettingsCommand:
 			go c.saveSettings(ctx, message.GetSaveSettingsCommand())
+		case *v1.ServerMessage_AddWireguardInterface:
+			go c.addWireguardInterface(ctx, message.GetAddWireguardInterface())
+		case *v1.ServerMessage_RemoveWireguardInterface:
+			go c.removeWireguardInterface(ctx, message.GetRemoveWireguardInterface())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}

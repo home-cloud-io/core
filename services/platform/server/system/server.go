@@ -75,6 +75,10 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 			CurrentStats = message.GetSystemStats()
 		case *v1.DaemonMessage_SettingsSaved:
 			h.broadcaster.Send(message.GetSettingsSaved())
+		case *v1.DaemonMessage_WireguardInterfaceAdded:
+			h.broadcaster.Send(message.GetWireguardInterfaceAdded())
+		case *v1.DaemonMessage_WireguardInterfaceRemoved:
+			h.broadcaster.Send(message.GetWireguardInterfaceRemoved())
 		default:
 			h.logger.WithField("message", message).Warn("unknown message type received")
 		}

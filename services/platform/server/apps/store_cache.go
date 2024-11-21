@@ -11,7 +11,7 @@ import (
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
-	"k8s.io/apimachinery/pkg/util/yaml"
+	"gopkg.in/yaml.v3"
 )
 
 type (

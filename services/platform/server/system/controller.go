@@ -21,11 +21,13 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 	kvv1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
 	"golang.org/x/sync/errgroup"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
 type (
@@ -60,6 +62,10 @@ type (
 		AutoUpdateOS(logger chassis.Logger)
 		// UpdateOS will check for and install any OS (including Daemon) updates one time.
 		UpdateOS(ctx context.Context, logger chassis.Logger) error
+		// EnableWireguard will initialize the Wireguard server on the host and save the configuration to Blueprint
+		EnableWireguard(ctx context.Context, logger chassis.Logger) error
+		// DisableWireguard will disable the Wireguard server on the host and delete the configuration from Blueprint
+		DisableWireguard(ctx context.Context, logger chassis.Logger) error
 	}
 	Containers interface {
 		// SetSystemImage will update the image for a system container.
@@ -129,6 +135,10 @@ const (
 	daemonTagPath                    = "refs/tags/services/platform/daemon/"
 	osAutoUpdateCronConfigKey        = "server.updates.os_auto_update_cron"
 	containerAutoUpdateCronConfigKey = "server.updates.containers_auto_update_cron"
+
+	// Currently only a single interface is supported and defaults to this value. In the future we
+	// will probably want to support multiple interfaces (e.g. one for trusted mobile clients and another for federated servers)
+	DefaultWireguardInterface = "wg0"
 )
 
 // DAEMON
@@ -395,6 +405,148 @@ func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error 
 	return nil
 }
 
+func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger) error {
+	var (
+		err    error
+		config = &dv1.WireguardConfig{}
+	)
+
+	// check if wireguard is already enabled
+	result, err := kvclient.List(ctx, config)
+	if err != nil {
+		return err
+	}
+	if result != nil {
+		logger.Warn("the Wireguard server is already enabled")
+		return nil
+	}
+
+	key, err := wgtypes.GeneratePrivateKey()
+	if err != nil {
+		return err
+	}
+
+	// create wireguard config
+	config = &dv1.WireguardConfig{
+		Interfaces: []*dv1.WireguardInterface{
+			{
+				Id:         uuid.New().String(),
+				Name:       DefaultWireguardInterface,
+				PrivateKey: key.String(),
+				Ips: []string{
+					"10.100.0.1/24",
+				},
+				ListenPort: 51820,
+				Peers:      []*dv1.WireguardPeer{},
+			},
+		},
+	}
+
+	// command daemon to initialize
+	done := make(chan bool)
+	var listenerErr error
+	go func() {
+		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceAdded]{
+			Callback: func(event *dv1.WireguardInterfaceAdded) (bool, error) {
+				done <- true
+				if event.Error != nil {
+					return true, fmt.Errorf(event.Error.Error)
+				}
+				return true, nil
+			},
+			Timeout: 30 * time.Second,
+		}).Listen(ctx)
+		if listenerErr != nil {
+			done <- true
+		}
+	}()
+	err = com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_AddWireguardInterface{
+			AddWireguardInterface: &dv1.AddWireguardInterface{
+				// TODO: handle this better
+				Interface: config.Interfaces[0],
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	<-done
+	if listenerErr != nil {
+		return listenerErr
+	}
+
+	// save config to blueprint
+	_, err = kvclient.Set(ctx, kvclient.WIREGUARD_CONFIG_KEY, config)
+	if err != nil {
+		return err
+	}
+
+	// enable feature in blueprint
+	settings := &v1.DeviceSettings{}
+	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return err
+	}
+	settings.LocatorSettings = &v1.LocatorSettings{
+		Enabled:  true,
+		Locators: make([]*v1.Locator, 0),
+	}
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return fmt.Errorf("failed to save settings")
+	}
+
+	return nil
+}
+
+func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger) error {
+	var (
+		err error
+	)
+
+	// disable on daemon
+	done := make(chan bool)
+	var listenerErr error
+	go func() {
+		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceRemoved]{
+			Callback: func(event *dv1.WireguardInterfaceRemoved) (bool, error) {
+				done <- true
+				if event.Error != nil {
+					return true, fmt.Errorf(event.Error.Error)
+				}
+				return true, nil
+			},
+			Timeout: 30 * time.Second,
+		}).Listen(ctx)
+		if listenerErr != nil {
+			done <- true
+		}
+	}()
+	err = com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_RemoveWireguardInterface{
+			RemoveWireguardInterface: &dv1.RemoveWireguardInterface{
+				Name: DefaultWireguardInterface,
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	<-done
+	if listenerErr != nil {
+		return listenerErr
+	}
+
+	// delete config from blueprint
+	_, err = kvclient.Delete(ctx, kvclient.WIREGUARD_CONFIG_KEY, &dv1.WireguardConfig{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CONTAINERS
 
 func (c *controller) CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error) {
@@ -494,7 +646,7 @@ func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings,
 	settings := &v1.DeviceSettings{}
 	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
-		return nil, errors.New(ErrFailedToGetSettings)
+		return nil, err
 	}
 
 	settings.AdminUser.Password = "" // don't return the password
