@@ -9,20 +9,17 @@ import (
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
-var (
-	systemKubernetesManifests = []string{
-		DraftManifestFile,
-		OperatorManifestFile,
-		ServerManifestFile,
-	}
-)
-
 func SetSystemImage(ctx context.Context, logger chassis.Logger, def *v1.SetSystemImageCommand) error {
 	var (
 		replacers = []Replacer{
 			func(line string) string {
 				return strings.ReplaceAll(line, def.CurrentImage, def.RequestedImage)
 			},
+		}
+		systemKubernetesManifests = []string{
+			DraftManifestFile(),
+			OperatorManifestFile(),
+			ServerManifestFile(),
 		}
 	)
 

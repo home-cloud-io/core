@@ -2,7 +2,6 @@ package host
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -321,18 +320,8 @@ in
 		return err
 	}
 
-	err = Test(logger)
-	if err != nil {
-		return err
-	}
-
 	for path, config := range configs {
-		bytes, err := json.Marshal(config)
-		if err != nil {
-			return err
-		}
-
-		err = os.WriteFile(path, bytes, 0600)
+		err = WriteJsonFile(path, config, 0600)
 		if err != nil {
 			return err
 		}
