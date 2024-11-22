@@ -93,7 +93,7 @@ func setSSH(enableSSH bool, trustedSSHKeys []string) error {
 		return err
 	}
 	usersConfig := UsersConfig{}
-	err = json.Unmarshal(bytes, &sshConfig)
+	err = json.Unmarshal(bytes, &usersConfig)
 	if err != nil {
 		return err
 	}
