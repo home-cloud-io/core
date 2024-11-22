@@ -34,7 +34,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		}
 
 		// make temporary chunk upload directory
-		err := os.MkdirAll(filepath.Join(host.ChunkPath, info.FileId), 0777)
+		err := os.MkdirAll(filepath.Join(host.ChunkPath(), info.FileId), 0777)
 		if err != nil {
 			log.WithError(err).Error("failed to create temp directory for file upload")
 			return
@@ -69,7 +69,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		})
 
 		// write chunk as temp file
-		fileName := filepath.Join(host.ChunkPath, meta.id, fmt.Sprintf("chunk.%d", chunk.Index))
+		fileName := filepath.Join(host.ChunkPath(), meta.id, fmt.Sprintf("chunk.%d", chunk.Index))
 		err := os.WriteFile(fileName, chunk.Data, 0666)
 		if err != nil {
 			log.WithError(err).Error("failed to write uploaded file chunk")
@@ -185,7 +185,7 @@ func (c *client) reconstructFile(logger chassis.Logger, metadata fileMeta) error
 	}
 
 	// remove the chunk file directory
-	err = os.Remove(filepath.Join(host.ChunkPath, metadata.id))
+	err = os.Remove(filepath.Join(host.ChunkPath(), metadata.id))
 	if err != nil {
 		logger.WithError(err).Error("failed to remove chunk directory")
 	}

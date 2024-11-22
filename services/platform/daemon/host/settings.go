@@ -14,41 +14,6 @@ import (
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
-type (
-	TimeConfig struct {
-		TimeZone string `json:"timeZone"`
-	}
-	ServicesConfig struct {
-		Resolved struct {
-			Enable  bool     `json:"enable"`
-			Domains []string `json:"domains"`
-		} `json:"resolved"`
-		K3s struct {
-			Enable     bool   `json:"enable"`
-			Role       string `json:"role"`
-			ExtraFlags string `json:"extraFlags"`
-		} `json:"k3s"`
-		OpenSSH struct {
-			Enable         bool `json:"enable"`
-			AuthorizedKeys struct {
-				Keys []string `json:"keys"`
-			} `json:"authorizedKeys"`
-		} `json:"openssh"`
-		Avahi struct {
-			Enable   bool `json:"enable"`
-			IPv4     bool `json:"ipv4"`
-			IPv6     bool `json:"ipv6"`
-			NSSmDNS4 bool `json:"nssmdns4"`
-			Publish  struct {
-				Enable       bool `json:"enable"`
-				Domain       bool `json:"domain"`
-				Addresses    bool `json:"addresses"`
-				UserServices bool `json:"userServices"`
-			}
-		} `json:"avahi"`
-	}
-)
-
 func SaveSettings(ctx context.Context, logger chassis.Logger, def *v1.SaveSettingsCommand) error {
 
 	err := setUserPassword(ctx, logger, def.AdminPassword)
@@ -76,7 +41,7 @@ func SaveSettings(ctx context.Context, logger chassis.Logger, def *v1.SaveSettin
 
 func setTimeZone(timeZone string) error {
 	// read
-	f, err := os.ReadFile(TimeConfigFile)
+	f, err := os.ReadFile(TimeConfigFile())
 	if err != nil {
 		return err
 	}
@@ -94,7 +59,7 @@ func setTimeZone(timeZone string) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(TimeConfigFile, b, 0777)
+	err = os.WriteFile(TimeConfigFile(), b, 0777)
 	if err != nil {
 		return err
 	}
@@ -102,33 +67,52 @@ func setTimeZone(timeZone string) error {
 }
 
 func setSSH(enableSSH bool, trustedSSHKeys []string) error {
-	// read
-	f, err := os.ReadFile(ServicesConfigFile)
+	// update ssh config
+
+	bytes, err := os.ReadFile(ServicesConfigFile())
 	if err != nil {
 		return err
 	}
-	c := ServicesConfig{}
-	err = json.Unmarshal(f, &c)
+	sshConfig := ServicesConfig{}
+	err = json.Unmarshal(bytes, &sshConfig)
 	if err != nil {
 		return err
 	}
 
-	// update
-	c.OpenSSH.Enable = enableSSH
+	sshConfig.OpenSSH.Enable = enableSSH
+
+	err = WriteJsonFile(ServicesConfigFile(), sshConfig, DefaultFileMode)
+	if err != nil {
+		return err
+	}
+
+	// update users config
+
+	bytes, err = os.ReadFile(UsersConfigFile())
+	if err != nil {
+		return err
+	}
+	usersConfig := UsersConfig{}
+	err = json.Unmarshal(bytes, &usersConfig)
+	if err != nil {
+		return err
+	}
+
 	if trustedSSHKeys == nil {
 		trustedSSHKeys = []string{}
 	}
-	c.OpenSSH.AuthorizedKeys.Keys = trustedSSHKeys
+	user, ok := usersConfig.Users["admin"]
+	if !ok {
+		return fmt.Errorf("admin user did not exist in config")
+	}
+	user.OpenSSH.AuthorizedKeys.Keys = trustedSSHKeys
+	usersConfig.Users["admin"] = user
 
-	// write
-	b, err := json.MarshalIndent(c, "", "  ")
+	err = WriteJsonFile(UsersConfigFile(), usersConfig, DefaultFileMode)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(ServicesConfigFile, b, 0777)
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
 

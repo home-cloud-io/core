@@ -1,10 +1,14 @@
 #!/bin/bash
 
-VERSION=$(git rev-parse HEAD)
-REVISION=$(git rev-parse HEAD)
+VERSION=$1
+REVISION='services/platform/daemon/${version}'
+if [[ -z "$VERSION" ]]; then
+    VERSION=$(git rev-parse HEAD)
+    REVISION=$(git rev-parse HEAD)
+fi
 
-echo "version: $REVISION"
-sed -e "s/__VERSION__/$VERSION/g" -e "s/__REVISION__/$REVISION/g" default.nix.tmpl > tmp/default.nix
+echo "version: $VERSION"
+sed -e "s|__VERSION__|$VERSION|g" -e "s|__REVISION__|$REVISION|g" default.nix.tmpl > tmp/default.nix
 
 cd tmp/
 

@@ -21,9 +21,6 @@ func main() {
 		WithRunner(mdns.Start).
 		WithRunner(migrator.Migrate)
 
-	// configure file paths before starting
-	host.ConfigureFilePaths(logger)
-
 	// start daemon runtime
 	runtime.Start()
 }

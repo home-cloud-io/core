@@ -27,7 +27,7 @@ var (
 )
 
 func GetDaemonVersion(logger chassis.Logger) (*v1.CurrentDaemonVersion, error) {
-	f, err := os.Open(DaemonNixFile)
+	f, err := os.Open(DaemonNixFile())
 	if err != nil {
 		logger.WithError(err).Error("failed to read daemon nix file")
 		return nil, err
@@ -89,7 +89,7 @@ func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.Cha
 		}
 	)
 
-	err = LineByLineReplace(DaemonNixFile, replacers)
+	err = LineByLineReplace(DaemonNixFile(), replacers)
 	if err != nil {
 		logger.WithError(err).Error("failed to replace version")
 		return err

@@ -68,11 +68,11 @@ func getMemoryStats(stats *v1.SystemStats) error {
 		return err
 	}
 	stats.Memory = &v1.MemoryStats{
-		TotalBytes:     uint32(memory.Total),
-		UsedBytes:      uint32(memory.Used),
-		CachedBytes:    uint32(memory.Cached),
-		FreeBytes:      uint32(memory.Free),
-		AvailableBytes: uint32(memory.Available),
+		TotalBytes:     memory.Total,
+		UsedBytes:      memory.Used,
+		CachedBytes:    memory.Cached,
+		FreeBytes:      memory.Free,
+		AvailableBytes: memory.Available,
 	}
 	return nil
 }
@@ -85,8 +85,8 @@ func getDriveStats(stats *v1.SystemStats, mounts []string) error {
 			return err
 		}
 		// Available blocks * size per block = available space in bytes
-		free := uint32(stat.Bavail * uint64(stat.Bsize))
-		total := uint32(stat.Blocks) * uint32(stat.Bsize)
+		free := stat.Bavail * uint64(stat.Bsize)
+		total := stat.Blocks * uint64(stat.Bsize)
 		stats.Drives[index] = &v1.DriveStats{
 			MountPoint: mountPoint,
 			TotalBytes: total,
