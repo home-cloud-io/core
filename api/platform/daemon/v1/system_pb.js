@@ -37,11 +37,11 @@ export const ComputeStats = /*@__PURE__*/ proto3.makeMessageType(
 export const MemoryStats = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.MemoryStats",
   () => [
-    { no: 1, name: "total_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 2, name: "used_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 3, name: "cached_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 4, name: "free_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 5, name: "available_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 1, name: "total_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "used_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 3, name: "cached_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 4, name: "free_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 5, name: "available_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
   ],
 );
 
@@ -52,8 +52,8 @@ export const DriveStats = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.DriveStats",
   () => [
     { no: 1, name: "mount_point", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "total_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 3, name: "free_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "total_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 3, name: "free_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
   ],
 );
 

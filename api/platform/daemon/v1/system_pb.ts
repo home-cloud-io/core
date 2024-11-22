@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
+import { Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
 
 /**
  * @generated from message platform.daemon.v1.SystemStats
@@ -121,29 +121,29 @@ export class ComputeStats extends Message<ComputeStats> {
  */
 export class MemoryStats extends Message<MemoryStats> {
   /**
-   * @generated from field: uint32 total_bytes = 1;
+   * @generated from field: uint64 total_bytes = 1;
    */
-  totalBytes = 0;
+  totalBytes = protoInt64.zero;
 
   /**
-   * @generated from field: uint32 used_bytes = 2;
+   * @generated from field: uint64 used_bytes = 2;
    */
-  usedBytes = 0;
+  usedBytes = protoInt64.zero;
 
   /**
-   * @generated from field: uint32 cached_bytes = 3;
+   * @generated from field: uint64 cached_bytes = 3;
    */
-  cachedBytes = 0;
+  cachedBytes = protoInt64.zero;
 
   /**
-   * @generated from field: uint32 free_bytes = 4;
+   * @generated from field: uint64 free_bytes = 4;
    */
-  freeBytes = 0;
+  freeBytes = protoInt64.zero;
 
   /**
-   * @generated from field: uint32 available_bytes = 5;
+   * @generated from field: uint64 available_bytes = 5;
    */
-  availableBytes = 0;
+  availableBytes = protoInt64.zero;
 
   constructor(data?: PartialMessage<MemoryStats>) {
     super();
@@ -153,11 +153,11 @@ export class MemoryStats extends Message<MemoryStats> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.MemoryStats";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "total_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 2, name: "used_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 3, name: "cached_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 4, name: "free_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 5, name: "available_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 1, name: "total_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "used_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 3, name: "cached_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 4, name: "free_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 5, name: "available_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MemoryStats {
@@ -187,14 +187,14 @@ export class DriveStats extends Message<DriveStats> {
   mountPoint = "";
 
   /**
-   * @generated from field: uint32 total_bytes = 2;
+   * @generated from field: uint64 total_bytes = 2;
    */
-  totalBytes = 0;
+  totalBytes = protoInt64.zero;
 
   /**
-   * @generated from field: uint32 free_bytes = 3;
+   * @generated from field: uint64 free_bytes = 3;
    */
-  freeBytes = 0;
+  freeBytes = protoInt64.zero;
 
   constructor(data?: PartialMessage<DriveStats>) {
     super();
@@ -205,8 +205,8 @@ export class DriveStats extends Message<DriveStats> {
   static readonly typeName = "platform.daemon.v1.DriveStats";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "mount_point", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "total_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 3, name: "free_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "total_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 3, name: "free_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DriveStats {
