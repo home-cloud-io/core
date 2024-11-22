@@ -51,6 +51,10 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 			AllowedIPs: peer.AllowedIps,
 		})
 	}
+	// make sure map isn't nil
+	if config.Wireguard.Interfaces == nil {
+		config.Wireguard.Interfaces = make(map[string]WireguardInterface)
+	}
 	// add interface to existing map
 	config.Wireguard.Interfaces[def.Interface.Name] = WireguardInterface{
 		IPs:            def.Interface.Ips,
