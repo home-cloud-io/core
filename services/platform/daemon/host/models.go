@@ -35,7 +35,7 @@ type (
 	}
 	NetworkingConfigNAT struct {
 		Enable             bool     `json:"enable"`
-		ExternalInterface  string   `json:"externalInterfaces,omitempty"`
+		ExternalInterface  string   `json:"externalInterface,omitempty"`
 		InternalInterfaces []string `json:"internalInterfaces,omitempty"`
 	}
 	NetworkingConfigWireguard struct {
