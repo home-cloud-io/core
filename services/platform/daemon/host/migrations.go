@@ -1,6 +1,8 @@
 package host
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -42,6 +44,12 @@ var (
 			Run:      m1,
 			Required: true,
 		},
+		{
+			Id:       "386e797e-4bf8-4a58-bb34-45edba27e8e5",
+			Name:     "Convert .nix configuration to mostly .json config files",
+			Run:      m2,
+			Required: true,
+		},
 	}
 )
 
@@ -55,7 +63,7 @@ func (m migrator) Migrate() {
 	m.logger.Info("running migrations")
 
 	history := migrationsHistory{}
-	f, err := os.ReadFile(MigrationsFile)
+	f, err := os.ReadFile(MigrationsFile())
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			m.logger.Info("no migrations history file")
@@ -72,27 +80,29 @@ func (m migrator) Migrate() {
 
 	for _, l := range migrationsList {
 		complete := false
-		for _, h := range history.Migrations {
-			if l.Id == h.Id {
-				complete = true
-				break
-			}
-		}
+		// for _, h := range history.Migrations {
+		// 	if l.Id == h.Id {
+		// 		complete = true
+		// 		break
+		// 	}
+		// }
 		if !complete {
+			log := m.logger.WithFields(
+				chassis.Fields{
+					"id":   l.Id,
+					"name": l.Name,
+				},
+			)
 			r := migrationRun{
 				Id:        l.Id,
 				Name:      l.Name,
 				Timestamp: time.Now(),
 			}
+			log.Info("running migration")
 			err := l.Run(m.logger)
 			if err != nil {
 				// TODO: send error to server
-				m.logger.WithError(err).WithFields(
-					chassis.Fields{
-						"id":   l.Id,
-						"name": l.Name,
-					},
-				).Error("failed to run migration")
+				log.WithError(err).Error("failed to run migration")
 				if l.Required {
 					m.logger.Panic("failed to run required migration")
 				}
@@ -107,7 +117,7 @@ func (m migrator) Migrate() {
 		m.logger.WithError(err).Panic("failed to marshal migrations history")
 	}
 
-	err = os.WriteFile(MigrationsFile, data, 0666)
+	err = os.WriteFile(MigrationsFile(), data, 0666)
 	if err != nil {
 		m.logger.WithError(err).Panic("failed to write migrations history file")
 	}
@@ -118,7 +128,7 @@ func (m migrator) Migrate() {
 func m1(logger chassis.Logger) error {
 	var (
 		replacers = []Replacer{}
-		fileName  = ServerManifestFile
+		fileName  = ServerManifestFile()
 	)
 
 	replacers = append(replacers, func(line string) string {
@@ -135,6 +145,210 @@ func m1(logger chassis.Logger) error {
 	})
 
 	err := LineByLineReplace(fileName, replacers)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func m2(logger chassis.Logger) error {
+	var (
+		ctx     = context.Background()
+		configs = map[string]any{
+			BootConfigFile(): BootConfig{
+				Loader: BootConfigLoader{
+					SystemdBoot: BootConfigLoaderSystemdBoot{
+						Enable: true,
+					},
+				},
+				BCache: BootConfigBCache{
+					Enable: true,
+				},
+			},
+			NetworkingConfigFile(): NetworkingConfig{
+				Hostname: "home-cloud",
+				Domain:   "local",
+				NetworkManager: NetworkingConfigNetworkManager{
+					Enable: true,
+				},
+				Wireless: NetworkingConfigWireless{
+					Enable: false,
+				},
+				Firewall: NetworkingConfigFirewall{
+					Enable: false,
+				},
+			},
+			SecurityConfigFile(): SecurityConfig{
+				Sudo: SecurityConfigSudo{
+					WheelNeedsPassword: false,
+				},
+			},
+			ServicesConfigFile(): ServicesConfig{
+				Resolved: ServicesConfigResolved{
+					Enable:  true,
+					Domains: []string{"local"},
+				},
+				K3s: ServicesConfigK3s{
+					Enable:     true,
+					Role:       "server",
+					ExtraFlags: "--tls-san home-cloud.local --disable traefik --service-node-port-range 80-32767",
+				},
+				OpenSSH: ServicesConfigOpenSSH{
+					Enable: false,
+				},
+				Avahi: ServicesConfigAvahi{
+					Enable:   true,
+					IPv4:     true,
+					IPv6:     true,
+					NSSmDNS4: true,
+					Publish: ServicesConfigAvahiPublish{
+						Enable:       true,
+						Domain:       true,
+						Addresses:    true,
+						UserServices: true,
+					},
+				},
+			},
+			TimeConfigFile(): TimeConfig{
+				TimeZone: "Etc/UTC",
+			},
+			UsersConfigFile(): UsersConfig{
+				Users: map[string]User{
+					"admin": {
+						IsNormalUser: true,
+						ExtraGroups:  []string{"wheel"},
+						OpenSSH: UserOpenSSH{
+							AuthorizedKeys: UserOpenSSHAuthorizedKeys{
+								Keys: []string{},
+							},
+						},
+					},
+				},
+			},
+		}
+	)
+	const (
+		nixVarsContents = `
+{ lib, ... }:
+with lib;
+{
+  options.vars = {
+    root = mkOption {
+      type = types.str;
+      default = "/etc/nixos";
+      description = "";
+    };
+  };
+}
+`
+		nixConfigurationContents = `
+{ config, lib, pkgs, ... }:
+let
+  home-cloud-daemon = import ./home-cloud/daemon/default.nix;
+in
+{
+  imports = [
+    <nixpkgs/nixos/modules/profiles/all-hardware.nix>
+    <nixpkgs/nixos/modules/profiles/base.nix>
+    ./vars.nix
+    ./hardware-configuration.nix
+  ];
+
+  boot = lib.importJSON (lib.concatStrings [ config.vars.root "/config/boot.json" ]);
+  networking = lib.importJSON (lib.concatStrings [ config.vars.root "/config/networking.json" ]);
+  services = lib.importJSON (lib.concatStrings [ config.vars.root "/config/services.json" ]);
+  time = lib.importJSON (lib.concatStrings [ config.vars.root "/config/time.json" ]);
+  users = lib.importJSON (lib.concatStrings [ config.vars.root "/config/users.json" ]);
+  security = lib.importJSON (lib.concatStrings [ config.vars.root "/config/security.json" ]);
+
+  # This service runs the Home Cloud Daemon at boot.
+  systemd.services.daemon = {
+    enable = true;
+    description = "Home Cloud Daemon";
+    after = [ "network.target" ];
+    serviceConfig = {
+      Environment = [
+        "DRAFT_CONFIG=/etc/home-cloud/config.yaml"
+        "NIX_PATH=/root/.nix-defexpr/channels:nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:nixos-config=/etc/nixos/configuration.nix:/nix/var/nix/profiles/per-user/root/channels"
+        "PATH=/run/current-system/sw/bin"
+      ];
+      Restart = "always";
+      RestartSec = 3;
+      WorkingDirectory = "/root";
+      ExecStart = ''
+        ${home-cloud-daemon}/bin/daemon
+      '';
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
+  environment.systemPackages =
+    [
+      home-cloud-daemon
+      pkgs.avahi
+      pkgs.coreutils
+      pkgs.curl
+      pkgs.nano
+      pkgs.openssl
+      pkgs.nvd
+    ];
+
+  # This option defines the first version of NixOS you have installed on this particular machine,
+  # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
+  #
+  # Most users should NEVER change this value after the initial install, for any reason,
+  # even if you've upgraded your system to a new NixOS release.
+  #
+  # This value does NOT affect the Nixpkgs version your packages and OS are pulled from,
+  # so changing it will NOT upgrade your system - see https://nixos.org/manual/nixos/stable/#sec-upgrading for how
+  # to actually do that.
+  #
+  # This value being lower than the current NixOS release does NOT mean your system is
+  # out of date, out of support, or vulnerable.
+  #
+  # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
+  # and migrated your data accordingly.
+  #
+  # For more information, see https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
+  system.stateVersion = "24.05"; # Did you read the comment?
+}
+`
+	)
+
+	err := os.MkdirAll(NixosConfigsPath(), 0755)
+	if err != nil {
+		return err
+	}
+
+	err = Test(logger)
+	if err != nil {
+		return err
+	}
+
+	for path, config := range configs {
+		bytes, err := json.Marshal(config)
+		if err != nil {
+			return err
+		}
+
+		err = os.WriteFile(path, bytes, 0600)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = os.WriteFile(NixosVarsFile(), []byte(nixVarsContents), 0600)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(NixosConfigFile(), []byte(nixConfigurationContents), 0600)
+	if err != nil {
+		return err
+	}
+
+	err = RebuildAndSwitchOS(ctx, logger)
 	if err != nil {
 		return err
 	}

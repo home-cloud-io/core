@@ -11,45 +11,11 @@ import (
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
-type (
-	NetworkingConfig struct {
-		Hostname       string `json:"hostName"`
-		Domain         string `json:"domain"`
-		NetworkManager struct {
-			Enable bool `json:"enable"`
-		} `json:"networkmanager"`
-		Wireless struct {
-			Enable bool `json:"enable"`
-		} `json:"wireless"`
-		Firewall struct {
-			Enable bool `json:"enable"`
-		} `json:"firewall"`
-		NAT struct {
-			Enable             bool     `json:"enable"`
-			ExternalInterface  string   `json:"externalInterfaces,omitempty"`
-			InternalInterfaces []string `json:"internalInterfaces,omitempty"`
-		} `json:"nat"`
-		Wireguard struct {
-			Interfaces map[string]WireguardInterface `json:"interfaces"`
-		} `json:"wireguard"`
-	}
-	WireguardInterface struct {
-		IPs            []string        `json:"ips"`
-		ListenPort     uint32          `json:"listenPort"`
-		PrivateKeyFile string          `json:"privateKeyFile"`
-		Peers          []WireguardPeer `json:"peers"`
-	}
-	WireguardPeer struct {
-		PublicKey  string   `json:"publicKey"`
-		AllowedIPs []string `json:"allowedIPs"`
-	}
-)
-
 func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.AddWireguardInterface) error {
 
 	// read config
 	config := NetworkingConfig{}
-	f, err := os.ReadFile(NetworkingConfigFile)
+	f, err := os.ReadFile(NetworkingConfigFile())
 	if err != nil {
 		return err
 	}
@@ -59,11 +25,11 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 	}
 
 	// write the private key file
-	err = os.MkdirAll(wireguardKeyPath(def.Interface.Name), 0700)
+	err = os.MkdirAll(fullWireguardKeyPath(def.Interface.Name), 0700)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(wireguardKeyPath(def.Interface.Name)+"/private", []byte(def.Interface.PrivateKey), 0600)
+	err = os.WriteFile(fullWireguardKeyPath(def.Interface.Name)+"/private", []byte(def.Interface.PrivateKey), 0600)
 	if err != nil {
 		return err
 	}
@@ -89,7 +55,7 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 	config.Wireguard.Interfaces[def.Interface.Name] = WireguardInterface{
 		IPs:            def.Interface.Ips,
 		ListenPort:     def.Interface.ListenPort,
-		PrivateKeyFile: wireguardKeyPath(def.Interface.Name) + "/private",
+		PrivateKeyFile: fullWireguardKeyPath(def.Interface.Name) + "/private",
 		Peers:          peers,
 	}
 
@@ -98,7 +64,7 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(NetworkingConfigFile, b, 0777)
+	err = os.WriteFile(NetworkingConfigFile(), b, 0777)
 	if err != nil {
 		return err
 	}
@@ -115,7 +81,7 @@ func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v
 
 	// read config
 	config := NetworkingConfig{}
-	f, err := os.ReadFile(NetworkingConfigFile)
+	f, err := os.ReadFile(NetworkingConfigFile())
 	if err != nil {
 		return err
 	}
@@ -125,7 +91,7 @@ func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v
 	}
 
 	// remove private key file
-	err = os.RemoveAll(wireguardKeyPath(def.Name))
+	err = os.RemoveAll(fullWireguardKeyPath(def.Name))
 	if err != nil {
 		return err
 	}
@@ -152,7 +118,7 @@ func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(NetworkingConfigFile, b, 0777)
+	err = os.WriteFile(NetworkingConfigFile(), b, 0777)
 	if err != nil {
 		return err
 	}
@@ -165,6 +131,6 @@ func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v
 	return nil
 }
 
-func wireguardKeyPath(interfaceName string) string {
-	return filepath.Join(WireguardKeyPath, interfaceName)
+func fullWireguardKeyPath(interfaceName string) string {
+	return filepath.Join(WireguardKeyPath(), interfaceName)
 }

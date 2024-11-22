@@ -2,8 +2,10 @@ package host
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sync"
@@ -17,40 +19,92 @@ type (
 )
 
 var (
-	ChunkPath            = "/etc/daemon/tmp"
-	ConfigFile           = "/etc/home-cloud/config.yaml"
-	MigrationsFile       = "/etc/home-cloud/migrations.yaml"
-	WireguardKeyPath     = "/etc/home-cloud/wireguard-keys"
-	NixosConfigFile      = "/etc/nixos/configuration.nix"
-	NetworkingConfigFile = "/etc/nixos/config/networking.json"
-	ServicesConfigFile   = "/etc/nixos/config/services.json"
-	TimeConfigFile       = "/etc/nixos/config/time.json"
-	DaemonNixFile        = "/etc/nixos/home-cloud/daemon/default.nix"
-	DraftManifestFile    = "/var/lib/rancher/k3s/server/manifests/draft.yaml"
-	OperatorManifestFile = "/var/lib/rancher/k3s/server/manifests/operator.yaml"
-	ServerManifestFile   = "/var/lib/rancher/k3s/server/manifests/server.yaml"
-)
-
-var (
 	// fileMutex is a safety check to make sure we don't accidentally write to the same file from multiple threads
 	// in the future this could be put into a map keyed off of filenames to allow parallel writes to different files
 	fileMutex = sync.Mutex{}
 )
 
-func ConfigureFilePaths(logger chassis.Logger) {
-	logger.Info("configuring file paths")
-	ChunkPath = FilePath(ChunkPath)
-	ConfigFile = FilePath(ConfigFile)
-	MigrationsFile = FilePath(MigrationsFile)
-	WireguardKeyPath = FilePath(WireguardKeyPath)
-	NixosConfigFile = FilePath(NixosConfigFile)
-	NetworkingConfigFile = FilePath(NetworkingConfigFile)
-	ServicesConfigFile = FilePath(ServicesConfigFile)
-	TimeConfigFile = FilePath(TimeConfigFile)
-	DaemonNixFile = FilePath(DaemonNixFile)
-	DraftManifestFile = FilePath(DraftManifestFile)
-	OperatorManifestFile = FilePath(OperatorManifestFile)
-	ServerManifestFile = FilePath(ServerManifestFile)
+const (
+	NixosRoot        = "/etc/nixos/"
+	HomeCloudRoot    = "/etc/home-cloud/"
+	K3sRoot          = "/var/lib/rancher/k3s/"
+	nixosConfigsPath = "config/"
+
+	DefaultFileMode = 0600
+)
+
+// Home Cloud paths
+
+func ChunkPath() string {
+	return FilePath(HomeCloudRoot, "tmp/")
+}
+
+func ConfigFile() string {
+	return FilePath(HomeCloudRoot, "config.yaml")
+}
+
+func MigrationsFile() string {
+	return FilePath(HomeCloudRoot, "migrations.yaml")
+}
+
+func WireguardKeyPath() string {
+	return FilePath(HomeCloudRoot, "wireguard-keys/")
+}
+
+// NixOS paths
+
+func NixosConfigFile() string {
+	return FilePath(NixosRoot, "configuration.nix")
+}
+
+func NixosVarsFile() string {
+	return FilePath(NixosRoot, "vars.nix")
+}
+
+func DaemonNixFile() string {
+	return FilePath(NixosRoot, "daemon/default.nix")
+}
+
+func NixosConfigsPath() string {
+	return FilePath(NixosRoot, nixosConfigsPath)
+}
+
+func BootConfigFile() string {
+	return FilePath(NixosRoot, nixosConfigsPath, "boot.json")
+}
+
+func NetworkingConfigFile() string {
+	return FilePath(NixosRoot, nixosConfigsPath, "networking.json")
+}
+
+func SecurityConfigFile() string {
+	return FilePath(NixosRoot, nixosConfigsPath, "security.json")
+}
+
+func ServicesConfigFile() string {
+	return FilePath(NixosRoot, nixosConfigsPath, "services.json")
+}
+
+func TimeConfigFile() string {
+	return FilePath(NixosRoot, nixosConfigsPath, "time.json")
+}
+
+func UsersConfigFile() string {
+	return FilePath(NixosRoot, nixosConfigsPath, "users.json")
+}
+
+// k3s paths
+
+func DraftManifestFile() string {
+	return FilePath(K3sRoot, "server/manifests/draft.yaml")
+}
+
+func OperatorManifestFile() string {
+	return FilePath(K3sRoot, "server/manifests/operator.yaml")
+}
+
+func ServerManifestFile() string {
+	return FilePath(K3sRoot, "server/manifests/operator.yaml")
 }
 
 // LineByLineReplace will process all lines in the given file running all Replacers against each line.
@@ -114,9 +168,25 @@ func LineByLineReplace(filename string, replacers []Replacer) error {
 
 // FilePath cleans the given path and makes it a local path by prefixing a "./tmp/" if
 // the draft env is "test".
-func FilePath(path string) string {
+func FilePath(paths ...string) string {
+	path := filepath.Join(paths...)
 	if chassis.GetConfig().Env() == "test" {
 		path = filepath.Join(".", "tmp", path)
 	}
 	return filepath.Clean(path)
+}
+
+func WriteJsonFile(path string, config any, perm fs.FileMode) error {
+
+	bytes, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(path, bytes, perm)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
