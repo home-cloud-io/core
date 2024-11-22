@@ -79,12 +79,12 @@ func (m migrator) Migrate() {
 
 	for _, l := range migrationsList {
 		complete := false
-		// for _, h := range history.Migrations {
-		// 	if l.Id == h.Id {
-		// 		complete = true
-		// 		break
-		// 	}
-		// }
+		for _, h := range history.Migrations {
+			if l.Id == h.Id {
+				complete = true
+				break
+			}
+		}
 		if !complete {
 			log := m.logger.WithFields(
 				chassis.Fields{
@@ -162,7 +162,7 @@ func m2(logger chassis.Logger) error {
 					},
 				},
 				BCache: BootConfigBCache{
-					Enable: true,
+					Enable: false,
 				},
 			},
 			NetworkingConfigFile(): NetworkingConfig{
