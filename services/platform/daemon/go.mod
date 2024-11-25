@@ -8,11 +8,11 @@ go 1.22.5
 
 require (
 	connectrpc.com/connect v1.16.2
-	github.com/home-cloud-io/core/api v0.4.25
+	github.com/home-cloud-io/core/api v0.4.26
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/spf13/viper v1.18.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0
-	github.com/steady-bytes/draft/pkg/loggers v0.2.3-0.20241125211613-7c9817e1fddc
+	github.com/steady-bytes/draft/pkg/loggers v0.2.3
 	golang.org/x/mod v0.13.0
 	golang.org/x/net v0.25.0
 	golang.org/x/sync v0.7.0

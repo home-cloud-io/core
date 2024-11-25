@@ -73,8 +73,8 @@ github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245 h1:Nyeelmxya
 github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245/go.mod h1:nTakvJ4XYq45UXtn0DbwR4aU9ZdjlnIenpbs6Cd+FM0=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0 h1:fPpQR1iGEVYjZ2OELvUHX600VAK5qmdnDEv3eXOwZUA=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0/go.mod h1:YHukhB04ChJsLHLJEUD6vjFyLX2L3dsX3wPBZcX4tmc=
-github.com/home-cloud-io/core/api v0.4.25 h1:TVaX8SJho7u1CikLPZafFo0DDvcKGPPhjbbByKjbgzs=
-github.com/home-cloud-io/core/api v0.4.25/go.mod h1:4G9DoubvZUuMFZOM63P6AOHyQ5Ulm9X2ilJ1EshIvjc=
+github.com/home-cloud-io/core/api v0.4.26 h1:4D9wX57j3wmbXow+fwon4n0iTaLm6cQBxosQxXJ/Ens=
+github.com/home-cloud-io/core/api v0.4.26/go.mod h1:4G9DoubvZUuMFZOM63P6AOHyQ5Ulm9X2ilJ1EshIvjc=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.9/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
@@ -157,8 +157,8 @@ github.com/steady-bytes/draft/api v0.3.1 h1:dv4EoLefhqfCFDEukjZlwqVl9GffLWLCQC7Z
 github.com/steady-bytes/draft/api v0.3.1/go.mod h1:mlwxjvRiqvwySGdzVmF8voFhMffWq2F7dyd+xt6kENA=
 github.com/steady-bytes/draft/pkg/chassis v0.3.0 h1:9uk+RRuSec2Sl7wy5ZSNv3IcqRqbU6vYiVSLj5Bo9co=
 github.com/steady-bytes/draft/pkg/chassis v0.3.0/go.mod h1:5TQfgltb/008bcuLe6vAQva0Kzrq1zEDCFoCfQjzzLo=
-github.com/steady-bytes/draft/pkg/loggers v0.2.3-0.20241125211613-7c9817e1fddc h1:CclW1I30PToO2YWnVOqZ8E+ayx02Hz1xKnhtq0y9ceQ=
-github.com/steady-bytes/draft/pkg/loggers v0.2.3-0.20241125211613-7c9817e1fddc/go.mod h1:nXeOQ6lXhsVWHzRqVcJz0JIeSW75ORVN+0izJwwnH+Y=
+github.com/steady-bytes/draft/pkg/loggers v0.2.3 h1:tZadHH8f9fo+tRHVp3BaJlVYvKlrlX8Hd6LxncUVgAM=
+github.com/steady-bytes/draft/pkg/loggers v0.2.3/go.mod h1:nXeOQ6lXhsVWHzRqVcJz0JIeSW75ORVN+0izJwwnH+Y=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
