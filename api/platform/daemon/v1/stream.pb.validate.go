@@ -4453,6 +4453,8 @@ func (m *FileDone) validate(all bool) error {
 
 	// no validation rules for ChunkCount
 
+	// no validation rules for FilePath
+
 	if len(errors) > 0 {
 		return FileDoneMultiError(errors)
 	}

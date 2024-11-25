@@ -356,6 +356,7 @@ export const FileDone = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "file_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "chunk_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "file_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

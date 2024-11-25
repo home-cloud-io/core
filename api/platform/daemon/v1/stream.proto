@@ -189,6 +189,7 @@ message FileChunk {
 message FileDone {
   string file_id = 1;
   uint32 chunk_count = 2;
+  string file_path = 3;
 }
 
 message SaveSettingsCommand {
