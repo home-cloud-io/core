@@ -21,17 +21,31 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 			"file_id":   info.FileId,
 			"file_path": info.FilePath,
 		})
-		// check if existing upload exists and ignore if so (only a single info message should be sent for a given file)
-		if _, ok := c.fileMetas[info.FileId]; ok {
-			log.Warn("info message recieved for already instantiated upload buffer")
-			return
-		}
-
-		// save meta
 		meta := fileMeta{
 			id:       info.FileId,
 			filePath: info.FilePath,
 		}
+
+		// check if existing upload exists and ignore if so (only a single info message should be sent for a given file)
+		if _, ok := c.fileMetas[info.FileId]; ok {
+			log.Warn("info message recieved for already instantiated upload buffer")
+			// repond to server with ready
+			err := c.Send(&v1.DaemonMessage{
+				Message: &v1.DaemonMessage_UploadFileReady{
+					UploadFileReady: &v1.UploadFileReady{
+						Id: info.FileId,
+					},
+				},
+			})
+			if err != nil {
+				log.Error("failed to alert server with ready state for file upload")
+				c.cleanupFailedFileUpload(log, meta)
+				return
+			}
+			return
+		}
+
+		// save meta
 		c.fileMetas[info.FileId] = meta
 
 		// make temporary chunk upload directory
