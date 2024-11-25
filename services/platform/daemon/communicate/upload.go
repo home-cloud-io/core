@@ -27,16 +27,18 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 			return
 		}
 
-		// save metadata
-		c.fileMetas[info.FileId] = fileMeta{
+		// save meta
+		meta := fileMeta{
 			id:       info.FileId,
 			filePath: info.FilePath,
 		}
+		c.fileMetas[info.FileId] = meta
 
 		// make temporary chunk upload directory
 		err := os.MkdirAll(filepath.Join(host.ChunkPath(), info.FileId), 0777)
 		if err != nil {
 			log.WithError(err).Error("failed to create temp directory for file upload")
+			c.cleanupFailedFileUpload(log, meta)
 			return
 		}
 
@@ -50,6 +52,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		})
 		if err != nil {
 			log.Error("failed to alert server with ready state for file upload")
+			c.cleanupFailedFileUpload(log, meta)
 			return
 		}
 		log.Info("completed file upload setup")
@@ -73,6 +76,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		err := os.WriteFile(fileName, chunk.Data, 0666)
 		if err != nil {
 			log.WithError(err).Error("failed to write uploaded file chunk")
+			c.cleanupFailedFileUpload(log, meta)
 			return
 		}
 		log.Debug("wrote temp file")
@@ -95,6 +99,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		})
 		if err != nil {
 			log.WithError(err).Error("failed to alert server with completed state for chunk upload")
+			c.cleanupFailedFileUpload(log, meta)
 			return
 		}
 
@@ -117,6 +122,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		err := c.reconstructFile(log, meta)
 		if err != nil {
 			log.WithError(err).Error("failed to reconstruct file from chunks")
+			c.cleanupFailedFileUpload(log, meta)
 			return
 		}
 
@@ -128,6 +134,27 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 	default:
 		c.logger.Error("unknown UploadFileRequest type")
 	}
+}
+
+func (c *client) cleanupFailedFileUpload(logger chassis.Logger, metadata fileMeta) {
+	// delete all chunks from metadata
+	i := 0
+	for {
+		_, ok := c.chunkMetas.LoadAndDelete(fmt.Sprintf("%s.%d", metadata.id, i))
+		if !ok {
+			break
+		}
+		i++
+	}
+
+	// remove chunk directory
+	err := os.RemoveAll(filepath.Join(host.ChunkPath(), metadata.id))
+	if err != nil {
+		logger.WithError(err).Error("failed to remove chunk directory")
+	}
+
+	// delete metadata
+	delete(c.fileMetas, metadata.id)
 }
 
 // reconstructFile reconstructs a file from its chunks using the provided metadata.
