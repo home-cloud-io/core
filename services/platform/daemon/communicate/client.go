@@ -28,20 +28,10 @@ type (
 		Send(*v1.DaemonMessage) error
 	}
 	client struct {
-		mutex      sync.Mutex
-		logger     chassis.Logger
-		stream     *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
-		mdns       host.DNSPublisher
-		fileMetas  map[string]fileMeta
-		chunkMetas sync.Map
-	}
-	fileMeta struct {
-		id       string
-		filePath string
-	}
-	chunkMeta struct {
-		index    uint32
-		fileName string
+		mutex  sync.Mutex
+		logger chassis.Logger
+		stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
+		mdns   host.DNSPublisher
 	}
 )
 
@@ -58,11 +48,9 @@ var (
 
 func NewClient(logger chassis.Logger, mdns host.DNSPublisher) Client {
 	clientSingleton = &client{
-		mutex:      sync.Mutex{},
-		logger:     logger,
-		mdns:       mdns,
-		fileMetas:  map[string]fileMeta{},
-		chunkMetas: sync.Map{},
+		mutex:  sync.Mutex{},
+		logger: logger,
+		mdns:   mdns,
 	}
 	return clientSingleton
 }
