@@ -12,7 +12,7 @@ require (
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/spf13/viper v1.18.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.0
-	github.com/steady-bytes/draft/pkg/loggers v0.2.2
+	github.com/steady-bytes/draft/pkg/loggers v0.2.3-0.20241125211613-7c9817e1fddc
 	golang.org/x/mod v0.13.0
 	golang.org/x/net v0.25.0
 	golang.org/x/sync v0.7.0
