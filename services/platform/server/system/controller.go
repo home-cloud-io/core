@@ -276,7 +276,6 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 				// update callback function for the current chunk
 				options.Callback = func(event *dv1.UploadFileChunkCompleted) (bool, error) {
 					if event.FileId == fileId && event.Index == uint32(chunk.index) {
-						fmt.Println("finished chunk")
 						done <- true
 					}
 					return false, nil
