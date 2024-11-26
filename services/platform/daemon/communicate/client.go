@@ -65,7 +65,11 @@ func (c *client) Listen() {
 			c.logger.Fatal("exhausted retries connecting to server - exiting")
 			os.Exit(1)
 		}
-		client := sdConnect.NewDaemonStreamServiceClient(newInsecureClient(), config.GetString("daemon.server"))
+		client := sdConnect.NewDaemonStreamServiceClient(
+			newInsecureClient(),
+			config.GetString("daemon.server"),
+			connect.WithGRPC(),
+		)
 		c.stream = client.Communicate(ctx)
 
 		// spin off workers
