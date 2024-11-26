@@ -1,6 +1,8 @@
 package async
 
 import (
+	"fmt"
+	"reflect"
 	"sync"
 )
 
@@ -19,7 +21,7 @@ type (
 		Deregister(id string)
 	}
 	broadcaster struct {
-		mu          sync.Mutex
+		mu          sync.RWMutex
 		subscribers map[string]chan any
 	}
 )
@@ -43,9 +45,16 @@ func (b *broadcaster) Deregister(id string) {
 }
 
 func (b *broadcaster) Send(m any) {
-	for _, c := range b.subscribers {
-		go func(c chan any) {
-			c <- m
-		}(c)
-	}
+	go func() {
+		b.mu.RLock()
+		defer b.mu.RUnlock()
+		for _, c := range b.subscribers {
+			select {
+			case c <- m: // attempt to send message and drop if not able
+			default:
+				// TODO: convert to logger?
+				fmt.Printf("dropping message: %s\n", reflect.TypeOf(m).String())
+			}
+		}
+	}()
 }
