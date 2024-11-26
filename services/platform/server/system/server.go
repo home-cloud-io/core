@@ -44,6 +44,12 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 	}
 	h.logger.Info("establishing daemon stream")
 	for {
+		if ctx.Err() != nil {
+			h.logger.WithError(err).Error("stream error")
+			com.CloseStream()
+			return err
+		}
+
 		message, err := stream.Receive()
 		if err != nil {
 			h.logger.WithError(err).Error("failed to recieve message")

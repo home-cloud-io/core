@@ -227,23 +227,14 @@ func (c *controller) RemoveMdnsHost(hostname string) error {
 
 func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId, fileName string) (string, error) {
 	logger.Info("uploading file")
-	var listenerErr error
-	done := make(chan bool)
-	go func() {
-		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileReady]{
-			Callback: func(event *dv1.UploadFileReady) (bool, error) {
-				if event.Id == fileId {
-					done <- true
-					return true, nil
-				}
-				return false, nil
-			},
-			Timeout: 5 * time.Second,
-		}).Listen(ctx)
-		if listenerErr != nil {
-			done <- true
-		}
-	}()
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileReady]{
+		Callback: func(event *dv1.UploadFileReady) (bool, error) {
+			if event.Id == fileId {
+				return true, nil
+			}
+			return false, nil
+		},
+	})
 
 	// prepare upload to daemon
 	err := com.Send(&dv1.ServerMessage{
@@ -262,16 +253,16 @@ func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger
 		logger.WithError(err).Error("failed to ready daemon for file upload")
 		return fileId, err
 	}
-	logger.Info("waiting for done signal")
-	<-done
-	if listenerErr != nil {
-		logger.WithError(listenerErr).Error("failed to ready daemon for file upload")
-		return fileId, listenerErr
+	logger.Info("waiting for ready signal")
+	err = listener.Listen(ctx)
+	if err != nil {
+		logger.WithError(err).Error("failed to ready daemon for file upload")
+		return fileId, err
 	}
 	logger.Info("daemon ready for file upload")
 
 	// chunk file and upload
-	err = c.streamFile(ctx, logger, buf, fileId)
+	err = c.streamFile(ctx, logger, buf, fileId, fileName)
 	if err != nil {
 		logger.WithError(err).Error("failed to upload chunked file")
 		return fileId, err
@@ -294,25 +285,25 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	)
 
 	// get the os update diff from the daemon
-	done := make(chan bool)
-	go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.OSUpdateDiff]{
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.OSUpdateDiff]{
 		Callback: func(event *dv1.OSUpdateDiff) (bool, error) {
 			response.OsDiff = event.Description
-			done <- true
 			return true, nil
 		},
-	}).Listen(ctx)
+	})
 	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestOsUpdateDiff{},
 	})
 	if err != nil {
 		return nil, err
 	}
-	<-done
+	err = listener.Listen(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	// get the current daemon version from the daemon
-	done = make(chan bool)
-	go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.CurrentDaemonVersion]{
+	listener = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.CurrentDaemonVersion]{
 		Callback: func(event *dv1.CurrentDaemonVersion) (bool, error) {
 			response.DaemonVersions = &v1.DaemonVersions{
 				Current: &v1.DaemonVersion{
@@ -321,13 +312,16 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 					SrcHash:    event.SrcHash,
 				},
 			}
-			done <- true
 			return true, nil
 		},
-	}).Listen(ctx)
+	})
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestCurrentDaemonVersion{},
 	})
+	if err != nil {
+		return nil, err
+	}
+	err = listener.Listen(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -443,23 +437,15 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	}
 
 	// command daemon to initialize
-	done := make(chan bool)
-	var listenerErr error
-	go func() {
-		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceAdded]{
-			Callback: func(event *dv1.WireguardInterfaceAdded) (bool, error) {
-				done <- true
-				if event.Error != nil {
-					return true, fmt.Errorf(event.Error.Error)
-				}
-				return true, nil
-			},
-			Timeout: 30 * time.Second,
-		}).Listen(ctx)
-		if listenerErr != nil {
-			done <- true
-		}
-	}()
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceAdded]{
+		Callback: func(event *dv1.WireguardInterfaceAdded) (bool, error) {
+			if event.Error != nil {
+				return true, fmt.Errorf(event.Error.Error)
+			}
+			return true, nil
+		},
+		Timeout: 30 * time.Second,
+	})
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardInterface{
 			AddWireguardInterface: &dv1.AddWireguardInterface{
@@ -471,9 +457,9 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	if err != nil {
 		return err
 	}
-	<-done
-	if listenerErr != nil {
-		return listenerErr
+	err = listener.Listen(ctx)
+	if err != nil {
+		return err
 	}
 
 	// save config to blueprint
@@ -506,23 +492,15 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 	)
 
 	// disable on daemon
-	done := make(chan bool)
-	var listenerErr error
-	go func() {
-		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceRemoved]{
-			Callback: func(event *dv1.WireguardInterfaceRemoved) (bool, error) {
-				done <- true
-				if event.Error != nil {
-					return true, fmt.Errorf(event.Error.Error)
-				}
-				return true, nil
-			},
-			Timeout: 30 * time.Second,
-		}).Listen(ctx)
-		if listenerErr != nil {
-			done <- true
-		}
-	}()
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceRemoved]{
+		Callback: func(event *dv1.WireguardInterfaceRemoved) (bool, error) {
+			if event.Error != nil {
+				return true, fmt.Errorf(event.Error.Error)
+			}
+			return true, nil
+		},
+		Timeout: 30 * time.Second,
+	})
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RemoveWireguardInterface{
 			RemoveWireguardInterface: &dv1.RemoveWireguardInterface{
@@ -533,9 +511,9 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 	if err != nil {
 		return err
 	}
-	<-done
-	if listenerErr != nil {
-		return listenerErr
+	err = listener.Listen(ctx)
+	if err != nil {
+		return err
 	}
 
 	// delete config from blueprint
@@ -774,23 +752,15 @@ func (c *controller) Login(ctx context.Context, username, password string) (stri
 
 func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cmd *dv1.SaveSettingsCommand) error {
 	logger.Info("saving settings")
-	done := make(chan bool)
-	var listenerErr error
-	go func() {
-		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.SettingsSaved]{
-			Callback: func(event *dv1.SettingsSaved) (bool, error) {
-				done <- true
-				if event.Error != nil {
-					return true, fmt.Errorf(event.Error.Error)
-				}
-				return true, nil
-			},
-			Timeout: 30 * time.Second,
-		}).Listen(ctx)
-		if listenerErr != nil {
-			done <- true
-		}
-	}()
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.SettingsSaved]{
+		Callback: func(event *dv1.SettingsSaved) (bool, error) {
+			if event.Error != nil {
+				return true, fmt.Errorf(event.Error.Error)
+			}
+			return true, nil
+		},
+		Timeout: 30 * time.Second,
+	})
 	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SaveSettingsCommand{
 			SaveSettingsCommand: cmd,
@@ -799,9 +769,9 @@ func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cm
 	if err != nil {
 		return err
 	}
-	<-done
-	if listenerErr != nil {
-		return listenerErr
+	err = listener.Listen(ctx)
+	if err != nil {
+		return err
 	}
 	logger.Info("settings saved successfully")
 	return nil
@@ -947,7 +917,7 @@ func getLatestImageTag(ctx context.Context, image string) (string, error) {
 	return latestVersion, nil
 }
 
-func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId string) error {
+func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId string, fileName string) error {
 	var (
 		g         errgroup.Group
 		log       = logger.WithField("file_id", fileId)
@@ -962,20 +932,34 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 		log := log.WithField("worker", i)
 		g.Go(func() error {
 			log.Debug("waiting for work")
+			options := &async.ListenerOptions[*dv1.UploadFileChunkCompleted]{
+				Callback: func(event *dv1.UploadFileChunkCompleted) (bool, error) {
+					return false, nil
+				},
+				Timeout: 30 * time.Minute,
+				Buffer:  64,
+			}
+			ctxCancel, cancel := context.WithCancel(ctx)
+			listener := async.RegisterListener(ctxCancel, c.broadcaster, options)
+			// begin listening and close when this routine is done
+			go listener.Listen(ctxCancel)
+			defer cancel()
+
+			done := make(chan bool)
 			for chunk := range chunks {
 				log := log.WithField("chunk_index", chunk.index)
-				log.Info("uploading chunk")
+				log.Debug("uploading chunk")
+
+				// update callback function for the current chunk
+				options.Callback = func(event *dv1.UploadFileChunkCompleted) (bool, error) {
+					if event.FileId == fileId && event.Index == uint32(chunk.index) {
+						fmt.Println("finished chunk")
+						done <- true
+					}
+					return false, nil
+				}
+
 				// upload chunk
-				done := make(chan bool)
-				go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileChunkCompleted]{
-					Callback: func(event *dv1.UploadFileChunkCompleted) (bool, error) {
-						if event.FileId == fileId && event.Index == uint32(chunk.index) {
-							done <- true
-							return true, nil
-						}
-						return false, nil
-					},
-				}).Listen(ctx)
 				err := com.Send(&dv1.ServerMessage{
 					Message: &dv1.ServerMessage_UploadFileRequest{
 						UploadFileRequest: &dv1.UploadFileRequest{
@@ -990,6 +974,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 					},
 				})
 				if err != nil {
+					log.WithError(err).Error("failed to send chunk to daemon")
 					return err
 				}
 
@@ -1036,6 +1021,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 	currentChunk++
 
 	// wait for all goroutines to finish
+	log.Info("waiting on pending chunks")
 	err := g.Wait()
 	if err != nil {
 		return err
@@ -1050,6 +1036,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 					Done: &dv1.FileDone{
 						FileId:     fileId,
 						ChunkCount: uint32(currentChunk),
+						FilePath:   fileName,
 					},
 				},
 			},
