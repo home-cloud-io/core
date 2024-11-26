@@ -1,0 +1,6 @@
+# ignore generated protbuf files
+api/**/*.ts linguist-generated
+api/**/*.js linguist-generated
+api/**/*.go linguist-generated
+# ignore documentation
+docs/** linguist-documentation
