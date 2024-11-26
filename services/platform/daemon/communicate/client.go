@@ -68,7 +68,6 @@ func (c *client) Listen() {
 		client := sdConnect.NewDaemonStreamServiceClient(
 			newInsecureClient(),
 			config.GetString("daemon.server"),
-			connect.WithGRPC(),
 		)
 		c.stream = client.Communicate(ctx)
 
@@ -85,7 +84,7 @@ func (c *client) Listen() {
 		})
 		// send the SettingsSaved event to cover the case where the daemon could be restarted while running the `nixos-rebuild switch` command
 		g.Go(func() error {
-			return c.stream.Send(&v1.DaemonMessage{
+			return c.Send(&v1.DaemonMessage{
 				Message: &v1.DaemonMessage_SettingsSaved{
 					SettingsSaved: &v1.SettingsSaved{},
 				},
@@ -121,12 +120,8 @@ func (c *client) Send(message *v1.DaemonMessage) error {
 	if c.stream == nil {
 		return ErrNoStream
 	}
-	fmt.Println("locking stream")
 	c.mutex.Lock()
-	fmt.Println("sending message")
-	time.Sleep(500 * time.Millisecond)
 	err := c.stream.Send(message)
-	fmt.Println("UNlocking stream")
 	c.mutex.Unlock()
 	return err
 }
@@ -177,7 +172,7 @@ func (c *client) listen(ctx context.Context) error {
 
 func (c *client) heartbeat() error {
 	for {
-		err := c.stream.Send(&v1.DaemonMessage{
+		err := c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_Heartbeat{},
 		})
 		if err != nil {
@@ -197,7 +192,7 @@ func (c *client) systemStats(ctx context.Context) error {
 			if err != nil {
 				c.logger.WithError(err).Error("failed to collect system stats")
 			}
-			err = c.stream.Send(&v1.DaemonMessage{
+			err = c.Send(&v1.DaemonMessage{
 				Message: &v1.DaemonMessage_SystemStats{
 					SystemStats: stats,
 				},
@@ -243,7 +238,7 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 	osUpdateDiff, err := host.GetOSVersionDiff(ctx, c.logger)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to get os version diff")
-		c.stream.Send(&v1.DaemonMessage{
+		c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_OsUpdateDiff{
 				OsUpdateDiff: &v1.OSUpdateDiff{
 					Error: &v1.DaemonError{
@@ -254,7 +249,7 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 		})
 		return
 	} else {
-		err := c.stream.Send(&v1.DaemonMessage{
+		err := c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_OsUpdateDiff{
 				OsUpdateDiff: &v1.OSUpdateDiff{
 					Description: osUpdateDiff,
@@ -273,7 +268,7 @@ func (c *client) currentDaemonVersion() {
 	current, err := host.GetDaemonVersion(c.logger)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to get current daemon version")
-		c.stream.Send(&v1.DaemonMessage{
+		c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_CurrentDaemonVersion{
 				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
 					Error: &v1.DaemonError{
@@ -284,7 +279,7 @@ func (c *client) currentDaemonVersion() {
 		})
 		return
 	} else {
-		err := c.stream.Send(&v1.DaemonMessage{
+		err := c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_CurrentDaemonVersion{
 				CurrentDaemonVersion: current,
 			},

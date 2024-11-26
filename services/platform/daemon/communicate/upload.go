@@ -45,7 +45,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 			},
 		})
 		if err != nil {
-			log.Error("failed to alert server with ready state for file upload")
+			log.WithError(err).Error("failed to alert server with ready state for file upload")
 			cleanupFailedFileUpload(log, info.FileId)
 			return
 		}
