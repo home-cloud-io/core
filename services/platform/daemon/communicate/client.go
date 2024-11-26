@@ -121,8 +121,11 @@ func (c *client) Send(message *v1.DaemonMessage) error {
 	if c.stream == nil {
 		return ErrNoStream
 	}
+	fmt.Println("locking stream")
 	c.mutex.Lock()
+	fmt.Println("sending message")
 	err := c.stream.Send(message)
+	fmt.Println("UNlocking stream")
 	c.mutex.Unlock()
 	return err
 }
