@@ -58,15 +58,8 @@ func NewController(logger chassis.Logger) Controller {
 }
 
 const (
-	ErrDeviceAlreadySetup     = "device already setup"
-	ErrFailedToCreateSettings = "failed to create settings"
-	ErrFailedToSaveSettings   = "failed to save settings"
-	ErrFailedToGetApps        = "failed to get apps"
-	ErrFailedToGetAppStorage  = "failed to get app storage"
-
-	ErrFailedToBuildSeedGetRequest = "failed to build get request for seed"
-	ErrFailedToGetSeedValue        = "failed to get seed value"
-	ErrFailedToUnmarshalSeedValue  = "failed to unmarshal seed value"
+	ErrFailedToGetApps       = "failed to get apps"
+	ErrFailedToGetAppStorage = "failed to get app storage"
 
 	autoUpdateCronConfigKey = "server.updates.apps_auto_update_cron"
 	rawChartBaseUrl         = "https://raw.githubusercontent.com/home-cloud-io/store"
