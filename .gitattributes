@@ -1,5 +1,6 @@
 # ignore generated protbuf files
-api/** linguist-generated
+api/**/*.ts linguist-generated
+api/**/*.js linguist-generated
 # api/**.js linguist-generated
 # api/**.go linguist-generated
 # ignore documentation
