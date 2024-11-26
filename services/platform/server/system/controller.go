@@ -75,23 +75,15 @@ const (
 
 func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cmd *dv1.SaveSettingsCommand) error {
 	logger.Info("saving settings")
-	done := make(chan bool)
-	var listenerErr error
-	go func() {
-		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.SettingsSaved]{
-			Callback: func(event *dv1.SettingsSaved) (bool, error) {
-				done <- true
-				if event.Error != nil {
-					return true, fmt.Errorf(event.Error.Error)
-				}
-				return true, nil
-			},
-			Timeout: 30 * time.Second,
-		}).Listen(ctx)
-		if listenerErr != nil {
-			done <- true
-		}
-	}()
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.SettingsSaved]{
+		Callback: func(event *dv1.SettingsSaved) (bool, error) {
+			if event.Error != nil {
+				return true, fmt.Errorf(event.Error.Error)
+			}
+			return true, nil
+		},
+		Timeout: 30 * time.Second,
+	})
 	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SaveSettingsCommand{
 			SaveSettingsCommand: cmd,
@@ -100,9 +92,9 @@ func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cm
 	if err != nil {
 		return err
 	}
-	<-done
-	if listenerErr != nil {
-		return listenerErr
+	err = listener.Listen(ctx)
+	if err != nil {
+		return err
 	}
 	logger.Info("settings saved successfully")
 	return nil
@@ -248,7 +240,7 @@ func getLatestImageTag(ctx context.Context, image string) (string, error) {
 	return latestVersion, nil
 }
 
-func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId string) error {
+func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId string, fileName string) error {
 	var (
 		g         errgroup.Group
 		log       = logger.WithField("file_id", fileId)
@@ -263,20 +255,33 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 		log := log.WithField("worker", i)
 		g.Go(func() error {
 			log.Debug("waiting for work")
+			options := &async.ListenerOptions[*dv1.UploadFileChunkCompleted]{
+				Callback: func(event *dv1.UploadFileChunkCompleted) (bool, error) {
+					return false, nil
+				},
+				Timeout: 30 * time.Minute,
+				Buffer:  64,
+			}
+			ctxCancel, cancel := context.WithCancel(ctx)
+			listener := async.RegisterListener(ctxCancel, c.broadcaster, options)
+			// begin listening and close when this routine is done
+			go listener.Listen(ctxCancel)
+			defer cancel()
+
+			done := make(chan bool)
 			for chunk := range chunks {
 				log := log.WithField("chunk_index", chunk.index)
-				log.Info("uploading chunk")
+				log.Debug("uploading chunk")
+
+				// update callback function for the current chunk
+				options.Callback = func(event *dv1.UploadFileChunkCompleted) (bool, error) {
+					if event.FileId == fileId && event.Index == uint32(chunk.index) {
+						done <- true
+					}
+					return false, nil
+				}
+
 				// upload chunk
-				done := make(chan bool)
-				go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileChunkCompleted]{
-					Callback: func(event *dv1.UploadFileChunkCompleted) (bool, error) {
-						if event.FileId == fileId && event.Index == uint32(chunk.index) {
-							done <- true
-							return true, nil
-						}
-						return false, nil
-					},
-				}).Listen(ctx)
 				err := com.Send(&dv1.ServerMessage{
 					Message: &dv1.ServerMessage_UploadFileRequest{
 						UploadFileRequest: &dv1.UploadFileRequest{
@@ -291,6 +296,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 					},
 				})
 				if err != nil {
+					log.WithError(err).Error("failed to send chunk to daemon")
 					return err
 				}
 
@@ -337,6 +343,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 	currentChunk++
 
 	// wait for all goroutines to finish
+	log.Info("waiting on pending chunks")
 	err := g.Wait()
 	if err != nil {
 		return err
@@ -351,6 +358,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 					Done: &dv1.FileDone{
 						FileId:     fileId,
 						ChunkCount: uint32(currentChunk),
+						FilePath:   fileName,
 					},
 				},
 			},

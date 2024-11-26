@@ -48,25 +48,25 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	)
 
 	// get the os update diff from the daemon
-	done := make(chan bool)
-	go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.OSUpdateDiff]{
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.OSUpdateDiff]{
 		Callback: func(event *dv1.OSUpdateDiff) (bool, error) {
 			response.OsDiff = event.Description
-			done <- true
 			return true, nil
 		},
-	}).Listen(ctx)
+	})
 	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestOsUpdateDiff{},
 	})
 	if err != nil {
 		return nil, err
 	}
-	<-done
+	err = listener.Listen(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	// get the current daemon version from the daemon
-	done = make(chan bool)
-	go async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.CurrentDaemonVersion]{
+	listener = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.CurrentDaemonVersion]{
 		Callback: func(event *dv1.CurrentDaemonVersion) (bool, error) {
 			response.DaemonVersions = &v1.DaemonVersions{
 				Current: &v1.DaemonVersion{
@@ -75,13 +75,16 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 					SrcHash:    event.SrcHash,
 				},
 			}
-			done <- true
 			return true, nil
 		},
-	}).Listen(ctx)
+	})
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestCurrentDaemonVersion{},
 	})
+	if err != nil {
+		return nil, err
+	}
+	err = listener.Listen(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -207,23 +210,15 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	}
 
 	// command daemon to initialize
-	done := make(chan bool)
-	var listenerErr error
-	go func() {
-		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceAdded]{
-			Callback: func(event *dv1.WireguardInterfaceAdded) (bool, error) {
-				done <- true
-				if event.Error != nil {
-					return true, fmt.Errorf(event.Error.Error)
-				}
-				return true, nil
-			},
-			Timeout: 30 * time.Second,
-		}).Listen(ctx)
-		if listenerErr != nil {
-			done <- true
-		}
-	}()
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceAdded]{
+		Callback: func(event *dv1.WireguardInterfaceAdded) (bool, error) {
+			if event.Error != nil {
+				return true, fmt.Errorf(event.Error.Error)
+			}
+			return true, nil
+		},
+		Timeout: 30 * time.Second,
+	})
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardInterface{
 			AddWireguardInterface: &dv1.AddWireguardInterface{
@@ -235,9 +230,9 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	if err != nil {
 		return err
 	}
-	<-done
-	if listenerErr != nil {
-		return listenerErr
+	err = listener.Listen(ctx)
+	if err != nil {
+		return err
 	}
 
 	// save config to blueprint
@@ -270,23 +265,15 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 	)
 
 	// disable on daemon
-	done := make(chan bool)
-	var listenerErr error
-	go func() {
-		listenerErr = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceRemoved]{
-			Callback: func(event *dv1.WireguardInterfaceRemoved) (bool, error) {
-				done <- true
-				if event.Error != nil {
-					return true, fmt.Errorf(event.Error.Error)
-				}
-				return true, nil
-			},
-			Timeout: 30 * time.Second,
-		}).Listen(ctx)
-		if listenerErr != nil {
-			done <- true
-		}
-	}()
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceRemoved]{
+		Callback: func(event *dv1.WireguardInterfaceRemoved) (bool, error) {
+			if event.Error != nil {
+				return true, fmt.Errorf(event.Error.Error)
+			}
+			return true, nil
+		},
+		Timeout: 30 * time.Second,
+	})
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RemoveWireguardInterface{
 			RemoveWireguardInterface: &dv1.RemoveWireguardInterface{
@@ -297,9 +284,9 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 	if err != nil {
 		return err
 	}
-	<-done
-	if listenerErr != nil {
-		return listenerErr
+	err = listener.Listen(ctx)
+	if err != nil {
+		return err
 	}
 
 	// delete config from blueprint
