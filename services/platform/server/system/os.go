@@ -68,6 +68,10 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	// get the current daemon version from the daemon
 	listener = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.CurrentDaemonVersion]{
 		Callback: func(event *dv1.CurrentDaemonVersion) (bool, error) {
+			if event.Error != nil {
+				logger.WithError(fmt.Errorf(event.Error.Error)).Error("failed to get current daemon version")
+				return true, fmt.Errorf(event.Error.Error)
+			}
 			response.DaemonVersions = &v1.DaemonVersions{
 				Current: &v1.DaemonVersion{
 					Version:    event.Version,
@@ -149,7 +153,10 @@ func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error 
 
 	// if the daemon needs updating, install it along with the os updates
 	// otherwise just install the os update
-	if updates.DaemonVersions.Current != updates.DaemonVersions.Latest {
+	if updates.DaemonVersions.Current.Version != updates.DaemonVersions.Latest.Version &&
+		updates.DaemonVersions.Current.SrcHash != updates.DaemonVersions.Latest.SrcHash &&
+		updates.DaemonVersions.Current.VendorHash != updates.DaemonVersions.Latest.VendorHash {
+		logger.Info("updating daemon along with os")
 		err = com.Send(&dv1.ServerMessage{
 			Message: &dv1.ServerMessage_ChangeDaemonVersionCommand{
 				ChangeDaemonVersionCommand: &dv1.ChangeDaemonVersionCommand{
