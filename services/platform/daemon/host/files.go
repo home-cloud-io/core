@@ -62,7 +62,7 @@ func NixosVarsFile() string {
 }
 
 func DaemonNixFile() string {
-	return FilePath(NixosRoot, "daemon/default.nix")
+	return FilePath(NixosRoot, "home-cloud/daemon/default.nix")
 }
 
 func NixosConfigsPath() string {
