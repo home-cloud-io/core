@@ -19,44 +19,6 @@ export const AppStatus = proto3.makeEnum(
 );
 
 /**
- * @generated from message platform.server.v1.RegisterPeerRequest
- */
-export const RegisterPeerRequest = proto3.makeMessageType(
-  "platform.server.v1.RegisterPeerRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.RegisterPeerResponse
- */
-export const RegisterPeerResponse = proto3.makeMessageType(
-  "platform.server.v1.RegisterPeerResponse",
-  () => [
-    { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * Model to store config in key/val store
- *
- * @generated from message platform.server.v1.PeerConfiguration
- */
-export const PeerConfiguration = proto3.makeMessageType(
-  "platform.server.v1.PeerConfiguration",
-  () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
  * @generated from message platform.server.v1.ShutdownHostRequest
  */
 export const ShutdownHostRequest = proto3.makeMessageType(
@@ -776,6 +738,44 @@ export const FileUploadedEvent = proto3.makeMessageType(
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.RegisterPeerRequest
+ */
+export const RegisterPeerRequest = proto3.makeMessageType(
+  "platform.server.v1.RegisterPeerRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.RegisterPeerResponse
+ */
+export const RegisterPeerResponse = proto3.makeMessageType(
+  "platform.server.v1.RegisterPeerResponse",
+  () => [
+    { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * Model to store config in key/val store
+ *
+ * @generated from message platform.server.v1.PeerConfiguration
+ */
+export const PeerConfiguration = proto3.makeMessageType(
+  "platform.server.v1.PeerConfiguration",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

@@ -38,328 +38,6 @@ var (
 // define the regex for a UUID once up-front
 var _web_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
-// Validate checks the field values on RegisterPeerRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *RegisterPeerRequest) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on RegisterPeerRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// RegisterPeerRequestMultiError, or nil if none found.
-func (m *RegisterPeerRequest) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *RegisterPeerRequest) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if len(errors) > 0 {
-		return RegisterPeerRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-// RegisterPeerRequestMultiError is an error wrapping multiple validation
-// errors returned by RegisterPeerRequest.ValidateAll() if the designated
-// constraints aren't met.
-type RegisterPeerRequestMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m RegisterPeerRequestMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m RegisterPeerRequestMultiError) AllErrors() []error { return m }
-
-// RegisterPeerRequestValidationError is the validation error returned by
-// RegisterPeerRequest.Validate if the designated constraints aren't met.
-type RegisterPeerRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RegisterPeerRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RegisterPeerRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RegisterPeerRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RegisterPeerRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RegisterPeerRequestValidationError) ErrorName() string {
-	return "RegisterPeerRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e RegisterPeerRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRegisterPeerRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RegisterPeerRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RegisterPeerRequestValidationError{}
-
-// Validate checks the field values on RegisterPeerResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *RegisterPeerResponse) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on RegisterPeerResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// RegisterPeerResponseMultiError, or nil if none found.
-func (m *RegisterPeerResponse) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *RegisterPeerResponse) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for PrivateKey
-
-	// no validation rules for PublicKey
-
-	// no validation rules for ServerPublicKey
-
-	// no validation rules for ServerId
-
-	// no validation rules for LocatorUrl
-
-	if len(errors) > 0 {
-		return RegisterPeerResponseMultiError(errors)
-	}
-
-	return nil
-}
-
-// RegisterPeerResponseMultiError is an error wrapping multiple validation
-// errors returned by RegisterPeerResponse.ValidateAll() if the designated
-// constraints aren't met.
-type RegisterPeerResponseMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m RegisterPeerResponseMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m RegisterPeerResponseMultiError) AllErrors() []error { return m }
-
-// RegisterPeerResponseValidationError is the validation error returned by
-// RegisterPeerResponse.Validate if the designated constraints aren't met.
-type RegisterPeerResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RegisterPeerResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RegisterPeerResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RegisterPeerResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RegisterPeerResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RegisterPeerResponseValidationError) ErrorName() string {
-	return "RegisterPeerResponseValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e RegisterPeerResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRegisterPeerResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RegisterPeerResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RegisterPeerResponseValidationError{}
-
-// Validate checks the field values on PeerConfiguration with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *PeerConfiguration) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on PeerConfiguration with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// PeerConfigurationMultiError, or nil if none found.
-func (m *PeerConfiguration) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *PeerConfiguration) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Id
-
-	// no validation rules for PublicKey
-
-	// no validation rules for PrivateKey
-
-	if len(errors) > 0 {
-		return PeerConfigurationMultiError(errors)
-	}
-
-	return nil
-}
-
-// PeerConfigurationMultiError is an error wrapping multiple validation errors
-// returned by PeerConfiguration.ValidateAll() if the designated constraints
-// aren't met.
-type PeerConfigurationMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m PeerConfigurationMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m PeerConfigurationMultiError) AllErrors() []error { return m }
-
-// PeerConfigurationValidationError is the validation error returned by
-// PeerConfiguration.Validate if the designated constraints aren't met.
-type PeerConfigurationValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e PeerConfigurationValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e PeerConfigurationValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e PeerConfigurationValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e PeerConfigurationValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e PeerConfigurationValidationError) ErrorName() string {
-	return "PeerConfigurationValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e PeerConfigurationValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPeerConfiguration.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = PeerConfigurationValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = PeerConfigurationValidationError{}
-
 // Validate checks the field values on ShutdownHostRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -8500,3 +8178,325 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = FileUploadedEventValidationError{}
+
+// Validate checks the field values on RegisterPeerRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RegisterPeerRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RegisterPeerRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RegisterPeerRequestMultiError, or nil if none found.
+func (m *RegisterPeerRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RegisterPeerRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return RegisterPeerRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// RegisterPeerRequestMultiError is an error wrapping multiple validation
+// errors returned by RegisterPeerRequest.ValidateAll() if the designated
+// constraints aren't met.
+type RegisterPeerRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RegisterPeerRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RegisterPeerRequestMultiError) AllErrors() []error { return m }
+
+// RegisterPeerRequestValidationError is the validation error returned by
+// RegisterPeerRequest.Validate if the designated constraints aren't met.
+type RegisterPeerRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegisterPeerRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegisterPeerRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegisterPeerRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegisterPeerRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegisterPeerRequestValidationError) ErrorName() string {
+	return "RegisterPeerRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RegisterPeerRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRegisterPeerRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegisterPeerRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegisterPeerRequestValidationError{}
+
+// Validate checks the field values on RegisterPeerResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RegisterPeerResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RegisterPeerResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RegisterPeerResponseMultiError, or nil if none found.
+func (m *RegisterPeerResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RegisterPeerResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PrivateKey
+
+	// no validation rules for PublicKey
+
+	// no validation rules for ServerPublicKey
+
+	// no validation rules for ServerId
+
+	// no validation rules for LocatorUrl
+
+	if len(errors) > 0 {
+		return RegisterPeerResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// RegisterPeerResponseMultiError is an error wrapping multiple validation
+// errors returned by RegisterPeerResponse.ValidateAll() if the designated
+// constraints aren't met.
+type RegisterPeerResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RegisterPeerResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RegisterPeerResponseMultiError) AllErrors() []error { return m }
+
+// RegisterPeerResponseValidationError is the validation error returned by
+// RegisterPeerResponse.Validate if the designated constraints aren't met.
+type RegisterPeerResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegisterPeerResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegisterPeerResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegisterPeerResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegisterPeerResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegisterPeerResponseValidationError) ErrorName() string {
+	return "RegisterPeerResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RegisterPeerResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRegisterPeerResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegisterPeerResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegisterPeerResponseValidationError{}
+
+// Validate checks the field values on PeerConfiguration with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *PeerConfiguration) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PeerConfiguration with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PeerConfigurationMultiError, or nil if none found.
+func (m *PeerConfiguration) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PeerConfiguration) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for PublicKey
+
+	// no validation rules for PrivateKey
+
+	if len(errors) > 0 {
+		return PeerConfigurationMultiError(errors)
+	}
+
+	return nil
+}
+
+// PeerConfigurationMultiError is an error wrapping multiple validation errors
+// returned by PeerConfiguration.ValidateAll() if the designated constraints
+// aren't met.
+type PeerConfigurationMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PeerConfigurationMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PeerConfigurationMultiError) AllErrors() []error { return m }
+
+// PeerConfigurationValidationError is the validation error returned by
+// PeerConfiguration.Validate if the designated constraints aren't met.
+type PeerConfigurationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PeerConfigurationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PeerConfigurationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PeerConfigurationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PeerConfigurationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PeerConfigurationValidationError) ErrorName() string {
+	return "PeerConfigurationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PeerConfigurationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPeerConfiguration.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PeerConfigurationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PeerConfigurationValidationError{}
