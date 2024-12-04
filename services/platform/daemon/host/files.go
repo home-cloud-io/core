@@ -104,7 +104,7 @@ func OperatorManifestFile() string {
 }
 
 func ServerManifestFile() string {
-	return FilePath(K3sRoot, "server/manifests/operator.yaml")
+	return FilePath(K3sRoot, "server/manifests/server.yaml")
 }
 
 // LineByLineReplace will process all lines in the given file running all Replacers against each line.
