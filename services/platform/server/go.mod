@@ -15,7 +15,7 @@ require (
 	github.com/containers/image/v5 v5.32.2
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.4.26
+	github.com/home-cloud-io/core/api v0.5.0
 	github.com/home-cloud-io/core/services/platform/operator v0.0.2
 	github.com/netbirdio/netbird v0.30.3
 	github.com/robfig/cron/v3 v3.0.0
