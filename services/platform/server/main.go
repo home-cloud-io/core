@@ -6,7 +6,6 @@ import (
 	"github.com/home-cloud-io/core/services/platform/server/apps"
 	"github.com/home-cloud-io/core/services/platform/server/async"
 	"github.com/home-cloud-io/core/services/platform/server/internal"
-	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	"github.com/home-cloud-io/core/services/platform/server/locator"
 	"github.com/home-cloud-io/core/services/platform/server/system"
 	"github.com/home-cloud-io/core/services/platform/server/web"
@@ -28,25 +27,25 @@ func main() {
 		sctl        = system.NewController(logger, broadcaster)
 		lctl        = locator.NewController(logger)
 		webRPC      = web.New(logger, actl, sctl, lctl)
-		webHTTP     = web.NewHttp(logger, actl, sctl)
+		// webHTTP     = web.NewHttp(logger, actl, sctl)
 		internalRPC = internal.New(logger, sctl)
 	)
 
 	runner := func() {
-		kvclient.Init()
-		system.InitSecretSeed(logger)
-		go apps.AppStoreCache(logger)
-		go actl.AutoUpdate(logger)
-		go sctl.AutoUpdateOS(logger)
-		go sctl.AutoUpdateContainers(logger)
-		go lctl.Load()
+		// kvclient.Init()
+		// system.InitSecretSeed(logger)
+		// go apps.AppStoreCache(logger)
+		// go actl.AutoUpdate(logger)
+		// go sctl.AutoUpdateOS(logger)
+		// go sctl.AutoUpdateContainers(logger)
+		// go lctl.Load()
 	}
 
 	defer chassis.New(logger).
 		WithClientApplication(files).
 		WithRPCHandler(daemonRPC).
+		// WithRPCHandler(webHTTP).
 		WithRPCHandler(webRPC).
-		WithRPCHandler(webHTTP).
 		WithRPCHandler(internalRPC).
 		WithRunner(runner).
 		WithRoute(&ntv1.Route{

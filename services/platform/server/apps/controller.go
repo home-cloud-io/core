@@ -53,7 +53,7 @@ type (
 func NewController(logger chassis.Logger) Controller {
 	chassis.GetConfig().SetDefault(autoUpdateCronConfigKey, "0 3 * * *")
 	return &controller{
-		k8sclient: k8sclient.NewClient(logger),
+		//k8sclient: k8sclient.NewClient(logger),
 	}
 }
 
