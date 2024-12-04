@@ -16,7 +16,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/pion/stun/v3"
+	"github.com/pion/stun/v2"
 )
 
 func copyAddr(dst *stun.XORMappedAddress, src stun.XORMappedAddress) {
@@ -82,7 +82,7 @@ func multiplex(conn *net.UDPConn, stunAddr net.Addr, stunConn io.Reader) {
 	}
 }
 
-var stunServer = flag.String("stun", "stun.l.google.com:19302", "STUN Server to use") //nolint:gochecknoglobals
+var stunServer = flag.String("stun", "192.168.1.205:3478", "STUN Server to use") //nolint:gochecknoglobals
 
 func main() {
 	flag.Parse()
