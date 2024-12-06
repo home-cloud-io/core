@@ -7,7 +7,9 @@
 package main
 
 import (
+	"bufio"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -160,55 +162,69 @@ func main() {
 	if isServer {
 		log.Printf("Acting as server. Use following command to connect: %s %s", os.Args[0], gotAddr)
 
-		for {
-			select {
-			case m := <-messages:
-				if _, err = conn.WriteTo([]byte(m.text), m.addr); err != nil {
-					log.Panicf("Failed to write: %s", err)
+		go func() {
+			for {
+				select {
+				case m := <-messages:
+					if _, err = conn.WriteTo([]byte(m.text), m.addr); err != nil {
+						log.Panicf("Failed to write: %s", err)
+					}
+				case <-notify:
+					log.Println("Stopping")
+					return
 				}
-			case <-notify:
-				log.Println("Stopping")
-				return
 			}
+		}()
+
+	}
+
+	fmt.Println("Enter the peer to connect to:")
+	var i string
+	scanner := bufio.NewScanner(os.Stdin)
+	if scanner.Scan() {
+		i = scanner.Text()
+	}
+
+	if i == "" {
+		log.Panicf("No peer given")
+	}
+
+	peerAddr, err := net.ResolveUDPAddr("udp4", i)
+	if err != nil {
+		log.Panicf("Failed to resolve '%s': %s", i, err)
+	}
+
+	log.Printf("Acting as client. Connecting to %s", peerAddr)
+
+	msg := "Hello peer"
+
+	sendMsg := func() {
+		log.Printf("Writing to: %s", peerAddr)
+		if _, err = conn.WriteTo([]byte(msg), peerAddr); err != nil {
+			log.Panicf("Failed to write: %s", err)
 		}
-	} else {
-		peerAddr, err := net.ResolveUDPAddr("udp4", flag.Arg(0))
-		if err != nil {
-			log.Panicf("Failed to resolve '%s': %s", flag.Arg(0), err)
-		}
+	}
 
-		log.Printf("Acting as client. Connecting to %s", peerAddr)
+	sendMsg()
 
-		msg := "Hello peer"
+	deadline := time.After(time.Second * 30)
 
-		sendMsg := func() {
-			log.Printf("Writing to: %s", peerAddr)
-			if _, err = conn.WriteTo([]byte(msg), peerAddr); err != nil {
-				log.Panicf("Failed to write: %s", err)
-			}
-		}
+	for {
+		select {
+		case <-deadline:
+			log.Fatal("Failed to connect: deadline reached.")
 
-		sendMsg()
+		case <-time.After(time.Second):
+			// Retry.
+			sendMsg()
 
-		deadline := time.After(time.Second * 10)
+		case m := <-messages:
+			log.Printf("Got response from %s: %s", m.addr, m.text)
+			return
 
-		for {
-			select {
-			case <-deadline:
-				log.Fatal("Failed to connect: deadline reached.")
-
-			case <-time.After(time.Second):
-				// Retry.
-				sendMsg()
-
-			case m := <-messages:
-				log.Printf("Got response from %s: %s", m.addr, m.text)
-				return
-
-			case <-notify:
-				log.Print("Stopping")
-				return
-			}
+		case <-notify:
+			log.Print("Stopping")
+			return
 		}
 	}
 }
