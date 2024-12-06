@@ -220,8 +220,6 @@ func main() {
 
 			case m := <-messages:
 				log.Printf("Got response from %s: %s", m.addr, m.text)
-				return
-
 			case <-notify:
 				log.Print("Stopping")
 				return
