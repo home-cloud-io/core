@@ -18,6 +18,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/pion/stun/v2"
 )
 
@@ -195,35 +196,33 @@ func main() {
 	}
 
 	log.Printf("Acting as client. Connecting to %s", peerAddr)
-	msg := "Hello peer"
+
+	sendMsg := func() {
+		msg := uuid.New().String()
+		log.Printf("Sending: %s", msg)
+		log.Printf("Writing to: %s", peerAddr)
+		if _, err = conn.WriteTo([]byte(msg), peerAddr); err != nil {
+			log.Panicf("Failed to write: %s", err)
+		}
+	}
+
+	sendMsg()
+
+	deadline := time.After(time.Second * 30)
 
 	for {
-		sendMsg := func() {
-			log.Printf("Writing to: %s", peerAddr)
-			if _, err = conn.WriteTo([]byte(msg), peerAddr); err != nil {
-				log.Panicf("Failed to write: %s", err)
-			}
-		}
+		select {
+		case <-deadline:
+			log.Fatal("Failed to connect: deadline reached.")
 
-		sendMsg()
-
-		deadline := time.After(time.Second * 30)
-
-		for {
-			select {
-			case <-deadline:
-				log.Fatal("Failed to connect: deadline reached.")
-
-			case <-time.After(time.Second):
-				// Retry.
-				sendMsg()
-
-			case m := <-messages:
-				log.Printf("Got response from %s: %s", m.addr, m.text)
-			case <-notify:
-				log.Print("Stopping")
-				return
-			}
+		case <-time.After(time.Second):
+			// Retry.
+			sendMsg()
+		case m := <-messages:
+			log.Printf("Got response from %s: %s", m.addr, m.text)
+		case <-notify:
+			log.Print("Stopping")
+			return
 		}
 	}
 
