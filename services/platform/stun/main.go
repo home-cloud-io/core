@@ -195,36 +195,38 @@ func main() {
 	}
 
 	log.Printf("Acting as client. Connecting to %s", peerAddr)
-
 	msg := "Hello peer"
 
-	sendMsg := func() {
-		log.Printf("Writing to: %s", peerAddr)
-		if _, err = conn.WriteTo([]byte(msg), peerAddr); err != nil {
-			log.Panicf("Failed to write: %s", err)
-		}
-	}
-
-	sendMsg()
-
-	deadline := time.After(time.Second * 30)
-
 	for {
-		select {
-		case <-deadline:
-			log.Fatal("Failed to connect: deadline reached.")
+		sendMsg := func() {
+			log.Printf("Writing to: %s", peerAddr)
+			if _, err = conn.WriteTo([]byte(msg), peerAddr); err != nil {
+				log.Panicf("Failed to write: %s", err)
+			}
+		}
 
-		case <-time.After(time.Second):
-			// Retry.
-			sendMsg()
+		sendMsg()
 
-		case m := <-messages:
-			log.Printf("Got response from %s: %s", m.addr, m.text)
-			return
+		deadline := time.After(time.Second * 30)
 
-		case <-notify:
-			log.Print("Stopping")
-			return
+		for {
+			select {
+			case <-deadline:
+				log.Fatal("Failed to connect: deadline reached.")
+
+			case <-time.After(time.Second):
+				// Retry.
+				sendMsg()
+
+			case m := <-messages:
+				log.Printf("Got response from %s: %s", m.addr, m.text)
+				return
+
+			case <-notify:
+				log.Print("Stopping")
+				return
+			}
 		}
 	}
+
 }
