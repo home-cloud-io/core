@@ -509,6 +509,47 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_WireguardPeerAdded:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetWireguardPeerAdded()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "WireguardPeerAdded",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "WireguardPeerAdded",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetWireguardPeerAdded()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "WireguardPeerAdded",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -1305,6 +1346,47 @@ func (m *ServerMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
 					field:  "RemoveWireguardInterface",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_AddWireguardPeer:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAddWireguardPeer()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "AddWireguardPeer",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "AddWireguardPeer",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAddWireguardPeer()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "AddWireguardPeer",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2689,6 +2771,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WireguardInterfaceRemovedValidationError{}
+
+// Validate checks the field values on WireguardPeerAdded with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WireguardPeerAdded) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WireguardPeerAdded with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WireguardPeerAddedMultiError, or nil if none found.
+func (m *WireguardPeerAdded) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WireguardPeerAdded) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WireguardPeerAddedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WireguardPeerAddedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WireguardPeerAddedValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return WireguardPeerAddedMultiError(errors)
+	}
+
+	return nil
+}
+
+// WireguardPeerAddedMultiError is an error wrapping multiple validation errors
+// returned by WireguardPeerAdded.ValidateAll() if the designated constraints
+// aren't met.
+type WireguardPeerAddedMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WireguardPeerAddedMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WireguardPeerAddedMultiError) AllErrors() []error { return m }
+
+// WireguardPeerAddedValidationError is the validation error returned by
+// WireguardPeerAdded.Validate if the designated constraints aren't met.
+type WireguardPeerAddedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WireguardPeerAddedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WireguardPeerAddedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WireguardPeerAddedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WireguardPeerAddedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WireguardPeerAddedValidationError) ErrorName() string {
+	return "WireguardPeerAddedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WireguardPeerAddedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWireguardPeerAdded.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WireguardPeerAddedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WireguardPeerAddedValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -4874,3 +5087,132 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RemoveWireguardInterfaceValidationError{}
+
+// Validate checks the field values on AddWireguardPeer with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *AddWireguardPeer) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddWireguardPeer with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddWireguardPeerMultiError, or nil if none found.
+func (m *AddWireguardPeer) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddWireguardPeer) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPeer()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AddWireguardPeerValidationError{
+					field:  "Peer",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AddWireguardPeerValidationError{
+					field:  "Peer",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPeer()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddWireguardPeerValidationError{
+				field:  "Peer",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AddWireguardPeerMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddWireguardPeerMultiError is an error wrapping multiple validation errors
+// returned by AddWireguardPeer.ValidateAll() if the designated constraints
+// aren't met.
+type AddWireguardPeerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddWireguardPeerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddWireguardPeerMultiError) AllErrors() []error { return m }
+
+// AddWireguardPeerValidationError is the validation error returned by
+// AddWireguardPeer.Validate if the designated constraints aren't met.
+type AddWireguardPeerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddWireguardPeerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddWireguardPeerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddWireguardPeerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddWireguardPeerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddWireguardPeerValidationError) ErrorName() string { return "AddWireguardPeerValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddWireguardPeerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddWireguardPeer.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddWireguardPeerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddWireguardPeerValidationError{}

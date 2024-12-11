@@ -228,6 +228,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 		},
 		Timeout: 30 * time.Second,
 	})
+
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardInterface{
 			AddWireguardInterface: &dv1.AddWireguardInterface{

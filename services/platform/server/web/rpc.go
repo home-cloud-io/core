@@ -419,15 +419,15 @@ const (
 func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
 	h.logger.Info("register a peer")
 
-	_, err := h.sctl.RegisterPeer(ctx, h.logger)
+	peerCfg, err := h.sctl.RegisterPeer(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error(ErrFailedPeerRegistration)
 		return nil, errors.New(ErrFailedPeerRegistration)
 	}
 
 	return connect.NewResponse(&v1.RegisterPeerResponse{
-		PrivateKey:      "",
-		PublicKey:       "",
+		PrivateKey:      peerCfg.GetPrivateKey(),
+		PublicKey:       peerCfg.GetPublicKey(),
 		Addresses:       []string{},
 		DnsServers:      []string{},
 		ServerPublicKey: "",
