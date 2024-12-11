@@ -3,9 +3,13 @@ package system
 import (
 	"context"
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/google/uuid"
+	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	"github.com/home-cloud-io/core/services/platform/server/async"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
@@ -52,9 +56,35 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		return nil, errors.New(ErrFailedToSetPeerConfig)
 	}
 
-	// send to daemon
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardPeerAdded]{
+		Callback: func(event *dv1.WireguardPeerAdded) (bool, error) {
+			if event.Error != nil {
+				return true, fmt.Errorf(event.Error.Error)
+			}
+			return true, nil
+		},
+		Timeout: 30 * time.Second,
+	})
 
-	// grab remaining server config
+	err = listener.Listen(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, errors.New("implement me")
+	err = com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_AddWireguardPeer{
+			AddWireguardPeer: &dv1.AddWireguardPeer{
+				Peer: &dv1.WireguardPeer{
+					PublicKey: pubKey.String(),
+					// The assumption is that any device using wireguard in the network can talk to each other
+					AllowedIps: []string{"*", "0.0.0.0"},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
 }
