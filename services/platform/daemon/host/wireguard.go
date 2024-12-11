@@ -37,12 +37,14 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 	// configure NAT
 	config.NAT.Enable = true
 	config.NAT.ExternalInterface = "eth0"
+
 	// add interface to existing array if necessary
 	if config.NAT.InternalInterfaces == nil {
 		config.NAT.InternalInterfaces = []string{def.Interface.Name}
 	} else {
 		config.NAT.InternalInterfaces = append(config.NAT.InternalInterfaces, def.Interface.Name)
 	}
+
 	// build out Wireguard peers
 	peers := make([]WireguardPeer, len(def.Interface.Peers))
 	for _, peer := range def.Interface.Peers {
@@ -51,10 +53,12 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 			AllowedIPs: peer.AllowedIps,
 		})
 	}
+
 	// make sure map isn't nil
 	if config.Wireguard.Interfaces == nil {
 		config.Wireguard.Interfaces = make(map[string]WireguardInterface)
 	}
+
 	// add interface to existing map
 	config.Wireguard.Interfaces[def.Interface.Name] = WireguardInterface{
 		IPs:            def.Interface.Ips,
@@ -68,6 +72,7 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 	if err != nil {
 		return err
 	}
+
 	err = os.WriteFile(NetworkingConfigFile(), b, 0777)
 	if err != nil {
 		return err

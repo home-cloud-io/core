@@ -29,10 +29,11 @@ import (
 
 type (
 	Controller interface {
-		Daemon
-		OS
 		Containers
+		Daemon
 		Device
+		OS
+		Peering
 	}
 
 	controller struct {
@@ -51,7 +52,7 @@ func NewController(logger chassis.Logger, broadcaster async.Broadcaster) Control
 	config.SetDefault(osAutoUpdateCronConfigKey, "0 1 * * *")
 	config.SetDefault(containerAutoUpdateCronConfigKey, "0 2 * * *")
 	return &controller{
-		k8sclient:        k8sclient.NewClient(logger),
+		k8sclient:        nil,
 		systemUpdateLock: sync.Mutex{},
 		broadcaster:      broadcaster,
 	}
