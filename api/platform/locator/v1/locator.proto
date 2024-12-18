@@ -33,6 +33,8 @@ message LocateRequest {
 }
 message LocateRequestBody {
   string server_id = 1;
+  string address = 2;
+  uint32 port = 3;
 }
 message LocateResponse {
   // body is of type LocateResponseBody

@@ -398,6 +398,10 @@ func (m *LocateRequestBody) validate(all bool) error {
 
 	// no validation rules for ServerId
 
+	// no validation rules for Address
+
+	// no validation rules for Port
+
 	if len(errors) > 0 {
 		return LocateRequestBodyMultiError(errors)
 	}

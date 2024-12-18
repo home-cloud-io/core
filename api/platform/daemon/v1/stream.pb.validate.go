@@ -509,6 +509,47 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_StunAddress:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetStunAddress()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "StunAddress",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "StunAddress",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetStunAddress()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "StunAddress",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -1305,6 +1346,47 @@ func (m *ServerMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
 					field:  "RemoveWireguardInterface",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_SetStunServerCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetSetStunServerCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "SetStunServerCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "SetStunServerCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSetStunServerCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "SetStunServerCommand",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2689,6 +2771,109 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WireguardInterfaceRemovedValidationError{}
+
+// Validate checks the field values on STUNAddress with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *STUNAddress) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on STUNAddress with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in STUNAddressMultiError, or
+// nil if none found.
+func (m *STUNAddress) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *STUNAddress) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Address
+
+	// no validation rules for Port
+
+	if len(errors) > 0 {
+		return STUNAddressMultiError(errors)
+	}
+
+	return nil
+}
+
+// STUNAddressMultiError is an error wrapping multiple validation errors
+// returned by STUNAddress.ValidateAll() if the designated constraints aren't met.
+type STUNAddressMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m STUNAddressMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m STUNAddressMultiError) AllErrors() []error { return m }
+
+// STUNAddressValidationError is the validation error returned by
+// STUNAddress.Validate if the designated constraints aren't met.
+type STUNAddressValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e STUNAddressValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e STUNAddressValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e STUNAddressValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e STUNAddressValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e STUNAddressValidationError) ErrorName() string { return "STUNAddressValidationError" }
+
+// Error satisfies the builtin error interface
+func (e STUNAddressValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSTUNAddress.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = STUNAddressValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = STUNAddressValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -4874,3 +5059,107 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RemoveWireguardInterfaceValidationError{}
+
+// Validate checks the field values on SetSTUNServerCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetSTUNServerCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetSTUNServerCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetSTUNServerCommandMultiError, or nil if none found.
+func (m *SetSTUNServerCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetSTUNServerCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Server
+
+	if len(errors) > 0 {
+		return SetSTUNServerCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetSTUNServerCommandMultiError is an error wrapping multiple validation
+// errors returned by SetSTUNServerCommand.ValidateAll() if the designated
+// constraints aren't met.
+type SetSTUNServerCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetSTUNServerCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetSTUNServerCommandMultiError) AllErrors() []error { return m }
+
+// SetSTUNServerCommandValidationError is the validation error returned by
+// SetSTUNServerCommand.Validate if the designated constraints aren't met.
+type SetSTUNServerCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetSTUNServerCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetSTUNServerCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetSTUNServerCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetSTUNServerCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetSTUNServerCommandValidationError) ErrorName() string {
+	return "SetSTUNServerCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetSTUNServerCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetSTUNServerCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetSTUNServerCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetSTUNServerCommandValidationError{}

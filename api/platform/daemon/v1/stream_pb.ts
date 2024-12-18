@@ -83,6 +83,12 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: WireguardInterfaceRemoved;
     case: "wireguardInterfaceRemoved";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.STUNAddress stun_address = 12;
+     */
+    value: STUNAddress;
+    case: "stunAddress";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -104,6 +110,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
     { no: 10, name: "wireguard_interface_added", kind: "message", T: WireguardInterfaceAdded, oneof: "message" },
     { no: 11, name: "wireguard_interface_removed", kind: "message", T: WireguardInterfaceRemoved, oneof: "message" },
+    { no: 12, name: "stun_address", kind: "message", T: STUNAddress, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -238,6 +245,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: RemoveWireguardInterface;
     case: "removeWireguardInterface";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.SetSTUNServerCommand set_stun_server_command = 18;
+     */
+    value: SetSTUNServerCommand;
+    case: "setStunServerCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -265,6 +278,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 15, name: "save_settings_command", kind: "message", T: SaveSettingsCommand, oneof: "message" },
     { no: 16, name: "add_wireguard_interface", kind: "message", T: AddWireguardInterface, oneof: "message" },
     { no: 17, name: "remove_wireguard_interface", kind: "message", T: RemoveWireguardInterface, oneof: "message" },
+    { no: 18, name: "set_stun_server_command", kind: "message", T: SetSTUNServerCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -718,6 +732,49 @@ export class WireguardInterfaceRemoved extends Message<WireguardInterfaceRemoved
 
   static equals(a: WireguardInterfaceRemoved | PlainMessage<WireguardInterfaceRemoved> | undefined, b: WireguardInterfaceRemoved | PlainMessage<WireguardInterfaceRemoved> | undefined): boolean {
     return proto3.util.equals(WireguardInterfaceRemoved, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.STUNAddress
+ */
+export class STUNAddress extends Message<STUNAddress> {
+  /**
+   * @generated from field: string address = 1;
+   */
+  address = "";
+
+  /**
+   * @generated from field: uint32 port = 2;
+   */
+  port = 0;
+
+  constructor(data?: PartialMessage<STUNAddress>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.STUNAddress";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): STUNAddress {
+    return new STUNAddress().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): STUNAddress {
+    return new STUNAddress().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): STUNAddress {
+    return new STUNAddress().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: STUNAddress | PlainMessage<STUNAddress> | undefined, b: STUNAddress | PlainMessage<STUNAddress> | undefined): boolean {
+    return proto3.util.equals(STUNAddress, a, b);
   }
 }
 
@@ -1515,6 +1572,43 @@ export class RemoveWireguardInterface extends Message<RemoveWireguardInterface> 
 
   static equals(a: RemoveWireguardInterface | PlainMessage<RemoveWireguardInterface> | undefined, b: RemoveWireguardInterface | PlainMessage<RemoveWireguardInterface> | undefined): boolean {
     return proto3.util.equals(RemoveWireguardInterface, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.SetSTUNServerCommand
+ */
+export class SetSTUNServerCommand extends Message<SetSTUNServerCommand> {
+  /**
+   * @generated from field: string server = 1;
+   */
+  server = "";
+
+  constructor(data?: PartialMessage<SetSTUNServerCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.SetSTUNServerCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "server", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetSTUNServerCommand {
+    return new SetSTUNServerCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetSTUNServerCommand {
+    return new SetSTUNServerCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetSTUNServerCommand {
+    return new SetSTUNServerCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetSTUNServerCommand | PlainMessage<SetSTUNServerCommand> | undefined, b: SetSTUNServerCommand | PlainMessage<SetSTUNServerCommand> | undefined): boolean {
+    return proto3.util.equals(SetSTUNServerCommand, a, b);
   }
 }
 

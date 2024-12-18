@@ -233,6 +233,7 @@ message DisableSecureTunnellingResponse {}
 
 message RegisterToLocatorRequest {
   string locator_address = 1;
+  string stun_address = 2;
   // TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
 }
 message RegisterToLocatorResponse {
@@ -324,6 +325,7 @@ message DeviceSettings {
 message LocatorSettings {
   bool enabled = 1;
   repeated Locator locators = 2;
+  string stun_server_address = 3;
 }
 
 message Locator {

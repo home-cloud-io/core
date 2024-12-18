@@ -5385,6 +5385,8 @@ func (m *RegisterToLocatorRequest) validate(all bool) error {
 
 	// no validation rules for LocatorAddress
 
+	// no validation rules for StunAddress
+
 	if len(errors) > 0 {
 		return RegisterToLocatorRequestMultiError(errors)
 	}
@@ -6988,6 +6990,8 @@ func (m *LocatorSettings) validate(all bool) error {
 		}
 
 	}
+
+	// no validation rules for StunServerAddress
 
 	if len(errors) > 0 {
 		return LocatorSettingsMultiError(errors)

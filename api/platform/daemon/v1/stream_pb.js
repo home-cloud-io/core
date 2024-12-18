@@ -24,6 +24,7 @@ export const DaemonMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
     { no: 10, name: "wireguard_interface_added", kind: "message", T: WireguardInterfaceAdded, oneof: "message" },
     { no: 11, name: "wireguard_interface_removed", kind: "message", T: WireguardInterfaceRemoved, oneof: "message" },
+    { no: 12, name: "stun_address", kind: "message", T: STUNAddress, oneof: "message" },
   ],
 );
 
@@ -50,6 +51,7 @@ export const ServerMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 15, name: "save_settings_command", kind: "message", T: SaveSettingsCommand, oneof: "message" },
     { no: 16, name: "add_wireguard_interface", kind: "message", T: AddWireguardInterface, oneof: "message" },
     { no: 17, name: "remove_wireguard_interface", kind: "message", T: RemoveWireguardInterface, oneof: "message" },
+    { no: 18, name: "set_stun_server_command", kind: "message", T: SetSTUNServerCommand, oneof: "message" },
   ],
 );
 
@@ -173,6 +175,17 @@ export const WireguardInterfaceRemoved = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.WireguardInterfaceRemoved",
   () => [
     { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.STUNAddress
+ */
+export const STUNAddress = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.STUNAddress",
+  () => [
+    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ],
 );
 
@@ -390,6 +403,16 @@ export const RemoveWireguardInterface = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.RemoveWireguardInterface",
   () => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.SetSTUNServerCommand
+ */
+export const SetSTUNServerCommand = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.SetSTUNServerCommand",
+  () => [
+    { no: 1, name: "server", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

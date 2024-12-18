@@ -484,6 +484,7 @@ export const RegisterToLocatorRequest = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.RegisterToLocatorRequest",
   () => [
     { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "stun_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -644,6 +645,7 @@ export const LocatorSettings = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "locators", kind: "message", T: Locator, repeated: true },
+    { no: 3, name: "stun_server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

@@ -45,6 +45,8 @@ export const LocateRequestBody = /*@__PURE__*/ proto3.makeMessageType(
   "platform.locator.v1.LocateRequestBody",
   () => [
     { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ],
 );
 

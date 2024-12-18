@@ -25,6 +25,7 @@ message DaemonMessage {
     SettingsSaved settings_saved = 9;
     WireguardInterfaceAdded wireguard_interface_added = 10;
     WireguardInterfaceRemoved wireguard_interface_removed = 11;
+    STUNAddress stun_address = 12;
   }
 }
 
@@ -50,6 +51,7 @@ message ServerMessage {
     SaveSettingsCommand save_settings_command = 15;
     AddWireguardInterface add_wireguard_interface = 16;
     RemoveWireguardInterface remove_wireguard_interface = 17;
+    SetSTUNServerCommand set_stun_server_command = 18;
   }
 }
 
@@ -108,6 +110,11 @@ message WireguardInterfaceAdded {
 
 message WireguardInterfaceRemoved {
   DaemonError error = 16;
+}
+
+message STUNAddress {
+  string address = 1;
+  uint32 port = 2;
 }
 
 // Server -> Daemon
@@ -206,4 +213,8 @@ message AddWireguardInterface {
 
 message RemoveWireguardInterface {
   string name = 1;
+}
+
+message SetSTUNServerCommand {
+  string server = 1;
 }

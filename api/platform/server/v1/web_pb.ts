@@ -1838,11 +1838,16 @@ export class DisableSecureTunnellingResponse extends Message<DisableSecureTunnel
  */
 export class RegisterToLocatorRequest extends Message<RegisterToLocatorRequest> {
   /**
-   * TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
-   *
    * @generated from field: string locator_address = 1;
    */
   locatorAddress = "";
+
+  /**
+   * TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
+   *
+   * @generated from field: string stun_address = 2;
+   */
+  stunAddress = "";
 
   constructor(data?: PartialMessage<RegisterToLocatorRequest>) {
     super();
@@ -1853,6 +1858,7 @@ export class RegisterToLocatorRequest extends Message<RegisterToLocatorRequest> 
   static readonly typeName = "platform.server.v1.RegisterToLocatorRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "stun_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterToLocatorRequest {
@@ -2472,6 +2478,11 @@ export class LocatorSettings extends Message<LocatorSettings> {
    */
   locators: Locator[] = [];
 
+  /**
+   * @generated from field: string stun_server_address = 3;
+   */
+  stunServerAddress = "";
+
   constructor(data?: PartialMessage<LocatorSettings>) {
     super();
     proto3.util.initPartial(data, this);
@@ -2482,6 +2493,7 @@ export class LocatorSettings extends Message<LocatorSettings> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "locators", kind: "message", T: Locator, repeated: true },
+    { no: 3, name: "stun_server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorSettings {
