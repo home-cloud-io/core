@@ -5,8 +5,24 @@ service:
     port: 9000
     bind_address: localhost
   env: test
+  logging:
+    level: debug
 
 daemon:
+  # server: http://home-cloud.local
   server: http://localhost:8000
   domain: local
   hostnames: []
+  locatorSettings:
+    enabled: true
+    stunServerAddress: localhost:3478
+    locators:
+      - address: http://localhost:8001
+        connections:
+          - serverId: 76165d7c-8d4c-4fcc-8271-cd7767a2d966
+            wireguardInterface: wg0
+  # TODO: remove this and just read the JSON config?
+  wireguard:
+    interfaces:
+      - name: wg0
+        id: 76165d7c-8d4c-4fcc-8271-cd7767a2d966

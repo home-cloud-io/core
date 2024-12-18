@@ -32,6 +32,7 @@ type (
 		logger chassis.Logger
 		stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
 		mdns   host.DNSPublisher
+		stun   host.STUNClient
 	}
 )
 
@@ -46,11 +47,12 @@ var (
 	ErrNoStream = fmt.Errorf("no stream")
 )
 
-func NewClient(logger chassis.Logger, mdns host.DNSPublisher) Client {
+func NewClient(logger chassis.Logger, mdns host.DNSPublisher, stun host.STUNClient) Client {
 	clientSingleton = &client{
 		mutex:  sync.Mutex{},
 		logger: logger,
 		mdns:   mdns,
+		stun:   stun,
 	}
 	return clientSingleton
 }
@@ -164,6 +166,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.addWireguardInterface(ctx, message.GetAddWireguardInterface())
 		case *v1.ServerMessage_RemoveWireguardInterface:
 			go c.removeWireguardInterface(ctx, message.GetRemoveWireguardInterface())
+		case *v1.ServerMessage_SetStunServerCommand:
+			go c.setSTUNServer(ctx, message.GetSetStunServerCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -367,5 +371,12 @@ func (c *client) saveSettings(ctx context.Context, def *v1.SaveSettingsCommand) 
 	if err != nil {
 		c.logger.WithError(err).Error("failed to send success")
 		return
+	}
+}
+
+func (c *client) setSTUNServer(_ context.Context, def *v1.SetSTUNServerCommand) {
+	_, err := c.stun.Bind(def.Server)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to bind to new stun server")
 	}
 }

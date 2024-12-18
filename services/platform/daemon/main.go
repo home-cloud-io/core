@@ -9,9 +9,11 @@ import (
 
 func main() {
 	var (
-		logger   = zerolog.New()
-		mdns     = host.NewDNSPublisher(logger)
-		client   = communicate.NewClient(logger, mdns)
+		logger = zerolog.New()
+		mdns   = host.NewDNSPublisher(logger)
+		stun     = host.NewSTUNClient(logger)
+		locator  = host.NewLocatorController(logger, stun)
+		client   = communicate.NewClient(logger, mdns, stun)
 		migrator = host.NewMigrator(logger)
 	)
 
@@ -19,7 +21,8 @@ func main() {
 	runtime := chassis.New(logger).
 		WithRunner(client.Listen).
 		WithRunner(mdns.Start).
-		WithRunner(migrator.Migrate)
+		WithRunner(migrator.Migrate).
+		WithRunner(locator.Load)
 
 	// start daemon runtime
 	runtime.Start()
