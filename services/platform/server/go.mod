@@ -4,7 +4,7 @@ go 1.23.0
 
 toolchain go1.23.2
 
-// replace github.com/home-cloud-io/core/api => ../../../api
+replace github.com/home-cloud-io/core/api => ../../../api
 
 // replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 

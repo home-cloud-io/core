@@ -255,8 +255,10 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 		return err
 	}
 	settings.LocatorSettings = &v1.LocatorSettings{
-		Enabled:  true,
-		Locators: make([]*v1.Locator, 0),
+		Enabled:           true,
+		Locators:          make([]*v1.Locator, 0),
+		// TODO: default to locator.home-cloud.io:3478 and it configurable
+		StunServerAddress: "localhost:3478",
 	}
 	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {

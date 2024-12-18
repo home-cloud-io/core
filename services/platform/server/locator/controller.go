@@ -7,11 +7,13 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/locator/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/locator/v1/v1connect"
 	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	"github.com/home-cloud-io/core/services/platform/server/async"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 
 	"connectrpc.com/connect"
@@ -43,7 +45,9 @@ type (
 		Disable(ctx context.Context) error
 	}
 	controller struct {
-		logger chassis.Logger
+		logger      chassis.Logger
+		broadcaster async.Broadcaster
+		stunAddress *dv1.STUNAddress
 		// map of unique keys ("serverId@locatorAddress") to locator
 		locators map[string]locator
 	}
@@ -58,15 +62,35 @@ const (
 	fakeAccessToken = "fake_access_token"
 )
 
-func NewController(logger chassis.Logger) Controller {
+func NewController(logger chassis.Logger, broadcaster async.Broadcaster) Controller {
 	return &controller{
-		logger:   logger,
-		locators: make(map[string]locator),
+		logger:      logger,
+		locators:    make(map[string]locator),
+		broadcaster: broadcaster,
 	}
 }
 
 func (m *controller) Load() {
 	ctx := context.Background()
+
+	go func() {
+		err := async.RegisterListener(ctx, m.broadcaster, &async.ListenerOptions[*dv1.STUNAddress]{
+			// the max duration (around 292 years) since we don't ever want this listener to close
+			// TODO: change listeners to have an infinite listen option
+			Timeout: time.Duration(1<<63 - 1),
+			Callback: func(event *dv1.STUNAddress) (done bool, err error) {
+				m.logger.WithFields(chassis.Fields{
+					"stun_address": event.Address,
+					"stun_port":    event.Port,
+				}).Info("received new STUN address from daemon")
+				m.stunAddress = event
+				return false, nil
+			},
+		}).Listen(ctx)
+		if err != nil {
+			m.logger.WithError(err).Error("failed while listening for STUN address updates from daemon")
+		}
+	}()
 
 	// get settings from blueprint
 	settings := &sv1.DeviceSettings{}
@@ -96,7 +120,7 @@ func (m *controller) Load() {
 			}
 
 			// run connection in background (can be cancelled through context)
-			go connectToLocator(ctx, m.logger, l.Address, c.ServerId, c.WireguardInterface)
+			go m.connectToLocator(ctx, m.logger, l.Address, c.ServerId, c.WireguardInterface)
 		}
 
 	}
@@ -143,7 +167,7 @@ func (m *controller) AddLocator(ctx context.Context, locatorAddress string) (*sv
 		}
 
 		// run connection in background (can be cancelled through context)
-		go connectToLocator(ctx, m.logger, locatorAddress, inf.Id, inf.Name)
+		go m.connectToLocator(ctx, m.logger, locatorAddress, inf.Id, inf.Name)
 
 		connections[index] = &sv1.LocatorConnection{
 			ServerId:           inf.Id,
@@ -225,7 +249,7 @@ func (m *controller) Disable(ctx context.Context) error {
 	return nil
 }
 
-func connectToLocator(ctx context.Context, logger chassis.Logger, locatorAddress, serverId, wgInterface string) {
+func (m *controller) connectToLocator(ctx context.Context, logger chassis.Logger, locatorAddress, serverId, wgInterface string) {
 	log := logger.WithFields(chassis.Fields{
 		"locator_address": locatorAddress,
 		"server_id":       serverId,
@@ -257,13 +281,13 @@ func connectToLocator(ctx context.Context, logger chassis.Logger, locatorAddress
 		}
 		switch msg.Body.(type) {
 		case *v1.LocatorMessage_Locate:
-			go authorizeLocate(ctx, log, wgInterface, stream, msg.GetLocate())
+			go m.authorizeLocate(ctx, log, wgInterface, stream, msg.GetLocate())
 		default:
 			log.WithError(err).Error("invalid message type received from locator")
 		}
 	}
 }
-func authorizeLocate(ctx context.Context, logger chassis.Logger, wgInterface string, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate) {
+func (m *controller) authorizeLocate(ctx context.Context, logger chassis.Logger, wgInterface string, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate) {
 
 	// get wireguard config from blueprint
 	c := &dv1.WireguardConfig{}
@@ -306,39 +330,18 @@ func authorizeLocate(ctx context.Context, logger chassis.Logger, wgInterface str
 	}
 
 	// attempt to validate the locate request and reject if we can't validate it
-	authorized, err := validate(config, remoteKey, locate.Body.Body)
+	authorized, err := validate(logger, config, remoteKey, locate.Body.Body)
 	if authorized && err == nil {
-		log.Info("approving request")
-		// TODO: return STUN information
-		msg := &v1.LocateResponseBody{
-			Address: "localhost",
-			Port:    8000,
-		}
-		// encrypt the response before sending
-		body, err := encryption.EncryptMessage(remoteKey, config.PrivateKey, msg)
-		err = stream.Send(&v1.ServerMessage{
-			AccessToken: fakeAccessToken,
-			Body: &v1.ServerMessage_Accept{
-				Accept: &v1.Accept{
-					RequestId: locate.RequestId,
-					Body: &v1.EncryptedMessage{
-						PublicKey: config.PublicKey.String(),
-						Body:      body,
-					},
-				},
-			},
-		})
-		if err != nil {
-			logger.WithError(err).Error("failed to send accept message")
-			reject(log, locate.RequestId, stream)
-			return
-		}
+		m.accept(logger, config, remoteKey, stream, locate)
 		return
+	}
+	if err != nil {
+		logger.WithError(err).Error("failed to validate locate request")
 	}
 	reject(log, locate.RequestId, stream)
 }
 
-func validate(config WireGuardConfig, remoteKey wgtypes.Key, body []byte) (authorized bool, err error) {
+func validate(logger chassis.Logger, config WireGuardConfig, remoteKey wgtypes.Key, body []byte) (authorized bool, err error) {
 	for _, trustedKey := range config.Peers {
 		if trustedKey == remoteKey {
 			// attempt to decrypt message using our private key and their given public key
@@ -353,10 +356,46 @@ func validate(config WireGuardConfig, remoteKey wgtypes.Key, body []byte) (autho
 				return true, nil
 			}
 
+			logger.WithFields(chassis.Fields{
+				"requested": msg.ServerId,
+				"actual":    config.Id,
+			}).Debug("server id does not match")
 			return false, nil
 		}
 	}
+	logger.Debug("given public key not in trusted peers")
 	return false, nil
+}
+
+func (m *controller) accept(logger chassis.Logger, config WireGuardConfig, remoteKey wgtypes.Key, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate) {
+	logger.Info("approving request")
+
+	msg := &v1.LocateResponseBody{
+		Address: m.stunAddress.Address,
+		Port:    m.stunAddress.Port,
+	}
+
+	// encrypt the response before sending
+	body, err := encryption.EncryptMessage(remoteKey, config.PrivateKey, msg)
+	err = stream.Send(&v1.ServerMessage{
+		AccessToken: fakeAccessToken,
+		Body: &v1.ServerMessage_Accept{
+			Accept: &v1.Accept{
+				RequestId: locate.RequestId,
+				Body: &v1.EncryptedMessage{
+					PublicKey: config.PublicKey.String(),
+					Body:      body,
+				},
+			},
+		},
+	})
+	if err != nil {
+		logger.WithError(err).Error("failed to send accept message")
+		reject(logger, locate.RequestId, stream)
+		return
+	}
+
+	// TODO: attempt outbound connection to peer to open hole in NAT
 }
 
 func reject(logger chassis.Logger, requestId string, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage]) {
@@ -394,6 +433,7 @@ func parseConfig(c *dv1.WireguardInterface) (config WireGuardConfig, err error) 
 		config.Peers[index] = publicKey
 	}
 
+	config.Id = c.Id
 	return config, nil
 }
 
