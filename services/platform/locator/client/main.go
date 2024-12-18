@@ -207,24 +207,30 @@ func main() {
 		log.Panicf("Failed to resolve '%s': %s", fmt.Sprintf("%s:%d", msg.Address, msg.Port), err)
 	}
 
-	testMsg := uuid.New().String()
-	if _, err = conn.WriteTo([]byte(testMsg), peerAddr); err != nil {
+	deadline := time.After(time.Second * 10)
+
+	sendMsg := func() {
+		msg := uuid.New().String()
+		log.Printf("sending: %s", msg)
+		if _, err := conn.WriteTo([]byte(msg), peerAddr); err != nil {
 		log.Panicf("Failed to write: %s", err)
 	}
-
-}
-
-func newInsecureClient() *http.Client {
-	return &http.Client{
-		Transport: &http2.Transport{
-			AllowHTTP: true,
-			DialTLS: func(network, addr string, _ *tls.Config) (net.Conn, error) {
-				// If you're also using this client for non-h2c traffic, you may want
-				// to delegate to tls.Dial if the network isn't TCP or the addr isn't
-				// in an allowlist.
-				return net.Dial(network, addr)
-			},
-			// Don't forget timeouts!
-		},
 	}
+
+	for {
+		select {
+		case <-deadline:
+			log.Print("finished attempt to open connection to peer")
+			return
+		case <-time.After(time.Second):
+			// Retry
+			sendMsg()
+			// case m := <-messages:
+			// 	log.Printf("Got response from %s: %s", m.addr, m.text)
+			// case <-notify:
+			// 	log.Print("Stopping")
+			// 	return
+		}
+	}
+
 }
