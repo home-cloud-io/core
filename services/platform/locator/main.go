@@ -22,5 +22,6 @@ func main() {
 			},
 			EnableHttp2: true,
 		}).
+		WithRunner(server.StartStun).
 		Start()
 }

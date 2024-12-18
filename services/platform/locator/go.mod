@@ -4,7 +4,7 @@ go 1.23.0
 
 toolchain go1.23.2
 
-// replace github.com/home-cloud-io/core/api => ../../../api
+replace github.com/home-cloud-io/core/api => ../../../api
 
 replace golang.zx2c4.com/wireguard => github.com/netbirdio/wireguard-go v0.0.0-20240105182236-6c340dd55aed
 
@@ -13,6 +13,8 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/home-cloud-io/core/api v0.4.21
 	github.com/netbirdio/netbird v0.30.3
+	github.com/pion/stun/v2 v2.0.0
+	github.com/pion/turn/v4 v4.0.0
 	github.com/steady-bytes/draft/api v0.3.2
 	github.com/steady-bytes/draft/pkg/chassis v0.3.4
 	github.com/steady-bytes/draft/pkg/loggers v0.2.2
@@ -64,6 +66,13 @@ require (
 	github.com/miekg/dns v1.1.59 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
+	github.com/pion/dtls/v2 v2.2.10 // indirect
+	github.com/pion/dtls/v3 v3.0.1 // indirect
+	github.com/pion/logging v0.2.2 // indirect
+	github.com/pion/randutil v0.1.0 // indirect
+	github.com/pion/stun/v3 v3.0.0 // indirect
+	github.com/pion/transport/v2 v2.2.4 // indirect
+	github.com/pion/transport/v3 v3.0.7 // indirect
 	github.com/rs/cors v1.10.1 // indirect
 	github.com/rs/zerolog v1.32.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
@@ -75,6 +84,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.18.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
+	github.com/wlynxg/anet v0.0.3 // indirect
 	github.com/zeebo/blake3 v0.2.3 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
