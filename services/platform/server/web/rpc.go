@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
+	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	"github.com/home-cloud-io/core/services/platform/server/locator"
 	"github.com/home-cloud-io/core/services/platform/server/system"
 
@@ -425,13 +427,42 @@ func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[
 		return nil, errors.New(ErrFailedPeerRegistration)
 	}
 
+	// get ip address
+	// get dns server
+	adder, err := getOutboundIP()
+	if err != nil {
+		h.logger.WithError(err).Error("failed to get device ip")
+		return nil, err
+	}
+
+	// get locator address
+	settings := &v1.DeviceSettings{}
+	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		h.logger.WithError(err).Warn("failed to get device settings when loading locators")
+		return nil, err
+	}
+
+	dns := fmt.Sprintf("%s:%d", adder, 53)
+
 	return connect.NewResponse(&v1.RegisterPeerResponse{
 		PrivateKey:      peerCfg.GetPrivateKey(),
 		PublicKey:       peerCfg.GetPublicKey(),
-		Addresses:       []string{},
-		DnsServers:      []string{},
+		Addresses:       []string{adder},
+		DnsServers:      []string{dns},
 		ServerPublicKey: "",
 		ServerId:        "",
 		LocatorUrl:      "",
 	}), nil
+}
+
+// Get preferred outbound ip of this machine
+func getOutboundIP() (string, error) {
+	conn, err := net.Dial("udp", "home-cloud.io:80")
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String(), nil
 }
