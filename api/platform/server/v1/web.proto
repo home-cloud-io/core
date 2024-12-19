@@ -389,4 +389,10 @@ message PeerConfiguration {
   string id = 1;
   string public_key = 2;
   string private_key = 3;
+  ClientRegistrationDetails client_details = 4;
+}
+
+message ClientRegistrationDetails {
+  string server_address = 1;
+  string locator_address = 2;
 }
