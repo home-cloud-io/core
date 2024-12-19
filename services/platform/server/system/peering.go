@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/google/uuid"
@@ -86,5 +87,36 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		return nil, err
 	}
 
+	adder, err := getOutboundIP()
+	if err != nil {
+		logger.WithError(err).Error("failed to get device ip")
+		return nil, err
+	}
+
+	// get locator address
+	settings := &v1.DeviceSettings{}
+	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		logger.WithError(err).Warn("failed to get device settings when loading locators")
+		return nil, err
+	}
+
+	clientConfig := &v1.ClientRegistrationDetails{
+		ServerAddress:  adder,
+		LocatorAddress: settings.LocatorSettings.Locators[0].Address,
+	}
+
+	cfg.ClientDetails = clientConfig
+
 	return cfg, nil
+}
+
+func getOutboundIP() (string, error) {
+	conn, err := net.Dial("udp", "home-cloud.io:80")
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String(), nil
 }
