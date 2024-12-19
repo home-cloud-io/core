@@ -28,7 +28,7 @@ func main() {
 		sctl        = system.NewController(logger, broadcaster)
 		lctl        = locator.NewController(logger)
 		webRPC      = web.New(logger, actl, sctl, lctl)
-		// webHTTP     = web.NewHttp(logger, actl, sctl)
+		webHTTP     = web.NewHttp(logger, actl, sctl)
 		internalRPC = internal.New(logger, sctl)
 	)
 
@@ -46,7 +46,7 @@ func main() {
 		WithClientApplication(files).
 		WithRPCHandler(daemonRPC).
 		WithRPCHandler(webRPC).
-		// WithRPCHandler(webHTTP).
+		WithRPCHandler(webHTTP).
 		WithRPCHandler(internalRPC).
 		WithRunner(runner).
 		WithRoute(&ntv1.Route{
