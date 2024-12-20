@@ -5,7 +5,7 @@
 
 import { proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "./system_pb.js";
-import { WireguardInterface } from "./wireguard_pb.js";
+import { WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -24,6 +24,7 @@ export const DaemonMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
     { no: 10, name: "wireguard_interface_added", kind: "message", T: WireguardInterfaceAdded, oneof: "message" },
     { no: 11, name: "wireguard_interface_removed", kind: "message", T: WireguardInterfaceRemoved, oneof: "message" },
+    { no: 12, name: "wireguard_peer_added", kind: "message", T: WireguardPeerAdded, oneof: "message" },
   ],
 );
 
@@ -50,6 +51,7 @@ export const ServerMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 15, name: "save_settings_command", kind: "message", T: SaveSettingsCommand, oneof: "message" },
     { no: 16, name: "add_wireguard_interface", kind: "message", T: AddWireguardInterface, oneof: "message" },
     { no: 17, name: "remove_wireguard_interface", kind: "message", T: RemoveWireguardInterface, oneof: "message" },
+    { no: 18, name: "add_wireguard_peer", kind: "message", T: AddWireguardPeer, oneof: "message" },
   ],
 );
 
@@ -171,6 +173,16 @@ export const WireguardInterfaceAdded = /*@__PURE__*/ proto3.makeMessageType(
  */
 export const WireguardInterfaceRemoved = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.WireguardInterfaceRemoved",
+  () => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.WireguardPeerAdded
+ */
+export const WireguardPeerAdded = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.WireguardPeerAdded",
   () => [
     { no: 16, name: "error", kind: "message", T: DaemonError },
   ],
@@ -390,6 +402,16 @@ export const RemoveWireguardInterface = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.RemoveWireguardInterface",
   () => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.AddWireguardPeer
+ */
+export const AddWireguardPeer = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.AddWireguardPeer",
+  () => [
+    { no: 1, name: "peer", kind: "message", T: WireguardPeer },
   ],
 );
 

@@ -411,3 +411,29 @@ func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.
 		time.Sleep(5 * time.Second)
 	}
 }
+
+const (
+	ErrFailedPeerRegistration = "failed to register client device as peer to the overlay network"
+)
+
+func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
+	h.logger.Info("register a peer")
+
+	peerCfg, err := h.sctl.RegisterPeer(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error(ErrFailedPeerRegistration)
+		return nil, errors.New(ErrFailedPeerRegistration)
+	}
+
+	dns := fmt.Sprintf("%s:%d", peerCfg.ClientDetails.ServerAddress, 53)
+
+	return connect.NewResponse(&v1.RegisterPeerResponse{
+		PrivateKey:      peerCfg.GetPrivateKey(),
+		PublicKey:       peerCfg.GetPublicKey(),
+		Addresses:       []string{peerCfg.ClientDetails.ServerAddress},
+		DnsServers:      []string{dns},
+		ServerPublicKey: peerCfg.PublicKey,
+		ServerId:        peerCfg.Id,
+		LocatorUrl:      peerCfg.ClientDetails.LocatorAddress,
+	}), nil
+}

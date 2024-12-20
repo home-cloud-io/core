@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "./system_pb.js";
-import { WireguardInterface } from "./wireguard_pb.js";
+import { WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -83,6 +83,12 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: WireguardInterfaceRemoved;
     case: "wireguardInterfaceRemoved";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.WireguardPeerAdded wireguard_peer_added = 12;
+     */
+    value: WireguardPeerAdded;
+    case: "wireguardPeerAdded";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -104,6 +110,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
     { no: 10, name: "wireguard_interface_added", kind: "message", T: WireguardInterfaceAdded, oneof: "message" },
     { no: 11, name: "wireguard_interface_removed", kind: "message", T: WireguardInterfaceRemoved, oneof: "message" },
+    { no: 12, name: "wireguard_peer_added", kind: "message", T: WireguardPeerAdded, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -238,6 +245,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: RemoveWireguardInterface;
     case: "removeWireguardInterface";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.AddWireguardPeer add_wireguard_peer = 18;
+     */
+    value: AddWireguardPeer;
+    case: "addWireguardPeer";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -265,6 +278,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 15, name: "save_settings_command", kind: "message", T: SaveSettingsCommand, oneof: "message" },
     { no: 16, name: "add_wireguard_interface", kind: "message", T: AddWireguardInterface, oneof: "message" },
     { no: 17, name: "remove_wireguard_interface", kind: "message", T: RemoveWireguardInterface, oneof: "message" },
+    { no: 18, name: "add_wireguard_peer", kind: "message", T: AddWireguardPeer, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -718,6 +732,43 @@ export class WireguardInterfaceRemoved extends Message<WireguardInterfaceRemoved
 
   static equals(a: WireguardInterfaceRemoved | PlainMessage<WireguardInterfaceRemoved> | undefined, b: WireguardInterfaceRemoved | PlainMessage<WireguardInterfaceRemoved> | undefined): boolean {
     return proto3.util.equals(WireguardInterfaceRemoved, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.WireguardPeerAdded
+ */
+export class WireguardPeerAdded extends Message<WireguardPeerAdded> {
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
+  constructor(data?: PartialMessage<WireguardPeerAdded>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.WireguardPeerAdded";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardPeerAdded {
+    return new WireguardPeerAdded().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WireguardPeerAdded {
+    return new WireguardPeerAdded().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WireguardPeerAdded {
+    return new WireguardPeerAdded().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WireguardPeerAdded | PlainMessage<WireguardPeerAdded> | undefined, b: WireguardPeerAdded | PlainMessage<WireguardPeerAdded> | undefined): boolean {
+    return proto3.util.equals(WireguardPeerAdded, a, b);
   }
 }
 
@@ -1515,6 +1566,43 @@ export class RemoveWireguardInterface extends Message<RemoveWireguardInterface> 
 
   static equals(a: RemoveWireguardInterface | PlainMessage<RemoveWireguardInterface> | undefined, b: RemoveWireguardInterface | PlainMessage<RemoveWireguardInterface> | undefined): boolean {
     return proto3.util.equals(RemoveWireguardInterface, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.AddWireguardPeer
+ */
+export class AddWireguardPeer extends Message<AddWireguardPeer> {
+  /**
+   * @generated from field: platform.daemon.v1.WireguardPeer peer = 1;
+   */
+  peer?: WireguardPeer;
+
+  constructor(data?: PartialMessage<AddWireguardPeer>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.AddWireguardPeer";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "peer", kind: "message", T: WireguardPeer },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddWireguardPeer {
+    return new AddWireguardPeer().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AddWireguardPeer {
+    return new AddWireguardPeer().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AddWireguardPeer {
+    return new AddWireguardPeer().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AddWireguardPeer | PlainMessage<AddWireguardPeer> | undefined, b: AddWireguardPeer | PlainMessage<AddWireguardPeer> | undefined): boolean {
+    return proto3.util.equals(AddWireguardPeer, a, b);
   }
 }
 
