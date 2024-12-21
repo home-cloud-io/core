@@ -242,6 +242,30 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 		return err
 	}
 
+	// set STUN server on daemon
+	listener = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.STUNServerSet]{
+		Callback: func(event *dv1.STUNServerSet) (bool, error) {
+			if event.Error != nil {
+				return true, fmt.Errorf(event.Error.Error)
+			}
+			return true, nil
+		},
+	})
+	err = com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_SetStunServerCommand{
+			SetStunServerCommand: &dv1.SetSTUNServerCommand{
+				Server: DefaultSTUNServerAddress,
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	err = listener.Listen(ctx)
+	if err != nil {
+		return err
+	}
+
 	// save config to blueprint
 	_, err = kvclient.Set(ctx, kvclient.WIREGUARD_CONFIG_KEY, config)
 	if err != nil {
@@ -256,9 +280,8 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	}
 	settings.LocatorSettings = &v1.LocatorSettings{
 		Enabled:           true,
-		Locators:          make([]*v1.Locator, 0),
-		// TODO: default to locator.home-cloud.io:3478 and it configurable
-		StunServerAddress: "localhost:3478",
+		Locators:          make([]*dv1.Locator, 0),
+		StunServerAddress: DefaultSTUNServerAddress,
 	}
 	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {

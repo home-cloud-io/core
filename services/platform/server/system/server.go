@@ -85,8 +85,14 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 			h.broadcaster.Send(message.GetWireguardInterfaceAdded())
 		case *v1.DaemonMessage_WireguardInterfaceRemoved:
 			h.broadcaster.Send(message.GetWireguardInterfaceRemoved())
-		case *v1.DaemonMessage_StunAddress:
-			h.broadcaster.Send(message.GetStunAddress())
+		case *v1.DaemonMessage_StunServerSet:
+			h.broadcaster.Send(message.GetStunServerSet())
+		case *v1.DaemonMessage_LocatorServerAdded:
+			h.broadcaster.Send(message.GetLocatorServerAdded())
+		case *v1.DaemonMessage_LocatorServerRemoved:
+			h.broadcaster.Send(message.GetLocatorServerRemoved())
+		case *v1.DaemonMessage_AllLocatorsDisabled:
+			h.broadcaster.Send(message.GetAllLocatorsDisabled())
 		default:
 			h.logger.WithField("message", message).Warn("unknown message type received")
 		}
