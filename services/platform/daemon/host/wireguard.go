@@ -147,6 +147,23 @@ func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v
 		return err
 	}
 
+	// remove from daemon config
+	wgConfig := &v1.WireguardConfig{}
+	err = chassis.GetConfig().UnmarshalKey(WireguardConfigKey, wgConfig)
+	if err != nil {
+		return err
+	}
+	for i, inf := range wgConfig.Interfaces {
+		if inf.Name == def.Name {
+			wgConfig.Interfaces = append(wgConfig.Interfaces[:i], wgConfig.Interfaces[i+1:]...)
+			break
+		}
+	}
+	err = chassis.GetConfig().SetAndWrite(WireguardConfigKey, wgConfig)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

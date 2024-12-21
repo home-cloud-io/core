@@ -35,7 +35,7 @@ type (
 		// AddLocator will start a background connection to the given Locator and will serve up connection
 		// information to locate requests from that Locator for all Wireguard interfaces. The Locator connection
 		// can be killed by calling RemoveLocator or RemoveAll.
-		AddLocator(ctx context.Context, locatorAddress string) (locator *sv1.Locator, err error)
+		AddLocator(ctx context.Context, locatorAddress string) (locator *dv1.Locator, err error)
 		// RemoveLocator will remove a background Locator connection that was started through Load or
 		// AddLocator and will delete it from the config.
 		RemoveLocator(ctx context.Context, locatorAddress string) error
@@ -70,23 +70,24 @@ func NewLocatorController(logger chassis.Logger, stun STUNClient) LocatorControl
 
 func (m *locatorController) Load() {
 
-	address, err := m.stunClient.Start()
-	if err != nil {
-		m.logger.WithError(err).Error("failed to get public address using STUN client")
-		return
-	}
-	m.stunAddress = address
-
 	// get settings from config
 	settings := &sv1.LocatorSettings{}
-	err = chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
+	err := chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
 	if err != nil {
 		m.logger.WithError(err).Error("failed to read locator settings from config")
 		return
 	}
 
-	// nothing to do if there are no locator settings
-	if settings == nil || !settings.Enabled {
+	if settings.StunServerAddress != "" {
+		address, err := m.stunClient.Bind(settings.StunServerAddress)
+		if err != nil {
+			m.logger.WithError(err).Error("failed to get public address using STUN client")
+			return
+		}
+		m.stunAddress = address
+	}
+
+	if !settings.Enabled {
 		return
 	}
 
@@ -107,12 +108,10 @@ func (m *locatorController) Load() {
 			// run connection in background (can be cancelled through context)
 			go m.connectToLocator(ctx, m.logger, l.Address, c.ServerId, c.WireguardInterface)
 		}
-
 	}
-
 }
 
-func (m *locatorController) AddLocator(ctx context.Context, locatorAddress string) (*sv1.Locator, error) {
+func (m *locatorController) AddLocator(ctx context.Context, locatorAddress string) (*dv1.Locator, error) {
 	// check if locator already exists in config and reject if so
 	settings := &sv1.LocatorSettings{}
 	err := chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
@@ -124,11 +123,11 @@ func (m *locatorController) AddLocator(ctx context.Context, locatorAddress strin
 	}
 	settings.Enabled = true
 	if settings.Locators == nil {
-		settings.Locators = make([]*sv1.Locator, 0)
+		settings.Locators = make([]*dv1.Locator, 0)
 	}
 	for _, l := range settings.Locators {
 		if l.Address == locatorAddress {
-			return nil, fmt.Errorf("requested locator with the same interface name is already registered")
+			return nil, fmt.Errorf("requested locator is already registered")
 		}
 	}
 
@@ -140,7 +139,7 @@ func (m *locatorController) AddLocator(ctx context.Context, locatorAddress strin
 		return nil, err
 	}
 
-	connections := make([]*sv1.LocatorConnection, len(wgConfig.Interfaces))
+	connections := make([]*dv1.LocatorConnection, len(wgConfig.Interfaces))
 	for index, inf := range wgConfig.Interfaces {
 		// save locator information in memory
 		ctx, cancel := context.WithCancel(context.Background())
@@ -153,14 +152,14 @@ func (m *locatorController) AddLocator(ctx context.Context, locatorAddress strin
 		// run connection in background (can be cancelled later through context)
 		go m.connectToLocator(ctx, m.logger, locatorAddress, inf.Id, inf.Name)
 
-		connections[index] = &sv1.LocatorConnection{
+		connections[index] = &dv1.LocatorConnection{
 			ServerId:           inf.Id,
 			WireguardInterface: inf.Name,
 		}
 	}
 
 	// save locator to config
-	locator := &sv1.Locator{
+	locator := &dv1.Locator{
 		Address:     locatorAddress,
 		Connections: connections,
 	}

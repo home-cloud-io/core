@@ -25,14 +25,15 @@ import (
 type (
 	Client interface {
 		Listen()
-		Send(*v1.DaemonMessage) error
+		Send(*v1.DaemonMessage)
 	}
 	client struct {
-		mutex  sync.Mutex
-		logger chassis.Logger
-		stream *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
-		mdns   host.DNSPublisher
-		stun   host.STUNClient
+		mutex             sync.Mutex
+		logger            chassis.Logger
+		stream            *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
+		mdns              host.DNSPublisher
+		stun              host.STUNClient
+		locatorController host.LocatorController
 	}
 )
 
@@ -47,12 +48,13 @@ var (
 	ErrNoStream = fmt.Errorf("no stream")
 )
 
-func NewClient(logger chassis.Logger, mdns host.DNSPublisher, stun host.STUNClient) Client {
+func NewClient(logger chassis.Logger, mdns host.DNSPublisher, stun host.STUNClient, locatorController host.LocatorController) Client {
 	clientSingleton = &client{
-		mutex:  sync.Mutex{},
-		logger: logger,
-		mdns:   mdns,
-		stun:   stun,
+		mutex:             sync.Mutex{},
+		logger:            logger,
+		mdns:              mdns,
+		stun:              stun,
+		locatorController: locatorController,
 	}
 	return clientSingleton
 }
@@ -86,11 +88,12 @@ func (c *client) Listen() {
 		})
 		// send the SettingsSaved event to cover the case where the daemon could be restarted while running the `nixos-rebuild switch` command
 		g.Go(func() error {
-			return c.Send(&v1.DaemonMessage{
+			c.Send(&v1.DaemonMessage{
 				Message: &v1.DaemonMessage_SettingsSaved{
 					SettingsSaved: &v1.SettingsSaved{},
 				},
 			})
+			return nil
 		})
 
 		// wait on errors
@@ -118,7 +121,21 @@ func newInsecureClient() *http.Client {
 	}
 }
 
-func (c *client) Send(message *v1.DaemonMessage) error {
+func (c *client) Send(message *v1.DaemonMessage) {
+	if c.stream == nil {
+		c.logger.WithError(ErrNoStream).Error("failed to send message to server")
+		return
+	}
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	err := c.stream.Send(message)
+	if err != nil {
+		c.logger.WithError(ErrNoStream).Error("failed to send message to server")
+		return
+	}
+}
+
+func (c *client) SendWithError(message *v1.DaemonMessage) error {
 	if c.stream == nil {
 		return ErrNoStream
 	}
@@ -168,6 +185,12 @@ func (c *client) listen(ctx context.Context) error {
 			go c.removeWireguardInterface(ctx, message.GetRemoveWireguardInterface())
 		case *v1.ServerMessage_SetStunServerCommand:
 			go c.setSTUNServer(ctx, message.GetSetStunServerCommand())
+		case *v1.ServerMessage_AddLocatorServerCommand:
+			go c.addLocatorServer(ctx, message.GetAddLocatorServerCommand())
+		case *v1.ServerMessage_RemoveLocatorServerCommand:
+			go c.removeLocatorServer(ctx, message.GetRemoveLocatorServerCommand())
+		case *v1.ServerMessage_DisableAllLocatorsCommand:
+			go c.disableAllLocators(ctx, message.GetDisableAllLocatorsCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -176,7 +199,7 @@ func (c *client) listen(ctx context.Context) error {
 
 func (c *client) heartbeat() error {
 	for {
-		err := c.Send(&v1.DaemonMessage{
+		err := c.SendWithError(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_Heartbeat{},
 		})
 		if err != nil {
@@ -196,14 +219,11 @@ func (c *client) systemStats(ctx context.Context) error {
 			if err != nil {
 				c.logger.WithError(err).Error("failed to collect system stats")
 			}
-			err = c.Send(&v1.DaemonMessage{
+			c.Send(&v1.DaemonMessage{
 				Message: &v1.DaemonMessage_SystemStats{
 					SystemStats: stats,
 				},
 			})
-			if err != nil {
-				c.logger.WithError(err).Error("failed to send system stats message")
-			}
 		}()
 		time.Sleep(host.ComputeMeasurementDuration)
 	}
@@ -253,16 +273,13 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 		})
 		return
 	} else {
-		err := c.Send(&v1.DaemonMessage{
+		c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_OsUpdateDiff{
 				OsUpdateDiff: &v1.OSUpdateDiff{
 					Description: osUpdateDiff,
 				},
 			},
 		})
-		if err != nil {
-			c.logger.WithError(err).Error("failed to send os update diff to server")
-		}
 	}
 	c.logger.Info("finished generating os version diff successfully")
 }
@@ -283,14 +300,11 @@ func (c *client) currentDaemonVersion() {
 		})
 		return
 	} else {
-		err := c.Send(&v1.DaemonMessage{
+		c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_CurrentDaemonVersion{
 				CurrentDaemonVersion: current,
 			},
 		})
-		if err != nil {
-			c.logger.WithError(err).Error("failed to send current daemon version to server")
-		}
 	}
 	c.logger.Info("finished getting current daemon version successfully")
 }
@@ -348,7 +362,7 @@ func (c *client) removeMdnsHost(_ context.Context, def *v1.RemoveMdnsHostCommand
 func (c *client) saveSettings(ctx context.Context, def *v1.SaveSettingsCommand) {
 	err := host.SaveSettings(ctx, c.logger, def)
 	if err != nil {
-		err = c.Send(&v1.DaemonMessage{
+		c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_SettingsSaved{
 				SettingsSaved: &v1.SettingsSaved{
 					Error: &v1.DaemonError{
@@ -357,26 +371,79 @@ func (c *client) saveSettings(ctx context.Context, def *v1.SaveSettingsCommand) 
 				},
 			},
 		})
-		if err != nil {
-			c.logger.WithError(err).Error("failed to send error")
-		}
 		return
 	}
 
-	err = c.Send(&v1.DaemonMessage{
+	c.Send(&v1.DaemonMessage{
 		Message: &v1.DaemonMessage_SettingsSaved{
 			SettingsSaved: &v1.SettingsSaved{},
 		},
 	})
-	if err != nil {
-		c.logger.WithError(err).Error("failed to send success")
-		return
-	}
 }
 
 func (c *client) setSTUNServer(_ context.Context, def *v1.SetSTUNServerCommand) {
+	resp := &v1.DaemonMessage{
+		Message: &v1.DaemonMessage_StunServerSet{
+			StunServerSet: &v1.STUNServerSet{},
+		},
+	}
+
 	_, err := c.stun.Bind(def.Server)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to bind to new stun server")
+		resp.GetStunServerSet().Error = &v1.DaemonError{Error: err.Error()}
 	}
+
+	c.Send(resp)
+}
+
+func (c *client) addLocatorServer(ctx context.Context, cmd *v1.AddLocatorServerCommand) {
+	resp := &v1.DaemonMessage{
+		Message: &v1.DaemonMessage_LocatorServerAdded{
+			LocatorServerAdded: &v1.LocatorServerAdded{},
+		},
+	}
+
+	locator, err := c.locatorController.AddLocator(ctx, cmd.LocatorAddress)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to add locator server")
+		resp.GetLocatorServerAdded().Error = &v1.DaemonError{Error: err.Error()}
+	}
+	resp.GetLocatorServerAdded().Locator = locator
+
+	c.Send(resp)
+}
+
+func (c *client) removeLocatorServer(ctx context.Context, cmd *v1.RemoveLocatorServerCommand) {
+	resp := &v1.DaemonMessage{
+		Message: &v1.DaemonMessage_LocatorServerRemoved{
+			LocatorServerRemoved: &v1.LocatorServerRemoved{
+				Address: cmd.LocatorAddress,
+			},
+		},
+	}
+
+	err := c.locatorController.RemoveLocator(ctx, cmd.LocatorAddress)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to remove locator server")
+		resp.GetLocatorServerRemoved().Error = &v1.DaemonError{Error: err.Error()}
+	}
+
+	c.Send(resp)
+}
+
+func (c *client) disableAllLocators(ctx context.Context, cmd *v1.DisableAllLocatorsCommand) {
+	resp := &v1.DaemonMessage{
+		Message: &v1.DaemonMessage_AllLocatorsDisabled{
+			AllLocatorsDisabled: &v1.AllLocatorsDisabled{},
+		},
+	}
+
+	err := c.locatorController.Disable(ctx)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to disable all locators")
+		resp.GetAllLocatorsDisabled().Error = &v1.DaemonError{Error: err.Error()}
+	}
+
+	c.Send(resp)
 }

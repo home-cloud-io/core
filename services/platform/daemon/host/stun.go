@@ -1,7 +1,6 @@
 package host
 
 import (
-	"fmt"
 	"io"
 	"net"
 	"time"
@@ -14,8 +13,6 @@ import (
 
 type (
 	STUNClient interface {
-		// Start initializes the STUN client using the STUN server defined in the daemon config
-		Start() (address stun.XORMappedAddress, err error)
 		// Bind restarts the STUN client using the given STUN server
 		Bind(server string) (stun.XORMappedAddress, error)
 		// Connect initializes a short period of connection attempts to the given STUN address of a peer.
@@ -46,21 +43,20 @@ func NewSTUNClient(logger chassis.Logger) STUNClient {
 	}
 }
 
-func (c *stunClient) Start() (address stun.XORMappedAddress, err error) {
+func (c *stunClient) Bind(server string) (address stun.XORMappedAddress, err error) {
+	// get current settings
 	settings := &v1.LocatorSettings{}
 	err = chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
 	if err != nil {
 		return address, err
 	}
-	if settings.StunServerAddress == "" {
-		msg := "no stun server defined in the config"
-		c.logger.Error(msg)
-		return address, fmt.Errorf(msg)
+	// update settings
+	settings.StunServerAddress = server
+	err = chassis.GetConfig().SetAndWrite(LocatorSettingsKey, settings)
+	if err != nil {
+		return address, err
 	}
-	return c.bind(c.logger, settings.StunServerAddress)
-}
 
-func (c *stunClient) Bind(server string) (address stun.XORMappedAddress, err error) {
 	return c.bind(c.logger, server)
 }
 
@@ -225,8 +221,8 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 		return address, err
 	}
 
-	// keep the STUN connection alive (maintains hole in NAT)
-	go keepAlive(logger, client)
+	// TODO: we might need this if the application data doesn't do it for us
+	// go keepAlive(logger, client)
 
 	// TODO: forward application messages to wireguard
 	go func() {
@@ -238,7 +234,7 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 		}
 	}()
 
-	logger.WithField("address", address.String()).Debug("finished binding to STUN server")
+	logger.WithField("address", address.String()).Info("finished binding to STUN server")
 
 	return address, nil
 }
