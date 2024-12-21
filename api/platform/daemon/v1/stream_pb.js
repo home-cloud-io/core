@@ -191,7 +191,9 @@ export const WireguardInterfaceRemoved = /*@__PURE__*/ proto3.makeMessageType(
  */
 export const WireguardPeerAdded = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.WireguardPeerAdded",
-  [],
+  () => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
 );
 
 /**

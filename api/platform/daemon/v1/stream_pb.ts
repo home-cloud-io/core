@@ -795,6 +795,11 @@ export class WireguardInterfaceRemoved extends Message<WireguardInterfaceRemoved
  * @generated from message platform.daemon.v1.WireguardPeerAdded
  */
 export class WireguardPeerAdded extends Message<WireguardPeerAdded> {
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
   constructor(data?: PartialMessage<WireguardPeerAdded>) {
     super();
     proto3.util.initPartial(data, this);
@@ -803,6 +808,7 @@ export class WireguardPeerAdded extends Message<WireguardPeerAdded> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.WireguardPeerAdded";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardPeerAdded {

@@ -120,7 +120,9 @@ message WireguardInterfaceRemoved {
   DaemonError error = 16;
 }
 
-message WireguardPeerAdded {}
+message WireguardPeerAdded {
+  DaemonError error = 16;
+}
 
 message STUNServerSet {
   DaemonError error = 16;
