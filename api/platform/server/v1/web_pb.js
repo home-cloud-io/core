@@ -5,6 +5,7 @@
 
 import { proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "../../daemon/v1/system_pb.js";
+import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
  * @generated from enum platform.server.v1.AppStatus
@@ -484,7 +485,6 @@ export const RegisterToLocatorRequest = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.RegisterToLocatorRequest",
   () => [
     { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "stun_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -646,28 +646,6 @@ export const LocatorSettings = /*@__PURE__*/ proto3.makeMessageType(
     { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "locators", kind: "message", T: Locator, repeated: true },
     { no: 3, name: "stun_server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.Locator
- */
-export const Locator = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.Locator",
-  () => [
-    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "connections", kind: "message", T: LocatorConnection, repeated: true },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.LocatorConnection
- */
-export const LocatorConnection = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.LocatorConnection",
-  () => [
-    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

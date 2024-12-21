@@ -6,6 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "../../daemon/v1/system_pb.js";
+import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
  * @generated from enum platform.server.v1.AppStatus
@@ -1838,16 +1839,11 @@ export class DisableSecureTunnellingResponse extends Message<DisableSecureTunnel
  */
 export class RegisterToLocatorRequest extends Message<RegisterToLocatorRequest> {
   /**
+   * TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
+   *
    * @generated from field: string locator_address = 1;
    */
   locatorAddress = "";
-
-  /**
-   * TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
-   *
-   * @generated from field: string stun_address = 2;
-   */
-  stunAddress = "";
 
   constructor(data?: PartialMessage<RegisterToLocatorRequest>) {
     super();
@@ -1858,7 +1854,6 @@ export class RegisterToLocatorRequest extends Message<RegisterToLocatorRequest> 
   static readonly typeName = "platform.server.v1.RegisterToLocatorRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "stun_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterToLocatorRequest {
@@ -1883,7 +1878,7 @@ export class RegisterToLocatorRequest extends Message<RegisterToLocatorRequest> 
  */
 export class RegisterToLocatorResponse extends Message<RegisterToLocatorResponse> {
   /**
-   * @generated from field: platform.server.v1.Locator locator = 1;
+   * @generated from field: platform.daemon.v1.Locator locator = 1;
    */
   locator?: Locator;
 
@@ -2474,7 +2469,7 @@ export class LocatorSettings extends Message<LocatorSettings> {
   enabled = false;
 
   /**
-   * @generated from field: repeated platform.server.v1.Locator locators = 2;
+   * @generated from field: repeated platform.daemon.v1.Locator locators = 2;
    */
   locators: Locator[] = [];
 
@@ -2510,100 +2505,6 @@ export class LocatorSettings extends Message<LocatorSettings> {
 
   static equals(a: LocatorSettings | PlainMessage<LocatorSettings> | undefined, b: LocatorSettings | PlainMessage<LocatorSettings> | undefined): boolean {
     return proto3.util.equals(LocatorSettings, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.Locator
- */
-export class Locator extends Message<Locator> {
-  /**
-   * address is the full web address (e.g. https://locator.home-cloud.io) of the locator server
-   *
-   * @generated from field: string address = 1;
-   */
-  address = "";
-
-  /**
-   * @generated from field: repeated platform.server.v1.LocatorConnection connections = 2;
-   */
-  connections: LocatorConnection[] = [];
-
-  constructor(data?: PartialMessage<Locator>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.Locator";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "connections", kind: "message", T: LocatorConnection, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Locator {
-    return new Locator().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Locator {
-    return new Locator().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Locator {
-    return new Locator().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Locator | PlainMessage<Locator> | undefined, b: Locator | PlainMessage<Locator> | undefined): boolean {
-    return proto3.util.equals(Locator, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.LocatorConnection
- */
-export class LocatorConnection extends Message<LocatorConnection> {
-  /**
-   * server_id is the globally unique identifier for the Home Cloud server instance
-   * it is used by clients as part of the locator query
-   *
-   * @generated from field: string server_id = 1;
-   */
-  serverId = "";
-
-  /**
-   * wireguard_interface is the internal wireguard instance to share the connection information
-   * of through this locator
-   *
-   * @generated from field: string wireguard_interface = 2;
-   */
-  wireguardInterface = "";
-
-  constructor(data?: PartialMessage<LocatorConnection>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.LocatorConnection";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorConnection {
-    return new LocatorConnection().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LocatorConnection {
-    return new LocatorConnection().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LocatorConnection {
-    return new LocatorConnection().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: LocatorConnection | PlainMessage<LocatorConnection> | undefined, b: LocatorConnection | PlainMessage<LocatorConnection> | undefined): boolean {
-    return proto3.util.equals(LocatorConnection, a, b);
   }
 }
 

@@ -6,6 +6,7 @@ option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 
 import "validate/validate.proto";
 import "platform/daemon/v1/system.proto";
+import "platform/daemon/v1/wireguard.proto";
 
 service WebService {
   // Shutdown the host machine running Home Cloud
@@ -233,11 +234,10 @@ message DisableSecureTunnellingResponse {}
 
 message RegisterToLocatorRequest {
   string locator_address = 1;
-  string stun_address = 2;
   // TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
 }
 message RegisterToLocatorResponse {
-  Locator locator = 1;
+  platform.daemon.v1.Locator locator = 1;
 }
 
 message DeregisterFromLocatorRequest {
@@ -324,24 +324,8 @@ message DeviceSettings {
 
 message LocatorSettings {
   bool enabled = 1;
-  repeated Locator locators = 2;
+  repeated platform.daemon.v1.Locator locators = 2;
   string stun_server_address = 3;
-}
-
-message Locator {
-  // address is the full web address (e.g. https://locator.home-cloud.io) of the locator server
-  string address = 1;
-  repeated LocatorConnection connections = 2;
-}
-
-message LocatorConnection {
-  // server_id is the globally unique identifier for the Home Cloud server instance
-  // it is used by clients as part of the locator query
-  string server_id = 1;
-  // wireguard_interface is the internal wireguard instance to share the connection information
-  // of through this locator
-  string wireguard_interface = 2;
-
 }
 
 message User {

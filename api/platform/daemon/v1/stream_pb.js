@@ -5,7 +5,7 @@
 
 import { proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "./system_pb.js";
-import { WireguardInterface } from "./wireguard_pb.js";
+import { Locator, WireguardInterface } from "./wireguard_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -24,7 +24,10 @@ export const DaemonMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
     { no: 10, name: "wireguard_interface_added", kind: "message", T: WireguardInterfaceAdded, oneof: "message" },
     { no: 11, name: "wireguard_interface_removed", kind: "message", T: WireguardInterfaceRemoved, oneof: "message" },
-    { no: 12, name: "stun_address", kind: "message", T: STUNAddress, oneof: "message" },
+    { no: 12, name: "stun_server_set", kind: "message", T: STUNServerSet, oneof: "message" },
+    { no: 13, name: "locator_server_added", kind: "message", T: LocatorServerAdded, oneof: "message" },
+    { no: 14, name: "locator_server_removed", kind: "message", T: LocatorServerRemoved, oneof: "message" },
+    { no: 15, name: "all_locators_disabled", kind: "message", T: AllLocatorsDisabled, oneof: "message" },
   ],
 );
 
@@ -52,6 +55,9 @@ export const ServerMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 16, name: "add_wireguard_interface", kind: "message", T: AddWireguardInterface, oneof: "message" },
     { no: 17, name: "remove_wireguard_interface", kind: "message", T: RemoveWireguardInterface, oneof: "message" },
     { no: 18, name: "set_stun_server_command", kind: "message", T: SetSTUNServerCommand, oneof: "message" },
+    { no: 19, name: "add_locator_server_command", kind: "message", T: AddLocatorServerCommand, oneof: "message" },
+    { no: 20, name: "remove_locator_server_command", kind: "message", T: RemoveLocatorServerCommand, oneof: "message" },
+    { no: 21, name: "disable_all_locators_command", kind: "message", T: DisableAllLocatorsCommand, oneof: "message" },
   ],
 );
 
@@ -179,13 +185,44 @@ export const WireguardInterfaceRemoved = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.daemon.v1.STUNAddress
+ * @generated from message platform.daemon.v1.STUNServerSet
  */
-export const STUNAddress = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.daemon.v1.STUNAddress",
+export const STUNServerSet = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.STUNServerSet",
+  () => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.LocatorServerAdded
+ */
+export const LocatorServerAdded = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.LocatorServerAdded",
+  () => [
+    { no: 1, name: "locator", kind: "message", T: Locator },
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.LocatorServerRemoved
+ */
+export const LocatorServerRemoved = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.LocatorServerRemoved",
   () => [
     { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.AllLocatorsDisabled
+ */
+export const AllLocatorsDisabled = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.AllLocatorsDisabled",
+  () => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
   ],
 );
 
@@ -414,5 +451,33 @@ export const SetSTUNServerCommand = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "server", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.AddLocatorServerCommand
+ */
+export const AddLocatorServerCommand = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.AddLocatorServerCommand",
+  () => [
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.RemoveLocatorServerCommand
+ */
+export const RemoveLocatorServerCommand = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.RemoveLocatorServerCommand",
+  () => [
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.DisableAllLocatorsCommand
+ */
+export const DisableAllLocatorsCommand = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.DisableAllLocatorsCommand",
+  [],
 );
 

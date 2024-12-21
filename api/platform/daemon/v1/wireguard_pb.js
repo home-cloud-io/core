@@ -41,3 +41,25 @@ export const WireguardPeer = /*@__PURE__*/ proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.daemon.v1.Locator
+ */
+export const Locator = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.Locator",
+  () => [
+    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "connections", kind: "message", T: LocatorConnection, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.LocatorConnection
+ */
+export const LocatorConnection = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.LocatorConnection",
+  () => [
+    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
