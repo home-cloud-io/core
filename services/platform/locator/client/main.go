@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"io"
 	"log"
@@ -17,7 +16,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/netbirdio/netbird/encryption"
 	"github.com/pion/stun/v2"
-	"golang.org/x/net/http2"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
@@ -26,8 +24,8 @@ const (
 	remotePublicKey = "/jvFx2gwuLOEruFPmmj7U00pgDGc+AtCvpoZeu8Hxn8="
 	serverId        = "76165d7c-8d4c-4fcc-8271-cd7767a2d966"
 
-	stunServer    = "localhost:3478"
-	locatorServer = "http://localhost:8001"
+	stunServer    = "locator.home-cloud.io:3478"
+	locatorServer = "https://locator.home-cloud.io"
 )
 
 func copyAddr(dst *stun.XORMappedAddress, src stun.XORMappedAddress) {
@@ -159,6 +157,16 @@ func main() {
 	// data will keep alive that binding too.
 	go keepAlive(c)
 
+	go func() {
+		for {
+			select {
+			case m := <-messages:
+				// TODO: just print messages for now
+				log.Println(m.text)
+			}
+		}
+	}()
+
 	// communicate with locator
 
 	ourPrivateKey, err := wgtypes.ParseKey(privateKey)
@@ -180,7 +188,7 @@ func main() {
 		panic(err)
 	}
 
-	client := sdConnect.NewLocatorServiceClient(newInsecureClient(), locatorServer)
+	client := sdConnect.NewLocatorServiceClient(http.DefaultClient, locatorServer)
 	res, err := client.Locate(ctx, &connect.Request[v1.LocateRequest]{
 		Msg: &v1.LocateRequest{
 			ServerId: serverId,
@@ -191,7 +199,7 @@ func main() {
 		},
 	})
 	if err != nil {
-		fmt.Println("rejected")
+		fmt.Printf("rejected: %s", err)
 		return
 	}
 
@@ -213,8 +221,8 @@ func main() {
 		msg := uuid.New().String()
 		log.Printf("sending: %s", msg)
 		if _, err := conn.WriteTo([]byte(msg), peerAddr); err != nil {
-		log.Panicf("Failed to write: %s", err)
-	}
+			log.Panicf("Failed to write: %s", err)
+		}
 	}
 
 	for {
@@ -223,13 +231,7 @@ func main() {
 			log.Print("finished attempt to open connection to peer")
 			return
 		case <-time.After(time.Second):
-			// Retry
 			sendMsg()
-			// case m := <-messages:
-			// 	log.Printf("Got response from %s: %s", m.addr, m.text)
-			// case <-notify:
-			// 	log.Print("Stopping")
-			// 	return
 		}
 	}
 
