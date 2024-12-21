@@ -3,6 +3,9 @@ service:
   domain: platform
   entrypoint: http://localhost:2221
 
+  logging:
+    level: debug
+
   network:
     port: 8000
     internal:
