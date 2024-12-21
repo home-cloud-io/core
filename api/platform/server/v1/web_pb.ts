@@ -6,6 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "../../daemon/v1/system_pb.js";
+import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
  * @generated from enum platform.server.v1.AppStatus
@@ -1877,7 +1878,7 @@ export class RegisterToLocatorRequest extends Message<RegisterToLocatorRequest> 
  */
 export class RegisterToLocatorResponse extends Message<RegisterToLocatorResponse> {
   /**
-   * @generated from field: platform.server.v1.Locator locator = 1;
+   * @generated from field: platform.daemon.v1.Locator locator = 1;
    */
   locator?: Locator;
 
@@ -2468,9 +2469,14 @@ export class LocatorSettings extends Message<LocatorSettings> {
   enabled = false;
 
   /**
-   * @generated from field: repeated platform.server.v1.Locator locators = 2;
+   * @generated from field: repeated platform.daemon.v1.Locator locators = 2;
    */
   locators: Locator[] = [];
+
+  /**
+   * @generated from field: string stun_server_address = 3;
+   */
+  stunServerAddress = "";
 
   constructor(data?: PartialMessage<LocatorSettings>) {
     super();
@@ -2482,6 +2488,7 @@ export class LocatorSettings extends Message<LocatorSettings> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "locators", kind: "message", T: Locator, repeated: true },
+    { no: 3, name: "stun_server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorSettings {
@@ -2498,100 +2505,6 @@ export class LocatorSettings extends Message<LocatorSettings> {
 
   static equals(a: LocatorSettings | PlainMessage<LocatorSettings> | undefined, b: LocatorSettings | PlainMessage<LocatorSettings> | undefined): boolean {
     return proto3.util.equals(LocatorSettings, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.Locator
- */
-export class Locator extends Message<Locator> {
-  /**
-   * address is the full web address (e.g. https://locator.home-cloud.io) of the locator server
-   *
-   * @generated from field: string address = 1;
-   */
-  address = "";
-
-  /**
-   * @generated from field: repeated platform.server.v1.LocatorConnection connections = 2;
-   */
-  connections: LocatorConnection[] = [];
-
-  constructor(data?: PartialMessage<Locator>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.Locator";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "connections", kind: "message", T: LocatorConnection, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Locator {
-    return new Locator().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Locator {
-    return new Locator().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Locator {
-    return new Locator().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Locator | PlainMessage<Locator> | undefined, b: Locator | PlainMessage<Locator> | undefined): boolean {
-    return proto3.util.equals(Locator, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.LocatorConnection
- */
-export class LocatorConnection extends Message<LocatorConnection> {
-  /**
-   * server_id is the globally unique identifier for the Home Cloud server instance
-   * it is used by clients as part of the locator query
-   *
-   * @generated from field: string server_id = 1;
-   */
-  serverId = "";
-
-  /**
-   * wireguard_interface is the internal wireguard instance to share the connection information
-   * of through this locator
-   *
-   * @generated from field: string wireguard_interface = 2;
-   */
-  wireguardInterface = "";
-
-  constructor(data?: PartialMessage<LocatorConnection>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.LocatorConnection";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorConnection {
-    return new LocatorConnection().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LocatorConnection {
-    return new LocatorConnection().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LocatorConnection {
-    return new LocatorConnection().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: LocatorConnection | PlainMessage<LocatorConnection> | undefined, b: LocatorConnection | PlainMessage<LocatorConnection> | undefined): boolean {
-    return proto3.util.equals(LocatorConnection, a, b);
   }
 }
 
@@ -2828,214 +2741,6 @@ export class AppInstalledEvent extends Message<AppInstalledEvent> {
 
   static equals(a: AppInstalledEvent | PlainMessage<AppInstalledEvent> | undefined, b: AppInstalledEvent | PlainMessage<AppInstalledEvent> | undefined): boolean {
     return proto3.util.equals(AppInstalledEvent, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.RegisterPeerRequest
- */
-export class RegisterPeerRequest extends Message<RegisterPeerRequest> {
-  constructor(data?: PartialMessage<RegisterPeerRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.RegisterPeerRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterPeerRequest {
-    return new RegisterPeerRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterPeerRequest {
-    return new RegisterPeerRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterPeerRequest {
-    return new RegisterPeerRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: RegisterPeerRequest | PlainMessage<RegisterPeerRequest> | undefined, b: RegisterPeerRequest | PlainMessage<RegisterPeerRequest> | undefined): boolean {
-    return proto3.util.equals(RegisterPeerRequest, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.RegisterPeerResponse
- */
-export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
-  /**
-   * client config
-   *
-   * @generated from field: string private_key = 1;
-   */
-  privateKey = "";
-
-  /**
-   * @generated from field: string public_key = 2;
-   */
-  publicKey = "";
-
-  /**
-   * @generated from field: repeated string addresses = 3;
-   */
-  addresses: string[] = [];
-
-  /**
-   * @generated from field: repeated string dns_servers = 4;
-   */
-  dnsServers: string[] = [];
-
-  /**
-   * server config
-   *
-   * @generated from field: string server_public_key = 5;
-   */
-  serverPublicKey = "";
-
-  /**
-   * @generated from field: string server_id = 6;
-   */
-  serverId = "";
-
-  /**
-   * @generated from field: string locator_url = 7;
-   */
-  locatorUrl = "";
-
-  constructor(data?: PartialMessage<RegisterPeerResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.RegisterPeerResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterPeerResponse {
-    return new RegisterPeerResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RegisterPeerResponse {
-    return new RegisterPeerResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RegisterPeerResponse {
-    return new RegisterPeerResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: RegisterPeerResponse | PlainMessage<RegisterPeerResponse> | undefined, b: RegisterPeerResponse | PlainMessage<RegisterPeerResponse> | undefined): boolean {
-    return proto3.util.equals(RegisterPeerResponse, a, b);
-  }
-}
-
-/**
- * Model to store config in key/val store
- *
- * @generated from message platform.server.v1.PeerConfiguration
- */
-export class PeerConfiguration extends Message<PeerConfiguration> {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id = "";
-
-  /**
-   * @generated from field: string public_key = 2;
-   */
-  publicKey = "";
-
-  /**
-   * @generated from field: string private_key = 3;
-   */
-  privateKey = "";
-
-  /**
-   * @generated from field: platform.server.v1.ClientRegistrationDetails client_details = 4;
-   */
-  clientDetails?: ClientRegistrationDetails;
-
-  constructor(data?: PartialMessage<PeerConfiguration>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.PeerConfiguration";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "client_details", kind: "message", T: ClientRegistrationDetails },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PeerConfiguration {
-    return new PeerConfiguration().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PeerConfiguration {
-    return new PeerConfiguration().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PeerConfiguration {
-    return new PeerConfiguration().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: PeerConfiguration | PlainMessage<PeerConfiguration> | undefined, b: PeerConfiguration | PlainMessage<PeerConfiguration> | undefined): boolean {
-    return proto3.util.equals(PeerConfiguration, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.ClientRegistrationDetails
- */
-export class ClientRegistrationDetails extends Message<ClientRegistrationDetails> {
-  /**
-   * @generated from field: string server_address = 1;
-   */
-  serverAddress = "";
-
-  /**
-   * @generated from field: string locator_address = 2;
-   */
-  locatorAddress = "";
-
-  constructor(data?: PartialMessage<ClientRegistrationDetails>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.ClientRegistrationDetails";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClientRegistrationDetails {
-    return new ClientRegistrationDetails().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ClientRegistrationDetails {
-    return new ClientRegistrationDetails().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ClientRegistrationDetails {
-    return new ClientRegistrationDetails().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: ClientRegistrationDetails | PlainMessage<ClientRegistrationDetails> | undefined, b: ClientRegistrationDetails | PlainMessage<ClientRegistrationDetails> | undefined): boolean {
-    return proto3.util.equals(ClientRegistrationDetails, a, b);
   }
 }
 

@@ -25,7 +25,10 @@ message DaemonMessage {
     SettingsSaved settings_saved = 9;
     WireguardInterfaceAdded wireguard_interface_added = 10;
     WireguardInterfaceRemoved wireguard_interface_removed = 11;
-    WireguardPeerAdded wireguard_peer_added = 12;
+    STUNServerSet stun_server_set = 12;
+    LocatorServerAdded locator_server_added = 13;
+    LocatorServerRemoved locator_server_removed = 14;
+    AllLocatorsDisabled all_locators_disabled = 15;
   }
 }
 
@@ -51,7 +54,10 @@ message ServerMessage {
     SaveSettingsCommand save_settings_command = 15;
     AddWireguardInterface add_wireguard_interface = 16;
     RemoveWireguardInterface remove_wireguard_interface = 17;
-    AddWireguardPeer add_wireguard_peer = 18;
+    SetSTUNServerCommand set_stun_server_command = 18;
+    AddLocatorServerCommand add_locator_server_command = 19;
+    RemoveLocatorServerCommand remove_locator_server_command = 20;
+    DisableAllLocatorsCommand disable_all_locators_command = 21;
   }
 }
 
@@ -112,7 +118,23 @@ message WireguardInterfaceRemoved {
   DaemonError error = 16;
 }
 
-message WireguardPeerAdded {
+message STUNServerSet {
+  DaemonError error = 16;
+}
+
+message LocatorServerAdded {
+  platform.daemon.v1.Locator locator = 1;
+
+  DaemonError error = 16;
+}
+
+message LocatorServerRemoved {
+  string address = 1;
+
+  DaemonError error = 16;
+}
+
+message AllLocatorsDisabled {
   DaemonError error = 16;
 }
 
@@ -214,6 +236,17 @@ message RemoveWireguardInterface {
   string name = 1;
 }
 
-message AddWireguardPeer {
-  platform.daemon.v1.WireguardPeer peer = 1;
+message SetSTUNServerCommand {
+  string server = 1;
 }
+
+message AddLocatorServerCommand {
+  string locator_address = 1;
+  // TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
+}
+
+message RemoveLocatorServerCommand {
+  string locator_address = 1;
+}
+
+message DisableAllLocatorsCommand {}

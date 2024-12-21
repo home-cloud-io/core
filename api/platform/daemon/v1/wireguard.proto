@@ -21,3 +21,18 @@ message WireguardPeer {
   string public_key = 1;
   repeated string allowed_ips = 2;
 }
+
+message Locator {
+  // address is the full web address (e.g. https://locator.home-cloud.io) of the locator server
+  string address = 1;
+  repeated LocatorConnection connections = 2;
+}
+
+message LocatorConnection {
+  // server_id is the globally unique identifier for the Home Cloud server instance
+  // it is used by clients as part of the locator query
+  string server_id = 1;
+  // wireguard_interface is the internal wireguard instance to share the connection information
+  // of through this locator
+  string wireguard_interface = 2;
+}

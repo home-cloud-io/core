@@ -5,6 +5,7 @@
 
 import { proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "../../daemon/v1/system_pb.js";
+import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
  * @generated from enum platform.server.v1.AppStatus
@@ -644,28 +645,7 @@ export const LocatorSettings = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "locators", kind: "message", T: Locator, repeated: true },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.Locator
- */
-export const Locator = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.Locator",
-  () => [
-    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "connections", kind: "message", T: LocatorConnection, repeated: true },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.LocatorConnection
- */
-export const LocatorConnection = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.LocatorConnection",
-  () => [
-    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "stun_server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -725,56 +705,6 @@ export const AppInstalledEvent = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.AppInstalledEvent",
   () => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.RegisterPeerRequest
- */
-export const RegisterPeerRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.RegisterPeerRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.RegisterPeerResponse
- */
-export const RegisterPeerResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.RegisterPeerResponse",
-  () => [
-    { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "locator_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * Model to store config in key/val store
- *
- * @generated from message platform.server.v1.PeerConfiguration
- */
-export const PeerConfiguration = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.PeerConfiguration",
-  () => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "client_details", kind: "message", T: ClientRegistrationDetails },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.ClientRegistrationDetails
- */
-export const ClientRegistrationDetails = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.ClientRegistrationDetails",
-  () => [
-    { no: 1, name: "server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

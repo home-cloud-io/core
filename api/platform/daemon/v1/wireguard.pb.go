@@ -209,6 +209,121 @@ func (x *WireguardPeer) GetAllowedIps() []string {
 	return nil
 }
 
+type Locator struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// address is the full web address (e.g. https://locator.home-cloud.io) of the locator server
+	Address     string               `protobuf:"bytes,1,opt,name=address,proto3" json:"address" bun:"address" csv:"address" pg:"address" yaml:"address"`
+	Connections []*LocatorConnection `protobuf:"bytes,2,rep,name=connections,proto3" json:"connections" bun:"connections" csv:"connections" pg:"connections" yaml:"connections"`
+}
+
+func (x *Locator) Reset() {
+	*x = Locator{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_daemon_v1_wireguard_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Locator) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Locator) ProtoMessage() {}
+
+func (x *Locator) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_daemon_v1_wireguard_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Locator.ProtoReflect.Descriptor instead.
+func (*Locator) Descriptor() ([]byte, []int) {
+	return file_platform_daemon_v1_wireguard_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Locator) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *Locator) GetConnections() []*LocatorConnection {
+	if x != nil {
+		return x.Connections
+	}
+	return nil
+}
+
+type LocatorConnection struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// server_id is the globally unique identifier for the Home Cloud server instance
+	// it is used by clients as part of the locator query
+	ServerId string `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id" bun:"server_id" csv:"server_id" pg:"server_id" yaml:"serverId"`
+	// wireguard_interface is the internal wireguard instance to share the connection information
+	// of through this locator
+	WireguardInterface string `protobuf:"bytes,2,opt,name=wireguard_interface,json=wireguardInterface,proto3" json:"wireguard_interface" bun:"wireguard_interface" csv:"wireguard_interface" pg:"wireguard_interface" yaml:"wireguardInterface"`
+}
+
+func (x *LocatorConnection) Reset() {
+	*x = LocatorConnection{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_daemon_v1_wireguard_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LocatorConnection) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocatorConnection) ProtoMessage() {}
+
+func (x *LocatorConnection) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_daemon_v1_wireguard_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocatorConnection.ProtoReflect.Descriptor instead.
+func (*LocatorConnection) Descriptor() ([]byte, []int) {
+	return file_platform_daemon_v1_wireguard_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *LocatorConnection) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *LocatorConnection) GetWireguardInterface() string {
+	if x != nil {
+		return x.WireguardInterface
+	}
+	return ""
+}
+
 var File_platform_daemon_v1_wireguard_proto protoreflect.FileDescriptor
 
 var file_platform_daemon_v1_wireguard_proto_rawDesc = []byte{
@@ -238,11 +353,24 @@ var file_platform_daemon_v1_wireguard_proto_rawDesc = []byte{
 	0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x09, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x4b, 0x65, 0x79, 0x12, 0x1f, 0x0a, 0x0b, 0x61,
 	0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x64, 0x5f, 0x69, 0x70, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09,
-	0x52, 0x0a, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x64, 0x49, 0x70, 0x73, 0x42, 0x36, 0x5a, 0x34,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x68, 0x6f, 0x6d, 0x65, 0x2d,
-	0x63, 0x6c, 0x6f, 0x75, 0x64, 0x2d, 0x69, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70,
-	0x69, 0x2f, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f,
-	0x6e, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x0a, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x64, 0x49, 0x70, 0x73, 0x22, 0x6c, 0x0a, 0x07,
+	0x4c, 0x6f, 0x63, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65,
+	0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
+	0x73, 0x12, 0x47, 0x0a, 0x0b, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73,
+	0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x25, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72,
+	0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x6f, 0x63, 0x61,
+	0x74, 0x6f, 0x72, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0b, 0x63,
+	0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0x61, 0x0a, 0x11, 0x4c, 0x6f,
+	0x63, 0x61, 0x74, 0x6f, 0x72, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12,
+	0x1b, 0x0a, 0x09, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x08, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x64, 0x12, 0x2f, 0x0a, 0x13,
+	0x77, 0x69, 0x72, 0x65, 0x67, 0x75, 0x61, 0x72, 0x64, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x66,
+	0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x12, 0x77, 0x69, 0x72, 0x65, 0x67,
+	0x75, 0x61, 0x72, 0x64, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65, 0x42, 0x36, 0x5a,
+	0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x68, 0x6f, 0x6d, 0x65,
+	0x2d, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x2d, 0x69, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2f, 0x64, 0x61, 0x65, 0x6d,
+	0x6f, 0x6e, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -257,20 +385,23 @@ func file_platform_daemon_v1_wireguard_proto_rawDescGZIP() []byte {
 	return file_platform_daemon_v1_wireguard_proto_rawDescData
 }
 
-var file_platform_daemon_v1_wireguard_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_platform_daemon_v1_wireguard_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_platform_daemon_v1_wireguard_proto_goTypes = []any{
 	(*WireguardConfig)(nil),    // 0: platform.daemon.v1.WireguardConfig
 	(*WireguardInterface)(nil), // 1: platform.daemon.v1.WireguardInterface
 	(*WireguardPeer)(nil),      // 2: platform.daemon.v1.WireguardPeer
+	(*Locator)(nil),            // 3: platform.daemon.v1.Locator
+	(*LocatorConnection)(nil),  // 4: platform.daemon.v1.LocatorConnection
 }
 var file_platform_daemon_v1_wireguard_proto_depIdxs = []int32{
 	1, // 0: platform.daemon.v1.WireguardConfig.interfaces:type_name -> platform.daemon.v1.WireguardInterface
 	2, // 1: platform.daemon.v1.WireguardInterface.peers:type_name -> platform.daemon.v1.WireguardPeer
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	4, // 2: platform.daemon.v1.Locator.connections:type_name -> platform.daemon.v1.LocatorConnection
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_platform_daemon_v1_wireguard_proto_init() }
@@ -315,6 +446,30 @@ func file_platform_daemon_v1_wireguard_proto_init() {
 				return nil
 			}
 		}
+		file_platform_daemon_v1_wireguard_proto_msgTypes[3].Exporter = func(v any, i int) any {
+			switch v := v.(*Locator); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_daemon_v1_wireguard_proto_msgTypes[4].Exporter = func(v any, i int) any {
+			switch v := v.(*LocatorConnection); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -322,7 +477,7 @@ func file_platform_daemon_v1_wireguard_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_platform_daemon_v1_wireguard_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

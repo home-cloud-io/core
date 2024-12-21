@@ -414,3 +414,243 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WireguardPeerValidationError{}
+
+// Validate checks the field values on Locator with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Locator) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Locator with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in LocatorMultiError, or nil if none found.
+func (m *Locator) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Locator) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Address
+
+	for idx, item := range m.GetConnections() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LocatorValidationError{
+						field:  fmt.Sprintf("Connections[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LocatorValidationError{
+						field:  fmt.Sprintf("Connections[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LocatorValidationError{
+					field:  fmt.Sprintf("Connections[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return LocatorMultiError(errors)
+	}
+
+	return nil
+}
+
+// LocatorMultiError is an error wrapping multiple validation errors returned
+// by Locator.ValidateAll() if the designated constraints aren't met.
+type LocatorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LocatorMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LocatorMultiError) AllErrors() []error { return m }
+
+// LocatorValidationError is the validation error returned by Locator.Validate
+// if the designated constraints aren't met.
+type LocatorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LocatorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LocatorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LocatorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LocatorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LocatorValidationError) ErrorName() string { return "LocatorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LocatorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLocator.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LocatorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LocatorValidationError{}
+
+// Validate checks the field values on LocatorConnection with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *LocatorConnection) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LocatorConnection with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LocatorConnectionMultiError, or nil if none found.
+func (m *LocatorConnection) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LocatorConnection) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ServerId
+
+	// no validation rules for WireguardInterface
+
+	if len(errors) > 0 {
+		return LocatorConnectionMultiError(errors)
+	}
+
+	return nil
+}
+
+// LocatorConnectionMultiError is an error wrapping multiple validation errors
+// returned by LocatorConnection.ValidateAll() if the designated constraints
+// aren't met.
+type LocatorConnectionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LocatorConnectionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LocatorConnectionMultiError) AllErrors() []error { return m }
+
+// LocatorConnectionValidationError is the validation error returned by
+// LocatorConnection.Validate if the designated constraints aren't met.
+type LocatorConnectionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LocatorConnectionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LocatorConnectionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LocatorConnectionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LocatorConnectionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LocatorConnectionValidationError) ErrorName() string {
+	return "LocatorConnectionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LocatorConnectionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLocatorConnection.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LocatorConnectionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LocatorConnectionValidationError{}
