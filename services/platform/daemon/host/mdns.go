@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/home-cloud-io/core/services/platform/daemon/execute"
-	"github.com/spf13/viper"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
@@ -145,6 +144,5 @@ func setHostnames(cancels map[string]context.CancelFunc) error {
 		hostnames[i] = hostname
 		i++
 	}
-	viper.Set(hostnamesConfigKey, hostnames)
-	return viper.WriteConfig()
+	return chassis.GetConfig().SetAndWrite(hostnamesConfigKey, hostnames)
 }
