@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "./system_pb.js";
-import { Locator, WireguardInterface } from "./wireguard_pb.js";
+import { Locator, WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -85,25 +85,31 @@ export class DaemonMessage extends Message<DaemonMessage> {
     case: "wireguardInterfaceRemoved";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.STUNServerSet stun_server_set = 12;
+     * @generated from field: platform.daemon.v1.WireguardPeerAdded wireguard_peer_added = 12;
+     */
+    value: WireguardPeerAdded;
+    case: "wireguardPeerAdded";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.STUNServerSet stun_server_set = 13;
      */
     value: STUNServerSet;
     case: "stunServerSet";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.LocatorServerAdded locator_server_added = 13;
+     * @generated from field: platform.daemon.v1.LocatorServerAdded locator_server_added = 14;
      */
     value: LocatorServerAdded;
     case: "locatorServerAdded";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.LocatorServerRemoved locator_server_removed = 14;
+     * @generated from field: platform.daemon.v1.LocatorServerRemoved locator_server_removed = 15;
      */
     value: LocatorServerRemoved;
     case: "locatorServerRemoved";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.AllLocatorsDisabled all_locators_disabled = 15;
+     * @generated from field: platform.daemon.v1.AllLocatorsDisabled all_locators_disabled = 16;
      */
     value: AllLocatorsDisabled;
     case: "allLocatorsDisabled";
@@ -128,10 +134,11 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 9, name: "settings_saved", kind: "message", T: SettingsSaved, oneof: "message" },
     { no: 10, name: "wireguard_interface_added", kind: "message", T: WireguardInterfaceAdded, oneof: "message" },
     { no: 11, name: "wireguard_interface_removed", kind: "message", T: WireguardInterfaceRemoved, oneof: "message" },
-    { no: 12, name: "stun_server_set", kind: "message", T: STUNServerSet, oneof: "message" },
-    { no: 13, name: "locator_server_added", kind: "message", T: LocatorServerAdded, oneof: "message" },
-    { no: 14, name: "locator_server_removed", kind: "message", T: LocatorServerRemoved, oneof: "message" },
-    { no: 15, name: "all_locators_disabled", kind: "message", T: AllLocatorsDisabled, oneof: "message" },
+    { no: 12, name: "wireguard_peer_added", kind: "message", T: WireguardPeerAdded, oneof: "message" },
+    { no: 13, name: "stun_server_set", kind: "message", T: STUNServerSet, oneof: "message" },
+    { no: 14, name: "locator_server_added", kind: "message", T: LocatorServerAdded, oneof: "message" },
+    { no: 15, name: "locator_server_removed", kind: "message", T: LocatorServerRemoved, oneof: "message" },
+    { no: 16, name: "all_locators_disabled", kind: "message", T: AllLocatorsDisabled, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -268,25 +275,31 @@ export class ServerMessage extends Message<ServerMessage> {
     case: "removeWireguardInterface";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.SetSTUNServerCommand set_stun_server_command = 18;
+     * @generated from field: platform.daemon.v1.AddWireguardPeer add_wireguard_peer = 18;
+     */
+    value: AddWireguardPeer;
+    case: "addWireguardPeer";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.SetSTUNServerCommand set_stun_server_command = 19;
      */
     value: SetSTUNServerCommand;
     case: "setStunServerCommand";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.AddLocatorServerCommand add_locator_server_command = 19;
+     * @generated from field: platform.daemon.v1.AddLocatorServerCommand add_locator_server_command = 20;
      */
     value: AddLocatorServerCommand;
     case: "addLocatorServerCommand";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.RemoveLocatorServerCommand remove_locator_server_command = 20;
+     * @generated from field: platform.daemon.v1.RemoveLocatorServerCommand remove_locator_server_command = 21;
      */
     value: RemoveLocatorServerCommand;
     case: "removeLocatorServerCommand";
   } | {
     /**
-     * @generated from field: platform.daemon.v1.DisableAllLocatorsCommand disable_all_locators_command = 21;
+     * @generated from field: platform.daemon.v1.DisableAllLocatorsCommand disable_all_locators_command = 22;
      */
     value: DisableAllLocatorsCommand;
     case: "disableAllLocatorsCommand";
@@ -317,10 +330,11 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 15, name: "save_settings_command", kind: "message", T: SaveSettingsCommand, oneof: "message" },
     { no: 16, name: "add_wireguard_interface", kind: "message", T: AddWireguardInterface, oneof: "message" },
     { no: 17, name: "remove_wireguard_interface", kind: "message", T: RemoveWireguardInterface, oneof: "message" },
-    { no: 18, name: "set_stun_server_command", kind: "message", T: SetSTUNServerCommand, oneof: "message" },
-    { no: 19, name: "add_locator_server_command", kind: "message", T: AddLocatorServerCommand, oneof: "message" },
-    { no: 20, name: "remove_locator_server_command", kind: "message", T: RemoveLocatorServerCommand, oneof: "message" },
-    { no: 21, name: "disable_all_locators_command", kind: "message", T: DisableAllLocatorsCommand, oneof: "message" },
+    { no: 18, name: "add_wireguard_peer", kind: "message", T: AddWireguardPeer, oneof: "message" },
+    { no: 19, name: "set_stun_server_command", kind: "message", T: SetSTUNServerCommand, oneof: "message" },
+    { no: 20, name: "add_locator_server_command", kind: "message", T: AddLocatorServerCommand, oneof: "message" },
+    { no: 21, name: "remove_locator_server_command", kind: "message", T: RemoveLocatorServerCommand, oneof: "message" },
+    { no: 22, name: "disable_all_locators_command", kind: "message", T: DisableAllLocatorsCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -774,6 +788,37 @@ export class WireguardInterfaceRemoved extends Message<WireguardInterfaceRemoved
 
   static equals(a: WireguardInterfaceRemoved | PlainMessage<WireguardInterfaceRemoved> | undefined, b: WireguardInterfaceRemoved | PlainMessage<WireguardInterfaceRemoved> | undefined): boolean {
     return proto3.util.equals(WireguardInterfaceRemoved, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.WireguardPeerAdded
+ */
+export class WireguardPeerAdded extends Message<WireguardPeerAdded> {
+  constructor(data?: PartialMessage<WireguardPeerAdded>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.WireguardPeerAdded";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardPeerAdded {
+    return new WireguardPeerAdded().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WireguardPeerAdded {
+    return new WireguardPeerAdded().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WireguardPeerAdded {
+    return new WireguardPeerAdded().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: WireguardPeerAdded | PlainMessage<WireguardPeerAdded> | undefined, b: WireguardPeerAdded | PlainMessage<WireguardPeerAdded> | undefined): boolean {
+    return proto3.util.equals(WireguardPeerAdded, a, b);
   }
 }
 
@@ -1731,6 +1776,43 @@ export class RemoveWireguardInterface extends Message<RemoveWireguardInterface> 
 
   static equals(a: RemoveWireguardInterface | PlainMessage<RemoveWireguardInterface> | undefined, b: RemoveWireguardInterface | PlainMessage<RemoveWireguardInterface> | undefined): boolean {
     return proto3.util.equals(RemoveWireguardInterface, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.AddWireguardPeer
+ */
+export class AddWireguardPeer extends Message<AddWireguardPeer> {
+  /**
+   * @generated from field: platform.daemon.v1.WireguardPeer peer = 1;
+   */
+  peer?: WireguardPeer;
+
+  constructor(data?: PartialMessage<AddWireguardPeer>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.AddWireguardPeer";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "peer", kind: "message", T: WireguardPeer },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddWireguardPeer {
+    return new AddWireguardPeer().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AddWireguardPeer {
+    return new AddWireguardPeer().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AddWireguardPeer {
+    return new AddWireguardPeer().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AddWireguardPeer | PlainMessage<AddWireguardPeer> | undefined, b: AddWireguardPeer | PlainMessage<AddWireguardPeer> | undefined): boolean {
+    return proto3.util.equals(AddWireguardPeer, a, b);
   }
 }
 
