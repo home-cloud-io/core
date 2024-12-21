@@ -78,6 +78,21 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 		return err
 	}
 
+	// add to daemon config
+	wgConfig := &v1.WireguardConfig{}
+	err = chassis.GetConfig().UnmarshalKey(WireguardConfigKey, wgConfig)
+	if err != nil {
+		return err
+	}
+	wgConfig.Interfaces = append(wgConfig.Interfaces, &v1.WireguardInterface{
+		Id:   def.Interface.Id,
+		Name: def.Interface.Name,
+	})
+	err = chassis.GetConfig().SetAndWrite(WireguardConfigKey, wgConfig)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

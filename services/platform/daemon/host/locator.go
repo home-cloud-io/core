@@ -2,7 +2,6 @@ package host
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -14,12 +13,11 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/locator/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/locator/v1/v1connect"
 	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	"github.com/pion/stun/v2"
 
 	"connectrpc.com/connect"
 	"github.com/netbirdio/netbird/encryption"
+	"github.com/pion/stun/v2"
 	"github.com/steady-bytes/draft/pkg/chassis"
-	"golang.org/x/net/http2"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
@@ -31,17 +29,17 @@ type (
 		Peers      []wgtypes.Key
 	}
 	LocatorController interface {
-		// Load will load all saved Locators from blueprint and create background connections to them.
-		// Meant to be called at service startup.
+		// Load will load all saved Locators from the config and create background connections to them.
+		// Meant to be called at daemon startup.
 		Load()
 		// AddLocator will start a background connection to the given Locator and will serve up connection
-		// information to locate requests from that Locator on all interfaces. The Locator connection
-		// can be killed by calling RemoveLocator or RemoveAll
+		// information to locate requests from that Locator for all Wireguard interfaces. The Locator connection
+		// can be killed by calling RemoveLocator or RemoveAll.
 		AddLocator(ctx context.Context, locatorAddress string) (locator *sv1.Locator, err error)
 		// RemoveLocator will remove a background Locator connection that was started through Load or
-		// AddLocator and will delete it from blueprint.
+		// AddLocator and will delete it from the config.
 		RemoveLocator(ctx context.Context, locatorAddress string) error
-		// Disable will remove all background Locator connections and delete them from blueprint.
+		// Disable will remove all background Locator connections and delete them from the config.
 		Disable(ctx context.Context) error
 	}
 	locatorController struct {
@@ -71,7 +69,6 @@ func NewLocatorController(logger chassis.Logger, stun STUNClient) LocatorControl
 }
 
 func (m *locatorController) Load() {
-	config := chassis.GetConfig()
 
 	address, err := m.stunClient.Start()
 	if err != nil {
@@ -82,9 +79,9 @@ func (m *locatorController) Load() {
 
 	// get settings from config
 	settings := &sv1.LocatorSettings{}
-	err = config.UnmarshalKey("daemon.locatorSettings", settings)
+	err = chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
 	if err != nil {
-		m.logger.WithError(err).Warn("faied to get device settings when loading locators")
+		m.logger.WithError(err).Error("failed to read locator settings from config")
 		return
 	}
 
@@ -116,11 +113,9 @@ func (m *locatorController) Load() {
 }
 
 func (m *locatorController) AddLocator(ctx context.Context, locatorAddress string) (*sv1.Locator, error) {
-	config := chassis.GetConfig()
-
-	// check if locator already exists in blueprint and reject if so
+	// check if locator already exists in config and reject if so
 	settings := &sv1.LocatorSettings{}
-	err := config.UnmarshalKey("daemon.locatorSettings", settings)
+	err := chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +134,7 @@ func (m *locatorController) AddLocator(ctx context.Context, locatorAddress strin
 
 	// get the server's wireguard wgConfig
 	wgConfig := &dv1.WireguardConfig{}
-	err = config.UnmarshalKey("daemon.wireguard", wgConfig)
+	err = chassis.GetConfig().UnmarshalKey(WireguardConfigKey, wgConfig)
 	if err != nil {
 		m.logger.WithError(err).Error("failed to get wireguard config")
 		return nil, err
@@ -155,7 +150,7 @@ func (m *locatorController) AddLocator(ctx context.Context, locatorAddress strin
 			cancel:   cancel,
 		}
 
-		// run connection in background (can be cancelled through context)
+		// run connection in background (can be cancelled later through context)
 		go m.connectToLocator(ctx, m.logger, locatorAddress, inf.Id, inf.Name)
 
 		connections[index] = &sv1.LocatorConnection{
@@ -170,10 +165,9 @@ func (m *locatorController) AddLocator(ctx context.Context, locatorAddress strin
 		Connections: connections,
 	}
 	settings.Locators = append(settings.Locators, locator)
-	config.Set("daemon.locatorSettings", settings)
-	err = config.WriteConfig()
+	err = chassis.GetConfig().SetAndWrite(LocatorSettingsKey, settings)
 	if err != nil {
-		return nil, fmt.Errorf("failed to save settings")
+		return nil, err
 	}
 
 	return locator, nil
@@ -194,21 +188,22 @@ func (m *locatorController) RemoveLocator(ctx context.Context, locatorAddress st
 	}
 	m.locators = locators
 
-	// TODO: delete from config
-	// settings := &sv1.DeviceSettings{}
-	// err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	// if err != nil {
-	// 	return err
-	// }
-	// for i, l := range settings.LocatorSettings.Locators {
-	// 	if l.Address == locatorAddress {
-	// 		settings.LocatorSettings.Locators = append(settings.LocatorSettings.Locators[:i], settings.LocatorSettings.Locators[i+1:]...)
-	// 	}
-	// }
-	// _, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to save settings")
-	// }
+	// delete from config
+	settings := &sv1.LocatorSettings{}
+	err := chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
+	if err != nil {
+		return err
+	}
+	for i, l := range settings.Locators {
+		if locatorAddress == l.Address {
+			settings.Locators = append(settings.Locators[:i], settings.Locators[i+1:]...)
+			err = chassis.GetConfig().SetAndWrite(LocatorSettingsKey, settings)
+			if err != nil {
+				return err
+			}
+			break
+		}
+	}
 
 	return nil
 }
@@ -222,19 +217,17 @@ func (m *locatorController) Disable(ctx context.Context) error {
 		}
 	}
 
-	// TODO: disable feature in config
-	// settings := &sv1.DeviceSettings{}
-	// err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	// if err != nil {
-	// 	return err
-	// }
-	// settings.LocatorSettings = &sv1.LocatorSettings{
-	// 	Enabled: false,
-	// }
-	// _, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to save settings")
-	// }
+	// disable feature in config
+	settings := &sv1.LocatorSettings{}
+	err := chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
+	if err != nil {
+		return err
+	}
+	settings.Enabled = false
+	err = chassis.GetConfig().SetAndWrite(LocatorSettingsKey, settings)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -246,7 +239,7 @@ func (m *locatorController) connectToLocator(ctx context.Context, logger chassis
 		"interface_name":  wgInterface,
 	})
 	log.Debug("connecting to locator")
-	client := sdConnect.NewLocatorServiceClient(newInsecureClient(), locatorAddress)
+	client := sdConnect.NewLocatorServiceClient(http.DefaultClient, locatorAddress)
 	stream := client.Connect(ctx)
 
 	err := stream.Send(&v1.ServerMessage{
@@ -279,11 +272,9 @@ func (m *locatorController) connectToLocator(ctx context.Context, logger chassis
 	}
 }
 func (m *locatorController) authorizeLocate(ctx context.Context, logger chassis.Logger, wgInterface string, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate) {
-	config := chassis.GetConfig()
-
 	// get wireguard config from blueprint
 	wgConfig := &dv1.WireguardConfig{}
-	err := config.UnmarshalKey("daemon.wireguard", wgConfig)
+	err := chassis.GetConfig().UnmarshalKey(WireguardConfigKey, wgConfig)
 	if err != nil {
 		m.logger.WithError(err).Error("failed to get wireguard config")
 		reject(logger, locate.RequestId, stream)
@@ -322,9 +313,9 @@ func (m *locatorController) authorizeLocate(ctx context.Context, logger chassis.
 	}
 
 	// attempt to validate the locate request and reject if we can't validate it
-	authorized, err := validate(logger, iConfig, remoteKey, locate.Body.Body)
+	authorized, request, err := validate(logger, iConfig, remoteKey, locate.Body.Body)
 	if authorized && err == nil {
-		m.accept(logger, iConfig, remoteKey, stream, locate)
+		m.accept(logger, iConfig, remoteKey, stream, locate, request)
 		return
 	}
 	if err != nil {
@@ -333,33 +324,33 @@ func (m *locatorController) authorizeLocate(ctx context.Context, logger chassis.
 	reject(log, locate.RequestId, stream)
 }
 
-func validate(logger chassis.Logger, config WireGuardConfig, remoteKey wgtypes.Key, body []byte) (authorized bool, err error) {
+func validate(logger chassis.Logger, config WireGuardConfig, remoteKey wgtypes.Key, body []byte) (authorized bool, request *v1.LocateRequestBody, err error) {
 	for _, trustedKey := range config.Peers {
 		if trustedKey == remoteKey {
 			// attempt to decrypt message using our private key and their given public key
-			msg := &v1.LocateRequestBody{}
-			err = encryption.DecryptMessage(remoteKey, config.PrivateKey, body, msg)
+			request = &v1.LocateRequestBody{}
+			err = encryption.DecryptMessage(remoteKey, config.PrivateKey, body, request)
 			if err != nil {
-				return false, err
+				return false, nil, err
 			}
 
 			// validate the encrypted server id matches our own
-			if msg.ServerId == config.Id {
-				return true, nil
+			if request.ServerId == config.Id {
+				return true, request, nil
 			}
 
 			logger.WithFields(chassis.Fields{
-				"requested": msg.ServerId,
+				"requested": request.ServerId,
 				"actual":    config.Id,
 			}).Debug("server id does not match")
-			return false, nil
+			return false, nil, nil
 		}
 	}
 	logger.Debug("given public key not in trusted peers")
-	return false, nil
+	return false, nil, nil
 }
 
-func (m *locatorController) accept(logger chassis.Logger, config WireGuardConfig, remoteKey wgtypes.Key, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate) {
+func (m *locatorController) accept(logger chassis.Logger, config WireGuardConfig, remoteKey wgtypes.Key, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate, request *v1.LocateRequestBody) {
 	logger.Info("approving request")
 
 	msg := &v1.LocateResponseBody{
@@ -388,7 +379,8 @@ func (m *locatorController) accept(logger chassis.Logger, config WireGuardConfig
 	}
 
 	// attempt outbound connection to peer to open hole in NAT
-	peerAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", msg.Address, msg.Port))
+	logger.WithField("address", fmt.Sprintf("%s:%d", request.Address, request.Port)).Debug("attempting peer connection")
+	peerAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", request.Address, request.Port))
 	if err != nil {
 		logger.WithError(err).Error("failed to resolve UDP address")
 		return
@@ -454,20 +446,4 @@ func parseConfig(name, id string) (config WireGuardConfig, err error) {
 
 func locatorKey(locatorAddress, serverId string) string {
 	return fmt.Sprintf("%s@%s", serverId, locatorAddress)
-}
-
-// TODO: replace with secure client and only use this one when running locally during development
-func newInsecureClient() *http.Client {
-	return &http.Client{
-		Transport: &http2.Transport{
-			AllowHTTP: true,
-			DialTLS: func(network, addr string, _ *tls.Config) (net.Conn, error) {
-				// If you're also using this client for non-h2c traffic, you may want
-				// to delegate to tls.Dial if the network isn't TCP or the addr isn't
-				// in an allowlist.
-				return net.Dial(network, addr)
-			},
-			// Don't forget timeouts!
-		},
-	}
 }

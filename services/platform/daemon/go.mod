@@ -10,8 +10,8 @@ replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes
 
 require (
 	connectrpc.com/connect v1.16.2
+	github.com/google/uuid v1.6.0
 	github.com/home-cloud-io/core/api v0.4.26
-	github.com/home-cloud-io/core/services/platform/server v0.0.0-20241205222704-d8cb7051a113
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/netbirdio/netbird v0.34.1
 	github.com/pion/stun/v2 v2.0.0
@@ -52,7 +52,6 @@ require (
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.1 // indirect

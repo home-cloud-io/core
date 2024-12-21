@@ -15,13 +15,12 @@ daemon:
   hostnames: []
   locatorSettings:
     enabled: true
-    stunServerAddress: localhost:3478
+    stunServerAddress: stunserver2024.stunprotocol.org:3478
     locators:
-      - address: http://localhost:8001
+      - address: https://locator.home-cloud.io
         connections:
           - serverId: 76165d7c-8d4c-4fcc-8271-cd7767a2d966
             wireguardInterface: wg0
-  # TODO: remove this and just read the JSON config?
   wireguard:
     interfaces:
       - name: wg0
