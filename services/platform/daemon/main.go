@@ -14,7 +14,7 @@ func main() {
 		mdns     = host.NewDNSPublisher(logger)
 		stun     = host.NewSTUNClient(logger)
 		locator  = host.NewLocatorController(logger, stun)
-		client   = communicate.NewClient(logger, mdns, stun)
+		client   = communicate.NewClient(logger, mdns, stun, locator)
 		migrator = host.NewMigrator(logger)
 	)
 

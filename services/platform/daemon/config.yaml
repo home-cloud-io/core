@@ -13,15 +13,3 @@ daemon:
   server: http://localhost:8000
   domain: local
   hostnames: []
-  locatorSettings:
-    enabled: true
-    stunServerAddress: stunserver2024.stunprotocol.org:3478
-    locators:
-      - address: https://locator.home-cloud.io
-        connections:
-          - serverId: 76165d7c-8d4c-4fcc-8271-cd7767a2d966
-            wireguardInterface: wg0
-  wireguard:
-    interfaces:
-      - name: wg0
-        id: 76165d7c-8d4c-4fcc-8271-cd7767a2d966
