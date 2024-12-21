@@ -55,6 +55,8 @@ service WebService {
   rpc RegisterToLocator(RegisterToLocatorRequest) returns (RegisterToLocatorResponse) {}
   // Deregister the server from the given Locator service
   rpc DeregisterFromLocator(DeregisterFromLocatorRequest) returns (DeregisterFromLocatorResponse) {}
+  // RegisterPeer is used to connect a client to the home-cloud overlay network
+  rpc RegisterPeer(RegisterPeerRequest) returns (RegisterPeerResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
