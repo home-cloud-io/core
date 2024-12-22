@@ -111,6 +111,8 @@ github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245 h1:Nyeelmxya
 github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245/go.mod h1:nTakvJ4XYq45UXtn0DbwR4aU9ZdjlnIenpbs6Cd+FM0=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0 h1:fPpQR1iGEVYjZ2OELvUHX600VAK5qmdnDEv3eXOwZUA=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0/go.mod h1:YHukhB04ChJsLHLJEUD6vjFyLX2L3dsX3wPBZcX4tmc=
+github.com/home-cloud-io/core/api v0.8.1 h1:kXUMfIqh6zJ9ziV4iyeQzPDxjU64xyGrRprn0+GZWfA=
+github.com/home-cloud-io/core/api v0.8.1/go.mod h1:4G9DoubvZUuMFZOM63P6AOHyQ5Ulm9X2ilJ1EshIvjc=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1 h1:shLQSRRSCCPj3f2gpwzGwWFoC7ycTf1rcQZHOlsJ6N8=
@@ -228,6 +230,8 @@ github.com/spf13/viper v1.18.2 h1:LUXCnvUvSM6FXAsj6nnfc8Q2tp1dIgUfY9Kc8GsSOiQ=
 github.com/spf13/viper v1.18.2/go.mod h1:EKmWIqdnk5lOcmR72yw6hS+8OPYcwD0jteitLMVB+yk=
 github.com/steady-bytes/draft/api v0.6.1 h1:rKf7KSzMGrsHTuXNUcgPfCtByrDB/QJuNquQidBP7eM=
 github.com/steady-bytes/draft/api v0.6.1/go.mod h1:mlwxjvRiqvwySGdzVmF8voFhMffWq2F7dyd+xt6kENA=
+github.com/steady-bytes/draft/pkg/chassis v0.3.5 h1:WGd5miOd2bupA5C3o87F4CWv7j72skZtWjULqQEKIqw=
+github.com/steady-bytes/draft/pkg/chassis v0.3.5/go.mod h1:g7JMbVINwUnvtOGpR/QKOlGK62/3rRIR0qg3++7hZUM=
 github.com/steady-bytes/draft/pkg/loggers v0.2.3 h1:tZadHH8f9fo+tRHVp3BaJlVYvKlrlX8Hd6LxncUVgAM=
 github.com/steady-bytes/draft/pkg/loggers v0.2.3/go.mod h1:nXeOQ6lXhsVWHzRqVcJz0JIeSW75ORVN+0izJwwnH+Y=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

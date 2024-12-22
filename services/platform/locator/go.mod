@@ -4,18 +4,18 @@ go 1.23.0
 
 toolchain go1.23.2
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
 replace golang.zx2c4.com/wireguard => github.com/netbirdio/wireguard-go v0.0.0-20240105182236-6c340dd55aed
 
 require (
 	connectrpc.com/connect v1.16.2
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.4.21
+	github.com/home-cloud-io/core/api v0.8.1
 	github.com/netbirdio/netbird v0.30.3
 	github.com/pion/stun/v2 v2.0.0
 	github.com/pion/turn/v4 v4.0.0
-	github.com/steady-bytes/draft/pkg/chassis v0.3.4
+	github.com/steady-bytes/draft/pkg/chassis v0.3.5
 	github.com/steady-bytes/draft/pkg/loggers v0.2.2
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.65.0

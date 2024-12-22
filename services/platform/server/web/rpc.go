@@ -354,6 +354,10 @@ func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *conne
 	return connect.NewResponse(&v1.DisableSecureTunnellingResponse{}), nil
 }
 
+func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
+	return nil, status.Error(codes.Unimplemented, "unimplemented")
+}
+
 func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
 	h.logger.WithField("msg", request.Msg).Info("registering to locator")
 

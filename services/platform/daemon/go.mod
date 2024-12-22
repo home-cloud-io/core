@@ -4,19 +4,18 @@ go 1.23.0
 
 toolchain go1.23.4
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
-replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
+// replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 
 require (
 	connectrpc.com/connect v1.16.2
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.4.26
+	github.com/home-cloud-io/core/api v0.8.1
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/netbirdio/netbird v0.34.1
 	github.com/pion/stun/v2 v2.0.0
-	github.com/spf13/viper v1.18.2
-	github.com/steady-bytes/draft/pkg/chassis v0.3.4
+	github.com/steady-bytes/draft/pkg/chassis v0.3.5
 	github.com/steady-bytes/draft/pkg/loggers v0.2.3
 	golang.org/x/mod v0.18.0
 	golang.org/x/net v0.30.0
@@ -83,6 +82,7 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/viper v1.18.2 // indirect
 	github.com/steady-bytes/draft/api v0.6.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/zeebo/blake3 v0.2.3 // indirect
