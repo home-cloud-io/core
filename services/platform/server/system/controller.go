@@ -29,11 +29,12 @@ import (
 
 type (
 	Controller interface {
-		Daemon
-		OS
 		Containers
+		Daemon
 		Device
 		Locators
+		OS
+		Peering
 	}
 
 	controller struct {

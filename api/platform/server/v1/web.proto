@@ -55,6 +55,8 @@ service WebService {
   rpc RegisterToLocator(RegisterToLocatorRequest) returns (RegisterToLocatorResponse) {}
   // Deregister the server from the given Locator service
   rpc DeregisterFromLocator(DeregisterFromLocatorRequest) returns (DeregisterFromLocatorResponse) {}
+  // RegisterPeer is used to connect a client to the home-cloud overlay network
+  rpc RegisterPeer(RegisterPeerRequest) returns (RegisterPeerResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
@@ -353,4 +355,31 @@ message ErrorEvent {
 
 message AppInstalledEvent {
   string name = 1;
+}
+
+message RegisterPeerRequest {}
+message RegisterPeerResponse{
+  // client config
+  string private_key = 1;
+  string public_key = 2;
+  repeated string addresses = 3;
+  repeated string dns_servers = 4;
+
+  // server config
+  string server_public_key = 5;
+  string server_id = 6;
+  string locator_url = 7;
+}
+
+// Model to store config in key/val store
+message PeerConfiguration {
+  string id = 1;
+  string public_key = 2;
+  string private_key = 3;
+  ClientRegistrationDetails client_details = 4;
+}
+
+message ClientRegistrationDetails {
+  string server_address = 1;
+  string locator_address = 2;
 }

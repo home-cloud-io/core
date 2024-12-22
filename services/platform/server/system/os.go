@@ -53,6 +53,8 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 			response.OsDiff = event.Description
 			return true, nil
 		},
+		// compiling the new OS can take a while
+		Timeout: 30 * time.Minute,
 	})
 	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestOsUpdateDiff{},
@@ -226,6 +228,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 		},
 		Timeout: 30 * time.Second,
 	})
+
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardInterface{
 			AddWireguardInterface: &dv1.AddWireguardInterface{
