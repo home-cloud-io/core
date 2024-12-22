@@ -550,6 +550,170 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_StunServerSet:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetStunServerSet()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "StunServerSet",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "StunServerSet",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetStunServerSet()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "StunServerSet",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *DaemonMessage_LocatorServerAdded:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetLocatorServerAdded()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "LocatorServerAdded",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "LocatorServerAdded",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLocatorServerAdded()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "LocatorServerAdded",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *DaemonMessage_LocatorServerRemoved:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetLocatorServerRemoved()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "LocatorServerRemoved",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "LocatorServerRemoved",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLocatorServerRemoved()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "LocatorServerRemoved",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *DaemonMessage_AllLocatorsDisabled:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAllLocatorsDisabled()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "AllLocatorsDisabled",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "AllLocatorsDisabled",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAllLocatorsDisabled()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "AllLocatorsDisabled",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -1387,6 +1551,170 @@ func (m *ServerMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
 					field:  "AddWireguardPeer",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_SetStunServerCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetSetStunServerCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "SetStunServerCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "SetStunServerCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSetStunServerCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "SetStunServerCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_AddLocatorServerCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAddLocatorServerCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "AddLocatorServerCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "AddLocatorServerCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAddLocatorServerCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "AddLocatorServerCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_RemoveLocatorServerCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRemoveLocatorServerCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RemoveLocatorServerCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RemoveLocatorServerCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRemoveLocatorServerCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "RemoveLocatorServerCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_DisableAllLocatorsCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetDisableAllLocatorsCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "DisableAllLocatorsCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "DisableAllLocatorsCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetDisableAllLocatorsCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "DisableAllLocatorsCommand",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2902,6 +3230,559 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WireguardPeerAddedValidationError{}
+
+// Validate checks the field values on STUNServerSet with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *STUNServerSet) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on STUNServerSet with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in STUNServerSetMultiError, or
+// nil if none found.
+func (m *STUNServerSet) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *STUNServerSet) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, STUNServerSetValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, STUNServerSetValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return STUNServerSetValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return STUNServerSetMultiError(errors)
+	}
+
+	return nil
+}
+
+// STUNServerSetMultiError is an error wrapping multiple validation errors
+// returned by STUNServerSet.ValidateAll() if the designated constraints
+// aren't met.
+type STUNServerSetMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m STUNServerSetMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m STUNServerSetMultiError) AllErrors() []error { return m }
+
+// STUNServerSetValidationError is the validation error returned by
+// STUNServerSet.Validate if the designated constraints aren't met.
+type STUNServerSetValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e STUNServerSetValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e STUNServerSetValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e STUNServerSetValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e STUNServerSetValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e STUNServerSetValidationError) ErrorName() string { return "STUNServerSetValidationError" }
+
+// Error satisfies the builtin error interface
+func (e STUNServerSetValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSTUNServerSet.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = STUNServerSetValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = STUNServerSetValidationError{}
+
+// Validate checks the field values on LocatorServerAdded with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LocatorServerAdded) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LocatorServerAdded with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LocatorServerAddedMultiError, or nil if none found.
+func (m *LocatorServerAdded) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LocatorServerAdded) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetLocator()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LocatorServerAddedValidationError{
+					field:  "Locator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LocatorServerAddedValidationError{
+					field:  "Locator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLocator()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LocatorServerAddedValidationError{
+				field:  "Locator",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LocatorServerAddedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LocatorServerAddedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LocatorServerAddedValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LocatorServerAddedMultiError(errors)
+	}
+
+	return nil
+}
+
+// LocatorServerAddedMultiError is an error wrapping multiple validation errors
+// returned by LocatorServerAdded.ValidateAll() if the designated constraints
+// aren't met.
+type LocatorServerAddedMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LocatorServerAddedMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LocatorServerAddedMultiError) AllErrors() []error { return m }
+
+// LocatorServerAddedValidationError is the validation error returned by
+// LocatorServerAdded.Validate if the designated constraints aren't met.
+type LocatorServerAddedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LocatorServerAddedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LocatorServerAddedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LocatorServerAddedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LocatorServerAddedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LocatorServerAddedValidationError) ErrorName() string {
+	return "LocatorServerAddedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LocatorServerAddedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLocatorServerAdded.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LocatorServerAddedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LocatorServerAddedValidationError{}
+
+// Validate checks the field values on LocatorServerRemoved with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *LocatorServerRemoved) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LocatorServerRemoved with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LocatorServerRemovedMultiError, or nil if none found.
+func (m *LocatorServerRemoved) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LocatorServerRemoved) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Address
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LocatorServerRemovedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LocatorServerRemovedValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LocatorServerRemovedValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return LocatorServerRemovedMultiError(errors)
+	}
+
+	return nil
+}
+
+// LocatorServerRemovedMultiError is an error wrapping multiple validation
+// errors returned by LocatorServerRemoved.ValidateAll() if the designated
+// constraints aren't met.
+type LocatorServerRemovedMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LocatorServerRemovedMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LocatorServerRemovedMultiError) AllErrors() []error { return m }
+
+// LocatorServerRemovedValidationError is the validation error returned by
+// LocatorServerRemoved.Validate if the designated constraints aren't met.
+type LocatorServerRemovedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LocatorServerRemovedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LocatorServerRemovedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LocatorServerRemovedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LocatorServerRemovedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LocatorServerRemovedValidationError) ErrorName() string {
+	return "LocatorServerRemovedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LocatorServerRemovedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLocatorServerRemoved.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LocatorServerRemovedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LocatorServerRemovedValidationError{}
+
+// Validate checks the field values on AllLocatorsDisabled with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AllLocatorsDisabled) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AllLocatorsDisabled with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AllLocatorsDisabledMultiError, or nil if none found.
+func (m *AllLocatorsDisabled) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AllLocatorsDisabled) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetError()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AllLocatorsDisabledValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AllLocatorsDisabledValidationError{
+					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AllLocatorsDisabledValidationError{
+				field:  "Error",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AllLocatorsDisabledMultiError(errors)
+	}
+
+	return nil
+}
+
+// AllLocatorsDisabledMultiError is an error wrapping multiple validation
+// errors returned by AllLocatorsDisabled.ValidateAll() if the designated
+// constraints aren't met.
+type AllLocatorsDisabledMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AllLocatorsDisabledMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AllLocatorsDisabledMultiError) AllErrors() []error { return m }
+
+// AllLocatorsDisabledValidationError is the validation error returned by
+// AllLocatorsDisabled.Validate if the designated constraints aren't met.
+type AllLocatorsDisabledValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AllLocatorsDisabledValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AllLocatorsDisabledValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AllLocatorsDisabledValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AllLocatorsDisabledValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AllLocatorsDisabledValidationError) ErrorName() string {
+	return "AllLocatorsDisabledValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AllLocatorsDisabledValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAllLocatorsDisabled.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AllLocatorsDisabledValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AllLocatorsDisabledValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -5216,3 +6097,417 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AddWireguardPeerValidationError{}
+
+// Validate checks the field values on SetSTUNServerCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SetSTUNServerCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SetSTUNServerCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SetSTUNServerCommandMultiError, or nil if none found.
+func (m *SetSTUNServerCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SetSTUNServerCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Server
+
+	if len(errors) > 0 {
+		return SetSTUNServerCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// SetSTUNServerCommandMultiError is an error wrapping multiple validation
+// errors returned by SetSTUNServerCommand.ValidateAll() if the designated
+// constraints aren't met.
+type SetSTUNServerCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SetSTUNServerCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SetSTUNServerCommandMultiError) AllErrors() []error { return m }
+
+// SetSTUNServerCommandValidationError is the validation error returned by
+// SetSTUNServerCommand.Validate if the designated constraints aren't met.
+type SetSTUNServerCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SetSTUNServerCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SetSTUNServerCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SetSTUNServerCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SetSTUNServerCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SetSTUNServerCommandValidationError) ErrorName() string {
+	return "SetSTUNServerCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SetSTUNServerCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSetSTUNServerCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SetSTUNServerCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SetSTUNServerCommandValidationError{}
+
+// Validate checks the field values on AddLocatorServerCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddLocatorServerCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddLocatorServerCommand with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddLocatorServerCommandMultiError, or nil if none found.
+func (m *AddLocatorServerCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddLocatorServerCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for LocatorAddress
+
+	if len(errors) > 0 {
+		return AddLocatorServerCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddLocatorServerCommandMultiError is an error wrapping multiple validation
+// errors returned by AddLocatorServerCommand.ValidateAll() if the designated
+// constraints aren't met.
+type AddLocatorServerCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddLocatorServerCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddLocatorServerCommandMultiError) AllErrors() []error { return m }
+
+// AddLocatorServerCommandValidationError is the validation error returned by
+// AddLocatorServerCommand.Validate if the designated constraints aren't met.
+type AddLocatorServerCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddLocatorServerCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddLocatorServerCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddLocatorServerCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddLocatorServerCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddLocatorServerCommandValidationError) ErrorName() string {
+	return "AddLocatorServerCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddLocatorServerCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddLocatorServerCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddLocatorServerCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddLocatorServerCommandValidationError{}
+
+// Validate checks the field values on RemoveLocatorServerCommand with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RemoveLocatorServerCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RemoveLocatorServerCommand with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RemoveLocatorServerCommandMultiError, or nil if none found.
+func (m *RemoveLocatorServerCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RemoveLocatorServerCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for LocatorAddress
+
+	if len(errors) > 0 {
+		return RemoveLocatorServerCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// RemoveLocatorServerCommandMultiError is an error wrapping multiple
+// validation errors returned by RemoveLocatorServerCommand.ValidateAll() if
+// the designated constraints aren't met.
+type RemoveLocatorServerCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RemoveLocatorServerCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RemoveLocatorServerCommandMultiError) AllErrors() []error { return m }
+
+// RemoveLocatorServerCommandValidationError is the validation error returned
+// by RemoveLocatorServerCommand.Validate if the designated constraints aren't met.
+type RemoveLocatorServerCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RemoveLocatorServerCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RemoveLocatorServerCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RemoveLocatorServerCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RemoveLocatorServerCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RemoveLocatorServerCommandValidationError) ErrorName() string {
+	return "RemoveLocatorServerCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RemoveLocatorServerCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRemoveLocatorServerCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RemoveLocatorServerCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RemoveLocatorServerCommandValidationError{}
+
+// Validate checks the field values on DisableAllLocatorsCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DisableAllLocatorsCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DisableAllLocatorsCommand with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DisableAllLocatorsCommandMultiError, or nil if none found.
+func (m *DisableAllLocatorsCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DisableAllLocatorsCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DisableAllLocatorsCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// DisableAllLocatorsCommandMultiError is an error wrapping multiple validation
+// errors returned by DisableAllLocatorsCommand.ValidateAll() if the
+// designated constraints aren't met.
+type DisableAllLocatorsCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DisableAllLocatorsCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DisableAllLocatorsCommandMultiError) AllErrors() []error { return m }
+
+// DisableAllLocatorsCommandValidationError is the validation error returned by
+// DisableAllLocatorsCommand.Validate if the designated constraints aren't met.
+type DisableAllLocatorsCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DisableAllLocatorsCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DisableAllLocatorsCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DisableAllLocatorsCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DisableAllLocatorsCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DisableAllLocatorsCommandValidationError) ErrorName() string {
+	return "DisableAllLocatorsCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DisableAllLocatorsCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDisableAllLocatorsCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DisableAllLocatorsCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DisableAllLocatorsCommandValidationError{}

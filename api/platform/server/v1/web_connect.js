@@ -266,17 +266,6 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Subscribe to the server for events
-     *
-     * @generated from rpc platform.server.v1.WebService.Subscribe
-     */
-    subscribe: {
-      name: "Subscribe",
-      I: SubscribeRequest,
-      O: ServerEvent,
-      kind: MethodKind.ServerStreaming,
-    },
-    /**
      * RegisterPeer is used to connect a client to the home-cloud overlay network
      *
      * @generated from rpc platform.server.v1.WebService.RegisterPeer
@@ -286,6 +275,17 @@ export const WebService = {
       I: RegisterPeerRequest,
       O: RegisterPeerResponse,
       kind: MethodKind.Unary,
+    },
+    /**
+     * Subscribe to the server for events
+     *
+     * @generated from rpc platform.server.v1.WebService.Subscribe
+     */
+    subscribe: {
+      name: "Subscribe",
+      I: SubscribeRequest,
+      O: ServerEvent,
+      kind: MethodKind.ServerStreaming,
     },
   }
 };

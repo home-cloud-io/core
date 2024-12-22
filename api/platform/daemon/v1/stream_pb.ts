@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { SystemStats } from "./system_pb.js";
-import { WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
+import { Locator, WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -89,6 +89,30 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: WireguardPeerAdded;
     case: "wireguardPeerAdded";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.STUNServerSet stun_server_set = 13;
+     */
+    value: STUNServerSet;
+    case: "stunServerSet";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.LocatorServerAdded locator_server_added = 14;
+     */
+    value: LocatorServerAdded;
+    case: "locatorServerAdded";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.LocatorServerRemoved locator_server_removed = 15;
+     */
+    value: LocatorServerRemoved;
+    case: "locatorServerRemoved";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.AllLocatorsDisabled all_locators_disabled = 16;
+     */
+    value: AllLocatorsDisabled;
+    case: "allLocatorsDisabled";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -111,6 +135,10 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 10, name: "wireguard_interface_added", kind: "message", T: WireguardInterfaceAdded, oneof: "message" },
     { no: 11, name: "wireguard_interface_removed", kind: "message", T: WireguardInterfaceRemoved, oneof: "message" },
     { no: 12, name: "wireguard_peer_added", kind: "message", T: WireguardPeerAdded, oneof: "message" },
+    { no: 13, name: "stun_server_set", kind: "message", T: STUNServerSet, oneof: "message" },
+    { no: 14, name: "locator_server_added", kind: "message", T: LocatorServerAdded, oneof: "message" },
+    { no: 15, name: "locator_server_removed", kind: "message", T: LocatorServerRemoved, oneof: "message" },
+    { no: 16, name: "all_locators_disabled", kind: "message", T: AllLocatorsDisabled, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -251,6 +279,30 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: AddWireguardPeer;
     case: "addWireguardPeer";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.SetSTUNServerCommand set_stun_server_command = 19;
+     */
+    value: SetSTUNServerCommand;
+    case: "setStunServerCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.AddLocatorServerCommand add_locator_server_command = 20;
+     */
+    value: AddLocatorServerCommand;
+    case: "addLocatorServerCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.RemoveLocatorServerCommand remove_locator_server_command = 21;
+     */
+    value: RemoveLocatorServerCommand;
+    case: "removeLocatorServerCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.DisableAllLocatorsCommand disable_all_locators_command = 22;
+     */
+    value: DisableAllLocatorsCommand;
+    case: "disableAllLocatorsCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -279,6 +331,10 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 16, name: "add_wireguard_interface", kind: "message", T: AddWireguardInterface, oneof: "message" },
     { no: 17, name: "remove_wireguard_interface", kind: "message", T: RemoveWireguardInterface, oneof: "message" },
     { no: 18, name: "add_wireguard_peer", kind: "message", T: AddWireguardPeer, oneof: "message" },
+    { no: 19, name: "set_stun_server_command", kind: "message", T: SetSTUNServerCommand, oneof: "message" },
+    { no: 20, name: "add_locator_server_command", kind: "message", T: AddLocatorServerCommand, oneof: "message" },
+    { no: 21, name: "remove_locator_server_command", kind: "message", T: RemoveLocatorServerCommand, oneof: "message" },
+    { no: 22, name: "disable_all_locators_command", kind: "message", T: DisableAllLocatorsCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -769,6 +825,166 @@ export class WireguardPeerAdded extends Message<WireguardPeerAdded> {
 
   static equals(a: WireguardPeerAdded | PlainMessage<WireguardPeerAdded> | undefined, b: WireguardPeerAdded | PlainMessage<WireguardPeerAdded> | undefined): boolean {
     return proto3.util.equals(WireguardPeerAdded, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.STUNServerSet
+ */
+export class STUNServerSet extends Message<STUNServerSet> {
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
+  constructor(data?: PartialMessage<STUNServerSet>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.STUNServerSet";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): STUNServerSet {
+    return new STUNServerSet().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): STUNServerSet {
+    return new STUNServerSet().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): STUNServerSet {
+    return new STUNServerSet().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: STUNServerSet | PlainMessage<STUNServerSet> | undefined, b: STUNServerSet | PlainMessage<STUNServerSet> | undefined): boolean {
+    return proto3.util.equals(STUNServerSet, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.LocatorServerAdded
+ */
+export class LocatorServerAdded extends Message<LocatorServerAdded> {
+  /**
+   * @generated from field: platform.daemon.v1.Locator locator = 1;
+   */
+  locator?: Locator;
+
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
+  constructor(data?: PartialMessage<LocatorServerAdded>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.LocatorServerAdded";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "locator", kind: "message", T: Locator },
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorServerAdded {
+    return new LocatorServerAdded().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LocatorServerAdded {
+    return new LocatorServerAdded().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LocatorServerAdded {
+    return new LocatorServerAdded().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LocatorServerAdded | PlainMessage<LocatorServerAdded> | undefined, b: LocatorServerAdded | PlainMessage<LocatorServerAdded> | undefined): boolean {
+    return proto3.util.equals(LocatorServerAdded, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.LocatorServerRemoved
+ */
+export class LocatorServerRemoved extends Message<LocatorServerRemoved> {
+  /**
+   * @generated from field: string address = 1;
+   */
+  address = "";
+
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
+  constructor(data?: PartialMessage<LocatorServerRemoved>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.LocatorServerRemoved";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorServerRemoved {
+    return new LocatorServerRemoved().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LocatorServerRemoved {
+    return new LocatorServerRemoved().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LocatorServerRemoved {
+    return new LocatorServerRemoved().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LocatorServerRemoved | PlainMessage<LocatorServerRemoved> | undefined, b: LocatorServerRemoved | PlainMessage<LocatorServerRemoved> | undefined): boolean {
+    return proto3.util.equals(LocatorServerRemoved, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.AllLocatorsDisabled
+ */
+export class AllLocatorsDisabled extends Message<AllLocatorsDisabled> {
+  /**
+   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   */
+  error?: DaemonError;
+
+  constructor(data?: PartialMessage<AllLocatorsDisabled>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.AllLocatorsDisabled";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 16, name: "error", kind: "message", T: DaemonError },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AllLocatorsDisabled {
+    return new AllLocatorsDisabled().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AllLocatorsDisabled {
+    return new AllLocatorsDisabled().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AllLocatorsDisabled {
+    return new AllLocatorsDisabled().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AllLocatorsDisabled | PlainMessage<AllLocatorsDisabled> | undefined, b: AllLocatorsDisabled | PlainMessage<AllLocatorsDisabled> | undefined): boolean {
+    return proto3.util.equals(AllLocatorsDisabled, a, b);
   }
 }
 
@@ -1603,6 +1819,150 @@ export class AddWireguardPeer extends Message<AddWireguardPeer> {
 
   static equals(a: AddWireguardPeer | PlainMessage<AddWireguardPeer> | undefined, b: AddWireguardPeer | PlainMessage<AddWireguardPeer> | undefined): boolean {
     return proto3.util.equals(AddWireguardPeer, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.SetSTUNServerCommand
+ */
+export class SetSTUNServerCommand extends Message<SetSTUNServerCommand> {
+  /**
+   * @generated from field: string server = 1;
+   */
+  server = "";
+
+  constructor(data?: PartialMessage<SetSTUNServerCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.SetSTUNServerCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "server", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetSTUNServerCommand {
+    return new SetSTUNServerCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetSTUNServerCommand {
+    return new SetSTUNServerCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetSTUNServerCommand {
+    return new SetSTUNServerCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetSTUNServerCommand | PlainMessage<SetSTUNServerCommand> | undefined, b: SetSTUNServerCommand | PlainMessage<SetSTUNServerCommand> | undefined): boolean {
+    return proto3.util.equals(SetSTUNServerCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.AddLocatorServerCommand
+ */
+export class AddLocatorServerCommand extends Message<AddLocatorServerCommand> {
+  /**
+   * TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
+   *
+   * @generated from field: string locator_address = 1;
+   */
+  locatorAddress = "";
+
+  constructor(data?: PartialMessage<AddLocatorServerCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.AddLocatorServerCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddLocatorServerCommand {
+    return new AddLocatorServerCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AddLocatorServerCommand {
+    return new AddLocatorServerCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AddLocatorServerCommand {
+    return new AddLocatorServerCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AddLocatorServerCommand | PlainMessage<AddLocatorServerCommand> | undefined, b: AddLocatorServerCommand | PlainMessage<AddLocatorServerCommand> | undefined): boolean {
+    return proto3.util.equals(AddLocatorServerCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.RemoveLocatorServerCommand
+ */
+export class RemoveLocatorServerCommand extends Message<RemoveLocatorServerCommand> {
+  /**
+   * @generated from field: string locator_address = 1;
+   */
+  locatorAddress = "";
+
+  constructor(data?: PartialMessage<RemoveLocatorServerCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.RemoveLocatorServerCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RemoveLocatorServerCommand {
+    return new RemoveLocatorServerCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RemoveLocatorServerCommand {
+    return new RemoveLocatorServerCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RemoveLocatorServerCommand {
+    return new RemoveLocatorServerCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RemoveLocatorServerCommand | PlainMessage<RemoveLocatorServerCommand> | undefined, b: RemoveLocatorServerCommand | PlainMessage<RemoveLocatorServerCommand> | undefined): boolean {
+    return proto3.util.equals(RemoveLocatorServerCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.DisableAllLocatorsCommand
+ */
+export class DisableAllLocatorsCommand extends Message<DisableAllLocatorsCommand> {
+  constructor(data?: PartialMessage<DisableAllLocatorsCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.DisableAllLocatorsCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DisableAllLocatorsCommand {
+    return new DisableAllLocatorsCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DisableAllLocatorsCommand {
+    return new DisableAllLocatorsCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DisableAllLocatorsCommand {
+    return new DisableAllLocatorsCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DisableAllLocatorsCommand | PlainMessage<DisableAllLocatorsCommand> | undefined, b: DisableAllLocatorsCommand | PlainMessage<DisableAllLocatorsCommand> | undefined): boolean {
+    return proto3.util.equals(DisableAllLocatorsCommand, a, b);
   }
 }
 
