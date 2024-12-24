@@ -11,7 +11,6 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
-	"github.com/home-cloud-io/core/services/platform/server/locator"
 	"github.com/home-cloud-io/core/services/platform/server/system"
 
 	"connectrpc.com/connect"
@@ -30,22 +29,21 @@ type (
 		logger chassis.Logger
 		actl   apps.Controller
 		sctl   system.Controller
-		lctl   locator.Controller
 	}
 )
 
 const (
-	ErrFailedToInitDevice = "failed to initialize device"
-	ErrInvalidInputValues = "invalid input values"
-	ErrFailedToLogin      = "failed to login"
+	ErrFailedToInitDevice     = "failed to initialize device"
+	ErrInvalidInputValues     = "invalid input values"
+	ErrFailedToLogin          = "failed to login"
+	ErrFailedPeerRegistration = "failed to register client device as peer to the overlay network"
 )
 
-func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller, lctl locator.Controller) Rpc {
+func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Rpc {
 	return &rpcHandler{
 		logger,
 		actl,
 		sctl,
-		lctl,
 	}
 }
 
@@ -343,13 +341,11 @@ func (h *rpcHandler) EnableSecureTunnelling(ctx context.Context, request *connec
 func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error) {
 	h.logger.Info("disabling secure tunnelling")
 
-	// disable locater controller (which closes all active connections)
-	err := h.lctl.Disable(ctx)
+	err := h.sctl.DisableAllLocators(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// now, disable wireguard on the host system
 	err = h.sctl.DisableWireguard(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to disable secure tunnelling")
@@ -357,6 +353,28 @@ func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *conne
 	}
 
 	return connect.NewResponse(&v1.DisableSecureTunnellingResponse{}), nil
+}
+
+func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
+	h.logger.Info("register a peer")
+
+	peerCfg, err := h.sctl.RegisterPeer(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error(ErrFailedPeerRegistration)
+		return nil, errors.New(ErrFailedPeerRegistration)
+	}
+
+	dns := fmt.Sprintf("%s:%d", peerCfg.ClientDetails.ServerAddress, 53)
+
+	return connect.NewResponse(&v1.RegisterPeerResponse{
+		PrivateKey:      peerCfg.GetPrivateKey(),
+		PublicKey:       peerCfg.GetPublicKey(),
+		Addresses:       []string{peerCfg.ClientDetails.ServerAddress},
+		DnsServers:      []string{dns},
+		ServerPublicKey: peerCfg.PublicKey,
+		ServerId:        peerCfg.Id,
+		LocatorUrl:      peerCfg.ClientDetails.LocatorAddress,
+	}), nil
 }
 
 func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
@@ -367,7 +385,7 @@ func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Req
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	locator, err := h.lctl.AddLocator(ctx, request.Msg.LocatorAddress)
+	locator, err := h.sctl.AddLocator(ctx, request.Msg.LocatorAddress)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to add locator")
 		return nil, fmt.Errorf("failed to add locator")
@@ -381,7 +399,7 @@ func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Req
 func (h *rpcHandler) DeregisterFromLocator(ctx context.Context, request *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error) {
 	h.logger.Info("deregistering from locator")
 
-	err := h.lctl.RemoveLocator(ctx, request.Msg.LocatorAddress)
+	err := h.sctl.RemoveLocator(ctx, request.Msg.LocatorAddress)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to remove locator")
 		return nil, fmt.Errorf("failed to remove locator")
@@ -410,30 +428,4 @@ func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.
 		}
 		time.Sleep(5 * time.Second)
 	}
-}
-
-const (
-	ErrFailedPeerRegistration = "failed to register client device as peer to the overlay network"
-)
-
-func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
-	h.logger.Info("register a peer")
-
-	peerCfg, err := h.sctl.RegisterPeer(ctx, h.logger)
-	if err != nil {
-		h.logger.WithError(err).Error(ErrFailedPeerRegistration)
-		return nil, errors.New(ErrFailedPeerRegistration)
-	}
-
-	dns := fmt.Sprintf("%s:%d", peerCfg.ClientDetails.ServerAddress, 53)
-
-	return connect.NewResponse(&v1.RegisterPeerResponse{
-		PrivateKey:      peerCfg.GetPrivateKey(),
-		PublicKey:       peerCfg.GetPublicKey(),
-		Addresses:       []string{peerCfg.ClientDetails.ServerAddress},
-		DnsServers:      []string{dns},
-		ServerPublicKey: peerCfg.PublicKey,
-		ServerId:        peerCfg.Id,
-		LocatorUrl:      peerCfg.ClientDetails.LocatorAddress,
-	}), nil
 }

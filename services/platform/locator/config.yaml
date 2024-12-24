@@ -1,15 +1,9 @@
 service:
-  name: home-cloud-signal
+  name: home-cloud-locator
   domain: platform
-  entrypoint: http://localhost:2221
 
   logging:
     level: debug
 
   network:
     port: 8001
-    internal:
-      host: localhost
-      port: 8001
-    external:
-      host: localhost
