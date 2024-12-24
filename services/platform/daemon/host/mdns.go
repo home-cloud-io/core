@@ -128,7 +128,7 @@ func publish(ctx context.Context, logger chassis.Logger, fqdn, address string) {
 
 // Get preferred outbound ip of this machine
 func getOutboundIP() (string, error) {
-	conn, err := net.Dial("udp", "home-cloud.io:80")
+	conn, err := net.Dial("udp4", "home-cloud.io:80")
 	if err != nil {
 		return "", err
 	}
