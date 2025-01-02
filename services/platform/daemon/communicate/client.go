@@ -164,6 +164,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.addWireguardInterface(ctx, message.GetAddWireguardInterface())
 		case *v1.ServerMessage_RemoveWireguardInterface:
 			go c.removeWireguardInterface(ctx, message.GetRemoveWireguardInterface())
+		case *v1.ServerMessage_AddWireguardPeer:
+			go c.addWireguardPeer(ctx, message.GetAddWireguardPeer().GetPeer())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
