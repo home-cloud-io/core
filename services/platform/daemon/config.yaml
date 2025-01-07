@@ -5,8 +5,11 @@ service:
     port: 9000
     bind_address: localhost
   env: test
+  logging:
+    level: debug
 
 daemon:
+  # server: http://home-cloud.local
   server: http://localhost:8000
   domain: local
   hostnames: []

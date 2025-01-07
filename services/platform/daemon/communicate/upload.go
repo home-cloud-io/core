@@ -37,7 +37,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		}
 
 		// repond to server with ready
-		err = c.Send(&v1.DaemonMessage{
+		err = c.SendWithError(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_UploadFileReady{
 				UploadFileReady: &v1.UploadFileReady{
 					Id: info.FileId,
@@ -78,7 +78,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 		log.Debug("wrote temp file")
 
 		// repond to server with chunk completion
-		err = c.Send(&v1.DaemonMessage{
+		err = c.SendWithError(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_UploadFileChunkCompleted{
 				UploadFileChunkCompleted: &v1.UploadFileChunkCompleted{
 					FileId: chunk.FileId,

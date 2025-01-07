@@ -15,6 +15,8 @@ const defaultTimeout = 15 * time.Second
 type (
 	Listener interface {
 		// Listen will start consuming events and send them to the configured Callback function.
+		// It will return when the Timeout is reached, an error is returned from the Callback, or
+		// done=true is returned from the Callback; whichever happens first.
 		Listen(ctx context.Context) error
 	}
 	listener[T proto.Message] struct {
