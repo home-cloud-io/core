@@ -60,5 +60,34 @@ func (c *client) removeWireguardInterface(ctx context.Context, def *v1.RemoveWir
 	if err != nil {
 		c.logger.WithError(err).Error("failed to send complete message to server")
 	}
+}
 
+func (c *client) addWireguardPeer(ctx context.Context, peer *v1.WireguardPeer) {
+	err := host.AddWireguardPeer(ctx, c.logger, peer)
+
+	if err != nil {
+		c.logger.WithError(err).Error("failed to add wireguard peer")
+		err = c.stream.Send(&v1.DaemonMessage{
+			// TODO: update message
+			Message: &v1.DaemonMessage_WireguardPeerAdded{
+				WireguardPeerAdded: &v1.WireguardPeerAdded{
+					Error: &v1.DaemonError{
+						Error: fmt.Sprintf("failed to add wireguard peer: %s", err.Error()),
+					},
+				},
+			},
+		})
+
+		if err != nil {
+			c.logger.WithError(err).Error("failed to send error message to server")
+		}
+		return
+	}
+
+	err = c.stream.Send(&v1.DaemonMessage{
+		Message: &v1.DaemonMessage_WireguardPeerAdded{},
+	})
+	if err != nil {
+		c.logger.WithError(err).Error("failed to send complete message to server")
+	}
 }
