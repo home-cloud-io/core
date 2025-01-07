@@ -175,3 +175,43 @@ func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v
 func fullWireguardKeyPath(interfaceName string) string {
 	return filepath.Join(WireguardKeyPath(), interfaceName)
 }
+
+func AddWireguardPeer(ctx context.Context, logger chassis.Logger, peer *v1.WireguardPeer) error {
+	// read config
+	config := NetworkingConfig{}
+	f, err := os.ReadFile(NetworkingConfigFile())
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(f, &config)
+	if err != nil {
+		return err
+	}
+
+	// Adding peer to all `wg` interfaces. This will need to change when peering to other devices is built.
+	// currently the interface name is unknown
+	for _, v := range config.Wireguard.Interfaces {
+		v.Peers = append(v.Peers, WireguardPeer{
+			PublicKey:  peer.PublicKey,
+			AllowedIPs: peer.AllowedIps,
+		})
+	}
+
+	// write config
+	b, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(NetworkingConfigFile(), b, 0777)
+	if err != nil {
+		return err
+	}
+
+	err = RebuildAndSwitchOS(ctx, logger)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

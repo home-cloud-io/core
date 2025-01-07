@@ -191,6 +191,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.removeLocatorServer(ctx, message.GetRemoveLocatorServerCommand())
 		case *v1.ServerMessage_DisableAllLocatorsCommand:
 			go c.disableAllLocators(ctx, message.GetDisableAllLocatorsCommand())
+		case *v1.ServerMessage_AddWireguardPeer:
+			go c.addWireguardPeer(ctx, message.GetAddWireguardPeer().GetPeer())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
