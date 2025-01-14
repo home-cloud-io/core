@@ -25,9 +25,10 @@ var (
 )
 
 const (
-	NixosRoot        = "/etc/nixos/"
-	HomeCloudRoot    = "/etc/home-cloud/"
-	K3sRoot          = "/var/lib/rancher/k3s/"
+	nixosRoot        = "/etc/nixos/"
+	homeCloudRoot    = "/etc/home-cloud/"
+	k3sRoot          = "/var/lib/rancher/k3s/"
+	dataRoot         = "/mnt/k8s-pvs/"
 	nixosConfigsPath = "config/"
 
 	DefaultFileMode = 0600
@@ -36,75 +37,81 @@ const (
 // Home Cloud paths
 
 func ChunkPath() string {
-	return FilePath(HomeCloudRoot, "tmp/")
+	return FilePath(homeCloudRoot, "tmp/")
 }
 
 func ConfigFile() string {
-	return FilePath(HomeCloudRoot, "config.yaml")
+	return FilePath(homeCloudRoot, "config.yaml")
 }
 
 func MigrationsFile() string {
-	return FilePath(HomeCloudRoot, "migrations.yaml")
+	return FilePath(homeCloudRoot, "migrations.yaml")
 }
 
 func WireguardKeyPath() string {
-	return FilePath(HomeCloudRoot, "wireguard-keys/")
+	return FilePath(homeCloudRoot, "wireguard-keys/")
 }
 
 // NixOS paths
 
 func NixosConfigFile() string {
-	return FilePath(NixosRoot, "configuration.nix")
+	return FilePath(nixosRoot, "configuration.nix")
 }
 
 func NixosVarsFile() string {
-	return FilePath(NixosRoot, "vars.nix")
+	return FilePath(nixosRoot, "vars.nix")
 }
 
 func DaemonNixFile() string {
-	return FilePath(NixosRoot, "home-cloud/daemon/default.nix")
+	return FilePath(nixosRoot, "home-cloud/daemon/default.nix")
 }
 
 func NixosConfigsPath() string {
-	return FilePath(NixosRoot, nixosConfigsPath)
+	return FilePath(nixosRoot, nixosConfigsPath)
 }
 
 func BootConfigFile() string {
-	return FilePath(NixosRoot, nixosConfigsPath, "boot.json")
+	return FilePath(nixosRoot, nixosConfigsPath, "boot.json")
 }
 
 func NetworkingConfigFile() string {
-	return FilePath(NixosRoot, nixosConfigsPath, "networking.json")
+	return FilePath(nixosRoot, nixosConfigsPath, "networking.json")
 }
 
 func SecurityConfigFile() string {
-	return FilePath(NixosRoot, nixosConfigsPath, "security.json")
+	return FilePath(nixosRoot, nixosConfigsPath, "security.json")
 }
 
 func ServicesConfigFile() string {
-	return FilePath(NixosRoot, nixosConfigsPath, "services.json")
+	return FilePath(nixosRoot, nixosConfigsPath, "services.json")
 }
 
 func TimeConfigFile() string {
-	return FilePath(NixosRoot, nixosConfigsPath, "time.json")
+	return FilePath(nixosRoot, nixosConfigsPath, "time.json")
 }
 
 func UsersConfigFile() string {
-	return FilePath(NixosRoot, nixosConfigsPath, "users.json")
+	return FilePath(nixosRoot, nixosConfigsPath, "users.json")
 }
 
 // k3s paths
 
 func DraftManifestFile() string {
-	return FilePath(K3sRoot, "server/manifests/draft.yaml")
+	return FilePath(k3sRoot, "server/manifests/draft.yaml")
 }
 
 func OperatorManifestFile() string {
-	return FilePath(K3sRoot, "server/manifests/operator.yaml")
+	return FilePath(k3sRoot, "server/manifests/operator.yaml")
 }
 
 func ServerManifestFile() string {
-	return FilePath(K3sRoot, "server/manifests/server.yaml")
+	return FilePath(k3sRoot, "server/manifests/server.yaml")
+}
+
+// data paths
+
+func DataPath() string {
+	return FilePath(dataRoot)
 }
 
 // LineByLineReplace will process all lines in the given file running all Replacers against each line.
