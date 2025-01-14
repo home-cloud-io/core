@@ -17,6 +17,7 @@ import {
   Spin,
   notification,
   Alert,
+  Badge,
 } from 'antd';
 import {
   ClockCircleOutlined,
@@ -121,19 +122,21 @@ export default function SettingsPage() {
           <Divider />
           <DeviceSettingsForm />
         </Card>
-        <Card bordered={false}>
-          <Row justify={'space-between'}>
-            <Col span={10}>
-              <strong>On the Go Settings</strong>
-            </Col>
-            <HelpModal
-              title="On the Go Settings Help"
-              items={onTheGoSettingsHelp}
-            />
-          </Row>
-          <Divider />
-          <OnTheGoSettingsForm />
-        </Card>
+        <Badge.Ribbon color="orange" text="Experimental" placement="start">
+          <Card bordered={false}>
+            <Row justify={'space-between'}>
+              <Col span={10}>
+                <strong>On the Go Settings</strong>
+              </Col>
+              <HelpModal
+                title="On the Go Settings Help"
+                items={onTheGoSettingsHelp}
+              />
+            </Row>
+            <Divider />
+            <OnTheGoSettingsForm />
+          </Card>
+        </Badge.Ribbon>
       </Space>
     </Flex>
   );
