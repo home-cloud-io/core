@@ -217,7 +217,7 @@ func (c *client) systemStats(ctx context.Context) error {
 			return nil
 		}
 		go func() {
-			stats, err := host.SystemStats([]string{"/"})
+			stats, err := host.SystemStats([]string{"/mnt/k8s-pvs"})
 			if err != nil {
 				c.logger.WithError(err).Error("failed to collect system stats")
 			}

@@ -102,8 +102,8 @@ export function DeviceDetails() {
         {!isLoading && !error && (
           <div>
             {`${formatBytes(
-              Number(stats.drives[0].freeBytes)
-            )} free out of ${formatBytes(Number(stats.drives[0].totalBytes))} total`}
+              Number(stats.drives[0].totalBytes - stats.drives[0].freeBytes)
+            )} used out of ${formatBytes(Number(stats.drives[0].totalBytes))} total`}
             <Progress
               percent={formatPercentage(
                 Number(stats.drives[0].freeBytes),

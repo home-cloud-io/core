@@ -13,9 +13,9 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/locator/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/locator/v1/v1connect"
 	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	"github.com/home-cloud-io/core/services/platform/daemon/host/encryption"
 
 	"connectrpc.com/connect"
-	"github.com/netbirdio/netbird/encryption"
 	"github.com/pion/stun/v2"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
