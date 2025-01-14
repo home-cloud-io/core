@@ -18,8 +18,8 @@ require (
 	github.com/home-cloud-io/core/api v0.8.1
 	github.com/home-cloud-io/core/services/platform/operator v0.0.2
 	github.com/robfig/cron/v3 v3.0.0
-	github.com/steady-bytes/draft/api v0.6.1
-	github.com/steady-bytes/draft/pkg/chassis v0.3.5
+	github.com/steady-bytes/draft/api v1.0.0
+	github.com/steady-bytes/draft/pkg/chassis v0.4.1
 	github.com/steady-bytes/draft/pkg/loggers v0.2.3
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/mod v0.18.0

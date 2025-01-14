@@ -13,7 +13,7 @@ require (
 	github.com/home-cloud-io/core/api v0.8.1
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/pion/stun/v2 v2.0.0
-	github.com/steady-bytes/draft/pkg/chassis v0.3.5
+	github.com/steady-bytes/draft/pkg/chassis v0.4.1
 	github.com/steady-bytes/draft/pkg/loggers v0.2.3
 	golang.org/x/crypto v0.28.0
 	golang.org/x/mod v0.18.0
@@ -58,7 +58,7 @@ require (
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.18.2 // indirect
-	github.com/steady-bytes/draft/api v0.6.1 // indirect
+	github.com/steady-bytes/draft/api v1.0.0 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.etcd.io/bbolt v1.3.10 // indirect
