@@ -23,6 +23,7 @@ import {
   Modal,
   Flex,
   notification,
+  Tag,
 } from 'antd';
 import {
   AppstoreAddOutlined,
@@ -47,6 +48,12 @@ const help = [
       'You can also remove any app you currently have installed and no longer need. Simply click "More Info", then "Uninstall".',
   },
 ];
+
+const statusMap: Record<string, string | undefined> = {
+  alpha: 'red',
+  beta: 'orange',
+  stable: 'green',
+};
 
 export default function AppStorePage() {
   const [api, contextHolder] = notification.useNotification();
@@ -242,7 +249,20 @@ function AppItem(props: AppItemProps) {
           </>
         )}
       >
-        <img src={app.icon} alt="" />
+        <Flex gap="middle" vertical={false}>
+          <img src={app.icon} alt="" />
+          <Flex gap="small" vertical justify="center" align="center">
+            <Tag color="grey">{app.appVersion}</Tag>
+            <Tag color={statusMap[app.annotations['status']]}>
+              {app.annotations['status']}
+            </Tag>
+          </Flex>
+          <Flex gap="small" vertical justify="center" align="center">
+            <Button onClick={() => window.open(app.home, '_blank')}>
+              Website
+            </Button>
+          </Flex>
+        </Flex>
         <div
           dangerouslySetInnerHTML={{
             __html: marked.parse(app.readme).toString(),
