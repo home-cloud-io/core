@@ -105,7 +105,7 @@ func GetNixOSVersion(ctx context.Context, logger chassis.Logger) (string, error)
 	}
 
 	logger.Info("getting NixOS version")
-	cmd = exec.Command("nix-instantiate", "--eval", "--expr", "\"builtins.substring 0 5 ((import <nixos> {}).lib.version)\"")
+	cmd = exec.Command("nix-instantiate", "--eval", "--expr", "'builtins.substring 0 5 ((import <nixos> {}).lib.version)'")
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}
