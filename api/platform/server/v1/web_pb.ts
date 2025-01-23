@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { SystemStats } from "../../daemon/v1/system_pb.js";
+import { ComponentVersion, SystemStats } from "../../daemon/v1/system_pb.js";
 import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
@@ -1981,6 +1981,80 @@ export class DeregisterFromLocatorResponse extends Message<DeregisterFromLocator
 
   static equals(a: DeregisterFromLocatorResponse | PlainMessage<DeregisterFromLocatorResponse> | undefined, b: DeregisterFromLocatorResponse | PlainMessage<DeregisterFromLocatorResponse> | undefined): boolean {
     return proto3.util.equals(DeregisterFromLocatorResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetComponentVersionsRequest
+ */
+export class GetComponentVersionsRequest extends Message<GetComponentVersionsRequest> {
+  constructor(data?: PartialMessage<GetComponentVersionsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetComponentVersionsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetComponentVersionsRequest {
+    return new GetComponentVersionsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetComponentVersionsRequest {
+    return new GetComponentVersionsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetComponentVersionsRequest {
+    return new GetComponentVersionsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetComponentVersionsRequest | PlainMessage<GetComponentVersionsRequest> | undefined, b: GetComponentVersionsRequest | PlainMessage<GetComponentVersionsRequest> | undefined): boolean {
+    return proto3.util.equals(GetComponentVersionsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetComponentVersionsResponse
+ */
+export class GetComponentVersionsResponse extends Message<GetComponentVersionsResponse> {
+  /**
+   * @generated from field: repeated platform.daemon.v1.ComponentVersion platform = 1;
+   */
+  platform: ComponentVersion[] = [];
+
+  /**
+   * @generated from field: repeated platform.daemon.v1.ComponentVersion system = 2;
+   */
+  system: ComponentVersion[] = [];
+
+  constructor(data?: PartialMessage<GetComponentVersionsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetComponentVersionsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "platform", kind: "message", T: ComponentVersion, repeated: true },
+    { no: 2, name: "system", kind: "message", T: ComponentVersion, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetComponentVersionsResponse {
+    return new GetComponentVersionsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetComponentVersionsResponse {
+    return new GetComponentVersionsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetComponentVersionsResponse {
+    return new GetComponentVersionsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetComponentVersionsResponse | PlainMessage<GetComponentVersionsResponse> | undefined, b: GetComponentVersionsResponse | PlainMessage<GetComponentVersionsResponse> | undefined): boolean {
+    return proto3.util.equals(GetComponentVersionsResponse, a, b);
   }
 }
 

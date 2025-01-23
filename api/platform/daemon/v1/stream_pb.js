@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { proto3 } from "@bufbuild/protobuf";
-import { SystemStats } from "./system_pb.js";
+import { ComponentVersion, SystemStats } from "./system_pb.js";
 import { Locator, WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
 
 /**
@@ -29,6 +29,7 @@ export const DaemonMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 14, name: "locator_server_added", kind: "message", T: LocatorServerAdded, oneof: "message" },
     { no: 15, name: "locator_server_removed", kind: "message", T: LocatorServerRemoved, oneof: "message" },
     { no: 16, name: "all_locators_disabled", kind: "message", T: AllLocatorsDisabled, oneof: "message" },
+    { no: 17, name: "component_versions", kind: "message", T: ComponentVersions, oneof: "message" },
   ],
 );
 
@@ -60,6 +61,7 @@ export const ServerMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 20, name: "add_locator_server_command", kind: "message", T: AddLocatorServerCommand, oneof: "message" },
     { no: 21, name: "remove_locator_server_command", kind: "message", T: RemoveLocatorServerCommand, oneof: "message" },
     { no: 22, name: "disable_all_locators_command", kind: "message", T: DisableAllLocatorsCommand, oneof: "message" },
+    { no: 23, name: "request_component_versions_command", kind: "message", T: RequestComponentVersionsCommand, oneof: "message" },
   ],
 );
 
@@ -235,6 +237,16 @@ export const AllLocatorsDisabled = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.AllLocatorsDisabled",
   () => [
     { no: 16, name: "error", kind: "message", T: DaemonError },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.ComponentVersions
+ */
+export const ComponentVersions = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.ComponentVersions",
+  () => [
+    { no: 1, name: "components", kind: "message", T: ComponentVersion, repeated: true },
   ],
 );
 
@@ -500,6 +512,14 @@ export const RemoveLocatorServerCommand = /*@__PURE__*/ proto3.makeMessageType(
  */
 export const DisableAllLocatorsCommand = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.DisableAllLocatorsCommand",
+  [],
+);
+
+/**
+ * @generated from message platform.daemon.v1.RequestComponentVersionsCommand
+ */
+export const RequestComponentVersionsCommand = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.RequestComponentVersionsCommand",
   [],
 );
 

@@ -98,6 +98,9 @@ const (
 	WebServiceDeregisterFromLocatorProcedure = "/platform.server.v1.WebService/DeregisterFromLocator"
 	// WebServiceRegisterPeerProcedure is the fully-qualified name of the WebService's RegisterPeer RPC.
 	WebServiceRegisterPeerProcedure = "/platform.server.v1.WebService/RegisterPeer"
+	// WebServiceGetComponentVersionsProcedure is the fully-qualified name of the WebService's
+	// GetComponentVersions RPC.
+	WebServiceGetComponentVersionsProcedure = "/platform.server.v1.WebService/GetComponentVersions"
 	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
 	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
 )
@@ -129,6 +132,7 @@ var (
 	webServiceRegisterToLocatorMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("RegisterToLocator")
 	webServiceDeregisterFromLocatorMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("DeregisterFromLocator")
 	webServiceRegisterPeerMethodDescriptor             = webServiceServiceDescriptor.Methods().ByName("RegisterPeer")
+	webServiceGetComponentVersionsMethodDescriptor     = webServiceServiceDescriptor.Methods().ByName("GetComponentVersions")
 	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
 )
 
@@ -182,6 +186,8 @@ type WebServiceClient interface {
 	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
 	// RegisterPeer is used to connect a client to the home-cloud overlay network
 	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
+	// GetComponentVersions returns the versions of all system components (daemon, server, etc.)
+	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
 }
@@ -340,6 +346,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceRegisterPeerMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getComponentVersions: connect.NewClient[v1.GetComponentVersionsRequest, v1.GetComponentVersionsResponse](
+			httpClient,
+			baseURL+WebServiceGetComponentVersionsProcedure,
+			connect.WithSchema(webServiceGetComponentVersionsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		subscribe: connect.NewClient[v1.SubscribeRequest, v1.ServerEvent](
 			httpClient,
 			baseURL+WebServiceSubscribeProcedure,
@@ -375,6 +387,7 @@ type webServiceClient struct {
 	registerToLocator        *connect.Client[v1.RegisterToLocatorRequest, v1.RegisterToLocatorResponse]
 	deregisterFromLocator    *connect.Client[v1.DeregisterFromLocatorRequest, v1.DeregisterFromLocatorResponse]
 	registerPeer             *connect.Client[v1.RegisterPeerRequest, v1.RegisterPeerResponse]
+	getComponentVersions     *connect.Client[v1.GetComponentVersionsRequest, v1.GetComponentVersionsResponse]
 	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
 }
 
@@ -498,6 +511,11 @@ func (c *webServiceClient) RegisterPeer(ctx context.Context, req *connect.Reques
 	return c.registerPeer.CallUnary(ctx, req)
 }
 
+// GetComponentVersions calls platform.server.v1.WebService.GetComponentVersions.
+func (c *webServiceClient) GetComponentVersions(ctx context.Context, req *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error) {
+	return c.getComponentVersions.CallUnary(ctx, req)
+}
+
 // Subscribe calls platform.server.v1.WebService.Subscribe.
 func (c *webServiceClient) Subscribe(ctx context.Context, req *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error) {
 	return c.subscribe.CallServerStream(ctx, req)
@@ -553,6 +571,8 @@ type WebServiceHandler interface {
 	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
 	// RegisterPeer is used to connect a client to the home-cloud overlay network
 	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
+	// GetComponentVersions returns the versions of all system components (daemon, server, etc.)
+	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
 }
@@ -707,6 +727,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceRegisterPeerMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceGetComponentVersionsHandler := connect.NewUnaryHandler(
+		WebServiceGetComponentVersionsProcedure,
+		svc.GetComponentVersions,
+		connect.WithSchema(webServiceGetComponentVersionsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	webServiceSubscribeHandler := connect.NewServerStreamHandler(
 		WebServiceSubscribeProcedure,
 		svc.Subscribe,
@@ -763,6 +789,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceDeregisterFromLocatorHandler.ServeHTTP(w, r)
 		case WebServiceRegisterPeerProcedure:
 			webServiceRegisterPeerHandler.ServeHTTP(w, r)
+		case WebServiceGetComponentVersionsProcedure:
+			webServiceGetComponentVersionsHandler.ServeHTTP(w, r)
 		case WebServiceSubscribeProcedure:
 			webServiceSubscribeHandler.ServeHTTP(w, r)
 		default:
@@ -868,6 +896,10 @@ func (UnimplementedWebServiceHandler) DeregisterFromLocator(context.Context, *co
 
 func (UnimplementedWebServiceHandler) RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.RegisterPeer is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetComponentVersions is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {

@@ -2518,6 +2518,99 @@ func (x *DeregisterFromLocatorResponse) GetLocatorAddress() string {
 	return ""
 }
 
+type GetComponentVersionsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetComponentVersionsRequest) Reset() {
+	*x = GetComponentVersionsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[52]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetComponentVersionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetComponentVersionsRequest) ProtoMessage() {}
+
+func (x *GetComponentVersionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[52]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetComponentVersionsRequest.ProtoReflect.Descriptor instead.
+func (*GetComponentVersionsRequest) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{52}
+}
+
+type GetComponentVersionsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Platform []*v1.ComponentVersion `protobuf:"bytes,1,rep,name=platform,proto3" json:"platform" bun:"platform" csv:"platform" pg:"platform" yaml:"platform"`
+	System   []*v1.ComponentVersion `protobuf:"bytes,2,rep,name=system,proto3" json:"system" bun:"system" csv:"system" pg:"system" yaml:"system"`
+}
+
+func (x *GetComponentVersionsResponse) Reset() {
+	*x = GetComponentVersionsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_server_v1_web_proto_msgTypes[53]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetComponentVersionsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetComponentVersionsResponse) ProtoMessage() {}
+
+func (x *GetComponentVersionsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_server_v1_web_proto_msgTypes[53]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetComponentVersionsResponse.ProtoReflect.Descriptor instead.
+func (*GetComponentVersionsResponse) Descriptor() ([]byte, []int) {
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{53}
+}
+
+func (x *GetComponentVersionsResponse) GetPlatform() []*v1.ComponentVersion {
+	if x != nil {
+		return x.Platform
+	}
+	return nil
+}
+
+func (x *GetComponentVersionsResponse) GetSystem() []*v1.ComponentVersion {
+	if x != nil {
+		return x.System
+	}
+	return nil
+}
+
 type Apps struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2529,7 +2622,7 @@ type Apps struct {
 func (x *Apps) Reset() {
 	*x = Apps{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[52]
+		mi := &file_platform_server_v1_web_proto_msgTypes[54]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2542,7 +2635,7 @@ func (x *Apps) String() string {
 func (*Apps) ProtoMessage() {}
 
 func (x *Apps) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[52]
+	mi := &file_platform_server_v1_web_proto_msgTypes[54]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2555,7 +2648,7 @@ func (x *Apps) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Apps.ProtoReflect.Descriptor instead.
 func (*Apps) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{52}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *Apps) GetApps() []*App {
@@ -2596,7 +2689,7 @@ type App struct {
 func (x *App) Reset() {
 	*x = App{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[53]
+		mi := &file_platform_server_v1_web_proto_msgTypes[55]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2609,7 +2702,7 @@ func (x *App) String() string {
 func (*App) ProtoMessage() {}
 
 func (x *App) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[53]
+	mi := &file_platform_server_v1_web_proto_msgTypes[55]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2622,7 +2715,7 @@ func (x *App) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use App.ProtoReflect.Descriptor instead.
 func (*App) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{53}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *App) GetName() string {
@@ -2743,7 +2836,7 @@ type AppDependency struct {
 func (x *AppDependency) Reset() {
 	*x = AppDependency{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[54]
+		mi := &file_platform_server_v1_web_proto_msgTypes[56]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2756,7 +2849,7 @@ func (x *AppDependency) String() string {
 func (*AppDependency) ProtoMessage() {}
 
 func (x *AppDependency) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[54]
+	mi := &file_platform_server_v1_web_proto_msgTypes[56]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2769,7 +2862,7 @@ func (x *AppDependency) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppDependency.ProtoReflect.Descriptor instead.
 func (*AppDependency) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{54}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *AppDependency) GetName() string {
@@ -2806,7 +2899,7 @@ type AppRunningStatus struct {
 func (x *AppRunningStatus) Reset() {
 	*x = AppRunningStatus{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[55]
+		mi := &file_platform_server_v1_web_proto_msgTypes[57]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2819,7 +2912,7 @@ func (x *AppRunningStatus) String() string {
 func (*AppRunningStatus) ProtoMessage() {}
 
 func (x *AppRunningStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[55]
+	mi := &file_platform_server_v1_web_proto_msgTypes[57]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2832,7 +2925,7 @@ func (x *AppRunningStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppRunningStatus.ProtoReflect.Descriptor instead.
 func (*AppRunningStatus) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{55}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *AppRunningStatus) GetName() string {
@@ -2867,7 +2960,7 @@ type Entries struct {
 func (x *Entries) Reset() {
 	*x = Entries{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[56]
+		mi := &file_platform_server_v1_web_proto_msgTypes[58]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2880,7 +2973,7 @@ func (x *Entries) String() string {
 func (*Entries) ProtoMessage() {}
 
 func (x *Entries) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[56]
+	mi := &file_platform_server_v1_web_proto_msgTypes[58]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2893,7 +2986,7 @@ func (x *Entries) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Entries.ProtoReflect.Descriptor instead.
 func (*Entries) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{56}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *Entries) GetApps() []*App {
@@ -2916,7 +3009,7 @@ type InstalledApp struct {
 func (x *InstalledApp) Reset() {
 	*x = InstalledApp{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[57]
+		mi := &file_platform_server_v1_web_proto_msgTypes[59]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2929,7 +3022,7 @@ func (x *InstalledApp) String() string {
 func (*InstalledApp) ProtoMessage() {}
 
 func (x *InstalledApp) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[57]
+	mi := &file_platform_server_v1_web_proto_msgTypes[59]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2942,7 +3035,7 @@ func (x *InstalledApp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InstalledApp.ProtoReflect.Descriptor instead.
 func (*InstalledApp) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{57}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *InstalledApp) GetApplication() *App {
@@ -2975,7 +3068,7 @@ type AppStoreEntries struct {
 func (x *AppStoreEntries) Reset() {
 	*x = AppStoreEntries{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[58]
+		mi := &file_platform_server_v1_web_proto_msgTypes[60]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2988,7 +3081,7 @@ func (x *AppStoreEntries) String() string {
 func (*AppStoreEntries) ProtoMessage() {}
 
 func (x *AppStoreEntries) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[58]
+	mi := &file_platform_server_v1_web_proto_msgTypes[60]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3001,7 +3094,7 @@ func (x *AppStoreEntries) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppStoreEntries.ProtoReflect.Descriptor instead.
 func (*AppStoreEntries) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{58}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *AppStoreEntries) GetApiVersion() string {
@@ -3043,7 +3136,7 @@ type DeviceSettings struct {
 func (x *DeviceSettings) Reset() {
 	*x = DeviceSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[59]
+		mi := &file_platform_server_v1_web_proto_msgTypes[61]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3056,7 +3149,7 @@ func (x *DeviceSettings) String() string {
 func (*DeviceSettings) ProtoMessage() {}
 
 func (x *DeviceSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[59]
+	mi := &file_platform_server_v1_web_proto_msgTypes[61]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3069,7 +3162,7 @@ func (x *DeviceSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeviceSettings.ProtoReflect.Descriptor instead.
 func (*DeviceSettings) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{59}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *DeviceSettings) GetAdminUser() *User {
@@ -3134,7 +3227,7 @@ type LocatorSettings struct {
 func (x *LocatorSettings) Reset() {
 	*x = LocatorSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[60]
+		mi := &file_platform_server_v1_web_proto_msgTypes[62]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3147,7 +3240,7 @@ func (x *LocatorSettings) String() string {
 func (*LocatorSettings) ProtoMessage() {}
 
 func (x *LocatorSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[60]
+	mi := &file_platform_server_v1_web_proto_msgTypes[62]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3160,7 +3253,7 @@ func (x *LocatorSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LocatorSettings.ProtoReflect.Descriptor instead.
 func (*LocatorSettings) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{60}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *LocatorSettings) GetEnabled() bool {
@@ -3196,7 +3289,7 @@ type User struct {
 func (x *User) Reset() {
 	*x = User{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[61]
+		mi := &file_platform_server_v1_web_proto_msgTypes[63]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3209,7 +3302,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[61]
+	mi := &file_platform_server_v1_web_proto_msgTypes[63]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3222,7 +3315,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{61}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *User) GetUsername() string {
@@ -3248,7 +3341,7 @@ type SubscribeRequest struct {
 func (x *SubscribeRequest) Reset() {
 	*x = SubscribeRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[62]
+		mi := &file_platform_server_v1_web_proto_msgTypes[64]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3261,7 +3354,7 @@ func (x *SubscribeRequest) String() string {
 func (*SubscribeRequest) ProtoMessage() {}
 
 func (x *SubscribeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[62]
+	mi := &file_platform_server_v1_web_proto_msgTypes[64]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3274,7 +3367,7 @@ func (x *SubscribeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubscribeRequest.ProtoReflect.Descriptor instead.
 func (*SubscribeRequest) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{62}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{64}
 }
 
 type ServerEvent struct {
@@ -3293,7 +3386,7 @@ type ServerEvent struct {
 func (x *ServerEvent) Reset() {
 	*x = ServerEvent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[63]
+		mi := &file_platform_server_v1_web_proto_msgTypes[65]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3306,7 +3399,7 @@ func (x *ServerEvent) String() string {
 func (*ServerEvent) ProtoMessage() {}
 
 func (x *ServerEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[63]
+	mi := &file_platform_server_v1_web_proto_msgTypes[65]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3319,7 +3412,7 @@ func (x *ServerEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerEvent.ProtoReflect.Descriptor instead.
 func (*ServerEvent) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{63}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{65}
 }
 
 func (m *ServerEvent) GetEvent() isServerEvent_Event {
@@ -3381,7 +3474,7 @@ type HeartbeatEvent struct {
 func (x *HeartbeatEvent) Reset() {
 	*x = HeartbeatEvent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[64]
+		mi := &file_platform_server_v1_web_proto_msgTypes[66]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3394,7 +3487,7 @@ func (x *HeartbeatEvent) String() string {
 func (*HeartbeatEvent) ProtoMessage() {}
 
 func (x *HeartbeatEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[64]
+	mi := &file_platform_server_v1_web_proto_msgTypes[66]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3407,7 +3500,7 @@ func (x *HeartbeatEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HeartbeatEvent.ProtoReflect.Descriptor instead.
 func (*HeartbeatEvent) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{64}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{66}
 }
 
 type ErrorEvent struct {
@@ -3421,7 +3514,7 @@ type ErrorEvent struct {
 func (x *ErrorEvent) Reset() {
 	*x = ErrorEvent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[65]
+		mi := &file_platform_server_v1_web_proto_msgTypes[67]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3434,7 +3527,7 @@ func (x *ErrorEvent) String() string {
 func (*ErrorEvent) ProtoMessage() {}
 
 func (x *ErrorEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[65]
+	mi := &file_platform_server_v1_web_proto_msgTypes[67]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3447,7 +3540,7 @@ func (x *ErrorEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ErrorEvent.ProtoReflect.Descriptor instead.
 func (*ErrorEvent) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{65}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *ErrorEvent) GetError() string {
@@ -3468,7 +3561,7 @@ type AppInstalledEvent struct {
 func (x *AppInstalledEvent) Reset() {
 	*x = AppInstalledEvent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[66]
+		mi := &file_platform_server_v1_web_proto_msgTypes[68]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3481,7 +3574,7 @@ func (x *AppInstalledEvent) String() string {
 func (*AppInstalledEvent) ProtoMessage() {}
 
 func (x *AppInstalledEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[66]
+	mi := &file_platform_server_v1_web_proto_msgTypes[68]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3494,7 +3587,7 @@ func (x *AppInstalledEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppInstalledEvent.ProtoReflect.Descriptor instead.
 func (*AppInstalledEvent) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{66}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *AppInstalledEvent) GetName() string {
@@ -3513,7 +3606,7 @@ type RegisterPeerRequest struct {
 func (x *RegisterPeerRequest) Reset() {
 	*x = RegisterPeerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[67]
+		mi := &file_platform_server_v1_web_proto_msgTypes[69]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3526,7 +3619,7 @@ func (x *RegisterPeerRequest) String() string {
 func (*RegisterPeerRequest) ProtoMessage() {}
 
 func (x *RegisterPeerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[67]
+	mi := &file_platform_server_v1_web_proto_msgTypes[69]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3539,7 +3632,7 @@ func (x *RegisterPeerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterPeerRequest.ProtoReflect.Descriptor instead.
 func (*RegisterPeerRequest) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{67}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{69}
 }
 
 type RegisterPeerResponse struct {
@@ -3561,7 +3654,7 @@ type RegisterPeerResponse struct {
 func (x *RegisterPeerResponse) Reset() {
 	*x = RegisterPeerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[68]
+		mi := &file_platform_server_v1_web_proto_msgTypes[70]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3574,7 +3667,7 @@ func (x *RegisterPeerResponse) String() string {
 func (*RegisterPeerResponse) ProtoMessage() {}
 
 func (x *RegisterPeerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[68]
+	mi := &file_platform_server_v1_web_proto_msgTypes[70]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3587,7 +3680,7 @@ func (x *RegisterPeerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterPeerResponse.ProtoReflect.Descriptor instead.
 func (*RegisterPeerResponse) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{68}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *RegisterPeerResponse) GetPrivateKey() string {
@@ -3654,7 +3747,7 @@ type PeerConfiguration struct {
 func (x *PeerConfiguration) Reset() {
 	*x = PeerConfiguration{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[69]
+		mi := &file_platform_server_v1_web_proto_msgTypes[71]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3667,7 +3760,7 @@ func (x *PeerConfiguration) String() string {
 func (*PeerConfiguration) ProtoMessage() {}
 
 func (x *PeerConfiguration) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[69]
+	mi := &file_platform_server_v1_web_proto_msgTypes[71]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3680,7 +3773,7 @@ func (x *PeerConfiguration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerConfiguration.ProtoReflect.Descriptor instead.
 func (*PeerConfiguration) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{69}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *PeerConfiguration) GetId() string {
@@ -3723,7 +3816,7 @@ type ClientRegistrationDetails struct {
 func (x *ClientRegistrationDetails) Reset() {
 	*x = ClientRegistrationDetails{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_platform_server_v1_web_proto_msgTypes[70]
+		mi := &file_platform_server_v1_web_proto_msgTypes[72]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3736,7 +3829,7 @@ func (x *ClientRegistrationDetails) String() string {
 func (*ClientRegistrationDetails) ProtoMessage() {}
 
 func (x *ClientRegistrationDetails) ProtoReflect() protoreflect.Message {
-	mi := &file_platform_server_v1_web_proto_msgTypes[70]
+	mi := &file_platform_server_v1_web_proto_msgTypes[72]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3749,7 +3842,7 @@ func (x *ClientRegistrationDetails) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientRegistrationDetails.ProtoReflect.Descriptor instead.
 func (*ClientRegistrationDetails) Descriptor() ([]byte, []int) {
-	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{70}
+	return file_platform_server_v1_web_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *ClientRegistrationDetails) GetServerAddress() string {
@@ -3984,7 +4077,19 @@ var file_platform_server_v1_web_proto_rawDesc = []byte{
 	0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x27, 0x0a, 0x0f,
 	0x6c, 0x6f, 0x63, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x6c, 0x6f, 0x63, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64,
-	0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x33, 0x0a, 0x04, 0x41, 0x70, 0x70, 0x73, 0x12, 0x2b, 0x0a,
+	0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x1d, 0x0a, 0x1b, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x70,
+	0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x22, 0x9e, 0x01, 0x0a, 0x1c, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x70,
+	0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x40, 0x0a, 0x08, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72,
+	0x6d, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f,
+	0x72, 0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6d,
+	0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x08, 0x70,
+	0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x12, 0x3c, 0x0a, 0x06, 0x73, 0x79, 0x73, 0x74, 0x65,
+	0x6d, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f,
+	0x72, 0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6d,
+	0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x06, 0x73,
+	0x79, 0x73, 0x74, 0x65, 0x6d, 0x22, 0x33, 0x0a, 0x04, 0x41, 0x70, 0x70, 0x73, 0x12, 0x2b, 0x0a,
 	0x04, 0x61, 0x70, 0x70, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x70, 0x6c,
 	0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31,
 	0x2e, 0x41, 0x70, 0x70, 0x52, 0x04, 0x61, 0x70, 0x70, 0x73, 0x22, 0x9b, 0x04, 0x0a, 0x03, 0x41,
@@ -4161,7 +4266,7 @@ var file_platform_server_v1_web_proto_rawDesc = []byte{
 	0x44, 0x10, 0x00, 0x12, 0x16, 0x0a, 0x12, 0x41, 0x50, 0x50, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55,
 	0x53, 0x5f, 0x48, 0x45, 0x41, 0x4c, 0x54, 0x48, 0x59, 0x10, 0x01, 0x12, 0x18, 0x0a, 0x14, 0x41,
 	0x50, 0x50, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x55, 0x4e, 0x48, 0x45, 0x41, 0x4c,
-	0x54, 0x48, 0x59, 0x10, 0x02, 0x32, 0xc0, 0x15, 0x0a, 0x0a, 0x57, 0x65, 0x62, 0x53, 0x65, 0x72,
+	0x54, 0x48, 0x59, 0x10, 0x02, 0x32, 0xbd, 0x16, 0x0a, 0x0a, 0x57, 0x65, 0x62, 0x53, 0x65, 0x72,
 	0x76, 0x69, 0x63, 0x65, 0x12, 0x63, 0x0a, 0x0c, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f, 0x77, 0x6e,
 	0x48, 0x6f, 0x73, 0x74, 0x12, 0x27, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e,
 	0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x68, 0x75, 0x74, 0x64, 0x6f,
@@ -4328,16 +4433,24 @@ var file_platform_server_v1_web_proto_rawDesc = []byte{
 	0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e,
 	0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
 	0x65, 0x72, 0x50, 0x65, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
-	0x12, 0x56, 0x0a, 0x09, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x12, 0x24, 0x2e,
-	0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e,
-	0x76, 0x31, 0x2e, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73,
-	0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x45,
-	0x76, 0x65, 0x6e, 0x74, 0x22, 0x00, 0x30, 0x01, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x68, 0x6f, 0x6d, 0x65, 0x2d, 0x63, 0x6c, 0x6f, 0x75,
-	0x64, 0x2d, 0x69, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x6c,
-	0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x76, 0x31,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x12, 0x7b, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74,
+	0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x2f, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66,
+	0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65,
+	0x74, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f,
+	0x6e, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x30, 0x2e, 0x70, 0x6c, 0x61, 0x74,
+	0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47,
+	0x65, 0x74, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69,
+	0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x56, 0x0a,
+	0x09, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x12, 0x24, 0x2e, 0x70, 0x6c, 0x61,
+	0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e,
+	0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x1f, 0x2e, 0x70, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x73, 0x65, 0x72, 0x76,
+	0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x45, 0x76, 0x65, 0x6e,
+	0x74, 0x22, 0x00, 0x30, 0x01, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
+	0x63, 0x6f, 0x6d, 0x2f, 0x68, 0x6f, 0x6d, 0x65, 0x2d, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x2d, 0x69,
+	0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x6c, 0x61, 0x74, 0x66,
+	0x6f, 0x72, 0x6d, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -4353,7 +4466,7 @@ func file_platform_server_v1_web_proto_rawDescGZIP() []byte {
 }
 
 var file_platform_server_v1_web_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_platform_server_v1_web_proto_msgTypes = make([]protoimpl.MessageInfo, 73)
+var file_platform_server_v1_web_proto_msgTypes = make([]protoimpl.MessageInfo, 75)
 var file_platform_server_v1_web_proto_goTypes = []any{
 	(AppStatus)(0),                           // 0: platform.server.v1.AppStatus
 	(*ShutdownHostRequest)(nil),              // 1: platform.server.v1.ShutdownHostRequest
@@ -4408,29 +4521,32 @@ var file_platform_server_v1_web_proto_goTypes = []any{
 	(*RegisterToLocatorResponse)(nil),        // 50: platform.server.v1.RegisterToLocatorResponse
 	(*DeregisterFromLocatorRequest)(nil),     // 51: platform.server.v1.DeregisterFromLocatorRequest
 	(*DeregisterFromLocatorResponse)(nil),    // 52: platform.server.v1.DeregisterFromLocatorResponse
-	(*Apps)(nil),                             // 53: platform.server.v1.Apps
-	(*App)(nil),                              // 54: platform.server.v1.App
-	(*AppDependency)(nil),                    // 55: platform.server.v1.AppDependency
-	(*AppRunningStatus)(nil),                 // 56: platform.server.v1.AppRunningStatus
-	(*Entries)(nil),                          // 57: platform.server.v1.Entries
-	(*InstalledApp)(nil),                     // 58: platform.server.v1.InstalledApp
-	(*AppStoreEntries)(nil),                  // 59: platform.server.v1.AppStoreEntries
-	(*DeviceSettings)(nil),                   // 60: platform.server.v1.DeviceSettings
-	(*LocatorSettings)(nil),                  // 61: platform.server.v1.LocatorSettings
-	(*User)(nil),                             // 62: platform.server.v1.User
-	(*SubscribeRequest)(nil),                 // 63: platform.server.v1.SubscribeRequest
-	(*ServerEvent)(nil),                      // 64: platform.server.v1.ServerEvent
-	(*HeartbeatEvent)(nil),                   // 65: platform.server.v1.HeartbeatEvent
-	(*ErrorEvent)(nil),                       // 66: platform.server.v1.ErrorEvent
-	(*AppInstalledEvent)(nil),                // 67: platform.server.v1.AppInstalledEvent
-	(*RegisterPeerRequest)(nil),              // 68: platform.server.v1.RegisterPeerRequest
-	(*RegisterPeerResponse)(nil),             // 69: platform.server.v1.RegisterPeerResponse
-	(*PeerConfiguration)(nil),                // 70: platform.server.v1.PeerConfiguration
-	(*ClientRegistrationDetails)(nil),        // 71: platform.server.v1.ClientRegistrationDetails
-	nil,                                      // 72: platform.server.v1.App.AnnotationsEntry
-	nil,                                      // 73: platform.server.v1.AppStoreEntries.EntriesEntry
-	(*v1.SystemStats)(nil),                   // 74: platform.daemon.v1.SystemStats
-	(*v1.Locator)(nil),                       // 75: platform.daemon.v1.Locator
+	(*GetComponentVersionsRequest)(nil),      // 53: platform.server.v1.GetComponentVersionsRequest
+	(*GetComponentVersionsResponse)(nil),     // 54: platform.server.v1.GetComponentVersionsResponse
+	(*Apps)(nil),                             // 55: platform.server.v1.Apps
+	(*App)(nil),                              // 56: platform.server.v1.App
+	(*AppDependency)(nil),                    // 57: platform.server.v1.AppDependency
+	(*AppRunningStatus)(nil),                 // 58: platform.server.v1.AppRunningStatus
+	(*Entries)(nil),                          // 59: platform.server.v1.Entries
+	(*InstalledApp)(nil),                     // 60: platform.server.v1.InstalledApp
+	(*AppStoreEntries)(nil),                  // 61: platform.server.v1.AppStoreEntries
+	(*DeviceSettings)(nil),                   // 62: platform.server.v1.DeviceSettings
+	(*LocatorSettings)(nil),                  // 63: platform.server.v1.LocatorSettings
+	(*User)(nil),                             // 64: platform.server.v1.User
+	(*SubscribeRequest)(nil),                 // 65: platform.server.v1.SubscribeRequest
+	(*ServerEvent)(nil),                      // 66: platform.server.v1.ServerEvent
+	(*HeartbeatEvent)(nil),                   // 67: platform.server.v1.HeartbeatEvent
+	(*ErrorEvent)(nil),                       // 68: platform.server.v1.ErrorEvent
+	(*AppInstalledEvent)(nil),                // 69: platform.server.v1.AppInstalledEvent
+	(*RegisterPeerRequest)(nil),              // 70: platform.server.v1.RegisterPeerRequest
+	(*RegisterPeerResponse)(nil),             // 71: platform.server.v1.RegisterPeerResponse
+	(*PeerConfiguration)(nil),                // 72: platform.server.v1.PeerConfiguration
+	(*ClientRegistrationDetails)(nil),        // 73: platform.server.v1.ClientRegistrationDetails
+	nil,                                      // 74: platform.server.v1.App.AnnotationsEntry
+	nil,                                      // 75: platform.server.v1.AppStoreEntries.EntriesEntry
+	(*v1.SystemStats)(nil),                   // 76: platform.daemon.v1.SystemStats
+	(*v1.Locator)(nil),                       // 77: platform.daemon.v1.Locator
+	(*v1.ComponentVersion)(nil),              // 78: platform.daemon.v1.ComponentVersion
 }
 var file_platform_server_v1_web_proto_depIdxs = []int32{
 	13, // 0: platform.server.v1.CheckForSystemUpdatesResponse.daemon_versions:type_name -> platform.server.v1.DaemonVersions
@@ -4440,83 +4556,87 @@ var file_platform_server_v1_web_proto_depIdxs = []int32{
 	26, // 4: platform.server.v1.AppsHealthCheckResponse.checks:type_name -> platform.server.v1.AppHealth
 	0,  // 5: platform.server.v1.AppHealth.status:type_name -> platform.server.v1.AppStatus
 	27, // 6: platform.server.v1.AppHealth.display:type_name -> platform.server.v1.AppDisplay
-	74, // 7: platform.server.v1.GetSystemStatsResponse.stats:type_name -> platform.daemon.v1.SystemStats
-	54, // 8: platform.server.v1.GetAppsInStoreResponse.apps:type_name -> platform.server.v1.App
-	60, // 9: platform.server.v1.GetDeviceSettingsResponse.settings:type_name -> platform.server.v1.DeviceSettings
-	60, // 10: platform.server.v1.SetDeviceSettingsRequest.settings:type_name -> platform.server.v1.DeviceSettings
+	76, // 7: platform.server.v1.GetSystemStatsResponse.stats:type_name -> platform.daemon.v1.SystemStats
+	56, // 8: platform.server.v1.GetAppsInStoreResponse.apps:type_name -> platform.server.v1.App
+	62, // 9: platform.server.v1.GetDeviceSettingsResponse.settings:type_name -> platform.server.v1.DeviceSettings
+	62, // 10: platform.server.v1.SetDeviceSettingsRequest.settings:type_name -> platform.server.v1.DeviceSettings
 	44, // 11: platform.server.v1.GetAppStorageResponse.apps:type_name -> platform.server.v1.AppStorage
-	75, // 12: platform.server.v1.RegisterToLocatorResponse.locator:type_name -> platform.daemon.v1.Locator
-	54, // 13: platform.server.v1.Apps.apps:type_name -> platform.server.v1.App
-	55, // 14: platform.server.v1.App.dependencies:type_name -> platform.server.v1.AppDependency
-	72, // 15: platform.server.v1.App.annotations:type_name -> platform.server.v1.App.AnnotationsEntry
-	0,  // 16: platform.server.v1.AppRunningStatus.status:type_name -> platform.server.v1.AppStatus
-	54, // 17: platform.server.v1.Entries.apps:type_name -> platform.server.v1.App
-	54, // 18: platform.server.v1.InstalledApp.application:type_name -> platform.server.v1.App
-	56, // 19: platform.server.v1.InstalledApp.status:type_name -> platform.server.v1.AppRunningStatus
-	73, // 20: platform.server.v1.AppStoreEntries.entries:type_name -> platform.server.v1.AppStoreEntries.EntriesEntry
-	62, // 21: platform.server.v1.DeviceSettings.admin_user:type_name -> platform.server.v1.User
-	61, // 22: platform.server.v1.DeviceSettings.locator_settings:type_name -> platform.server.v1.LocatorSettings
-	75, // 23: platform.server.v1.LocatorSettings.locators:type_name -> platform.daemon.v1.Locator
-	65, // 24: platform.server.v1.ServerEvent.heartbeat:type_name -> platform.server.v1.HeartbeatEvent
-	66, // 25: platform.server.v1.ServerEvent.error:type_name -> platform.server.v1.ErrorEvent
-	67, // 26: platform.server.v1.ServerEvent.app_installed:type_name -> platform.server.v1.AppInstalledEvent
-	71, // 27: platform.server.v1.PeerConfiguration.client_details:type_name -> platform.server.v1.ClientRegistrationDetails
-	53, // 28: platform.server.v1.AppStoreEntries.EntriesEntry.value:type_name -> platform.server.v1.Apps
-	1,  // 29: platform.server.v1.WebService.ShutdownHost:input_type -> platform.server.v1.ShutdownHostRequest
-	3,  // 30: platform.server.v1.WebService.RestartHost:input_type -> platform.server.v1.RestartHostRequest
-	5,  // 31: platform.server.v1.WebService.InstallApp:input_type -> platform.server.v1.InstallAppRequest
-	7,  // 32: platform.server.v1.WebService.DeleteApp:input_type -> platform.server.v1.DeleteAppRequest
-	9,  // 33: platform.server.v1.WebService.UpdateApp:input_type -> platform.server.v1.UpdateAppRequest
-	11, // 34: platform.server.v1.WebService.CheckForSystemUpdates:input_type -> platform.server.v1.CheckForSystemUpdatesRequest
-	15, // 35: platform.server.v1.WebService.CheckForContainerUpdates:input_type -> platform.server.v1.CheckForContainerUpdatesRequest
-	18, // 36: platform.server.v1.WebService.ChangeDaemonVersion:input_type -> platform.server.v1.ChangeDaemonVersionRequest
-	20, // 37: platform.server.v1.WebService.InstallOSUpdate:input_type -> platform.server.v1.InstallOSUpdateRequest
-	22, // 38: platform.server.v1.WebService.SetSystemImage:input_type -> platform.server.v1.SetSystemImageRequest
-	24, // 39: platform.server.v1.WebService.AppsHealthCheck:input_type -> platform.server.v1.AppsHealthCheckRequest
-	28, // 40: platform.server.v1.WebService.GetSystemStats:input_type -> platform.server.v1.GetSystemStatsRequest
-	30, // 41: platform.server.v1.WebService.IsDeviceSetup:input_type -> platform.server.v1.IsDeviceSetupRequest
-	32, // 42: platform.server.v1.WebService.InitializeDevice:input_type -> platform.server.v1.InitializeDeviceRequest
-	34, // 43: platform.server.v1.WebService.Login:input_type -> platform.server.v1.LoginRequest
-	36, // 44: platform.server.v1.WebService.GetAppsInStore:input_type -> platform.server.v1.GetAppsInStoreRequest
-	38, // 45: platform.server.v1.WebService.GetDeviceSettings:input_type -> platform.server.v1.GetDeviceSettingsRequest
-	40, // 46: platform.server.v1.WebService.SetDeviceSettings:input_type -> platform.server.v1.SetDeviceSettingsRequest
-	42, // 47: platform.server.v1.WebService.GetAppStorage:input_type -> platform.server.v1.GetAppStorageRequest
-	45, // 48: platform.server.v1.WebService.EnableSecureTunnelling:input_type -> platform.server.v1.EnableSecureTunnellingRequest
-	47, // 49: platform.server.v1.WebService.DisableSecureTunnelling:input_type -> platform.server.v1.DisableSecureTunnellingRequest
-	49, // 50: platform.server.v1.WebService.RegisterToLocator:input_type -> platform.server.v1.RegisterToLocatorRequest
-	51, // 51: platform.server.v1.WebService.DeregisterFromLocator:input_type -> platform.server.v1.DeregisterFromLocatorRequest
-	68, // 52: platform.server.v1.WebService.RegisterPeer:input_type -> platform.server.v1.RegisterPeerRequest
-	63, // 53: platform.server.v1.WebService.Subscribe:input_type -> platform.server.v1.SubscribeRequest
-	2,  // 54: platform.server.v1.WebService.ShutdownHost:output_type -> platform.server.v1.ShutdownHostResponse
-	4,  // 55: platform.server.v1.WebService.RestartHost:output_type -> platform.server.v1.RestartHostResponse
-	6,  // 56: platform.server.v1.WebService.InstallApp:output_type -> platform.server.v1.InstallAppResponse
-	8,  // 57: platform.server.v1.WebService.DeleteApp:output_type -> platform.server.v1.DeleteAppResponse
-	10, // 58: platform.server.v1.WebService.UpdateApp:output_type -> platform.server.v1.UpdateAppResponse
-	12, // 59: platform.server.v1.WebService.CheckForSystemUpdates:output_type -> platform.server.v1.CheckForSystemUpdatesResponse
-	16, // 60: platform.server.v1.WebService.CheckForContainerUpdates:output_type -> platform.server.v1.CheckForContainerUpdatesResponse
-	19, // 61: platform.server.v1.WebService.ChangeDaemonVersion:output_type -> platform.server.v1.ChangeDaemonVersionResponse
-	21, // 62: platform.server.v1.WebService.InstallOSUpdate:output_type -> platform.server.v1.InstallOSUpdateResponse
-	23, // 63: platform.server.v1.WebService.SetSystemImage:output_type -> platform.server.v1.SetSystemImageResponse
-	25, // 64: platform.server.v1.WebService.AppsHealthCheck:output_type -> platform.server.v1.AppsHealthCheckResponse
-	29, // 65: platform.server.v1.WebService.GetSystemStats:output_type -> platform.server.v1.GetSystemStatsResponse
-	31, // 66: platform.server.v1.WebService.IsDeviceSetup:output_type -> platform.server.v1.IsDeviceSetupResponse
-	33, // 67: platform.server.v1.WebService.InitializeDevice:output_type -> platform.server.v1.InitializeDeviceResponse
-	35, // 68: platform.server.v1.WebService.Login:output_type -> platform.server.v1.LoginResponse
-	37, // 69: platform.server.v1.WebService.GetAppsInStore:output_type -> platform.server.v1.GetAppsInStoreResponse
-	39, // 70: platform.server.v1.WebService.GetDeviceSettings:output_type -> platform.server.v1.GetDeviceSettingsResponse
-	41, // 71: platform.server.v1.WebService.SetDeviceSettings:output_type -> platform.server.v1.SetDeviceSettingsResponse
-	43, // 72: platform.server.v1.WebService.GetAppStorage:output_type -> platform.server.v1.GetAppStorageResponse
-	46, // 73: platform.server.v1.WebService.EnableSecureTunnelling:output_type -> platform.server.v1.EnableSecureTunnellingResponse
-	48, // 74: platform.server.v1.WebService.DisableSecureTunnelling:output_type -> platform.server.v1.DisableSecureTunnellingResponse
-	50, // 75: platform.server.v1.WebService.RegisterToLocator:output_type -> platform.server.v1.RegisterToLocatorResponse
-	52, // 76: platform.server.v1.WebService.DeregisterFromLocator:output_type -> platform.server.v1.DeregisterFromLocatorResponse
-	69, // 77: platform.server.v1.WebService.RegisterPeer:output_type -> platform.server.v1.RegisterPeerResponse
-	64, // 78: platform.server.v1.WebService.Subscribe:output_type -> platform.server.v1.ServerEvent
-	54, // [54:79] is the sub-list for method output_type
-	29, // [29:54] is the sub-list for method input_type
-	29, // [29:29] is the sub-list for extension type_name
-	29, // [29:29] is the sub-list for extension extendee
-	0,  // [0:29] is the sub-list for field type_name
+	77, // 12: platform.server.v1.RegisterToLocatorResponse.locator:type_name -> platform.daemon.v1.Locator
+	78, // 13: platform.server.v1.GetComponentVersionsResponse.platform:type_name -> platform.daemon.v1.ComponentVersion
+	78, // 14: platform.server.v1.GetComponentVersionsResponse.system:type_name -> platform.daemon.v1.ComponentVersion
+	56, // 15: platform.server.v1.Apps.apps:type_name -> platform.server.v1.App
+	57, // 16: platform.server.v1.App.dependencies:type_name -> platform.server.v1.AppDependency
+	74, // 17: platform.server.v1.App.annotations:type_name -> platform.server.v1.App.AnnotationsEntry
+	0,  // 18: platform.server.v1.AppRunningStatus.status:type_name -> platform.server.v1.AppStatus
+	56, // 19: platform.server.v1.Entries.apps:type_name -> platform.server.v1.App
+	56, // 20: platform.server.v1.InstalledApp.application:type_name -> platform.server.v1.App
+	58, // 21: platform.server.v1.InstalledApp.status:type_name -> platform.server.v1.AppRunningStatus
+	75, // 22: platform.server.v1.AppStoreEntries.entries:type_name -> platform.server.v1.AppStoreEntries.EntriesEntry
+	64, // 23: platform.server.v1.DeviceSettings.admin_user:type_name -> platform.server.v1.User
+	63, // 24: platform.server.v1.DeviceSettings.locator_settings:type_name -> platform.server.v1.LocatorSettings
+	77, // 25: platform.server.v1.LocatorSettings.locators:type_name -> platform.daemon.v1.Locator
+	67, // 26: platform.server.v1.ServerEvent.heartbeat:type_name -> platform.server.v1.HeartbeatEvent
+	68, // 27: platform.server.v1.ServerEvent.error:type_name -> platform.server.v1.ErrorEvent
+	69, // 28: platform.server.v1.ServerEvent.app_installed:type_name -> platform.server.v1.AppInstalledEvent
+	73, // 29: platform.server.v1.PeerConfiguration.client_details:type_name -> platform.server.v1.ClientRegistrationDetails
+	55, // 30: platform.server.v1.AppStoreEntries.EntriesEntry.value:type_name -> platform.server.v1.Apps
+	1,  // 31: platform.server.v1.WebService.ShutdownHost:input_type -> platform.server.v1.ShutdownHostRequest
+	3,  // 32: platform.server.v1.WebService.RestartHost:input_type -> platform.server.v1.RestartHostRequest
+	5,  // 33: platform.server.v1.WebService.InstallApp:input_type -> platform.server.v1.InstallAppRequest
+	7,  // 34: platform.server.v1.WebService.DeleteApp:input_type -> platform.server.v1.DeleteAppRequest
+	9,  // 35: platform.server.v1.WebService.UpdateApp:input_type -> platform.server.v1.UpdateAppRequest
+	11, // 36: platform.server.v1.WebService.CheckForSystemUpdates:input_type -> platform.server.v1.CheckForSystemUpdatesRequest
+	15, // 37: platform.server.v1.WebService.CheckForContainerUpdates:input_type -> platform.server.v1.CheckForContainerUpdatesRequest
+	18, // 38: platform.server.v1.WebService.ChangeDaemonVersion:input_type -> platform.server.v1.ChangeDaemonVersionRequest
+	20, // 39: platform.server.v1.WebService.InstallOSUpdate:input_type -> platform.server.v1.InstallOSUpdateRequest
+	22, // 40: platform.server.v1.WebService.SetSystemImage:input_type -> platform.server.v1.SetSystemImageRequest
+	24, // 41: platform.server.v1.WebService.AppsHealthCheck:input_type -> platform.server.v1.AppsHealthCheckRequest
+	28, // 42: platform.server.v1.WebService.GetSystemStats:input_type -> platform.server.v1.GetSystemStatsRequest
+	30, // 43: platform.server.v1.WebService.IsDeviceSetup:input_type -> platform.server.v1.IsDeviceSetupRequest
+	32, // 44: platform.server.v1.WebService.InitializeDevice:input_type -> platform.server.v1.InitializeDeviceRequest
+	34, // 45: platform.server.v1.WebService.Login:input_type -> platform.server.v1.LoginRequest
+	36, // 46: platform.server.v1.WebService.GetAppsInStore:input_type -> platform.server.v1.GetAppsInStoreRequest
+	38, // 47: platform.server.v1.WebService.GetDeviceSettings:input_type -> platform.server.v1.GetDeviceSettingsRequest
+	40, // 48: platform.server.v1.WebService.SetDeviceSettings:input_type -> platform.server.v1.SetDeviceSettingsRequest
+	42, // 49: platform.server.v1.WebService.GetAppStorage:input_type -> platform.server.v1.GetAppStorageRequest
+	45, // 50: platform.server.v1.WebService.EnableSecureTunnelling:input_type -> platform.server.v1.EnableSecureTunnellingRequest
+	47, // 51: platform.server.v1.WebService.DisableSecureTunnelling:input_type -> platform.server.v1.DisableSecureTunnellingRequest
+	49, // 52: platform.server.v1.WebService.RegisterToLocator:input_type -> platform.server.v1.RegisterToLocatorRequest
+	51, // 53: platform.server.v1.WebService.DeregisterFromLocator:input_type -> platform.server.v1.DeregisterFromLocatorRequest
+	70, // 54: platform.server.v1.WebService.RegisterPeer:input_type -> platform.server.v1.RegisterPeerRequest
+	53, // 55: platform.server.v1.WebService.GetComponentVersions:input_type -> platform.server.v1.GetComponentVersionsRequest
+	65, // 56: platform.server.v1.WebService.Subscribe:input_type -> platform.server.v1.SubscribeRequest
+	2,  // 57: platform.server.v1.WebService.ShutdownHost:output_type -> platform.server.v1.ShutdownHostResponse
+	4,  // 58: platform.server.v1.WebService.RestartHost:output_type -> platform.server.v1.RestartHostResponse
+	6,  // 59: platform.server.v1.WebService.InstallApp:output_type -> platform.server.v1.InstallAppResponse
+	8,  // 60: platform.server.v1.WebService.DeleteApp:output_type -> platform.server.v1.DeleteAppResponse
+	10, // 61: platform.server.v1.WebService.UpdateApp:output_type -> platform.server.v1.UpdateAppResponse
+	12, // 62: platform.server.v1.WebService.CheckForSystemUpdates:output_type -> platform.server.v1.CheckForSystemUpdatesResponse
+	16, // 63: platform.server.v1.WebService.CheckForContainerUpdates:output_type -> platform.server.v1.CheckForContainerUpdatesResponse
+	19, // 64: platform.server.v1.WebService.ChangeDaemonVersion:output_type -> platform.server.v1.ChangeDaemonVersionResponse
+	21, // 65: platform.server.v1.WebService.InstallOSUpdate:output_type -> platform.server.v1.InstallOSUpdateResponse
+	23, // 66: platform.server.v1.WebService.SetSystemImage:output_type -> platform.server.v1.SetSystemImageResponse
+	25, // 67: platform.server.v1.WebService.AppsHealthCheck:output_type -> platform.server.v1.AppsHealthCheckResponse
+	29, // 68: platform.server.v1.WebService.GetSystemStats:output_type -> platform.server.v1.GetSystemStatsResponse
+	31, // 69: platform.server.v1.WebService.IsDeviceSetup:output_type -> platform.server.v1.IsDeviceSetupResponse
+	33, // 70: platform.server.v1.WebService.InitializeDevice:output_type -> platform.server.v1.InitializeDeviceResponse
+	35, // 71: platform.server.v1.WebService.Login:output_type -> platform.server.v1.LoginResponse
+	37, // 72: platform.server.v1.WebService.GetAppsInStore:output_type -> platform.server.v1.GetAppsInStoreResponse
+	39, // 73: platform.server.v1.WebService.GetDeviceSettings:output_type -> platform.server.v1.GetDeviceSettingsResponse
+	41, // 74: platform.server.v1.WebService.SetDeviceSettings:output_type -> platform.server.v1.SetDeviceSettingsResponse
+	43, // 75: platform.server.v1.WebService.GetAppStorage:output_type -> platform.server.v1.GetAppStorageResponse
+	46, // 76: platform.server.v1.WebService.EnableSecureTunnelling:output_type -> platform.server.v1.EnableSecureTunnellingResponse
+	48, // 77: platform.server.v1.WebService.DisableSecureTunnelling:output_type -> platform.server.v1.DisableSecureTunnellingResponse
+	50, // 78: platform.server.v1.WebService.RegisterToLocator:output_type -> platform.server.v1.RegisterToLocatorResponse
+	52, // 79: platform.server.v1.WebService.DeregisterFromLocator:output_type -> platform.server.v1.DeregisterFromLocatorResponse
+	71, // 80: platform.server.v1.WebService.RegisterPeer:output_type -> platform.server.v1.RegisterPeerResponse
+	54, // 81: platform.server.v1.WebService.GetComponentVersions:output_type -> platform.server.v1.GetComponentVersionsResponse
+	66, // 82: platform.server.v1.WebService.Subscribe:output_type -> platform.server.v1.ServerEvent
+	57, // [57:83] is the sub-list for method output_type
+	31, // [31:57] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_platform_server_v1_web_proto_init() }
@@ -5150,7 +5270,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[52].Exporter = func(v any, i int) any {
-			switch v := v.(*Apps); i {
+			switch v := v.(*GetComponentVersionsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5162,7 +5282,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[53].Exporter = func(v any, i int) any {
-			switch v := v.(*App); i {
+			switch v := v.(*GetComponentVersionsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5174,7 +5294,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[54].Exporter = func(v any, i int) any {
-			switch v := v.(*AppDependency); i {
+			switch v := v.(*Apps); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5186,7 +5306,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[55].Exporter = func(v any, i int) any {
-			switch v := v.(*AppRunningStatus); i {
+			switch v := v.(*App); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5198,7 +5318,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[56].Exporter = func(v any, i int) any {
-			switch v := v.(*Entries); i {
+			switch v := v.(*AppDependency); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5210,7 +5330,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[57].Exporter = func(v any, i int) any {
-			switch v := v.(*InstalledApp); i {
+			switch v := v.(*AppRunningStatus); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5222,7 +5342,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[58].Exporter = func(v any, i int) any {
-			switch v := v.(*AppStoreEntries); i {
+			switch v := v.(*Entries); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5234,7 +5354,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[59].Exporter = func(v any, i int) any {
-			switch v := v.(*DeviceSettings); i {
+			switch v := v.(*InstalledApp); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5246,7 +5366,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[60].Exporter = func(v any, i int) any {
-			switch v := v.(*LocatorSettings); i {
+			switch v := v.(*AppStoreEntries); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5258,7 +5378,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[61].Exporter = func(v any, i int) any {
-			switch v := v.(*User); i {
+			switch v := v.(*DeviceSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5270,7 +5390,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[62].Exporter = func(v any, i int) any {
-			switch v := v.(*SubscribeRequest); i {
+			switch v := v.(*LocatorSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5282,7 +5402,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[63].Exporter = func(v any, i int) any {
-			switch v := v.(*ServerEvent); i {
+			switch v := v.(*User); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5294,7 +5414,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[64].Exporter = func(v any, i int) any {
-			switch v := v.(*HeartbeatEvent); i {
+			switch v := v.(*SubscribeRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5306,7 +5426,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[65].Exporter = func(v any, i int) any {
-			switch v := v.(*ErrorEvent); i {
+			switch v := v.(*ServerEvent); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5318,7 +5438,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[66].Exporter = func(v any, i int) any {
-			switch v := v.(*AppInstalledEvent); i {
+			switch v := v.(*HeartbeatEvent); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5330,7 +5450,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[67].Exporter = func(v any, i int) any {
-			switch v := v.(*RegisterPeerRequest); i {
+			switch v := v.(*ErrorEvent); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5342,7 +5462,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[68].Exporter = func(v any, i int) any {
-			switch v := v.(*RegisterPeerResponse); i {
+			switch v := v.(*AppInstalledEvent); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5354,7 +5474,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[69].Exporter = func(v any, i int) any {
-			switch v := v.(*PeerConfiguration); i {
+			switch v := v.(*RegisterPeerRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5366,6 +5486,30 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 		file_platform_server_v1_web_proto_msgTypes[70].Exporter = func(v any, i int) any {
+			switch v := v.(*RegisterPeerResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[71].Exporter = func(v any, i int) any {
+			switch v := v.(*PeerConfiguration); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_platform_server_v1_web_proto_msgTypes[72].Exporter = func(v any, i int) any {
 			switch v := v.(*ClientRegistrationDetails); i {
 			case 0:
 				return &v.state
@@ -5378,7 +5522,7 @@ func file_platform_server_v1_web_proto_init() {
 			}
 		}
 	}
-	file_platform_server_v1_web_proto_msgTypes[63].OneofWrappers = []any{
+	file_platform_server_v1_web_proto_msgTypes[65].OneofWrappers = []any{
 		(*ServerEvent_Heartbeat)(nil),
 		(*ServerEvent_Error)(nil),
 		(*ServerEvent_AppInstalled)(nil),
@@ -5389,7 +5533,7 @@ func file_platform_server_v1_web_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_platform_server_v1_web_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   73,
+			NumMessages:   75,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

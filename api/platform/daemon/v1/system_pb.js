@@ -57,3 +57,15 @@ export const DriveStats = /*@__PURE__*/ proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.daemon.v1.ComponentVersion
+ */
+export const ComponentVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.ComponentVersion",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+

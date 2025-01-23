@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { proto3 } from "@bufbuild/protobuf";
-import { SystemStats } from "../../daemon/v1/system_pb.js";
+import { ComponentVersion, SystemStats } from "../../daemon/v1/system_pb.js";
 import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
@@ -515,6 +515,25 @@ export const DeregisterFromLocatorResponse = /*@__PURE__*/ proto3.makeMessageTyp
   "platform.server.v1.DeregisterFromLocatorResponse",
   () => [
     { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GetComponentVersionsRequest
+ */
+export const GetComponentVersionsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.GetComponentVersionsRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.GetComponentVersionsResponse
+ */
+export const GetComponentVersionsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.GetComponentVersionsResponse",
+  () => [
+    { no: 1, name: "platform", kind: "message", T: ComponentVersion, repeated: true },
+    { no: 2, name: "system", kind: "message", T: ComponentVersion, repeated: true },
   ],
 );
 

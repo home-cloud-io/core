@@ -33,3 +33,9 @@ message DriveStats {
   uint64 total_bytes = 2;
   uint64 free_bytes = 3;
 }
+
+message ComponentVersion {
+  string name = 1;
+  string domain = 2;
+  string version = 3;
+}
