@@ -34,7 +34,6 @@ import TextArea from 'antd/es/input/TextArea';
 import {
   DeviceSettings,
   SetDeviceSettingsRequest,
-  Locator,
   RegisterToLocatorRequest,
   DeregisterFromLocatorRequest,
 } from 'api/platform/server/v1/web_pb';
@@ -47,6 +46,7 @@ import {
   setDeviceSettings,
 } from 'api/platform/server/v1/web-WebService_connectquery';
 import { HelpModal } from '../../components/HelpModal';
+import { Locator } from 'api/platform/daemon/v1/wireguard_pb';
 
 const deviceSettingsHelp = [
   {
