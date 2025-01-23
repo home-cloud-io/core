@@ -93,6 +93,8 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 			h.broadcaster.Send(message.GetLocatorServerRemoved())
 		case *v1.DaemonMessage_AllLocatorsDisabled:
 			h.broadcaster.Send(message.GetAllLocatorsDisabled())
+		case *v1.DaemonMessage_ComponentVersions:
+			h.broadcaster.Send(message.GetComponentVersions())
 		default:
 			h.logger.WithField("message", message).Warn("unknown message type received")
 		}

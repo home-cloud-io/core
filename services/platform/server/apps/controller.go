@@ -58,8 +58,9 @@ func NewController(logger chassis.Logger) Controller {
 }
 
 const (
-	ErrFailedToGetApps       = "failed to get apps"
-	ErrFailedToGetAppStorage = "failed to get app storage"
+	ErrFailedToGetApps              = "failed to get apps"
+	ErrFailedToGetAppStorage        = "failed to get app storage"
+	ErrFailedToGetComponentVersions = "failed to get component versions"
 
 	autoUpdateCronConfigKey = "server.updates.apps_auto_update_cron"
 	rawChartBaseUrl         = "https://raw.githubusercontent.com/home-cloud-io/store"

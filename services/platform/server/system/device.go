@@ -4,9 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path/filepath"
+	"sort"
+	"strings"
+	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	"github.com/home-cloud-io/core/services/platform/server/async"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
@@ -29,6 +34,8 @@ type (
 		//
 		// NOTE: the token is unimplemented so this only checks the validity of the password for now
 		Login(ctx context.Context, username, password string) (string, error)
+		// GetComponentVersions returns all the versions of system components (server, daemon, etc.)
+		GetComponentVersions(ctx context.Context, logger chassis.Logger) (*v1.GetComponentVersionsResponse, error)
 	}
 )
 
@@ -168,4 +175,116 @@ func (c *controller) Login(ctx context.Context, username, password string) (stri
 	// TODO: forge token
 
 	return "JWT_TOKEN", nil
+}
+
+func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Logger) (*v1.GetComponentVersionsResponse, error) {
+
+	var (
+		versions = []*dv1.ComponentVersion{}
+	)
+
+	k8sVersion, err := c.k8sclient.GetServerVersion(ctx)
+	if err != nil {
+		versions = append(versions, &dv1.ComponentVersion{
+			Name:    "k8s",
+			Domain:  "system",
+			Version: err.Error(),
+		})
+	} else {
+		versions = append(versions, &dv1.ComponentVersion{
+			Name:    "k8s",
+			Domain:  "system",
+			Version: k8sVersion,
+		})
+	}
+
+	imageVersions, err := c.k8sclient.CurrentImages(ctx)
+	if err != nil {
+		versions = append(versions, &dv1.ComponentVersion{
+			Name:    "images",
+			Domain:  "platform",
+			Version: err.Error(),
+		})
+	} else {
+		for _, image := range imageVersions {
+			versions = append(versions, &dv1.ComponentVersion{
+				Name:    componentFromImage(image.Image),
+				Domain:  "platform",
+				Version: image.Current,
+			})
+		}
+	}
+
+	logger.Info("requesting component versions from daemon")
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.ComponentVersions]{
+		Callback: func(event *dv1.ComponentVersions) (bool, error) {
+			versions = append(versions, event.Components...)
+			return true, nil
+		},
+		Timeout: 30 * time.Second,
+	})
+	err = com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_RequestComponentVersionsCommand{
+			RequestComponentVersionsCommand: &dv1.RequestComponentVersionsCommand{},
+		},
+	})
+	if err != nil {
+		versions = append(versions, &dv1.ComponentVersion{
+			Name:    "daemon",
+			Domain:  "platform",
+			Version: err.Error(),
+		}, &dv1.ComponentVersion{
+			Name:    "nixos",
+			Domain:  "system",
+			Version: err.Error(),
+		})
+	} else {
+		err = listener.Listen(ctx)
+		if err != nil {
+			versions = append(versions, &dv1.ComponentVersion{
+				Name:    "daemon",
+				Domain:  "platform",
+				Version: err.Error(),
+			}, &dv1.ComponentVersion{
+				Name:    "nixos",
+				Domain:  "system",
+				Version: err.Error(),
+			})
+		}
+		logger.Info("settings saved successfully")
+	}
+
+	// sort versions
+	sort.Slice(versions, func(i, j int) bool {
+		return versions[i].Name < versions[j].Name
+	})
+
+	return buildComponentVersionsResponse(logger, versions), nil
+}
+
+func componentFromImage(image string) string {
+	s := strings.Split(filepath.Base(image), "-")
+	return s[len(s)-1]
+}
+
+func buildComponentVersionsResponse(logger chassis.Logger, versions []*dv1.ComponentVersion) *v1.GetComponentVersionsResponse {
+	var (
+		response = &v1.GetComponentVersionsResponse{
+			Platform: []*dv1.ComponentVersion{},
+			System:   []*dv1.ComponentVersion{},
+		}
+	)
+
+	for _, v := range versions {
+		switch v.Domain {
+		case "platform":
+			response.Platform = append(response.Platform, v)
+		case "system":
+			response.System = append(response.System, v)
+		default:
+			logger.WithField("component_version", v).Warn("unsupported component version received")
+		}
+	}
+
+	return response
 }
