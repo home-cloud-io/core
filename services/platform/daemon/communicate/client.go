@@ -193,6 +193,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.disableAllLocators(ctx, message.GetDisableAllLocatorsCommand())
 		case *v1.ServerMessage_AddWireguardPeer:
 			go c.addWireguardPeer(ctx, message.GetAddWireguardPeer().GetPeer())
+		case *v1.ServerMessage_RequestComponentVersionsCommand:
+			go c.componentVersions(ctx, message.GetRequestComponentVersionsCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -448,4 +450,52 @@ func (c *client) disableAllLocators(ctx context.Context, cmd *v1.DisableAllLocat
 	}
 
 	c.Send(resp)
+}
+
+func (c *client) componentVersions(ctx context.Context, _ *v1.RequestComponentVersionsCommand) {
+
+	var (
+		components = []*v1.ComponentVersion{}
+	)
+
+	daemonVersion, err := host.GetDaemonVersion(c.logger)
+	if err != nil {
+		components = append(components, &v1.ComponentVersion{
+			Name: "daemon",
+			Domain: "platform",
+			Version: err.Error(),
+		})
+	} else {
+		components = append(components, &v1.ComponentVersion{
+			Name: "daemon",
+			Domain: "platform",
+			Version: daemonVersion.Version,
+		})
+	}
+
+	nixosVersion, err := host.GetNixOSVersion(ctx, c.logger)
+	if err != nil {
+		components = append(components, &v1.ComponentVersion{
+			Name: "nixos",
+			Domain: "system",
+			Version: err.Error(),
+		})
+	} else {
+		components = append(components, &v1.ComponentVersion{
+			Name: "nixos",
+			Domain: "system",
+			Version: nixosVersion,
+		})
+	}
+
+	err = c.stream.Send(&v1.DaemonMessage{
+		Message: &v1.DaemonMessage_ComponentVersions{
+			ComponentVersions: &v1.ComponentVersions{
+				Components: components,
+			},
+		},
+	})
+	if err != nil {
+		c.logger.WithError(err).Error("failed to send complete message to server")
+	}
 }
