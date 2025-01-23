@@ -11,6 +11,7 @@ import {
   Spin,
   Badge,
   Alert,
+  Avatar,
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -103,7 +104,9 @@ export function DeviceDetails() {
           <div>
             {`${formatBytes(
               Number(stats.drives[0].totalBytes - stats.drives[0].freeBytes)
-            )} used out of ${formatBytes(Number(stats.drives[0].totalBytes))} total`}
+            )} used out of ${formatBytes(
+              Number(stats.drives[0].totalBytes)
+            )} total`}
             <Progress
               percent={formatPercentage(
                 Number(stats.drives[0].freeBytes),
@@ -172,17 +175,11 @@ function Application(props: Props) {
   }
 
   return (
-    <Col>
-      <Space direction="vertical" size="small" style={{ display: 'flex' }}>
-        <Row>
-          <Badge dot status={status}>
-            <img src={app.display?.iconUrl} width={48} height={48} alt="" />
-          </Badge>
-        </Row>
-        <Row>
-          <strong className="text-gray-dark">{app.name}</strong>
-        </Row>
-      </Space>
-    </Col>
+    <div style={{ padding: 4, width: 64, textAlign: 'center' }}>
+      <Badge dot status={status}>
+        <Avatar src={app.display?.iconUrl} shape="square" size="large" />
+      </Badge>
+      <div>{app.display?.name}</div>
+    </div>
   );
 }

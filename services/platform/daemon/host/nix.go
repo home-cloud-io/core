@@ -92,3 +92,29 @@ func RebuildAndSwitchOS(ctx context.Context, logger chassis.Logger) error {
 
 	return nil
 }
+
+func GetNixOSVersion(ctx context.Context, logger chassis.Logger) (string, error) {
+	var (
+		cmd *exec.Cmd
+	)
+
+	config := chassis.GetConfig()
+	if config.Env() == "test" {
+		logger.Info("mocking getting nixos version")
+		return "fake nixos version", nil
+	}
+
+	logger.Info("getting NixOS version")
+	cmd = exec.Command("nix-instantiate", "--eval", "--expr", "\"builtins.substring 0 5 ((import <nixos> {}).lib.version)\"")
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+	output, err := execute.ExecuteCommandReturnStdout(ctx, cmd)
+	if err != nil {
+		logger.WithError(err).Error("failed to get NixOS version")
+		return "", err
+	}
+	logger.Info("NixOS version command completed")
+
+	return output, nil
+}
