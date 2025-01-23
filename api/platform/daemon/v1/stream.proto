@@ -30,6 +30,7 @@ message DaemonMessage {
     LocatorServerAdded locator_server_added = 14;
     LocatorServerRemoved locator_server_removed = 15;
     AllLocatorsDisabled all_locators_disabled = 16;
+    ComponentVersions component_versions = 17;
   }
 }
 
@@ -60,6 +61,7 @@ message ServerMessage {
     AddLocatorServerCommand add_locator_server_command = 20;
     RemoveLocatorServerCommand remove_locator_server_command = 21;
     DisableAllLocatorsCommand disable_all_locators_command = 22;
+    RequestComponentVersionsCommand request_component_versions_command = 23;
   }
 }
 
@@ -142,6 +144,10 @@ message LocatorServerRemoved {
 
 message AllLocatorsDisabled {
   DaemonError error = 16;
+}
+
+message ComponentVersions {
+  repeated platform.daemon.v1.ComponentVersion components = 1;
 }
 
 // Server -> Daemon
@@ -260,3 +266,5 @@ message RemoveLocatorServerCommand {
 }
 
 message DisableAllLocatorsCommand {}
+
+message RequestComponentVersionsCommand {}

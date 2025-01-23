@@ -226,3 +226,52 @@ export class DriveStats extends Message<DriveStats> {
   }
 }
 
+/**
+ * @generated from message platform.daemon.v1.ComponentVersion
+ */
+export class ComponentVersion extends Message<ComponentVersion> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string domain = 2;
+   */
+  domain = "";
+
+  /**
+   * @generated from field: string version = 3;
+   */
+  version = "";
+
+  constructor(data?: PartialMessage<ComponentVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.ComponentVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ComponentVersion {
+    return new ComponentVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ComponentVersion {
+    return new ComponentVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ComponentVersion {
+    return new ComponentVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ComponentVersion | PlainMessage<ComponentVersion> | undefined, b: ComponentVersion | PlainMessage<ComponentVersion> | undefined): boolean {
+    return proto3.util.equals(ComponentVersion, a, b);
+  }
+}
+

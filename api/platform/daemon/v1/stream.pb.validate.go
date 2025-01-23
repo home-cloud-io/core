@@ -714,6 +714,47 @@ func (m *DaemonMessage) validate(all bool) error {
 			}
 		}
 
+	case *DaemonMessage_ComponentVersions:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetComponentVersions()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "ComponentVersions",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "ComponentVersions",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetComponentVersions()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "ComponentVersions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -1715,6 +1756,47 @@ func (m *ServerMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
 					field:  "DisableAllLocatorsCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_RequestComponentVersionsCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRequestComponentVersionsCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RequestComponentVersionsCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RequestComponentVersionsCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRequestComponentVersionsCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "RequestComponentVersionsCommand",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -3783,6 +3865,142 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AllLocatorsDisabledValidationError{}
+
+// Validate checks the field values on ComponentVersions with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ComponentVersions) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ComponentVersions with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ComponentVersionsMultiError, or nil if none found.
+func (m *ComponentVersions) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ComponentVersions) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetComponents() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ComponentVersionsValidationError{
+						field:  fmt.Sprintf("Components[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ComponentVersionsValidationError{
+						field:  fmt.Sprintf("Components[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ComponentVersionsValidationError{
+					field:  fmt.Sprintf("Components[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ComponentVersionsMultiError(errors)
+	}
+
+	return nil
+}
+
+// ComponentVersionsMultiError is an error wrapping multiple validation errors
+// returned by ComponentVersions.ValidateAll() if the designated constraints
+// aren't met.
+type ComponentVersionsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ComponentVersionsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ComponentVersionsMultiError) AllErrors() []error { return m }
+
+// ComponentVersionsValidationError is the validation error returned by
+// ComponentVersions.Validate if the designated constraints aren't met.
+type ComponentVersionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ComponentVersionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ComponentVersionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ComponentVersionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ComponentVersionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ComponentVersionsValidationError) ErrorName() string {
+	return "ComponentVersionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ComponentVersionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sComponentVersions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ComponentVersionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ComponentVersionsValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -6511,3 +6729,106 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DisableAllLocatorsCommandValidationError{}
+
+// Validate checks the field values on RequestComponentVersionsCommand with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RequestComponentVersionsCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RequestComponentVersionsCommand with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// RequestComponentVersionsCommandMultiError, or nil if none found.
+func (m *RequestComponentVersionsCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RequestComponentVersionsCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return RequestComponentVersionsCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+// RequestComponentVersionsCommandMultiError is an error wrapping multiple
+// validation errors returned by RequestComponentVersionsCommand.ValidateAll()
+// if the designated constraints aren't met.
+type RequestComponentVersionsCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RequestComponentVersionsCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RequestComponentVersionsCommandMultiError) AllErrors() []error { return m }
+
+// RequestComponentVersionsCommandValidationError is the validation error
+// returned by RequestComponentVersionsCommand.Validate if the designated
+// constraints aren't met.
+type RequestComponentVersionsCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RequestComponentVersionsCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RequestComponentVersionsCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RequestComponentVersionsCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RequestComponentVersionsCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RequestComponentVersionsCommandValidationError) ErrorName() string {
+	return "RequestComponentVersionsCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RequestComponentVersionsCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRequestComponentVersionsCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RequestComponentVersionsCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RequestComponentVersionsCommandValidationError{}

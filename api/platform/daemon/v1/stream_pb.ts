@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { SystemStats } from "./system_pb.js";
+import { ComponentVersion, SystemStats } from "./system_pb.js";
 import { Locator, WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
 
 /**
@@ -113,6 +113,12 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: AllLocatorsDisabled;
     case: "allLocatorsDisabled";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.ComponentVersions component_versions = 17;
+     */
+    value: ComponentVersions;
+    case: "componentVersions";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -139,6 +145,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 14, name: "locator_server_added", kind: "message", T: LocatorServerAdded, oneof: "message" },
     { no: 15, name: "locator_server_removed", kind: "message", T: LocatorServerRemoved, oneof: "message" },
     { no: 16, name: "all_locators_disabled", kind: "message", T: AllLocatorsDisabled, oneof: "message" },
+    { no: 17, name: "component_versions", kind: "message", T: ComponentVersions, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -303,6 +310,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: DisableAllLocatorsCommand;
     case: "disableAllLocatorsCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.RequestComponentVersionsCommand request_component_versions_command = 23;
+     */
+    value: RequestComponentVersionsCommand;
+    case: "requestComponentVersionsCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -335,6 +348,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 20, name: "add_locator_server_command", kind: "message", T: AddLocatorServerCommand, oneof: "message" },
     { no: 21, name: "remove_locator_server_command", kind: "message", T: RemoveLocatorServerCommand, oneof: "message" },
     { no: 22, name: "disable_all_locators_command", kind: "message", T: DisableAllLocatorsCommand, oneof: "message" },
+    { no: 23, name: "request_component_versions_command", kind: "message", T: RequestComponentVersionsCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -985,6 +999,43 @@ export class AllLocatorsDisabled extends Message<AllLocatorsDisabled> {
 
   static equals(a: AllLocatorsDisabled | PlainMessage<AllLocatorsDisabled> | undefined, b: AllLocatorsDisabled | PlainMessage<AllLocatorsDisabled> | undefined): boolean {
     return proto3.util.equals(AllLocatorsDisabled, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.ComponentVersions
+ */
+export class ComponentVersions extends Message<ComponentVersions> {
+  /**
+   * @generated from field: repeated platform.daemon.v1.ComponentVersion components = 1;
+   */
+  components: ComponentVersion[] = [];
+
+  constructor(data?: PartialMessage<ComponentVersions>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.ComponentVersions";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "components", kind: "message", T: ComponentVersion, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ComponentVersions {
+    return new ComponentVersions().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ComponentVersions {
+    return new ComponentVersions().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ComponentVersions {
+    return new ComponentVersions().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ComponentVersions | PlainMessage<ComponentVersions> | undefined, b: ComponentVersions | PlainMessage<ComponentVersions> | undefined): boolean {
+    return proto3.util.equals(ComponentVersions, a, b);
   }
 }
 
@@ -1963,6 +2014,37 @@ export class DisableAllLocatorsCommand extends Message<DisableAllLocatorsCommand
 
   static equals(a: DisableAllLocatorsCommand | PlainMessage<DisableAllLocatorsCommand> | undefined, b: DisableAllLocatorsCommand | PlainMessage<DisableAllLocatorsCommand> | undefined): boolean {
     return proto3.util.equals(DisableAllLocatorsCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.RequestComponentVersionsCommand
+ */
+export class RequestComponentVersionsCommand extends Message<RequestComponentVersionsCommand> {
+  constructor(data?: PartialMessage<RequestComponentVersionsCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.RequestComponentVersionsCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RequestComponentVersionsCommand {
+    return new RequestComponentVersionsCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RequestComponentVersionsCommand {
+    return new RequestComponentVersionsCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RequestComponentVersionsCommand {
+    return new RequestComponentVersionsCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RequestComponentVersionsCommand | PlainMessage<RequestComponentVersionsCommand> | undefined, b: RequestComponentVersionsCommand | PlainMessage<RequestComponentVersionsCommand> | undefined): boolean {
+    return proto3.util.equals(RequestComponentVersionsCommand, a, b);
   }
 }
 
