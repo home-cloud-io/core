@@ -410,6 +410,18 @@ func (h *rpcHandler) DeregisterFromLocator(ctx context.Context, request *connect
 	}), nil
 }
 
+func (h *rpcHandler) GetComponentVersions(ctx context.Context, request *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error) {
+	h.logger.Info("getting app storage")
+
+	response, err := h.sctl.GetComponentVersions(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error(apps.ErrFailedToGetComponentVersions)
+		return nil, errors.New(apps.ErrFailedToGetComponentVersions)
+	}
+
+	return connect.NewResponse(response), nil
+}
+
 func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {
 	h.logger.Info("establishing client stream")
 	id := events.AddStream(stream)
