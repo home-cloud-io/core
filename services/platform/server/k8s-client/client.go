@@ -11,6 +11,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/tools/clientcmd"
 	crclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -34,9 +35,9 @@ type (
 		Installed(ctx context.Context, name string) (installed bool, err error)
 		// Healthcheck will retrieve the health of all installed apps
 		Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error)
-		// InstalledApps will retrive all installed apps
+		// InstalledApps will retrieve all installed apps
 		InstalledApps(ctx context.Context) ([]opv1.App, error)
-		// AppStorage will retrive storage volumes for the given app list
+		// AppStorage will retrieve storage volumes for the given app list
 		AppStorage(ctx context.Context, apps []opv1.App) ([]*webv1.AppStorage, error)
 	}
 	System interface {
@@ -44,10 +45,13 @@ type (
 		// containers are considered to be those in the `home-cloud-system` and `draft-system`
 		// namespaces.
 		CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error)
+		// GetServerVersion will retrieve the current k8s server version
+		GetServerVersion(ctx context.Context) (version string, err error)
 	}
 
 	client struct {
-		client crclient.Client
+		client          crclient.Client
+		discoveryClient *discovery.DiscoveryClient
 	}
 )
 
@@ -67,13 +71,19 @@ func NewClient(logger chassis.Logger) Client {
 
 	c, err := crclient.New(kubeConfig, crclient.Options{})
 	if err != nil {
-		logger.WithError(err).Error("failed to create new k8s client")
+		logger.WithError(err).Panic("failed to create new k8s client")
 	} else {
 		opv1.AddToScheme(c.Scheme())
 	}
 
+	dc, err := discovery.NewDiscoveryClientForConfig(kubeConfig)
+	if err != nil {
+		logger.WithError(err).Panic("failed to create new k8s discovery client")
+	}
+
 	return &client{
-		client: c,
+		client:          c,
+		discoveryClient: dc,
 	}
 }
 
@@ -256,6 +266,14 @@ func (c *client) AppStorage(ctx context.Context, apps []opv1.App) ([]*webv1.AppS
 	}
 
 	return storage, nil
+}
+
+func (c *client) GetServerVersion(ctx context.Context) (string, error) {
+	version, err := c.discoveryClient.ServerVersion()
+	if err != nil {
+		return "", err
+	}
+	return version.GitVersion, nil
 }
 
 func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, images map[string]*webv1.ImageVersion) error {
