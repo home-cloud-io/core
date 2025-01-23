@@ -6,6 +6,7 @@ import {
   PoweroffOutlined,
   RedoOutlined,
   AppstoreOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -32,8 +33,9 @@ import {
   shutdownHost,
 } from 'api/platform/server/v1/web-WebService_connectquery';
 import DeviceOnboardPage from './pages/device/Onboard';
+import AboutPage from './pages/about/About';
 
-const logo = require('./assets/logo-white-flat.png');
+import logo from './assets/logo-white-flat.png';
 const { Header, Sider, Content } = Layout;
 
 const App: React.FC = () => {
@@ -168,6 +170,12 @@ const App: React.FC = () => {
                   icon: <SettingOutlined />,
                   disabled: disabled,
                 },
+                {
+                  label: 'About',
+                  key: '/about',
+                  icon: <InfoCircleOutlined />,
+                  disabled: disabled,
+                },
               ]}
             />
           </Sider>
@@ -181,6 +189,7 @@ const App: React.FC = () => {
               <Route path="/store" Component={AppStorePage} />
               <Route path="/upload" Component={UploadPage} />
               <Route path="/settings" Component={SettingsPage} />
+              <Route path="/about" Component={AboutPage} />
               <Route
                 path="/getting-started"
                 element={<DeviceOnboardPage setDisabled={setDisabled} />}
