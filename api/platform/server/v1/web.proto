@@ -127,6 +127,7 @@ message ImageVersion {
   string image = 1;
   string current = 2;
   string latest = 3;
+  string name = 4;
 }
 
 message ChangeDaemonVersionRequest {

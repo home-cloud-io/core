@@ -182,6 +182,7 @@ export const ImageVersion = /*@__PURE__*/ proto3.makeMessageType(
     { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "current", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "latest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

@@ -1844,6 +1844,8 @@ func (m *ImageVersion) validate(all bool) error {
 
 	// no validation rules for Latest
 
+	// no validation rules for Name
+
 	if len(errors) > 0 {
 		return ImageVersionMultiError(errors)
 	}
