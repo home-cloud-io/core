@@ -7,6 +7,7 @@ import {
   RedoOutlined,
   AppstoreOutlined,
   InfoCircleOutlined,
+  SyncOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -36,6 +37,7 @@ import DeviceOnboardPage from './pages/device/Onboard';
 import AboutPage from './pages/about/About';
 
 import logo from './assets/logo-white-flat.png';
+import UpdatesPage from './pages/updates/Updates';
 const { Header, Sider, Content } = Layout;
 
 const App: React.FC = () => {
@@ -165,6 +167,12 @@ const App: React.FC = () => {
                   disabled: disabled,
                 },
                 {
+                  label: 'Updates',
+                  key: '/updates',
+                  icon: <SyncOutlined />,
+                  disabled: disabled,
+                },
+                {
                   label: 'Settings',
                   key: '/settings',
                   icon: <SettingOutlined />,
@@ -188,6 +196,7 @@ const App: React.FC = () => {
               <Route path="/" Component={HomePage} />
               <Route path="/store" Component={AppStorePage} />
               <Route path="/upload" Component={UploadPage} />
+              <Route path="/updates" Component={UpdatesPage} />
               <Route path="/settings" Component={SettingsPage} />
               <Route path="/about" Component={AboutPage} />
               <Route

@@ -26,7 +26,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "antd": "^5.22.1",
-    "api": "https://gitpkg.vercel.app/home-cloud-io/core/api?api/v0.8.2",
+    "api": "https://gitpkg.vercel.app/home-cloud-io/core/api?api/v0.8.3",
     "install": "^0.13.0",
     "marked": "^15.0.0",
     "react": "^18.3.1",
