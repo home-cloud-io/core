@@ -462,13 +462,13 @@ func (c *client) componentVersions(ctx context.Context, _ *v1.RequestComponentVe
 	if err != nil {
 		components = append(components, &v1.ComponentVersion{
 			Name: "daemon",
-			Domain: "platform",
+			Domain: "system",
 			Version: err.Error(),
 		})
 	} else {
 		components = append(components, &v1.ComponentVersion{
 			Name: "daemon",
-			Domain: "platform",
+			Domain: "system",
 			Version: daemonVersion.Version,
 		})
 	}
