@@ -665,6 +665,11 @@ export class ImageVersion extends Message<ImageVersion> {
    */
   latest = "";
 
+  /**
+   * @generated from field: string name = 4;
+   */
+  name = "";
+
   constructor(data?: PartialMessage<ImageVersion>) {
     super();
     proto3.util.initPartial(data, this);
@@ -676,6 +681,7 @@ export class ImageVersion extends Message<ImageVersion> {
     { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "current", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "latest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ImageVersion {
