@@ -106,9 +106,8 @@ function PlatformComponents() {
     });
   };
 
-  useEffect(() => {
-    handleCheckForUpdates();
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(handleCheckForUpdates, [])
 
   return (
     <>
@@ -236,9 +235,8 @@ function SystemComponents() {
     useInstallOSUpdate.mutate({});
   };
 
-  useEffect(() => {
-    handleCheckForUpdates();
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(handleCheckForUpdates, [])
 
   return (
     <>
