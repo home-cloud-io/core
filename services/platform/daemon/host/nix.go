@@ -23,7 +23,11 @@ func GetOSVersionDiff(ctx context.Context, logger chassis.Logger) (string, error
 	config := chassis.GetConfig()
 	if config.Env() == "test" {
 		logger.Info("mocking os version diff")
-		return "fake os version diff", nil
+		return `<<< /run/current-system
+>>> result
+No version or selection state changes.
+Closure size: 970 -> 970 (0 paths added, 0 paths removed, delta +0, disk usage +0B).
+`, nil
 	}
 
 	var (
