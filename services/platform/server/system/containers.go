@@ -3,6 +3,7 @@ package system
 import (
 	"context"
 	"fmt"
+	"sort"
 	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
@@ -60,6 +61,16 @@ func (c *controller) CheckForContainerUpdates(ctx context.Context, logger chassi
 		logger.WithError(err).Error("failed to get latest image versions")
 		return nil, err
 	}
+
+	// add shorthand name to image structs
+	for _, image := range images {
+		image.Name = componentFromImage(image.Image)
+	}
+
+	// sort images
+	sort.Slice(images, func(i, j int) bool {
+		return images[i].Name < images[j].Name
+	})
 
 	return images, err
 }
