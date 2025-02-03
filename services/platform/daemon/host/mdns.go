@@ -64,6 +64,7 @@ func (p *dnsPublisher) Start() {
 }
 
 func (p *dnsPublisher) AddHost(ctx context.Context, hostname string) {
+	p.logger.Info("adding host to mDNS")
 	p.register(ctx, hostname)
 	err := setHostnames(p.cancels)
 	if err != nil {
