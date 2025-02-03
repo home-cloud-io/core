@@ -13,7 +13,7 @@ require (
 	github.com/home-cloud-io/core/api v0.8.2
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/pion/stun/v2 v2.0.0
-	github.com/steady-bytes/draft/pkg/chassis v0.4.1
+	github.com/steady-bytes/draft/pkg/chassis v0.4.2
 	github.com/steady-bytes/draft/pkg/loggers v0.2.3
 	golang.org/x/crypto v0.28.0
 	golang.org/x/mod v0.18.0
