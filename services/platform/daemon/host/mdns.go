@@ -59,33 +59,17 @@ func (p *dnsPublisher) Start() {
 	// start with initial set of hosts from config
 	hostnames := config.GetStringSlice(hostnamesConfigKey)
 	for _, hostname := range hostnames {
-		c, cancel := context.WithCancel(ctx)
-		fqdn := p.buildFQDN(hostname)
-		logger := p.logger.WithField("fqdn", fqdn)
-
-		logger.Info("adding host to mDNS")
-
-		p.cancels[hostname] = cancel
-		go publish(c, logger, fqdn, p.address)
+		p.register(ctx, hostname)
 	}
 }
 
 func (p *dnsPublisher) AddHost(ctx context.Context, hostname string) {
-	c, cancel := context.WithCancel(ctx)
-	fqdn := p.buildFQDN(hostname)
-	logger := p.logger.WithField("fqdn", fqdn)
-
-	logger.Info("adding host to mDNS")
-
-	p.cancels[hostname] = cancel
-	go publish(c, logger, fqdn, p.address)
-
+	p.register(ctx, hostname)
 	err := setHostnames(p.cancels)
 	if err != nil {
-		logger.WithError(err).Error("failed to save hostname to config")
+		p.logger.WithError(err).Error("failed to save hostname to config")
 	}
-
-	logger.Info("host added to mDNS")
+	p.logger.Info("host added to mDNS")
 }
 
 func (p *dnsPublisher) RemoveHost(hostname string) error {
@@ -113,6 +97,17 @@ func (p *dnsPublisher) RemoveHost(hostname string) error {
 
 func (p *dnsPublisher) buildFQDN(hostname string) string {
 	return fmt.Sprintf("%s.%s", hostname, p.domain)
+}
+
+func (p *dnsPublisher) register(ctx context.Context, hostname string) {
+	// save cancelable context
+	c, cancel := context.WithCancel(ctx)
+	fqdn := p.buildFQDN(hostname)
+	logger := p.logger.WithField("fqdn", fqdn)
+	p.cancels[hostname] = cancel
+
+	logger.Info("publishing hostname to mDNS")
+	go publish(c, logger, fqdn, p.address)
 }
 
 func publish(ctx context.Context, logger chassis.Logger, fqdn, address string) {
