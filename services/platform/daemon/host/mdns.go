@@ -59,19 +59,14 @@ func (p *dnsPublisher) Start() {
 	// start with initial set of hosts from config
 	hostnames := config.GetStringSlice(hostnamesConfigKey)
 	for _, hostname := range hostnames {
-		p.AddHost(ctx, hostname)
+		logger := p.logger.WithField("hostname", hostname)
+		go p.publish(ctx, logger, hostname)
 	}
 }
 
 func (p *dnsPublisher) AddHost(ctx context.Context, hostname string) {
-	c, cancel := context.WithCancel(ctx)
-	fqdn := p.buildFQDN(hostname)
-	logger := p.logger.WithField("fqdn", fqdn)
-
-	logger.Info("adding host to mDNS")
-
-	p.cancels[hostname] = cancel
-	go publish(c, logger, fqdn, p.address)
+	logger := p.logger.WithField("hostname", hostname)
+	go p.publish(ctx, logger, hostname)
 
 	err := setHostnames(p.cancels)
 	if err != nil {
@@ -108,14 +103,27 @@ func (p *dnsPublisher) buildFQDN(hostname string) string {
 	return fmt.Sprintf("%s.%s", hostname, p.domain)
 }
 
-func publish(ctx context.Context, logger chassis.Logger, fqdn, address string) {
+func (p *dnsPublisher) publish(ctx context.Context, logger chassis.Logger, hostname string) {
+
+	// skip if hostname is already published
+	if _, ok := p.cancels[hostname]; ok {
+		return
+	}
+
+	// store cancelable context for shutdown
+	c, cancel := context.WithCancel(ctx)
+	fqdn := p.buildFQDN(hostname)
+	p.cancels[hostname] = cancel
+
+	logger = logger.WithField("fqdn", fqdn)
+	logger.Info("publishing mDNS hostname")
 	for {
 		// if the context is cancelled just return
-		if ctx.Err() != nil {
+		if c.Err() != nil {
 			return
 		}
-		logger = logger.WithField("address", address)
-		cmd := exec.Command("avahi-publish", "-a", "-R", fqdn, address)
+		logger = logger.WithField("address", p.address)
+		cmd := exec.Command("avahi-publish", "-a", "-R", fqdn, p.address)
 		err := execute.ExecuteCommand(ctx, cmd)
 		if err != nil {
 			logger.WithError(err).Error("failed to publish mDNS")
