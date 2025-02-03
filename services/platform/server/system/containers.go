@@ -26,6 +26,8 @@ type (
 		AutoUpdateContainers(logger chassis.Logger)
 		// UpdateContainers will check for and install any container updates one time.
 		UpdateContainers(ctx context.Context, logger chassis.Logger) error
+		// StreamContainerLogs streams the logs from containers for a given namespace
+		StreamContainerLogs(ctx context.Context, logger chassis.Logger, namespace string, logs chan *v1.SystemLog) error
 	}
 )
 
@@ -142,4 +144,9 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 	}
 
 	return nil
+}
+
+func (c *controller) StreamContainerLogs(ctx context.Context, logger chassis.Logger, namespace string, logs chan *v1.SystemLog) error {
+
+	return c.k8sclient.StreamLogs(ctx, logger, logs)
 }

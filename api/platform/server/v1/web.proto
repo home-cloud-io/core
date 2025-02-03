@@ -62,6 +62,8 @@ service WebService {
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
+  // StreamSystemLogs streams system logs
+  rpc StreamSystemLogs(StreamSystemLogsRequest) returns (stream SystemLog) {}
 }
 
 message ShutdownHostRequest {}
@@ -393,4 +395,14 @@ message PeerConfiguration {
 message ClientRegistrationDetails {
   string server_address = 1;
   string locator_address = 2;
+}
+
+// Logs
+
+message StreamSystemLogsRequest {}
+
+message SystemLog {
+  string source = 1;
+  string domain = 2;
+  string log = 3;
 }

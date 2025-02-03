@@ -3032,3 +3032,83 @@ export class ClientRegistrationDetails extends Message<ClientRegistrationDetails
   }
 }
 
+/**
+ * @generated from message platform.server.v1.StreamSystemLogsRequest
+ */
+export class StreamSystemLogsRequest extends Message<StreamSystemLogsRequest> {
+  constructor(data?: PartialMessage<StreamSystemLogsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.StreamSystemLogsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StreamSystemLogsRequest {
+    return new StreamSystemLogsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StreamSystemLogsRequest {
+    return new StreamSystemLogsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StreamSystemLogsRequest {
+    return new StreamSystemLogsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StreamSystemLogsRequest | PlainMessage<StreamSystemLogsRequest> | undefined, b: StreamSystemLogsRequest | PlainMessage<StreamSystemLogsRequest> | undefined): boolean {
+    return proto3.util.equals(StreamSystemLogsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.SystemLog
+ */
+export class SystemLog extends Message<SystemLog> {
+  /**
+   * @generated from field: string source = 1;
+   */
+  source = "";
+
+  /**
+   * @generated from field: string domain = 2;
+   */
+  domain = "";
+
+  /**
+   * @generated from field: string log = 3;
+   */
+  log = "";
+
+  constructor(data?: PartialMessage<SystemLog>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.SystemLog";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SystemLog {
+    return new SystemLog().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SystemLog {
+    return new SystemLog().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SystemLog {
+    return new SystemLog().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SystemLog | PlainMessage<SystemLog> | undefined, b: SystemLog | PlainMessage<SystemLog> | undefined): boolean {
+    return proto3.util.equals(SystemLog, a, b);
+  }
+}
+

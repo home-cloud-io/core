@@ -36,7 +36,7 @@ const (
 // keeping the app store up to date with the latest available apps
 func AppStoreCache(logger chassis.Logger) {
 	config := chassis.GetConfig()
-	config.SetDefault(storeCacheIntervalConfigKey, 60)
+	config.SetDefault(storeCacheIntervalConfigKey, 15)
 	interval := config.GetInt(storeCacheIntervalConfigKey)
 	logger.WithField("interval_minutes", interval).Info("setting app store cache update interval")
 	for {

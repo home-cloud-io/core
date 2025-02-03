@@ -1,9 +1,11 @@
 package k8sclient
 
 import (
+	"bufio"
 	"context"
 	"strings"
 
+	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 
@@ -12,6 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	crclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -47,10 +50,14 @@ type (
 		CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error)
 		// GetServerVersion will retrieve the current k8s server version
 		GetServerVersion(ctx context.Context) (version string, err error)
+
+		// StreamLogs will stream the logs of current system pods
+		StreamLogs(ctx context.Context, logger chassis.Logger, logs chan *v1.SystemLog) error
 	}
 
 	client struct {
 		client          crclient.Client
+		clientset       *kubernetes.Clientset
 		discoveryClient *discovery.DiscoveryClient
 	}
 )
@@ -58,6 +65,10 @@ type (
 const (
 	homeCloudNamespace = "home-cloud-system"
 	draftNamespace     = "draft-system"
+)
+
+var (
+	sinceSecondsLogs = int64(300) // 5min
 )
 
 func NewClient(logger chassis.Logger) Client {
@@ -76,6 +87,11 @@ func NewClient(logger chassis.Logger) Client {
 		opv1.AddToScheme(c.Scheme())
 	}
 
+	cs, err := kubernetes.NewForConfig(kubeConfig)
+	if err != nil {
+		logger.WithError(err).Panic("failed to create new k8s clientset")
+	}
+
 	dc, err := discovery.NewDiscoveryClientForConfig(kubeConfig)
 	if err != nil {
 		logger.WithError(err).Panic("failed to create new k8s discovery client")
@@ -83,6 +99,7 @@ func NewClient(logger chassis.Logger) Client {
 
 	return &client{
 		client:          c,
+		clientset:       cs,
 		discoveryClient: dc,
 	}
 }
@@ -297,4 +314,50 @@ func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, 
 	}
 
 	return nil
+}
+
+func (c *client) StreamLogs(ctx context.Context, logger chassis.Logger, logs chan string) error {
+	pods := &corev1.PodList{}
+	err := c.client.List(ctx, pods, &crclient.ListOptions{
+		Namespace: "draft-system",
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, p := range pods.Items {
+		go c.getPodLogs(ctx, logger, p, logs)
+	}
+
+	return nil
+}
+
+func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, pod corev1.Pod, logs chan *v1.SystemLog) {
+
+	
+
+
+	podLogOpts := corev1.PodLogOptions{
+		Follow:       true,
+		SinceSeconds: &sinceSecondsLogs,
+	}
+	req := c.clientset.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &podLogOpts)
+	podLogs, err := req.Stream(ctx)
+	if err != nil {
+		logger.WithError(err).Error("error in opening stream")
+		return
+	}
+
+	reader := bufio.NewScanner(podLogs)
+	for reader.Scan() {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			logs <- &v1.SystemLog{
+				Source: pod.Labels["app"],
+				Domain: ,
+			}
+		}
+	}
 }

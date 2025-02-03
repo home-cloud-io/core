@@ -441,3 +441,30 @@ func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.
 		time.Sleep(5 * time.Second)
 	}
 }
+
+func (h *rpcHandler) StreamSystemLogs(ctx context.Context, request *connect.Request[v1.StreamSystemLogsRequest], stream *connect.ServerStream[v1.SystemLog]) error {
+	h.logger.Info("establishing client system log stream")
+
+	logs := make(chan *v1.SystemLog)
+
+	err := h.sctl.StreamContainerLogs(ctx, h.logger, "home-cloud-system", logs)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to stream logs")
+		return err
+	}
+	for {
+		select {
+		case <-ctx.Done():
+		case log := <-logs:
+			err := stream.Send(log)
+			if err != nil {
+				if err.Error() == "canceled: http2: stream closed" || strings.Contains(err.Error(), "write: broken pipe") {
+					h.logger.Info("stream closed by client")
+					return nil
+				}
+				h.logger.WithError(err).Warn("failed to send client heartbeat")
+				return err
+			}
+		}
+	}
+}

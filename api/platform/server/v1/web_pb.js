@@ -778,3 +778,23 @@ export const ClientRegistrationDetails = /*@__PURE__*/ proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.server.v1.StreamSystemLogsRequest
+ */
+export const StreamSystemLogsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.StreamSystemLogsRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.SystemLog
+ */
+export const SystemLog = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.SystemLog",
+  () => [
+    { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+

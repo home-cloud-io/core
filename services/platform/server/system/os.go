@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -71,8 +72,8 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	listener = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.CurrentDaemonVersion]{
 		Callback: func(event *dv1.CurrentDaemonVersion) (bool, error) {
 			if event.Error != nil {
-				logger.WithError(fmt.Errorf(event.Error.Error)).Error("failed to get current daemon version")
-				return true, fmt.Errorf(event.Error.Error)
+				logger.WithError(errors.New(event.Error.Error)).Error("failed to get current daemon version")
+				return true, errors.New(event.Error.Error)
 			}
 			response.DaemonVersions = &v1.DaemonVersions{
 				Current: &v1.DaemonVersion{

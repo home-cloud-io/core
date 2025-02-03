@@ -103,6 +103,9 @@ const (
 	WebServiceGetComponentVersionsProcedure = "/platform.server.v1.WebService/GetComponentVersions"
 	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
 	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
+	// WebServiceStreamSystemLogsProcedure is the fully-qualified name of the WebService's
+	// StreamSystemLogs RPC.
+	WebServiceStreamSystemLogsProcedure = "/platform.server.v1.WebService/StreamSystemLogs"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -134,6 +137,7 @@ var (
 	webServiceRegisterPeerMethodDescriptor             = webServiceServiceDescriptor.Methods().ByName("RegisterPeer")
 	webServiceGetComponentVersionsMethodDescriptor     = webServiceServiceDescriptor.Methods().ByName("GetComponentVersions")
 	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
+	webServiceStreamSystemLogsMethodDescriptor         = webServiceServiceDescriptor.Methods().ByName("StreamSystemLogs")
 )
 
 // WebServiceClient is a client for the platform.server.v1.WebService service.
@@ -190,6 +194,8 @@ type WebServiceClient interface {
 	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
+	// StreamSystemLogs streams system logs
+	StreamSystemLogs(context.Context, *connect.Request[v1.StreamSystemLogsRequest]) (*connect.ServerStreamForClient[v1.SystemLog], error)
 }
 
 // NewWebServiceClient constructs a client for the platform.server.v1.WebService service. By
@@ -358,6 +364,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceSubscribeMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		streamSystemLogs: connect.NewClient[v1.StreamSystemLogsRequest, v1.SystemLog](
+			httpClient,
+			baseURL+WebServiceStreamSystemLogsProcedure,
+			connect.WithSchema(webServiceStreamSystemLogsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -389,6 +401,7 @@ type webServiceClient struct {
 	registerPeer             *connect.Client[v1.RegisterPeerRequest, v1.RegisterPeerResponse]
 	getComponentVersions     *connect.Client[v1.GetComponentVersionsRequest, v1.GetComponentVersionsResponse]
 	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
+	streamSystemLogs         *connect.Client[v1.StreamSystemLogsRequest, v1.SystemLog]
 }
 
 // ShutdownHost calls platform.server.v1.WebService.ShutdownHost.
@@ -521,6 +534,11 @@ func (c *webServiceClient) Subscribe(ctx context.Context, req *connect.Request[v
 	return c.subscribe.CallServerStream(ctx, req)
 }
 
+// StreamSystemLogs calls platform.server.v1.WebService.StreamSystemLogs.
+func (c *webServiceClient) StreamSystemLogs(ctx context.Context, req *connect.Request[v1.StreamSystemLogsRequest]) (*connect.ServerStreamForClient[v1.SystemLog], error) {
+	return c.streamSystemLogs.CallServerStream(ctx, req)
+}
+
 // WebServiceHandler is an implementation of the platform.server.v1.WebService service.
 type WebServiceHandler interface {
 	// Shutdown the host machine running Home Cloud
@@ -575,6 +593,8 @@ type WebServiceHandler interface {
 	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
+	// StreamSystemLogs streams system logs
+	StreamSystemLogs(context.Context, *connect.Request[v1.StreamSystemLogsRequest], *connect.ServerStream[v1.SystemLog]) error
 }
 
 // NewWebServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -739,6 +759,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceSubscribeMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceStreamSystemLogsHandler := connect.NewServerStreamHandler(
+		WebServiceStreamSystemLogsProcedure,
+		svc.StreamSystemLogs,
+		connect.WithSchema(webServiceStreamSystemLogsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.server.v1.WebService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case WebServiceShutdownHostProcedure:
@@ -793,6 +819,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceGetComponentVersionsHandler.ServeHTTP(w, r)
 		case WebServiceSubscribeProcedure:
 			webServiceSubscribeHandler.ServeHTTP(w, r)
+		case WebServiceStreamSystemLogsProcedure:
+			webServiceStreamSystemLogsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -904,4 +932,8 @@ func (UnimplementedWebServiceHandler) GetComponentVersions(context.Context, *con
 
 func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.Subscribe is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) StreamSystemLogs(context.Context, *connect.Request[v1.StreamSystemLogsRequest], *connect.ServerStream[v1.SystemLog]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.StreamSystemLogs is not implemented"))
 }
