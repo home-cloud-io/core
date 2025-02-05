@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
+import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { ComponentVersion, SystemStats } from "../../daemon/v1/system_pb.js";
 import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
@@ -2071,9 +2071,9 @@ export class GetSystemLogsRequest extends Message<GetSystemLogsRequest> {
   /**
    * A relative time in seconds before the current time from which to show logs.
    *
-   * @generated from field: int64 since_seconds = 1;
+   * @generated from field: uint32 since_seconds = 1;
    */
-  sinceSeconds = protoInt64.zero;
+  sinceSeconds = 0;
 
   constructor(data?: PartialMessage<GetSystemLogsRequest>) {
     super();
@@ -2083,7 +2083,7 @@ export class GetSystemLogsRequest extends Message<GetSystemLogsRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.server.v1.GetSystemLogsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "since_seconds", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 1, name: "since_seconds", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSystemLogsRequest {
@@ -2112,6 +2112,21 @@ export class GetSystemLogsResponse extends Message<GetSystemLogsResponse> {
    */
   logs: Log[] = [];
 
+  /**
+   * @generated from field: repeated string sources = 2;
+   */
+  sources: string[] = [];
+
+  /**
+   * @generated from field: repeated string namespaces = 3;
+   */
+  namespaces: string[] = [];
+
+  /**
+   * @generated from field: repeated string domains = 4;
+   */
+  domains: string[] = [];
+
   constructor(data?: PartialMessage<GetSystemLogsResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -2121,6 +2136,9 @@ export class GetSystemLogsResponse extends Message<GetSystemLogsResponse> {
   static readonly typeName = "platform.server.v1.GetSystemLogsResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "logs", kind: "message", T: Log, repeated: true },
+    { no: 2, name: "sources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "namespaces", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "domains", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSystemLogsResponse {
@@ -3109,37 +3127,6 @@ export class ClientRegistrationDetails extends Message<ClientRegistrationDetails
 }
 
 /**
- * @generated from message platform.server.v1.LogsRequest
- */
-export class LogsRequest extends Message<LogsRequest> {
-  constructor(data?: PartialMessage<LogsRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.LogsRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LogsRequest {
-    return new LogsRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LogsRequest {
-    return new LogsRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LogsRequest {
-    return new LogsRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: LogsRequest | PlainMessage<LogsRequest> | undefined, b: LogsRequest | PlainMessage<LogsRequest> | undefined): boolean {
-    return proto3.util.equals(LogsRequest, a, b);
-  }
-}
-
-/**
  * @generated from message platform.server.v1.Log
  */
 export class Log extends Message<Log> {
@@ -3149,17 +3136,22 @@ export class Log extends Message<Log> {
   source = "";
 
   /**
-   * @generated from field: string domain = 2;
+   * @generated from field: string namespace = 2;
+   */
+  namespace = "";
+
+  /**
+   * @generated from field: string domain = 3;
    */
   domain = "";
 
   /**
-   * @generated from field: string log = 3;
+   * @generated from field: string log = 4;
    */
   log = "";
 
   /**
-   * @generated from field: google.protobuf.Timestamp timestamp = 4;
+   * @generated from field: google.protobuf.Timestamp timestamp = 5;
    */
   timestamp?: Timestamp;
 
@@ -3172,9 +3164,10 @@ export class Log extends Message<Log> {
   static readonly typeName = "platform.server.v1.Log";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "timestamp", kind: "message", T: Timestamp },
+    { no: 2, name: "namespace", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "timestamp", kind: "message", T: Timestamp },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Log {

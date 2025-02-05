@@ -544,7 +544,7 @@ export const GetComponentVersionsResponse = /*@__PURE__*/ proto3.makeMessageType
 export const GetSystemLogsRequest = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.GetSystemLogsRequest",
   () => [
-    { no: 1, name: "since_seconds", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 1, name: "since_seconds", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ],
 );
 
@@ -555,6 +555,9 @@ export const GetSystemLogsResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.GetSystemLogsResponse",
   () => [
     { no: 1, name: "logs", kind: "message", T: Log, repeated: true },
+    { no: 2, name: "sources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "namespaces", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "domains", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ],
 );
 
@@ -799,23 +802,16 @@ export const ClientRegistrationDetails = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.LogsRequest
- */
-export const LogsRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.LogsRequest",
-  [],
-);
-
-/**
  * @generated from message platform.server.v1.Log
  */
 export const Log = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.Log",
   () => [
     { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "timestamp", kind: "message", T: Timestamp },
+    { no: 2, name: "namespace", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "timestamp", kind: "message", T: Timestamp },
   ],
 );
 

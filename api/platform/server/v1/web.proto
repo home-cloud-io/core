@@ -60,14 +60,11 @@ service WebService {
   rpc RegisterPeer(RegisterPeerRequest) returns (RegisterPeerResponse) {}
   // GetComponentVersions returns the versions of all system components (daemon, server, etc.)
   rpc GetComponentVersions(GetComponentVersionsRequest) returns (GetComponentVersionsResponse) {}
-
   // GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
   rpc GetSystemLogs(GetSystemLogsRequest) returns (GetSystemLogsResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
-  // Logs streams all logs (apps and system)
-  rpc Logs(LogsRequest) returns (stream Log) {}
 }
 
 message ShutdownHostRequest {}
@@ -268,11 +265,14 @@ message GetComponentVersionsResponse {
 
 message GetSystemLogsRequest {
   // A relative time in seconds before the current time from which to show logs.
-  int64 since_seconds = 1;
+  uint32 since_seconds = 1;
 }
 
 message GetSystemLogsResponse {
   repeated Log logs = 1;
+  repeated string sources = 2;
+  repeated string namespaces = 3;
+  repeated string domains = 4;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -412,11 +412,10 @@ message ClientRegistrationDetails {
 
 // Logs
 
-message LogsRequest {}
-
 message Log {
   string source = 1;
-  string domain = 2;
-  string log = 3;
-  google.protobuf.Timestamp timestamp = 4;
+  string namespace = 2;
+  string domain = 3;
+  string log = 4;
+  google.protobuf.Timestamp timestamp = 5;
 }
