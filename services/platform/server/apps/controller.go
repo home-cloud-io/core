@@ -61,6 +61,7 @@ const (
 	ErrFailedToGetApps              = "failed to get apps"
 	ErrFailedToGetAppStorage        = "failed to get app storage"
 	ErrFailedToGetComponentVersions = "failed to get component versions"
+	ErrFailedToGetLogs              = "failed to get logs"
 
 	autoUpdateCronConfigKey = "server.updates.apps_auto_update_cron"
 	rawChartBaseUrl         = "https://raw.githubusercontent.com/home-cloud-io/store"

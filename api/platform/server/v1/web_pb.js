@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3 } from "@bufbuild/protobuf";
+import { proto3, Timestamp } from "@bufbuild/protobuf";
 import { ComponentVersion, SystemStats } from "../../daemon/v1/system_pb.js";
 import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
@@ -539,6 +539,26 @@ export const GetComponentVersionsResponse = /*@__PURE__*/ proto3.makeMessageType
 );
 
 /**
+ * @generated from message platform.server.v1.GetSystemLogsRequest
+ */
+export const GetSystemLogsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.GetSystemLogsRequest",
+  () => [
+    { no: 1, name: "since_seconds", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GetSystemLogsResponse
+ */
+export const GetSystemLogsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.GetSystemLogsResponse",
+  () => [
+    { no: 1, name: "logs", kind: "message", T: Log, repeated: true },
+  ],
+);
+
+/**
  * @generated from message platform.server.v1.Apps
  */
 export const Apps = /*@__PURE__*/ proto3.makeMessageType(
@@ -779,22 +799,23 @@ export const ClientRegistrationDetails = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.StreamSystemLogsRequest
+ * @generated from message platform.server.v1.LogsRequest
  */
-export const StreamSystemLogsRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.StreamSystemLogsRequest",
+export const LogsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.LogsRequest",
   [],
 );
 
 /**
- * @generated from message platform.server.v1.SystemLog
+ * @generated from message platform.server.v1.Log
  */
-export const SystemLog = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.SystemLog",
+export const Log = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.Log",
   () => [
     { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "timestamp", kind: "message", T: Timestamp },
   ],
 );
 

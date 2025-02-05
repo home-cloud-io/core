@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"context"
 	"strings"
+	"time"
 
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -51,8 +53,11 @@ type (
 		// GetServerVersion will retrieve the current k8s server version
 		GetServerVersion(ctx context.Context) (version string, err error)
 
+		// GetLogs...
+		GetLogs(ctx context.Context, logger chassis.Logger, namespace string, sinceSeconds int64) ([]*v1.Log, error)
+
 		// StreamLogs will stream the logs of current system pods
-		StreamLogs(ctx context.Context, logger chassis.Logger, logs chan *v1.SystemLog) error
+		StreamLogs(ctx context.Context, logger chassis.Logger, namespace string, logs chan *v1.Log) error
 	}
 
 	client struct {
@@ -65,10 +70,6 @@ type (
 const (
 	homeCloudNamespace = "home-cloud-system"
 	draftNamespace     = "draft-system"
-)
-
-var (
-	sinceSecondsLogs = int64(300) // 5min
 )
 
 func NewClient(logger chassis.Logger) Client {
@@ -225,6 +226,44 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 	return checks, nil
 }
 
+func (c *client) GetAppPodLists(ctx context.Context) ([]*corev1.PodList, error) {
+
+	var (
+		podLists = []*corev1.PodList{}
+	)
+
+	// get all installed apps
+	apps := &opv1.AppList{}
+	err := c.client.List(ctx, apps, &crclient.ListOptions{
+		Namespace: homeCloudNamespace,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// process each app and check all app pods for status
+	checks := make([]*webv1.AppHealth, len(apps.Items))
+	for index, app := range apps.Items {
+		checks[index] = &webv1.AppHealth{
+			Name:   app.Name,
+			Status: webv1.AppStatus_APP_STATUS_HEALTHY,
+		}
+
+		// get all pods in app namespace
+		pods := &corev1.PodList{}
+		err := c.client.List(ctx, pods, &crclient.ListOptions{
+			Namespace: app.Name,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		podLists = append(podLists, pods)
+	}
+
+	return podLists, nil
+}
+
 func (c *client) Installed(ctx context.Context, name string) (installed bool, err error) {
 	apps := &opv1.App{}
 	err = c.client.Get(ctx, types.NamespacedName{
@@ -316,30 +355,105 @@ func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, 
 	return nil
 }
 
-func (c *client) StreamLogs(ctx context.Context, logger chassis.Logger, logs chan string) error {
+func (c *client) GetLogs(ctx context.Context, logger chassis.Logger, namespace string, sinceSeconds int64) ([]*v1.Log, error) {
+	var (
+		logs = []*v1.Log{}
+	)
+
 	pods := &corev1.PodList{}
 	err := c.client.List(ctx, pods, &crclient.ListOptions{
-		Namespace: "draft-system",
+		// NOTE: we're not specifying namespace so we get all pods
+	})
+	if err != nil {
+		return logs, err
+	}
+
+	// iterate through each returned pod and parse the logs
+	for _, pod := range pods.Items {
+		logs = append(logs, c.getPodLogs(ctx, logger, sinceSeconds, pod)...)
+	}
+
+	return logs, nil
+}
+
+
+func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64, pod corev1.Pod) []*v1.Log {
+	var (
+		logs = []*v1.Log{}
+	)
+
+	logger = logger.WithFields(chassis.Fields{
+		"pod_app":    pod.Labels["app"],
+		"pod_domain": pod.Labels["domain"],
+	})
+
+	podLogOpts := corev1.PodLogOptions{
+		SinceSeconds: &sinceSeconds,
+		Timestamps:   true,
+	}
+	req := c.clientset.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &podLogOpts)
+	podLogs, err := req.Stream(ctx)
+	if err != nil {
+		logger.WithError(err).Error("error in opening stream")
+		return logs
+	}
+	defer podLogs.Close()
+
+	// read off logs and store in slice
+	reader := bufio.NewScanner(podLogs)
+	for reader.Scan() {
+		domain := pod.Labels["domain"]
+		app := pod.Labels["app"]
+		if app == "" {
+			app = pod.Labels["k8s-app"]
+			domain = "system"
+		}
+
+		s := strings.SplitN(reader.Text(), " ", 2)
+		if len(s) != 2 {
+			continue
+		}
+		t, err := time.Parse(time.RFC3339Nano, s[0])
+		if err != nil {
+			continue
+		}
+
+		logs = append(logs, &v1.Log{
+			Source:    app,
+			Domain:    domain,
+			Log:       s[1],
+			Timestamp: timestamppb.New(t),
+		})
+	}
+
+	return logs
+}
+
+func (c *client) StreamLogs(ctx context.Context, logger chassis.Logger, namespace string, logs chan *v1.Log) error {
+	pods := &corev1.PodList{}
+	err := c.client.List(ctx, pods, &crclient.ListOptions{
+		Namespace: namespace,
 	})
 	if err != nil {
 		return err
 	}
 
 	for _, p := range pods.Items {
-		go c.getPodLogs(ctx, logger, p, logs)
+		go c.streamPodLogs(ctx, logger, p, logs)
 	}
 
 	return nil
 }
 
-func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, pod corev1.Pod, logs chan *v1.SystemLog) {
+func (c *client) streamPodLogs(ctx context.Context, logger chassis.Logger, pod corev1.Pod, logs chan *v1.Log) {
+	logger = logger.WithFields(chassis.Fields{
+		"pod_app":    pod.Labels["app"],
+		"pod_domain": pod.Labels["domain"],
+	})
 
-	
-
-
+	// stream logs from pod
 	podLogOpts := corev1.PodLogOptions{
-		Follow:       true,
-		SinceSeconds: &sinceSecondsLogs,
+		Follow: true,
 	}
 	req := c.clientset.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &podLogOpts)
 	podLogs, err := req.Stream(ctx)
@@ -348,16 +462,15 @@ func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, pod core
 		return
 	}
 
+	// read off logs and send to log channel
 	reader := bufio.NewScanner(podLogs)
 	for reader.Scan() {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			logs <- &v1.SystemLog{
-				Source: pod.Labels["app"],
-				Domain: ,
-			}
+		logs <- &v1.Log{
+			Source: pod.Labels["app"],
+			Domain: pod.Labels["domain"],
+			Log:    reader.Text(),
 		}
 	}
+
+	logger.Debug("closing pod log stream")
 }

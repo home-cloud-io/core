@@ -422,6 +422,20 @@ func (h *rpcHandler) GetComponentVersions(ctx context.Context, request *connect.
 	return connect.NewResponse(response), nil
 }
 
+func (h *rpcHandler) GetSystemLogs(ctx context.Context, request *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error) {
+	h.logger.Info("getting system logs")
+
+	logs, err := h.sctl.GetContainerLogs(ctx, h.logger, request.Msg.SinceSeconds)
+	if err != nil {
+		h.logger.WithError(err).Error(apps.ErrFailedToGetLogs)
+		return nil, errors.New(apps.ErrFailedToGetLogs)
+	}
+
+	return connect.NewResponse(&v1.GetSystemLogsResponse{
+		Logs: logs,
+	}), nil
+}
+
 func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {
 	h.logger.Info("establishing client stream")
 	id := events.AddStream(stream)
@@ -442,12 +456,14 @@ func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.
 	}
 }
 
-func (h *rpcHandler) StreamSystemLogs(ctx context.Context, request *connect.Request[v1.StreamSystemLogsRequest], stream *connect.ServerStream[v1.SystemLog]) error {
+func (h *rpcHandler) Logs(ctx context.Context, request *connect.Request[v1.LogsRequest], stream *connect.ServerStream[v1.Log]) error {
 	h.logger.Info("establishing client system log stream")
 
-	logs := make(chan *v1.SystemLog)
+	logs := make(chan *v1.Log)
 
-	err := h.sctl.StreamContainerLogs(ctx, h.logger, "home-cloud-system", logs)
+	c, cancel := context.WithCancel(ctx)
+	defer cancel()
+	err := h.sctl.StreamContainerLogs(c, h.logger, "home-cloud-system", logs)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to stream logs")
 		return err
@@ -455,6 +471,7 @@ func (h *rpcHandler) StreamSystemLogs(ctx context.Context, request *connect.Requ
 	for {
 		select {
 		case <-ctx.Done():
+			return nil
 		case log := <-logs:
 			err := stream.Send(log)
 			if err != nil {
