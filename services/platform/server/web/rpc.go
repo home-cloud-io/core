@@ -425,14 +425,38 @@ func (h *rpcHandler) GetComponentVersions(ctx context.Context, request *connect.
 func (h *rpcHandler) GetSystemLogs(ctx context.Context, request *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error) {
 	h.logger.Info("getting system logs")
 
-	logs, err := h.sctl.GetContainerLogs(ctx, h.logger, request.Msg.SinceSeconds)
+	logs, err := h.sctl.GetContainerLogs(ctx, h.logger, int64(request.Msg.SinceSeconds))
 	if err != nil {
 		h.logger.WithError(err).Error(apps.ErrFailedToGetLogs)
 		return nil, errors.New(apps.ErrFailedToGetLogs)
 	}
 
+	domainsMap := make(map[string]struct{})
+	namespacesMap := make(map[string]struct{})
+	sourcesMap := make(map[string]struct{})
+	domains := []string{}
+	namespaces := []string{}
+	sources := []string{}
+	for _, log := range logs {
+		if _, ok := domainsMap[log.Domain]; !ok {
+			domainsMap[log.Domain] = struct{}{}
+			domains = append(domains, log.Domain)
+		}
+		if _, ok := namespacesMap[log.Namespace]; !ok {
+			namespacesMap[log.Namespace] = struct{}{}
+			namespaces = append(namespaces, log.Namespace)
+		}
+		if _, ok := sourcesMap[log.Source]; !ok {
+			sourcesMap[log.Source] = struct{}{}
+			sources = append(sources, log.Source)
+		}
+	}
+
 	return connect.NewResponse(&v1.GetSystemLogsResponse{
-		Logs: logs,
+		Logs:    logs,
+		Domains: domains,
+		Namespaces: namespaces,
+		Sources: sources,
 	}), nil
 }
 
@@ -453,35 +477,5 @@ func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.
 			return err
 		}
 		time.Sleep(5 * time.Second)
-	}
-}
-
-func (h *rpcHandler) Logs(ctx context.Context, request *connect.Request[v1.LogsRequest], stream *connect.ServerStream[v1.Log]) error {
-	h.logger.Info("establishing client system log stream")
-
-	logs := make(chan *v1.Log)
-
-	c, cancel := context.WithCancel(ctx)
-	defer cancel()
-	err := h.sctl.StreamContainerLogs(c, h.logger, "home-cloud-system", logs)
-	if err != nil {
-		h.logger.WithError(err).Error("failed to stream logs")
-		return err
-	}
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		case log := <-logs:
-			err := stream.Send(log)
-			if err != nil {
-				if err.Error() == "canceled: http2: stream closed" || strings.Contains(err.Error(), "write: broken pipe") {
-					h.logger.Info("stream closed by client")
-					return nil
-				}
-				h.logger.WithError(err).Warn("failed to send client heartbeat")
-				return err
-			}
-		}
 	}
 }

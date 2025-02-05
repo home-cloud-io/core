@@ -28,8 +28,6 @@ type (
 		UpdateContainers(ctx context.Context, logger chassis.Logger) error
 		// GetContainerLogs...
 		GetContainerLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*v1.Log, error)
-		// StreamContainerLogs streams the logs from containers for a given namespace
-		StreamContainerLogs(ctx context.Context, logger chassis.Logger, namespace string, logs chan *v1.Log) error
 	}
 )
 
@@ -150,8 +148,4 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 
 func (c *controller) GetContainerLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*v1.Log, error) {
 	return c.k8sclient.GetLogs(ctx, logger, "", sinceSeconds)
-}
-
-func (c *controller) StreamContainerLogs(ctx context.Context, logger chassis.Logger, namespace string, logs chan *v1.Log) error {
-	return c.k8sclient.StreamLogs(ctx, logger, namespace, logs)
 }

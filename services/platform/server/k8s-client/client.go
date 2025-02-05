@@ -55,9 +55,6 @@ type (
 
 		// GetLogs...
 		GetLogs(ctx context.Context, logger chassis.Logger, namespace string, sinceSeconds int64) ([]*v1.Log, error)
-
-		// StreamLogs will stream the logs of current system pods
-		StreamLogs(ctx context.Context, logger chassis.Logger, namespace string, logs chan *v1.Log) error
 	}
 
 	client struct {
@@ -376,7 +373,6 @@ func (c *client) GetLogs(ctx context.Context, logger chassis.Logger, namespace s
 	return logs, nil
 }
 
-
 func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64, pod corev1.Pod) []*v1.Log {
 	var (
 		logs = []*v1.Log{}
@@ -387,90 +383,50 @@ func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSec
 		"pod_domain": pod.Labels["domain"],
 	})
 
-	podLogOpts := corev1.PodLogOptions{
-		SinceSeconds: &sinceSeconds,
-		Timestamps:   true,
-	}
-	req := c.clientset.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &podLogOpts)
-	podLogs, err := req.Stream(ctx)
-	if err != nil {
-		logger.WithError(err).Error("error in opening stream")
-		return logs
-	}
-	defer podLogs.Close()
-
-	// read off logs and store in slice
-	reader := bufio.NewScanner(podLogs)
-	for reader.Scan() {
-		domain := pod.Labels["domain"]
-		app := pod.Labels["app"]
-		if app == "" {
-			app = pod.Labels["k8s-app"]
-			domain = "system"
+	// get logs for all containers
+	for _, container := range pod.Spec.Containers {
+		podLogOpts := corev1.PodLogOptions{
+			SinceSeconds: &sinceSeconds,
+			Timestamps:   true,
+			Container:    container.Name,
 		}
-
-		s := strings.SplitN(reader.Text(), " ", 2)
-		if len(s) != 2 {
-			continue
-		}
-		t, err := time.Parse(time.RFC3339Nano, s[0])
+		req := c.clientset.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &podLogOpts)
+		podLogs, err := req.Stream(ctx)
 		if err != nil {
-			continue
+			logger.WithError(err).Error("error in opening stream")
+			return logs
 		}
+		defer podLogs.Close()
 
-		logs = append(logs, &v1.Log{
-			Source:    app,
-			Domain:    domain,
-			Log:       s[1],
-			Timestamp: timestamppb.New(t),
-		})
+		// read off logs and store in slice
+		reader := bufio.NewScanner(podLogs)
+		for reader.Scan() {
+			// TODO: factor in the namespace as well since the app label could be redis and miss the fact it's a part of immich
+			domain := pod.Labels["domain"]
+			app := pod.Labels["app"]
+			if app == "" {
+				app = pod.Labels["k8s-app"]
+				domain = "system"
+			}
+
+			s := strings.SplitN(reader.Text(), " ", 2)
+			if len(s) != 2 {
+				continue
+			}
+			t, err := time.Parse(time.RFC3339Nano, s[0])
+			if err != nil {
+				continue
+			}
+
+			logs = append(logs, &v1.Log{
+				Source:    app,
+				Namespace: pod.Namespace,
+				Domain:    domain,
+				Log:       s[1],
+				Timestamp: timestamppb.New(t),
+			})
+		}
 	}
 
 	return logs
-}
-
-func (c *client) StreamLogs(ctx context.Context, logger chassis.Logger, namespace string, logs chan *v1.Log) error {
-	pods := &corev1.PodList{}
-	err := c.client.List(ctx, pods, &crclient.ListOptions{
-		Namespace: namespace,
-	})
-	if err != nil {
-		return err
-	}
-
-	for _, p := range pods.Items {
-		go c.streamPodLogs(ctx, logger, p, logs)
-	}
-
-	return nil
-}
-
-func (c *client) streamPodLogs(ctx context.Context, logger chassis.Logger, pod corev1.Pod, logs chan *v1.Log) {
-	logger = logger.WithFields(chassis.Fields{
-		"pod_app":    pod.Labels["app"],
-		"pod_domain": pod.Labels["domain"],
-	})
-
-	// stream logs from pod
-	podLogOpts := corev1.PodLogOptions{
-		Follow: true,
-	}
-	req := c.clientset.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &podLogOpts)
-	podLogs, err := req.Stream(ctx)
-	if err != nil {
-		logger.WithError(err).Error("error in opening stream")
-		return
-	}
-
-	// read off logs and send to log channel
-	reader := bufio.NewScanner(podLogs)
-	for reader.Scan() {
-		logs <- &v1.Log{
-			Source: pod.Labels["app"],
-			Domain: pod.Labels["domain"],
-			Log:    reader.Text(),
-		}
-	}
-
-	logger.Debug("closing pod log stream")
 }
