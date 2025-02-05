@@ -8,7 +8,7 @@ import React, {
 import { createConnectTransport } from '@connectrpc/connect-web';
 import { createClient } from '@connectrpc/connect';
 import { WebService } from 'api/platform/server/v1/web_connect';
-import { ServerEvent } from 'api/platform/server/v1/web_pb';
+import { Log } from 'api/platform/server/v1/web_pb';
 import * as Config from '../utils/config';
 
 export const SubscribeContext = React.createContext({ client: WebService });
@@ -22,64 +22,60 @@ export const client = createClient(WebService, transport);
 export type ProviderValue = {
   connected: boolean;
   setConnected: React.Dispatch<React.SetStateAction<boolean>>;
-  event: ServerEvent | undefined;
-  setEvent: React.Dispatch<React.SetStateAction<ServerEvent | undefined>>;
+  log: Log | undefined;
+  setLog: React.Dispatch<React.SetStateAction<Log | undefined>>;
 };
 type DefaultValue = undefined;
 type ContextValue = DefaultValue | ProviderValue;
 
-const EventContext = createContext<ContextValue>(undefined);
+const LogContext = createContext<ContextValue>(undefined);
 
-export function useEvents() {
-  return useContext(EventContext);
+export function useLogs() {
+  return useContext(LogContext);
 }
 
 export type Props = {
   children: ReactNode;
 };
 
-export function EventsProvider(props: Props) {
+export function LogProvider(props: Props) {
   const { children } = props;
 
   const [connected, setConnected] = useState(false);
-  const [event, setEvent] = useState<ServerEvent>();
+  const [log, setLog] = useState<Log>();
   const value = {
     connected,
     setConnected,
-    event,
-    setEvent,
+    log,
+    setLog,
   };
 
   return (
-    <EventContext.Provider value={value}>{children}</EventContext.Provider>
+    <LogContext.Provider value={value}>{children}</LogContext.Provider>
   );
 }
 
 // NOTE: this will load twice because of React.StrictMode loading all components twice
-export function EventListener() {
-  const { setConnected, setEvent } = useEvents() as ProviderValue;
+export function LogListener() {
+  const { setConnected, setLog } = useLogs() as ProviderValue;
 
   useEffect(() => {
-    console.log('initializing event listener');
+    console.log('initializing log listener');
     const listen = async function () {
       try {
-        for await (const event of client.subscribe({})) {
+        for await (const log of client.logs({})) {
           setConnected(true);
-          // ignore heartbeats
-          if (event.event.case === 'heartbeat') {
-            continue;
-          }
-          setEvent(event);
+          setLog(log);
         }
       } catch (err) {
-        console.warn(`event stream failed: ${err}`);
+        console.warn(`log stream failed: ${err}`);
         setConnected(false);
         await new Promise((f) => setTimeout(f, 1000));
       }
     };
     (async () => {
       while (true) {
-        console.log('connecting to event stream');
+        console.log('connecting to log stream');
         await listen();
       }
     })();
