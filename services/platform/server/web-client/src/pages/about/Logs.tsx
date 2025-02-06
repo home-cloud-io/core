@@ -49,7 +49,6 @@ export function Logs() {
   );
   const [logs, setLogs] = useState<LogType[]>([]);
   const [columns, setColumns] = useState<TableColumnsType<LogType>>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (data?.logs) {
@@ -80,7 +79,6 @@ export function Logs() {
           render: (value, record, index) => (
             <>{record.timestamp?.toLocaleString()}</>
           ),
-          width: '10%',
         },
         {
           title: 'Domain',
@@ -92,7 +90,6 @@ export function Logs() {
           filterMode: 'tree',
           filterSearch: true,
           onFilter: (value, log) => log.domain.includes(value as string),
-          width: '10%',
           render: (value, record, index) => (
             <Tag color={stringToColour(record.domain)}>{record.domain}</Tag>
           ),
@@ -107,7 +104,6 @@ export function Logs() {
           filterMode: 'tree',
           filterSearch: true,
           onFilter: (value, log) => log.namespace.includes(value as string),
-          width: '10%',
           render: (value, record, index) => (
             <Tag color={stringToColour(record.namespace)}>
               {record.namespace}
@@ -124,7 +120,6 @@ export function Logs() {
           filterMode: 'tree',
           filterSearch: true,
           onFilter: (value, log) => log.source.includes(value as string),
-          width: '10%',
           render: (value, record, index) => (
             <Tag color={stringToColour(record.source)}>{record.source}</Tag>
           ),
@@ -132,7 +127,6 @@ export function Logs() {
         {
           title: 'Log',
           dataIndex: 'log',
-          width: '60%',
           render: (value, record, index) => (
             <Typography
               style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}

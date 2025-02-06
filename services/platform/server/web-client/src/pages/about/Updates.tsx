@@ -47,13 +47,13 @@ export default function UpdatesPage() {
           <ArrowLeftOutlined />
           Back
         </Button>
-        <Details />
+        <Updates />
       </Space>
     </Flex>
   );
 }
 
-export function Details() {
+export function Updates() {
   return (
     <Card title="Updates" bordered={false}>
       <PlatformComponents />

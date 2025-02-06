@@ -401,7 +401,6 @@ func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSec
 		// read off logs and store in slice
 		reader := bufio.NewScanner(podLogs)
 		for reader.Scan() {
-			// TODO: factor in the namespace as well since the app label could be redis and miss the fact it's a part of immich
 			domain := pod.Labels["domain"]
 			app := pod.Labels["app"]
 			if app == "" {

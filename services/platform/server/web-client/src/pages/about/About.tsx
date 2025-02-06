@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Flex,
   Space,
@@ -8,21 +8,19 @@ import {
   Alert,
   Image,
   List,
-  Divider,
-  Typography,
-  Table,
-  TableColumnsType,
   Button,
-  Avatar,
 } from 'antd';
-import { FileSearchOutlined, LoadingOutlined, SyncOutlined } from '@ant-design/icons';
+import {
+  FileSearchOutlined,
+  LoadingOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import { useQuery } from '@connectrpc/connect-query';
 import {
   getComponentVersions,
-  getSystemLogs,
 } from 'api/platform/server/v1/web-WebService_connectquery';
 import logo from '../../assets/logo.png';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function AboutPage() {
   return (
@@ -86,15 +84,21 @@ export function Details() {
   );
 }
 
-
-
 export function Links() {
   const navigate = useNavigate();
   return (
     <Card title="Info" bordered={false}>
-      <Flex vertical gap="large" style={{ width: '100%' }}>
-        <Button block color="primary" variant="outlined" onClick={() => navigate("/about/updates")}><SyncOutlined/> Updates</Button>
-        <Button block color="primary" variant="outlined" onClick={() => navigate("/about/logs")}><FileSearchOutlined/> Logs</Button>
+      <Flex vertical gap="small" style={{ width: '100%' }}>
+        <Button
+          block
+          color="primary"
+          onClick={() => navigate('/about/updates')}
+        >
+          <SyncOutlined /> Updates
+        </Button>
+        <Button block color="primary" onClick={() => navigate('/about/logs')}>
+          <FileSearchOutlined /> Logs
+        </Button>
       </Flex>
     </Card>
   );
