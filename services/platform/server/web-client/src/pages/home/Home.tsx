@@ -5,8 +5,6 @@ import {
   Divider,
   Progress,
   Card,
-  Row,
-  Col,
   Tag,
   Spin,
   Badge,
