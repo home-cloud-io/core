@@ -25,34 +25,34 @@ const (
 	nixLineSuffix    = "\";"
 
 	mockJournalLogs = `
-2025-02-06T13:25:06-06:00 home-cloud daemon[391882]: 1:25PM INF shutting down function=shutdown service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[391882]: 1:25PM INF shutdown successfully function=shutdown service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud systemd[1]: Stopping Home Cloud Daemon...
-2025-02-06T13:25:06-06:00 home-cloud systemd[1]: daemon.service: Deactivated successfully.
-2025-02-06T13:25:06-06:00 home-cloud systemd[1]: Stopped Home Cloud Daemon.
-2025-02-06T13:25:06-06:00 home-cloud systemd[1]: daemon.service: Consumed 5.327s CPU time, 12.8M memory peak, 212K read from disk, 262.6K incoming IP traffic, 875.1K outgoing IP traffic.
-2025-02-06T13:25:06-06:00 home-cloud systemd[1]: Started Home Cloud Daemon.
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF starting function=Listen service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF starting mDNS publishing function=Start service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF running server on: localhost:9000 function=runMux service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF listening for messages from server function=listen service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF running migrations function=Migrate service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF migrations completed function=Migrate service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF found outbound IP address address=192.168.1.183 function=Start service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=hello.local function=register service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=memos.local function=register service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=movies.local function=register service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=recipes.local function=register service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=search.local function=register service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=homeassistant.local function=register service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=photos.local function=register service=home-cloud-daemon
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'search.local'
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'hello.local'
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'recipes.local'
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'homeassistant.local'
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'memos.local'
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'photos.local'
-2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'movies.local'
+2025-02-06T14:15:21.735028-06:00 home-cloud daemon[403489]: 2:15PM INF shutting down function=shutdown service=home-cloud-daemon
+2025-02-06T14:15:21.735028-06:00 home-cloud daemon[403489]: 2:15PM INF shutdown successfully function=shutdown service=home-cloud-daemon
+2025-02-06T14:15:21.736642-06:00 home-cloud systemd[1]: Stopping Home Cloud Daemon...
+2025-02-06T14:15:21.738464-06:00 home-cloud systemd[1]: daemon.service: Deactivated successfully.
+2025-02-06T14:15:21.745153-06:00 home-cloud systemd[1]: Stopped Home Cloud Daemon.
+2025-02-06T14:15:21.745432-06:00 home-cloud systemd[1]: daemon.service: Consumed 178ms CPU time, 9.8M memory peak, 8K read from disk, 6.2K incoming IP traffic, 19.1K outgoing IP traffic.
+2025-02-06T14:15:22.610482-06:00 home-cloud systemd[1]: Started Home Cloud Daemon.
+2025-02-06T14:15:22.645668-06:00 home-cloud daemon[403678]: 2:15PM INF running server on: localhost:9000 function=runMux service=home-cloud-daemon
+2025-02-06T14:15:22.645668-06:00 home-cloud daemon[403678]: 2:15PM INF starting mDNS publishing function=Start service=home-cloud-daemon
+2025-02-06T14:15:22.652157-06:00 home-cloud daemon[403678]: 2:15PM INF starting function=Listen service=home-cloud-daemon
+2025-02-06T14:15:22.652157-06:00 home-cloud daemon[403678]: 2:15PM INF running migrations function=Migrate service=home-cloud-daemon
+2025-02-06T14:15:22.652157-06:00 home-cloud daemon[403678]: 2:15PM INF listening for messages from server function=listen service=home-cloud-daemon
+2025-02-06T14:15:22.652157-06:00 home-cloud daemon[403678]: 2:15PM INF migrations completed function=Migrate service=home-cloud-daemon
+2025-02-06T14:15:22.656777-06:00 home-cloud daemon[403678]: 2:15PM INF found outbound IP address address=192.168.1.183 function=Start service=home-cloud-daemon
+2025-02-06T14:15:22.656777-06:00 home-cloud daemon[403678]: 2:15PM INF publishing hostname to mDNS fqdn=hello.local function=register service=home-cloud-daemon
+2025-02-06T14:15:22.656777-06:00 home-cloud daemon[403678]: 2:15PM INF publishing hostname to mDNS fqdn=memos.local function=register service=home-cloud-daemon
+2025-02-06T14:15:22.656777-06:00 home-cloud daemon[403678]: 2:15PM INF publishing hostname to mDNS fqdn=movies.local function=register service=home-cloud-daemon
+2025-02-06T14:15:22.656777-06:00 home-cloud daemon[403678]: 2:15PM INF publishing hostname to mDNS fqdn=recipes.local function=register service=home-cloud-daemon
+2025-02-06T14:15:22.656777-06:00 home-cloud daemon[403678]: 2:15PM INF publishing hostname to mDNS fqdn=search.local function=register service=home-cloud-daemon
+2025-02-06T14:15:22.656777-06:00 home-cloud daemon[403678]: 2:15PM INF publishing hostname to mDNS fqdn=homeassistant.local function=register service=home-cloud-daemon
+2025-02-06T14:15:22.656777-06:00 home-cloud daemon[403678]: 2:15PM INF publishing hostname to mDNS fqdn=photos.local function=register service=home-cloud-daemon
+2025-02-06T14:15:23.680434-06:00 home-cloud daemon[403678]: Established under name 'photos.local'
+2025-02-06T14:15:23.681921-06:00 home-cloud daemon[403678]: Established under name 'hello.local'
+2025-02-06T14:15:23.683508-06:00 home-cloud daemon[403678]: Established under name 'recipes.local'
+2025-02-06T14:15:23.685116-06:00 home-cloud daemon[403678]: Established under name 'memos.local'
+2025-02-06T14:15:23.686497-06:00 home-cloud daemon[403678]: Established under name 'homeassistant.local'
+2025-02-06T14:15:23.687791-06:00 home-cloud daemon[403678]: Established under name 'movies.local'
+2025-02-06T14:15:23.689101-06:00 home-cloud daemon[403678]: Established under name 'search.local'
 `
 )
 
@@ -154,7 +154,7 @@ func DaemonLogs(ctx context.Context, logger chassis.Logger, sinceSeconds uint32)
 		if len(s) != 2 {
 			continue
 		}
-		t, err := time.Parse(time.RFC3339, s[0])
+		t, err := time.Parse(time.RFC3339Nano, s[0])
 		if err != nil {
 			continue
 		}
@@ -182,7 +182,7 @@ func journalLogs(ctx context.Context, logger chassis.Logger, unit string, sinceS
 	}
 
 	logger.Debug("getting journal logs")
-	cmd = exec.Command("journalctl", "-u", unit, "--since", fmt.Sprintf("%dsec ago", sinceSeconds), "-o", "short-iso")
+	cmd = exec.Command("journalctl", "-u", unit, "--since", fmt.Sprintf("%dsec ago", sinceSeconds), "-o", "short-iso-precise")
 	output, err := execute.ExecuteCommandReturnStdout(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to get journal logs")
