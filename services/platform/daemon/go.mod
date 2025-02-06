@@ -2,7 +2,7 @@ module github.com/home-cloud-io/core/services/platform/daemon
 
 go 1.22.7
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
 // replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 
@@ -10,7 +10,7 @@ require (
 	connectrpc.com/connect v1.16.2
 	github.com/golang/protobuf v1.5.4
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.8.2
+	github.com/home-cloud-io/core/api v0.8.4
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/pion/stun/v2 v2.0.0
 	github.com/steady-bytes/draft/pkg/chassis v0.4.2
