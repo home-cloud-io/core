@@ -6082,6 +6082,246 @@ var _ interface {
 	ErrorName() string
 } = GetComponentVersionsResponseValidationError{}
 
+// Validate checks the field values on GetSystemLogsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetSystemLogsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetSystemLogsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetSystemLogsRequestMultiError, or nil if none found.
+func (m *GetSystemLogsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetSystemLogsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for SinceSeconds
+
+	if len(errors) > 0 {
+		return GetSystemLogsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetSystemLogsRequestMultiError is an error wrapping multiple validation
+// errors returned by GetSystemLogsRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetSystemLogsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetSystemLogsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetSystemLogsRequestMultiError) AllErrors() []error { return m }
+
+// GetSystemLogsRequestValidationError is the validation error returned by
+// GetSystemLogsRequest.Validate if the designated constraints aren't met.
+type GetSystemLogsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetSystemLogsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetSystemLogsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetSystemLogsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetSystemLogsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetSystemLogsRequestValidationError) ErrorName() string {
+	return "GetSystemLogsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetSystemLogsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetSystemLogsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetSystemLogsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetSystemLogsRequestValidationError{}
+
+// Validate checks the field values on GetSystemLogsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetSystemLogsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetSystemLogsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetSystemLogsResponseMultiError, or nil if none found.
+func (m *GetSystemLogsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetSystemLogsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetLogs() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetSystemLogsResponseValidationError{
+						field:  fmt.Sprintf("Logs[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetSystemLogsResponseValidationError{
+						field:  fmt.Sprintf("Logs[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetSystemLogsResponseValidationError{
+					field:  fmt.Sprintf("Logs[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetSystemLogsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetSystemLogsResponseMultiError is an error wrapping multiple validation
+// errors returned by GetSystemLogsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetSystemLogsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetSystemLogsResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetSystemLogsResponseMultiError) AllErrors() []error { return m }
+
+// GetSystemLogsResponseValidationError is the validation error returned by
+// GetSystemLogsResponse.Validate if the designated constraints aren't met.
+type GetSystemLogsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetSystemLogsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetSystemLogsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetSystemLogsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetSystemLogsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetSystemLogsResponseValidationError) ErrorName() string {
+	return "GetSystemLogsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetSystemLogsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetSystemLogsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetSystemLogsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetSystemLogsResponseValidationError{}
+
 // Validate checks the field values on Apps with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
 // encountered is returned, or nil if there are no violations.

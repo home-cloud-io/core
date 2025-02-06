@@ -6,6 +6,7 @@ option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
 
 import "platform/daemon/v1/system.proto";
 import "platform/daemon/v1/wireguard.proto";
+import "validate/validate.proto";
 
 service DaemonStreamService {
   rpc Communicate(stream DaemonMessage) returns (stream ServerMessage) {}
@@ -31,6 +32,7 @@ message DaemonMessage {
     LocatorServerRemoved locator_server_removed = 15;
     AllLocatorsDisabled all_locators_disabled = 16;
     ComponentVersions component_versions = 17;
+    Logs logs = 18;
   }
 }
 
@@ -62,6 +64,7 @@ message ServerMessage {
     RemoveLocatorServerCommand remove_locator_server_command = 21;
     DisableAllLocatorsCommand disable_all_locators_command = 22;
     RequestComponentVersionsCommand request_component_versions_command = 23;
+    RequestLogsCommand request_logs_command = 24;
   }
 }
 
@@ -148,6 +151,11 @@ message AllLocatorsDisabled {
 
 message ComponentVersions {
   repeated platform.daemon.v1.ComponentVersion components = 1;
+}
+
+message Logs {
+  string request_id = 1 [(validate.rules).string.uuid = true];
+  repeated platform.daemon.v1.Log logs = 2;
 }
 
 // Server -> Daemon
@@ -268,3 +276,9 @@ message RemoveLocatorServerCommand {
 message DisableAllLocatorsCommand {}
 
 message RequestComponentVersionsCommand {}
+
+message RequestLogsCommand {
+  string request_id = 1 [(validate.rules).string.uuid = true];
+  // A relative time in seconds before the current time from which to show logs.
+  uint32 since_seconds = 2;
+}

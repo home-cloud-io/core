@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { proto3 } from "@bufbuild/protobuf";
-import { ComponentVersion, SystemStats } from "../../daemon/v1/system_pb.js";
+import { ComponentVersion, Log, SystemStats } from "../../daemon/v1/system_pb.js";
 import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
@@ -535,6 +535,29 @@ export const GetComponentVersionsResponse = /*@__PURE__*/ proto3.makeMessageType
   () => [
     { no: 1, name: "platform", kind: "message", T: ComponentVersion, repeated: true },
     { no: 2, name: "system", kind: "message", T: ComponentVersion, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GetSystemLogsRequest
+ */
+export const GetSystemLogsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.GetSystemLogsRequest",
+  () => [
+    { no: 1, name: "since_seconds", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GetSystemLogsResponse
+ */
+export const GetSystemLogsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.GetSystemLogsResponse",
+  () => [
+    { no: 1, name: "logs", kind: "message", T: Log, repeated: true },
+    { no: 2, name: "sources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "namespaces", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "domains", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ],
 );
 

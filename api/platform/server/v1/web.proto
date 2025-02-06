@@ -5,6 +5,7 @@ package platform.server.v1;
 option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 
 import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 import "platform/daemon/v1/system.proto";
 import "platform/daemon/v1/wireguard.proto";
 
@@ -59,6 +60,8 @@ service WebService {
   rpc RegisterPeer(RegisterPeerRequest) returns (RegisterPeerResponse) {}
   // GetComponentVersions returns the versions of all system components (daemon, server, etc.)
   rpc GetComponentVersions(GetComponentVersionsRequest) returns (GetComponentVersionsResponse) {}
+  // GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
+  rpc GetSystemLogs(GetSystemLogsRequest) returns (GetSystemLogsResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
@@ -258,6 +261,18 @@ message GetComponentVersionsRequest {
 message GetComponentVersionsResponse {
   repeated platform.daemon.v1.ComponentVersion platform = 1;
   repeated platform.daemon.v1.ComponentVersion system = 2;
+}
+
+message GetSystemLogsRequest {
+  // A relative time in seconds before the current time from which to show logs.
+  uint32 since_seconds = 1;
+}
+
+message GetSystemLogsResponse {
+  repeated platform.daemon.v1.Log logs = 1;
+  repeated string sources = 2;
+  repeated string namespaces = 3;
+  repeated string domains = 4;
 }
 
 //////////////////////////////////////////////////////////////////////////

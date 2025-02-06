@@ -101,6 +101,9 @@ const (
 	// WebServiceGetComponentVersionsProcedure is the fully-qualified name of the WebService's
 	// GetComponentVersions RPC.
 	WebServiceGetComponentVersionsProcedure = "/platform.server.v1.WebService/GetComponentVersions"
+	// WebServiceGetSystemLogsProcedure is the fully-qualified name of the WebService's GetSystemLogs
+	// RPC.
+	WebServiceGetSystemLogsProcedure = "/platform.server.v1.WebService/GetSystemLogs"
 	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
 	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
 )
@@ -133,6 +136,7 @@ var (
 	webServiceDeregisterFromLocatorMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("DeregisterFromLocator")
 	webServiceRegisterPeerMethodDescriptor             = webServiceServiceDescriptor.Methods().ByName("RegisterPeer")
 	webServiceGetComponentVersionsMethodDescriptor     = webServiceServiceDescriptor.Methods().ByName("GetComponentVersions")
+	webServiceGetSystemLogsMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("GetSystemLogs")
 	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
 )
 
@@ -188,6 +192,8 @@ type WebServiceClient interface {
 	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
 	// GetComponentVersions returns the versions of all system components (daemon, server, etc.)
 	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
+	// GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
+	GetSystemLogs(context.Context, *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
 }
@@ -352,6 +358,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceGetComponentVersionsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getSystemLogs: connect.NewClient[v1.GetSystemLogsRequest, v1.GetSystemLogsResponse](
+			httpClient,
+			baseURL+WebServiceGetSystemLogsProcedure,
+			connect.WithSchema(webServiceGetSystemLogsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		subscribe: connect.NewClient[v1.SubscribeRequest, v1.ServerEvent](
 			httpClient,
 			baseURL+WebServiceSubscribeProcedure,
@@ -388,6 +400,7 @@ type webServiceClient struct {
 	deregisterFromLocator    *connect.Client[v1.DeregisterFromLocatorRequest, v1.DeregisterFromLocatorResponse]
 	registerPeer             *connect.Client[v1.RegisterPeerRequest, v1.RegisterPeerResponse]
 	getComponentVersions     *connect.Client[v1.GetComponentVersionsRequest, v1.GetComponentVersionsResponse]
+	getSystemLogs            *connect.Client[v1.GetSystemLogsRequest, v1.GetSystemLogsResponse]
 	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
 }
 
@@ -516,6 +529,11 @@ func (c *webServiceClient) GetComponentVersions(ctx context.Context, req *connec
 	return c.getComponentVersions.CallUnary(ctx, req)
 }
 
+// GetSystemLogs calls platform.server.v1.WebService.GetSystemLogs.
+func (c *webServiceClient) GetSystemLogs(ctx context.Context, req *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error) {
+	return c.getSystemLogs.CallUnary(ctx, req)
+}
+
 // Subscribe calls platform.server.v1.WebService.Subscribe.
 func (c *webServiceClient) Subscribe(ctx context.Context, req *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error) {
 	return c.subscribe.CallServerStream(ctx, req)
@@ -573,6 +591,8 @@ type WebServiceHandler interface {
 	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
 	// GetComponentVersions returns the versions of all system components (daemon, server, etc.)
 	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
+	// GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
+	GetSystemLogs(context.Context, *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
 }
@@ -733,6 +753,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceGetComponentVersionsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceGetSystemLogsHandler := connect.NewUnaryHandler(
+		WebServiceGetSystemLogsProcedure,
+		svc.GetSystemLogs,
+		connect.WithSchema(webServiceGetSystemLogsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	webServiceSubscribeHandler := connect.NewServerStreamHandler(
 		WebServiceSubscribeProcedure,
 		svc.Subscribe,
@@ -791,6 +817,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceRegisterPeerHandler.ServeHTTP(w, r)
 		case WebServiceGetComponentVersionsProcedure:
 			webServiceGetComponentVersionsHandler.ServeHTTP(w, r)
+		case WebServiceGetSystemLogsProcedure:
+			webServiceGetSystemLogsHandler.ServeHTTP(w, r)
 		case WebServiceSubscribeProcedure:
 			webServiceSubscribeHandler.ServeHTTP(w, r)
 		default:
@@ -900,6 +928,10 @@ func (UnimplementedWebServiceHandler) RegisterPeer(context.Context, *connect.Req
 
 func (UnimplementedWebServiceHandler) GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetComponentVersions is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) GetSystemLogs(context.Context, *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetSystemLogs is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {
