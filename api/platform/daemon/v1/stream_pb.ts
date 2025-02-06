@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { ComponentVersion, SystemStats } from "./system_pb.js";
+import { ComponentVersion, Log, SystemStats } from "./system_pb.js";
 import { Locator, WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
 
 /**
@@ -119,6 +119,12 @@ export class DaemonMessage extends Message<DaemonMessage> {
      */
     value: ComponentVersions;
     case: "componentVersions";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.Logs logs = 18;
+     */
+    value: Logs;
+    case: "logs";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<DaemonMessage>) {
@@ -146,6 +152,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 15, name: "locator_server_removed", kind: "message", T: LocatorServerRemoved, oneof: "message" },
     { no: 16, name: "all_locators_disabled", kind: "message", T: AllLocatorsDisabled, oneof: "message" },
     { no: 17, name: "component_versions", kind: "message", T: ComponentVersions, oneof: "message" },
+    { no: 18, name: "logs", kind: "message", T: Logs, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -316,6 +323,12 @@ export class ServerMessage extends Message<ServerMessage> {
      */
     value: RequestComponentVersionsCommand;
     case: "requestComponentVersionsCommand";
+  } | {
+    /**
+     * @generated from field: platform.daemon.v1.RequestLogsCommand request_logs_command = 24;
+     */
+    value: RequestLogsCommand;
+    case: "requestLogsCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<ServerMessage>) {
@@ -349,6 +362,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 21, name: "remove_locator_server_command", kind: "message", T: RemoveLocatorServerCommand, oneof: "message" },
     { no: 22, name: "disable_all_locators_command", kind: "message", T: DisableAllLocatorsCommand, oneof: "message" },
     { no: 23, name: "request_component_versions_command", kind: "message", T: RequestComponentVersionsCommand, oneof: "message" },
+    { no: 24, name: "request_logs_command", kind: "message", T: RequestLogsCommand, oneof: "message" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -1036,6 +1050,49 @@ export class ComponentVersions extends Message<ComponentVersions> {
 
   static equals(a: ComponentVersions | PlainMessage<ComponentVersions> | undefined, b: ComponentVersions | PlainMessage<ComponentVersions> | undefined): boolean {
     return proto3.util.equals(ComponentVersions, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.Logs
+ */
+export class Logs extends Message<Logs> {
+  /**
+   * @generated from field: string request_id = 1;
+   */
+  requestId = "";
+
+  /**
+   * @generated from field: repeated platform.daemon.v1.Log logs = 2;
+   */
+  logs: Log[] = [];
+
+  constructor(data?: PartialMessage<Logs>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.Logs";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "request_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "logs", kind: "message", T: Log, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Logs {
+    return new Logs().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Logs {
+    return new Logs().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Logs {
+    return new Logs().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Logs | PlainMessage<Logs> | undefined, b: Logs | PlainMessage<Logs> | undefined): boolean {
+    return proto3.util.equals(Logs, a, b);
   }
 }
 
@@ -2045,6 +2102,51 @@ export class RequestComponentVersionsCommand extends Message<RequestComponentVer
 
   static equals(a: RequestComponentVersionsCommand | PlainMessage<RequestComponentVersionsCommand> | undefined, b: RequestComponentVersionsCommand | PlainMessage<RequestComponentVersionsCommand> | undefined): boolean {
     return proto3.util.equals(RequestComponentVersionsCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.RequestLogsCommand
+ */
+export class RequestLogsCommand extends Message<RequestLogsCommand> {
+  /**
+   * @generated from field: string request_id = 1;
+   */
+  requestId = "";
+
+  /**
+   * A relative time in seconds before the current time from which to show logs.
+   *
+   * @generated from field: uint32 since_seconds = 2;
+   */
+  sinceSeconds = 0;
+
+  constructor(data?: PartialMessage<RequestLogsCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.RequestLogsCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "request_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "since_seconds", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RequestLogsCommand {
+    return new RequestLogsCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RequestLogsCommand {
+    return new RequestLogsCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RequestLogsCommand {
+    return new RequestLogsCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RequestLogsCommand | PlainMessage<RequestLogsCommand> | undefined, b: RequestLogsCommand | PlainMessage<RequestLogsCommand> | undefined): boolean {
+    return proto3.util.equals(RequestLogsCommand, a, b);
   }
 }
 

@@ -69,3 +69,17 @@ export const ComponentVersion = /*@__PURE__*/ proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.daemon.v1.Log
+ */
+export const Log = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.Log",
+  () => [
+    { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "namespace", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "timestamp", kind: "message", T: Timestamp },
+  ],
+);
+

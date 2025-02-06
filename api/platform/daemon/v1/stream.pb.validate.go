@@ -35,6 +35,9 @@ var (
 	_ = sort.Sort
 )
 
+// define the regex for a UUID once up-front
+var _stream_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
 // Validate checks the field values on DaemonMessage with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -749,6 +752,47 @@ func (m *DaemonMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return DaemonMessageValidationError{
 					field:  "ComponentVersions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *DaemonMessage_Logs:
+		if v == nil {
+			err := DaemonMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetLogs()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "Logs",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DaemonMessageValidationError{
+						field:  "Logs",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLogs()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DaemonMessageValidationError{
+					field:  "Logs",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -1797,6 +1841,47 @@ func (m *ServerMessage) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ServerMessageValidationError{
 					field:  "RequestComponentVersionsCommand",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ServerMessage_RequestLogsCommand:
+		if v == nil {
+			err := ServerMessageValidationError{
+				field:  "Message",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRequestLogsCommand()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RequestLogsCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerMessageValidationError{
+						field:  "RequestLogsCommand",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRequestLogsCommand()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerMessageValidationError{
+					field:  "RequestLogsCommand",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -4001,6 +4086,158 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ComponentVersionsValidationError{}
+
+// Validate checks the field values on Logs with the rules defined in the proto
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
+func (m *Logs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Logs with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in LogsMultiError, or nil if none found.
+func (m *Logs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Logs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if err := m._validateUuid(m.GetRequestId()); err != nil {
+		err = LogsValidationError{
+			field:  "RequestId",
+			reason: "value must be a valid UUID",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	for idx, item := range m.GetLogs() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LogsValidationError{
+						field:  fmt.Sprintf("Logs[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LogsValidationError{
+						field:  fmt.Sprintf("Logs[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LogsValidationError{
+					field:  fmt.Sprintf("Logs[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return LogsMultiError(errors)
+	}
+
+	return nil
+}
+
+func (m *Logs) _validateUuid(uuid string) error {
+	if matched := _stream_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// LogsMultiError is an error wrapping multiple validation errors returned by
+// Logs.ValidateAll() if the designated constraints aren't met.
+type LogsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LogsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LogsMultiError) AllErrors() []error { return m }
+
+// LogsValidationError is the validation error returned by Logs.Validate if the
+// designated constraints aren't met.
+type LogsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LogsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LogsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LogsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LogsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LogsValidationError) ErrorName() string { return "LogsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LogsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLogs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LogsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LogsValidationError{}
 
 // Validate checks the field values on ShutdownCommand with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -6832,3 +7069,127 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RequestComponentVersionsCommandValidationError{}
+
+// Validate checks the field values on RequestLogsCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RequestLogsCommand) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RequestLogsCommand with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RequestLogsCommandMultiError, or nil if none found.
+func (m *RequestLogsCommand) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RequestLogsCommand) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if err := m._validateUuid(m.GetRequestId()); err != nil {
+		err = RequestLogsCommandValidationError{
+			field:  "RequestId",
+			reason: "value must be a valid UUID",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for SinceSeconds
+
+	if len(errors) > 0 {
+		return RequestLogsCommandMultiError(errors)
+	}
+
+	return nil
+}
+
+func (m *RequestLogsCommand) _validateUuid(uuid string) error {
+	if matched := _stream_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// RequestLogsCommandMultiError is an error wrapping multiple validation errors
+// returned by RequestLogsCommand.ValidateAll() if the designated constraints
+// aren't met.
+type RequestLogsCommandMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RequestLogsCommandMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RequestLogsCommandMultiError) AllErrors() []error { return m }
+
+// RequestLogsCommandValidationError is the validation error returned by
+// RequestLogsCommand.Validate if the designated constraints aren't met.
+type RequestLogsCommandValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RequestLogsCommandValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RequestLogsCommandValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RequestLogsCommandValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RequestLogsCommandValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RequestLogsCommandValidationError) ErrorName() string {
+	return "RequestLogsCommandValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RequestLogsCommandValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRequestLogsCommand.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RequestLogsCommandValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RequestLogsCommandValidationError{}

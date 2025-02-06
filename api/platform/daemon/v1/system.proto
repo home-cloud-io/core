@@ -39,3 +39,11 @@ message ComponentVersion {
   string domain = 2;
   string version = 3;
 }
+
+message Log {
+  string source = 1;
+  string namespace = 2;
+  string domain = 3;
+  string log = 4;
+  google.protobuf.Timestamp timestamp = 5;
+}

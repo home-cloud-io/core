@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { ComponentVersion, SystemStats } from "../../daemon/v1/system_pb.js";
+import { ComponentVersion, Log, SystemStats } from "../../daemon/v1/system_pb.js";
 import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
@@ -2061,6 +2061,100 @@ export class GetComponentVersionsResponse extends Message<GetComponentVersionsRe
 
   static equals(a: GetComponentVersionsResponse | PlainMessage<GetComponentVersionsResponse> | undefined, b: GetComponentVersionsResponse | PlainMessage<GetComponentVersionsResponse> | undefined): boolean {
     return proto3.util.equals(GetComponentVersionsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetSystemLogsRequest
+ */
+export class GetSystemLogsRequest extends Message<GetSystemLogsRequest> {
+  /**
+   * A relative time in seconds before the current time from which to show logs.
+   *
+   * @generated from field: uint32 since_seconds = 1;
+   */
+  sinceSeconds = 0;
+
+  constructor(data?: PartialMessage<GetSystemLogsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetSystemLogsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "since_seconds", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSystemLogsRequest {
+    return new GetSystemLogsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSystemLogsRequest {
+    return new GetSystemLogsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSystemLogsRequest {
+    return new GetSystemLogsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSystemLogsRequest | PlainMessage<GetSystemLogsRequest> | undefined, b: GetSystemLogsRequest | PlainMessage<GetSystemLogsRequest> | undefined): boolean {
+    return proto3.util.equals(GetSystemLogsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GetSystemLogsResponse
+ */
+export class GetSystemLogsResponse extends Message<GetSystemLogsResponse> {
+  /**
+   * @generated from field: repeated platform.daemon.v1.Log logs = 1;
+   */
+  logs: Log[] = [];
+
+  /**
+   * @generated from field: repeated string sources = 2;
+   */
+  sources: string[] = [];
+
+  /**
+   * @generated from field: repeated string namespaces = 3;
+   */
+  namespaces: string[] = [];
+
+  /**
+   * @generated from field: repeated string domains = 4;
+   */
+  domains: string[] = [];
+
+  constructor(data?: PartialMessage<GetSystemLogsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GetSystemLogsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "logs", kind: "message", T: Log, repeated: true },
+    { no: 2, name: "sources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "namespaces", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "domains", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSystemLogsResponse {
+    return new GetSystemLogsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSystemLogsResponse {
+    return new GetSystemLogsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSystemLogsResponse {
+    return new GetSystemLogsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSystemLogsResponse | PlainMessage<GetSystemLogsResponse> | undefined, b: GetSystemLogsResponse | PlainMessage<GetSystemLogsResponse> | undefined): boolean {
+    return proto3.util.equals(GetSystemLogsResponse, a, b);
   }
 }
 
