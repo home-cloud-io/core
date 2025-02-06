@@ -45,6 +45,9 @@ export function Logs() {
     getSystemLogs,
     {
       sinceSeconds: 300,
+    },
+    {
+        refetchInterval: 5 * 1000,
     }
   );
   const [logs, setLogs] = useState<LogType[]>([]);
