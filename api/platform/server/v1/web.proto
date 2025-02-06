@@ -5,7 +5,6 @@ package platform.server.v1;
 option go_package = "github.com/home-cloud-io/core/api/platform/server/v1";
 
 import "validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 import "platform/daemon/v1/system.proto";
 import "platform/daemon/v1/wireguard.proto";
 
