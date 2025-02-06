@@ -3,8 +3,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { proto3, Timestamp } from "@bufbuild/protobuf";
-import { ComponentVersion, SystemStats } from "../../daemon/v1/system_pb.js";
+import { proto3 } from "@bufbuild/protobuf";
+import { ComponentVersion, Log, SystemStats } from "../../daemon/v1/system_pb.js";
 import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
@@ -798,20 +798,6 @@ export const ClientRegistrationDetails = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.Log
- */
-export const Log = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.Log",
-  () => [
-    { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "namespace", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "timestamp", kind: "message", T: Timestamp },
   ],
 );
 

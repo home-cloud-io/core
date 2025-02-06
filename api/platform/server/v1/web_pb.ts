@@ -4,8 +4,8 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { ComponentVersion, SystemStats } from "../../daemon/v1/system_pb.js";
+import { Message, proto3 } from "@bufbuild/protobuf";
+import { ComponentVersion, Log, SystemStats } from "../../daemon/v1/system_pb.js";
 import { Locator } from "../../daemon/v1/wireguard_pb.js";
 
 /**
@@ -2108,7 +2108,7 @@ export class GetSystemLogsRequest extends Message<GetSystemLogsRequest> {
  */
 export class GetSystemLogsResponse extends Message<GetSystemLogsResponse> {
   /**
-   * @generated from field: repeated platform.server.v1.Log logs = 1;
+   * @generated from field: repeated platform.daemon.v1.Log logs = 1;
    */
   logs: Log[] = [];
 
@@ -3123,67 +3123,6 @@ export class ClientRegistrationDetails extends Message<ClientRegistrationDetails
 
   static equals(a: ClientRegistrationDetails | PlainMessage<ClientRegistrationDetails> | undefined, b: ClientRegistrationDetails | PlainMessage<ClientRegistrationDetails> | undefined): boolean {
     return proto3.util.equals(ClientRegistrationDetails, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.Log
- */
-export class Log extends Message<Log> {
-  /**
-   * @generated from field: string source = 1;
-   */
-  source = "";
-
-  /**
-   * @generated from field: string namespace = 2;
-   */
-  namespace = "";
-
-  /**
-   * @generated from field: string domain = 3;
-   */
-  domain = "";
-
-  /**
-   * @generated from field: string log = 4;
-   */
-  log = "";
-
-  /**
-   * @generated from field: google.protobuf.Timestamp timestamp = 5;
-   */
-  timestamp?: Timestamp;
-
-  constructor(data?: PartialMessage<Log>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.Log";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "namespace", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "log", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "timestamp", kind: "message", T: Timestamp },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Log {
-    return new Log().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Log {
-    return new Log().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Log {
-    return new Log().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Log | PlainMessage<Log> | undefined, b: Log | PlainMessage<Log> | undefined): boolean {
-    return proto3.util.equals(Log, a, b);
   }
 }
 

@@ -269,7 +269,7 @@ message GetSystemLogsRequest {
 }
 
 message GetSystemLogsResponse {
-  repeated Log logs = 1;
+  repeated platform.daemon.v1.Log logs = 1;
   repeated string sources = 2;
   repeated string namespaces = 3;
   repeated string domains = 4;
@@ -408,14 +408,4 @@ message PeerConfiguration {
 message ClientRegistrationDetails {
   string server_address = 1;
   string locator_address = 2;
-}
-
-// Logs
-
-message Log {
-  string source = 1;
-  string namespace = 2;
-  string domain = 3;
-  string log = 4;
-  google.protobuf.Timestamp timestamp = 5;
 }
