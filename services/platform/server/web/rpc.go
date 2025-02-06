@@ -431,6 +431,14 @@ func (h *rpcHandler) GetSystemLogs(ctx context.Context, request *connect.Request
 		return nil, errors.New(apps.ErrFailedToGetLogs)
 	}
 
+	deviceLogs, err := h.sctl.GetDeviceLogs(ctx, h.logger, int64(request.Msg.SinceSeconds))
+	if err != nil {
+		h.logger.WithError(err).Error(apps.ErrFailedToGetLogs)
+		return nil, errors.New(apps.ErrFailedToGetLogs)
+	}
+
+	logs = append(logs, deviceLogs...)
+
 	domainsMap := make(map[string]struct{})
 	namespacesMap := make(map[string]struct{})
 	sourcesMap := make(map[string]struct{})

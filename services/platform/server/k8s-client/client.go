@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 
@@ -54,7 +54,7 @@ type (
 		GetServerVersion(ctx context.Context) (version string, err error)
 
 		// GetLogs...
-		GetLogs(ctx context.Context, logger chassis.Logger, namespace string, sinceSeconds int64) ([]*v1.Log, error)
+		GetLogs(ctx context.Context, logger chassis.Logger, namespace string, sinceSeconds int64) ([]*dv1.Log, error)
 	}
 
 	client struct {
@@ -352,9 +352,9 @@ func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, 
 	return nil
 }
 
-func (c *client) GetLogs(ctx context.Context, logger chassis.Logger, namespace string, sinceSeconds int64) ([]*v1.Log, error) {
+func (c *client) GetLogs(ctx context.Context, logger chassis.Logger, namespace string, sinceSeconds int64) ([]*dv1.Log, error) {
 	var (
-		logs = []*v1.Log{}
+		logs = []*dv1.Log{}
 	)
 
 	pods := &corev1.PodList{}
@@ -373,9 +373,9 @@ func (c *client) GetLogs(ctx context.Context, logger chassis.Logger, namespace s
 	return logs, nil
 }
 
-func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64, pod corev1.Pod) []*v1.Log {
+func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64, pod corev1.Pod) []*dv1.Log {
 	var (
-		logs = []*v1.Log{}
+		logs = []*dv1.Log{}
 	)
 
 	logger = logger.WithFields(chassis.Fields{
@@ -417,7 +417,7 @@ func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSec
 				continue
 			}
 
-			logs = append(logs, &v1.Log{
+			logs = append(logs, &dv1.Log{
 				Source:    app,
 				Namespace: pod.Namespace,
 				Domain:    domain,

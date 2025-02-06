@@ -32,7 +32,7 @@ type (
 		Timeout time.Duration
 		// Callback is the function that will be called when an event matching the given type is broadcast.
 		// The Broadcaster will continue sending events to this Listener until either the Callback function
-		// returns don=true or returns a non-nil error.
+		// returns done=true or returns a non-nil error.
 		Callback func(event T) (done bool, err error)
 		// Buffer specifies the buffer capacity of the listener. This is the limit of pending messages the
 		// Broadcaster will queue before dropping messages. Your Listener is reponsible for keeping up with

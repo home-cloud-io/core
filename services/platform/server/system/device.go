@@ -13,6 +13,8 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	"github.com/home-cloud-io/core/services/platform/server/async"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
+
+	"github.com/google/uuid"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
@@ -36,6 +38,8 @@ type (
 		Login(ctx context.Context, username, password string) (string, error)
 		// GetComponentVersions returns all the versions of system components (server, daemon, etc.)
 		GetComponentVersions(ctx context.Context, logger chassis.Logger) (*v1.GetComponentVersionsResponse, error)
+		// GetDeviceLogs returns the logs from the daemon for the given seconds in the past
+		GetDeviceLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error)
 	}
 )
 
@@ -261,6 +265,47 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 
 	return buildComponentVersionsResponse(logger, versions), nil
 }
+
+func (c *controller) GetDeviceLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error) {
+
+	var (
+		logs      = []*dv1.Log{}
+		requestId = uuid.New().String()
+	)
+
+	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.Logs]{
+		Callback: func(event *dv1.Logs) (bool, error) {
+			if event.RequestId == requestId {
+				logs = event.Logs
+				return true, nil
+			}
+			return false, nil
+		},
+		Timeout: 30 * time.Second,
+	})
+	err := com.Send(&dv1.ServerMessage{
+		Message: &dv1.ServerMessage_RequestLogsCommand{
+			RequestLogsCommand: &dv1.RequestLogsCommand{
+				RequestId:    requestId,
+				SinceSeconds: uint32(sinceSeconds),
+			},
+		},
+	})
+	if err != nil {
+		logger.WithError(err).Error("failed to send logs request to daemon")
+		return logs, err
+	} else {
+		err = listener.Listen(ctx)
+		if err != nil {
+			logger.WithError(err).Error("failed to receive logs from daemon")
+			return logs, err
+		}
+	}
+
+	return logs, nil
+}
+
+// HELPERS
 
 func componentFromImage(image string) string {
 	s := strings.Split(filepath.Base(image), "-")
