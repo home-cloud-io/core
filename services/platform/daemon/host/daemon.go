@@ -5,13 +5,17 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
+	"time"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	"github.com/home-cloud-io/core/services/platform/daemon/execute"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -19,6 +23,37 @@ const (
 	vendorHashPrefix = "  vendorHash = \""
 	srcHashPrefix    = "    hash = \""
 	nixLineSuffix    = "\";"
+
+	mockJournalLogs = `
+2025-02-06T13:25:06-06:00 home-cloud daemon[391882]: 1:25PM INF shutting down function=shutdown service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[391882]: 1:25PM INF shutdown successfully function=shutdown service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud systemd[1]: Stopping Home Cloud Daemon...
+2025-02-06T13:25:06-06:00 home-cloud systemd[1]: daemon.service: Deactivated successfully.
+2025-02-06T13:25:06-06:00 home-cloud systemd[1]: Stopped Home Cloud Daemon.
+2025-02-06T13:25:06-06:00 home-cloud systemd[1]: daemon.service: Consumed 5.327s CPU time, 12.8M memory peak, 212K read from disk, 262.6K incoming IP traffic, 875.1K outgoing IP traffic.
+2025-02-06T13:25:06-06:00 home-cloud systemd[1]: Started Home Cloud Daemon.
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF starting function=Listen service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF starting mDNS publishing function=Start service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF running server on: localhost:9000 function=runMux service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF listening for messages from server function=listen service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF running migrations function=Migrate service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF migrations completed function=Migrate service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF found outbound IP address address=192.168.1.183 function=Start service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=hello.local function=register service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=memos.local function=register service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=movies.local function=register service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=recipes.local function=register service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=search.local function=register service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=homeassistant.local function=register service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: 1:25PM INF publishing hostname to mDNS fqdn=photos.local function=register service=home-cloud-daemon
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'search.local'
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'hello.local'
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'recipes.local'
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'homeassistant.local'
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'memos.local'
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'photos.local'
+2025-02-06T13:25:06-06:00 home-cloud daemon[394291]: Established under name 'movies.local'
+`
 )
 
 var (
@@ -101,4 +136,59 @@ func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.Cha
 	}
 
 	return nil
+}
+
+func DaemonLogs(ctx context.Context, logger chassis.Logger, sinceSeconds uint32) ([]*v1.Log, error) {
+	var (
+		logs = []*v1.Log{}
+	)
+
+	raw, err := journalLogs(ctx, logger, "daemon", sinceSeconds)
+	if err != nil {
+		return logs, err
+	}
+
+	scanner := bufio.NewScanner(strings.NewReader(raw))
+	for scanner.Scan() {
+		s := strings.SplitN(scanner.Text(), " home-cloud ", 2)
+		if len(s) != 2 {
+			continue
+		}
+		t, err := time.Parse(time.RFC3339, s[0])
+		if err != nil {
+			continue
+		}
+		logs = append(logs, &v1.Log{
+			Source:    "daemon",
+			Namespace: "host",
+			Domain:    "platform",
+			Log:       s[1],
+			Timestamp: timestamppb.New(t),
+		})
+	}
+
+	return logs, nil
+}
+
+func journalLogs(ctx context.Context, logger chassis.Logger, unit string, sinceSeconds uint32) (string, error) {
+	var (
+		cmd *exec.Cmd
+	)
+
+	config := chassis.GetConfig()
+	if config.Env() == "test" {
+		logger.Info("mocking journal logs")
+		return mockJournalLogs, nil
+	}
+
+	logger.Debug("getting journal logs")
+	cmd = exec.Command("journalctl", "-u", unit, "--since", fmt.Sprintf("%dsec ago", sinceSeconds), "-o", "short-iso")
+	output, err := execute.ExecuteCommandReturnStdout(ctx, cmd)
+	if err != nil {
+		logger.WithError(err).Error("failed to get journal logs")
+		return "", err
+	}
+	logger.Debug("successfully got journal logs")
+
+	return output, nil
 }

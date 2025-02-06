@@ -422,6 +422,52 @@ func (h *rpcHandler) GetComponentVersions(ctx context.Context, request *connect.
 	return connect.NewResponse(response), nil
 }
 
+func (h *rpcHandler) GetSystemLogs(ctx context.Context, request *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error) {
+	h.logger.Info("getting system logs")
+
+	logs, err := h.sctl.GetContainerLogs(ctx, h.logger, int64(request.Msg.SinceSeconds))
+	if err != nil {
+		h.logger.WithError(err).Error(apps.ErrFailedToGetLogs)
+		return nil, errors.New(apps.ErrFailedToGetLogs)
+	}
+
+	deviceLogs, err := h.sctl.GetDeviceLogs(ctx, h.logger, int64(request.Msg.SinceSeconds))
+	if err != nil {
+		h.logger.WithError(err).Error(apps.ErrFailedToGetLogs)
+		return nil, errors.New(apps.ErrFailedToGetLogs)
+	}
+
+	logs = append(logs, deviceLogs...)
+
+	domainsMap := make(map[string]struct{})
+	namespacesMap := make(map[string]struct{})
+	sourcesMap := make(map[string]struct{})
+	domains := []string{}
+	namespaces := []string{}
+	sources := []string{}
+	for _, log := range logs {
+		if _, ok := domainsMap[log.Domain]; !ok {
+			domainsMap[log.Domain] = struct{}{}
+			domains = append(domains, log.Domain)
+		}
+		if _, ok := namespacesMap[log.Namespace]; !ok {
+			namespacesMap[log.Namespace] = struct{}{}
+			namespaces = append(namespaces, log.Namespace)
+		}
+		if _, ok := sourcesMap[log.Source]; !ok {
+			sourcesMap[log.Source] = struct{}{}
+			sources = append(sources, log.Source)
+		}
+	}
+
+	return connect.NewResponse(&v1.GetSystemLogsResponse{
+		Logs:    logs,
+		Domains: domains,
+		Namespaces: namespaces,
+		Sources: sources,
+	}), nil
+}
+
 func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {
 	h.logger.Info("establishing client stream")
 	id := events.AddStream(stream)

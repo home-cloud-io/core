@@ -26,6 +26,8 @@ type (
 		AutoUpdateContainers(logger chassis.Logger)
 		// UpdateContainers will check for and install any container updates one time.
 		UpdateContainers(ctx context.Context, logger chassis.Logger) error
+		// GetContainerLogs will return all logs for all containers in the cluster.
+		GetContainerLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error)
 	}
 )
 
@@ -142,4 +144,8 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 	}
 
 	return nil
+}
+
+func (c *controller) GetContainerLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error) {
+	return c.k8sclient.GetLogs(ctx, logger, sinceSeconds)
 }

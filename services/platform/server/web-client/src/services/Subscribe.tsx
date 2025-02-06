@@ -72,7 +72,7 @@ export function EventListener() {
           setEvent(event);
         }
       } catch (err) {
-        console.warn('stream failed');
+        console.warn(`event stream failed: ${err}`);
         setConnected(false);
         await new Promise((f) => setTimeout(f, 1000));
       }

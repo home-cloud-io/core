@@ -5,8 +5,6 @@ import {
   Divider,
   Progress,
   Card,
-  Row,
-  Col,
   Tag,
   Spin,
   Badge,
@@ -69,23 +67,19 @@ export function DeviceDetails() {
 
   return (
     <Card bordered={false}>
-      <Row justify="space-between">
-        <Col span={4}>
-          <strong>Status</strong>
-        </Col>
-        <Col span={4}>
-          {connected && (
-            <Tag icon={<CheckCircleOutlined />} color="success">
-              Online
-            </Tag>
-          )}
-          {!connected && (
-            <Tag icon={<CloseCircleOutlined />} color="error">
-              Offline
-            </Tag>
-          )}
-        </Col>
-      </Row>
+      <Flex justify="space-between">
+        <strong>Status</strong>
+        {connected && (
+          <Tag icon={<CheckCircleOutlined />} color="success">
+            Online
+          </Tag>
+        )}
+        {!connected && (
+          <Tag icon={<CloseCircleOutlined />} color="error">
+            Offline
+          </Tag>
+        )}
+      </Flex>
       <Divider />
       <Space direction="vertical" size="small" style={{ display: 'flex' }}>
         <strong>Storage</strong>
