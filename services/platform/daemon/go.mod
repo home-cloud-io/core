@@ -2,7 +2,7 @@ module github.com/home-cloud-io/core/services/platform/daemon
 
 go 1.22.7
 
-// replace github.com/home-cloud-io/core/api => ../../../api
+replace github.com/home-cloud-io/core/api => ../../../api
 
 // replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 

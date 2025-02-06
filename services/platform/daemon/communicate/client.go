@@ -195,6 +195,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.addWireguardPeer(ctx, message.GetAddWireguardPeer().GetPeer())
 		case *v1.ServerMessage_RequestComponentVersionsCommand:
 			go c.componentVersions(ctx, message.GetRequestComponentVersionsCommand())
+		case *v1.ServerMessage_RequestLogsCommand:
+			go c.logs(ctx, message.GetRequestLogsCommand())
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -461,14 +463,14 @@ func (c *client) componentVersions(ctx context.Context, _ *v1.RequestComponentVe
 	daemonVersion, err := host.GetDaemonVersion(c.logger)
 	if err != nil {
 		components = append(components, &v1.ComponentVersion{
-			Name: "daemon",
-			Domain: "system",
+			Name:    "daemon",
+			Domain:  "system",
 			Version: err.Error(),
 		})
 	} else {
 		components = append(components, &v1.ComponentVersion{
-			Name: "daemon",
-			Domain: "system",
+			Name:    "daemon",
+			Domain:  "system",
 			Version: daemonVersion.Version,
 		})
 	}
@@ -476,14 +478,14 @@ func (c *client) componentVersions(ctx context.Context, _ *v1.RequestComponentVe
 	nixosVersion, err := host.GetNixOSVersion(ctx, c.logger)
 	if err != nil {
 		components = append(components, &v1.ComponentVersion{
-			Name: "nixos",
-			Domain: "system",
+			Name:    "nixos",
+			Domain:  "system",
 			Version: err.Error(),
 		})
 	} else {
 		components = append(components, &v1.ComponentVersion{
-			Name: "nixos",
-			Domain: "system",
+			Name:    "nixos",
+			Domain:  "system",
 			Version: nixosVersion,
 		})
 	}
@@ -497,5 +499,27 @@ func (c *client) componentVersions(ctx context.Context, _ *v1.RequestComponentVe
 	})
 	if err != nil {
 		c.logger.WithError(err).Error("failed to send complete message to server")
+	}
+}
+
+func (c *client) logs(ctx context.Context, cmd *v1.RequestLogsCommand) {
+
+	logs, err := host.DaemonLogs(ctx, c.logger, cmd.SinceSeconds)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to get daemon logs")
+		// TODO: send error event to server
+		return
+	}
+
+	err = c.stream.Send(&v1.DaemonMessage{
+		Message: &v1.DaemonMessage_Logs{
+			Logs: &v1.Logs{
+				RequestId: cmd.RequestId,
+				Logs:      logs,
+			},
+		},
+	})
+	if err != nil {
+		c.logger.WithError(err).Error("failed to send logs message to server")
 	}
 }
