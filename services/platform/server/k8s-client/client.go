@@ -52,9 +52,8 @@ type (
 		CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error)
 		// GetServerVersion will retrieve the current k8s server version
 		GetServerVersion(ctx context.Context) (version string, err error)
-
-		// GetLogs...
-		GetLogs(ctx context.Context, logger chassis.Logger, namespace string, sinceSeconds int64) ([]*dv1.Log, error)
+		// GetLogs will retrieve the logs for all pods across the entire cluster
+		GetLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error)
 	}
 
 	client struct {
@@ -352,7 +351,7 @@ func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, 
 	return nil
 }
 
-func (c *client) GetLogs(ctx context.Context, logger chassis.Logger, namespace string, sinceSeconds int64) ([]*dv1.Log, error) {
+func (c *client) GetLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error) {
 	var (
 		logs = []*dv1.Log{}
 	)
