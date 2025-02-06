@@ -7,18 +7,16 @@ import {
   RedoOutlined,
   AppstoreOutlined,
   InfoCircleOutlined,
-  SyncOutlined,
 } from '@ant-design/icons';
 import {
   Button,
   Layout,
   Menu,
-  Row,
-  Col,
   // theme,
   Dropdown,
   MenuProps,
   message,
+  Flex,
 } from 'antd';
 import { ConfigProvider } from 'antd';
 import { Routes, Route, useNavigate } from 'react-router-dom';
@@ -37,7 +35,8 @@ import DeviceOnboardPage from './pages/device/Onboard';
 import AboutPage from './pages/about/About';
 
 import logo from './assets/logo-white-flat.png';
-import UpdatesPage from './pages/updates/Updates';
+import UpdatesPage from './pages/about/Updates';
+import LogsPage from './pages/about/Logs';
 const { Header, Sider, Content } = Layout;
 
 const App: React.FC = () => {
@@ -117,19 +116,18 @@ const App: React.FC = () => {
       <Layout style={{ minHeight: '100vh' }}>
         {contextHolder}
         <Header>
-          <Row justify="space-between">
-            <Col flex={1}>
-              <img src={logo} height={64} alt='the Home Cloud logo which is a white cloud with the silhouette of a house embedded in it' />
-            </Col>
-            <Col flex={20}></Col>
-            <Col span={1}>
-              <Dropdown menu={{ items }} placement="bottomRight">
-                <Button>
-                  <PoweroffOutlined />
-                </Button>
-              </Dropdown>
-            </Col>
-          </Row>
+          <Flex justify="space-between" align="center">
+            <img
+              src={logo}
+              height={64}
+              alt="the Home Cloud logo which is a white cloud with the silhouette of a house embedded in it"
+            />
+            <Dropdown menu={{ items }} placement="bottomRight">
+              <Button>
+                <PoweroffOutlined />
+              </Button>
+            </Dropdown>
+          </Flex>
         </Header>
         <Layout>
           <Sider
@@ -167,12 +165,6 @@ const App: React.FC = () => {
                   disabled: disabled,
                 },
                 {
-                  label: 'Updates',
-                  key: '/updates',
-                  icon: <SyncOutlined />,
-                  disabled: disabled,
-                },
-                {
                   label: 'Settings',
                   key: '/settings',
                   icon: <SettingOutlined />,
@@ -199,6 +191,8 @@ const App: React.FC = () => {
               <Route path="/updates" Component={UpdatesPage} />
               <Route path="/settings" Component={SettingsPage} />
               <Route path="/about" Component={AboutPage} />
+              <Route path="/about/logs" Component={LogsPage} />
+              <Route path="/about/updates" Component={UpdatesPage} />
               <Route
                 path="/getting-started"
                 element={<DeviceOnboardPage setDisabled={setDisabled} />}

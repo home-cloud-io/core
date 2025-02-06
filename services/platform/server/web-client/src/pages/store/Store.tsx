@@ -128,12 +128,10 @@ export default function AppStorePage() {
       {contextHolder}
       <Flex justify="center">
         <Card bordered={false} style={{ maxWidth: 650, flex: 'auto' }}>
-          <Row justify={'space-between'}>
-            <Col span={10}>
-              <strong>App Store</strong>
-            </Col>
+          <Flex justify={'space-between'}>
+            <strong>App Store</strong>
             <HelpModal title="App Store Help" items={help} />
-          </Row>
+          </Flex>
           <Divider />
           {isLoading && (
             <Spin indicator={<LoadingOutlined spin />} size="large" />

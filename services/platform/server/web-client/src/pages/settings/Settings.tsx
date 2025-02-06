@@ -110,29 +110,25 @@ export default function SettingsPage() {
         style={{ maxWidth: 450, flex: 'auto' }}
       >
         <Card bordered={false}>
-          <Row justify={'space-between'}>
-            <Col span={10}>
-              <strong>Device Settings</strong>
-            </Col>
+          <Flex justify="space-between">
+            <strong>Device Settings</strong>
             <HelpModal
               title="Device Settings Help"
               items={deviceSettingsHelp}
             />
-          </Row>
+          </Flex>
           <Divider />
           <DeviceSettingsForm />
         </Card>
         <Badge.Ribbon color="orange" text="Experimental" placement="start">
           <Card bordered={false}>
-            <Row justify={'space-between'}>
-              <Col span={10}>
-                <strong>On the Go Settings</strong>
-              </Col>
+            <Flex justify="space-between">
+              <strong>On the Go Settings</strong>
               <HelpModal
                 title="On the Go Settings Help"
                 items={onTheGoSettingsHelp}
               />
-            </Row>
+            </Flex>
             <Divider />
             <OnTheGoSettingsForm />
           </Card>

@@ -13,6 +13,7 @@ import {
   Typography,
 } from 'antd';
 import {
+  ArrowLeftOutlined,
   ArrowRightOutlined,
   CheckCircleOutlined,
   SyncOutlined,
@@ -31,8 +32,10 @@ import {
   DaemonVersion,
   ImageVersion,
 } from 'api/platform/server/v1/web_pb';
+import { useNavigate } from 'react-router-dom';
 
 export default function UpdatesPage() {
+  const navigate = useNavigate();
   return (
     <Flex justify="center">
       <Space
@@ -40,6 +43,10 @@ export default function UpdatesPage() {
         size="large"
         style={{ maxWidth: 450, flex: 'auto' }}
       >
+        <Button onClick={() => navigate('/about')}>
+          <ArrowLeftOutlined />
+          Back
+        </Button>
         <Details />
       </Space>
     </Flex>
@@ -107,7 +114,7 @@ function PlatformComponents() {
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(handleCheckForUpdates, [])
+  useEffect(handleCheckForUpdates, []);
 
   return (
     <>
@@ -236,7 +243,7 @@ function SystemComponents() {
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(handleCheckForUpdates, [])
+  useEffect(handleCheckForUpdates, []);
 
   return (
     <>
@@ -295,7 +302,9 @@ function SystemComponents() {
               </List.Item>
               <List.Item>
                 <strong>nixos</strong>
-                {systemUpdates?.osDiff.includes('No version or selection state changes.') ? (
+                {systemUpdates?.osDiff.includes(
+                  'No version or selection state changes.'
+                ) ? (
                   <Flex gap="none">
                     <Tag color="purple">Latest</Tag>
                     <CheckCircleOutlined style={{ color: 'green' }} />

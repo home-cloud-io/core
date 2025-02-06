@@ -50,13 +50,11 @@ const helpInfo = [
 export default function UploadPage() {
   return (
     <Flex justify="center">
-      <Card bordered={false} style={{ maxWidth: 450, flex: "auto" }}>
-        <Row justify={'space-between'}>
-          <Col span={7}>
-            <strong>Upload Files</strong>
-          </Col>
+      <Card bordered={false} style={{ maxWidth: 450, flex: 'auto' }}>
+        <Flex justify={'space-between'}>
+          <strong>Upload Files</strong>
           <HelpModal title="Upload Help" items={helpInfo} />
-        </Row>
+        </Flex>
         <Divider />
         <UploadForm />
       </Card>
