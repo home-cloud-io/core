@@ -1,8 +1,11 @@
 package host
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"net"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -27,7 +30,7 @@ type (
 )
 
 type message struct {
-	text string
+	body []byte
 	addr net.Addr
 }
 
@@ -120,7 +123,7 @@ func demultiplex(logger chassis.Logger, conn *net.UDPConn, stunConn io.Writer, m
 			// If not, it is application data.
 			logger.Infof("Demultiplex: [%s]: %s", raddr, buf[:n])
 			messages <- message{
-				text: string(buf[:n]),
+				body: buf,
 				addr: raddr,
 			}
 		}
@@ -189,9 +192,30 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 		return address, err
 	}
 
+	// read config
+	config := NetworkingConfig{}
+	f, err := os.ReadFile(NetworkingConfigFile())
+	if err != nil {
+		return address, err
+	}
+	err = json.Unmarshal(f, &config)
+	if err != nil {
+		return address, err
+	}
+
 	// create channel for application messages
 	// TODO: this needs to pipe to wireguard
+	wgAddress, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", config.Wireguard.Interfaces["wg0"].ListenPort))
+	if err != nil {
+		logger.WithError(err).Error("failed to resolve local wireguard address")
+		return address, err
+	}
 	messages := make(chan message)
+	wgConn, err := net.DialUDP("udp", nil, wgAddress)
+	if err != nil {
+		logger.WithError(err).Error("failed to dial local wireguard address")
+		return address, err
+	}
 
 	// start de/multiplexing
 	go demultiplex(logger, conn, stunL, messages)
@@ -226,10 +250,11 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 
 	// TODO: forward application messages to wireguard
 	go func() {
-		for {
-			select {
-			case m := <-messages:
-				logger.Info(m.text)
+		for m := range messages {
+			logger.Info(string(m.body))
+			_, err := wgConn.Write(m.body)
+			if err != nil {
+				logger.WithError(err).Error("failed to write message to wireguard connection")
 			}
 		}
 	}()
