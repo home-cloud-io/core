@@ -66,12 +66,6 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		},
 		Timeout: 30 * time.Second,
 	})
-
-	err = listener.Listen(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardPeer{
 			AddWireguardPeer: &dv1.AddWireguardPeer{
@@ -83,6 +77,10 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 			},
 		},
 	})
+	if err != nil {
+		return nil, err
+	}
+	err = listener.Listen(ctx)
 	if err != nil {
 		return nil, err
 	}
