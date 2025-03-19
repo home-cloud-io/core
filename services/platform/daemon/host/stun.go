@@ -8,8 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/google/uuid"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+
+	"github.com/google/uuid"
 	"github.com/pion/stun/v2"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
