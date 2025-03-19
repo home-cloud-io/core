@@ -194,11 +194,12 @@ func AddWireguardPeer(ctx context.Context, logger chassis.Logger, peer *v1.Wireg
 
 	// Adding peer to all `wg` interfaces. This will need to change when peering to other devices is built.
 	// currently the interface name is unknown
-	for _, v := range config.Wireguard.Interfaces {
-		v.Peers = append(v.Peers, WireguardPeer{
+	for key, inf := range config.Wireguard.Interfaces {
+		inf.Peers = append(inf.Peers, WireguardPeer{
 			PublicKey:  peer.PublicKey,
 			AllowedIPs: peer.AllowedIps,
 		})
+		config.Wireguard.Interfaces[key] = inf
 	}
 
 	// write config

@@ -71,8 +71,7 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 			AddWireguardPeer: &dv1.AddWireguardPeer{
 				Peer: &dv1.WireguardPeer{
 					PublicKey: pubKey.String(),
-					// The assumption is that any device using wireguard in the network can talk to each other
-					AllowedIps: []string{"*", "0.0.0.0"},
+					AllowedIps: []string{"10.100.0.1/24"},
 				},
 			},
 		},
@@ -98,13 +97,27 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		logger.WithError(err).Warn("failed to get device settings when loading locators")
 		return nil, err
 	}
-
-	clientConfig := &v1.ClientRegistrationDetails{
+	cfg.ClientDetails = &v1.ClientRegistrationDetails{
 		ServerAddress:  adder,
-		LocatorAddress: settings.LocatorSettings.Locators[0].Address,
+		// TODO: get this here?
+		// LocatorAddress: settings.LocatorSettings.Locators[0].Address,
+		LocatorAddress: "https://locator1.home-cloud.io",
 	}
 
-	cfg.ClientDetails = clientConfig
+	// get server public key
+	wgConfig := &dv1.WireguardConfig{}
+	err = kvclient.Get(ctx, kvclient.WIREGUARD_CONFIG_KEY, wgConfig)
+	if err != nil {
+		logger.WithError(err).Warn("failed to get wireguard config")
+		return nil, err
+	}
+
+	key, err := wgtypes.ParseKey(wgConfig.Interfaces[0].PrivateKey)
+	if err != nil {
+		logger.WithError(err).Error("failed to parse server key")
+		return nil, err
+	}
+	cfg.ServerPublicKey = key.PublicKey().String()
 
 	return cfg, nil
 }
