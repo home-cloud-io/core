@@ -12,6 +12,7 @@ import (
 )
 
 func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.AddWireguardInterface) error {
+	logger.Info("adding wireguard interface")
 
 	// read config
 	config := NetworkingConfig{}
@@ -102,6 +103,7 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 }
 
 func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.RemoveWireguardInterface) error {
+	logger.Info("removing wireguard interface")
 
 	// read config
 	config := NetworkingConfig{}
@@ -177,6 +179,8 @@ func fullWireguardKeyPath(interfaceName string) string {
 }
 
 func AddWireguardPeer(ctx context.Context, logger chassis.Logger, peer *v1.WireguardPeer) error {
+	logger.Info("adding wireguard peer")
+
 	// read config
 	config := NetworkingConfig{}
 	f, err := os.ReadFile(NetworkingConfigFile())
