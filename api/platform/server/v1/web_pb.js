@@ -787,6 +787,7 @@ export const PeerConfiguration = /*@__PURE__*/ proto3.makeMessageType(
     { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "client_details", kind: "message", T: ClientRegistrationDetails },
+    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

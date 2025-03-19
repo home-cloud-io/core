@@ -3052,6 +3052,11 @@ export class PeerConfiguration extends Message<PeerConfiguration> {
    */
   clientDetails?: ClientRegistrationDetails;
 
+  /**
+   * @generated from field: string server_public_key = 5;
+   */
+  serverPublicKey = "";
+
   constructor(data?: PartialMessage<PeerConfiguration>) {
     super();
     proto3.util.initPartial(data, this);
@@ -3064,6 +3069,7 @@ export class PeerConfiguration extends Message<PeerConfiguration> {
     { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "client_details", kind: "message", T: ClientRegistrationDetails },
+    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PeerConfiguration {

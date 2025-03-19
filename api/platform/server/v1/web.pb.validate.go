@@ -8590,6 +8590,8 @@ func (m *PeerConfiguration) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ServerPublicKey
+
 	if len(errors) > 0 {
 		return PeerConfigurationMultiError(errors)
 	}
