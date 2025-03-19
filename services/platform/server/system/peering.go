@@ -71,7 +71,7 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 			AddWireguardPeer: &dv1.AddWireguardPeer{
 				Peer: &dv1.WireguardPeer{
 					PublicKey: pubKey.String(),
-					AllowedIps: []string{"10.100.0.1/24"},
+					AllowedIps: []string{"10.100.0.1/32"},
 				},
 			},
 		},
