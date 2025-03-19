@@ -10,6 +10,8 @@ import {
   Badge,
   Alert,
   Avatar,
+  Empty,
+  Button,
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -24,6 +26,7 @@ import {
 } from 'api/platform/server/v1/web-WebService_connectquery';
 import { SystemStats } from 'api/platform/daemon/v1/system_pb';
 import { ProviderValue, useEvents } from '../../services/Subscribe';
+import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
   return (
@@ -117,6 +120,7 @@ export function DeviceDetails() {
 
 export function InstalledApplicationsList() {
   const { data, error, isLoading } = useQuery(appsHealthCheck);
+    const navigate = useNavigate();
 
   var checks: AppHealth[] = [];
   if (data?.checks) {
@@ -135,7 +139,12 @@ export function InstalledApplicationsList() {
         );
       }
     }
-    return <p>None</p>;
+    return <Empty
+      image={Empty.PRESENTED_IMAGE_SIMPLE}
+      description={"No apps installed"}
+    >
+      <Button type="primary" onClick={() => navigate('/store')}>App Store</Button>
+    </Empty>;
   };
 
   return (
