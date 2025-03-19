@@ -60,7 +60,7 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 		case *v1.DaemonMessage_ShutdownAlert:
 			h.logger.Info("shutdown alert")
 		case *v1.DaemonMessage_Heartbeat:
-			h.logger.Debug("heartbeat received")
+			h.logger.Trace("heartbeat received")
 			err = stream.Send(&v1.ServerMessage{
 				Message: &v1.ServerMessage_Heartbeat{},
 			})

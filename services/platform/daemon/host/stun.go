@@ -160,6 +160,8 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 		return address, err
 	}
 
+	logger.WithField("stun_port", addr.Port).Debug("stun port")
+
 	// begin listening on the given port
 	conn, err := net.ListenUDP("udp4", addr)
 	if err != nil {
