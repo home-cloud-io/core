@@ -22,10 +22,10 @@ import (
 const (
 	privateKey      = ""
 	remotePublicKey = "/jvFx2gwuLOEruFPmmj7U00pgDGc+AtCvpoZeu8Hxn8="
-	serverId        = "76165d7c-8d4c-4fcc-8271-cd7767a2d966"
+	serverId        = "4a306461-e3fb-4b8c-a5f0-9052370fddcc"
 
-	stunServer    = "locator.home-cloud.io:3478"
-	locatorServer = "https://locator.home-cloud.io"
+	stunServer    = "locator1.home-cloud.io:3478"
+	locatorServer = "https://locator1.home-cloud.io"
 )
 
 func copyAddr(dst *stun.XORMappedAddress, src stun.XORMappedAddress) {
