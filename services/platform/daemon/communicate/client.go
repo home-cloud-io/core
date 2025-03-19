@@ -156,7 +156,7 @@ func (c *client) listen(ctx context.Context) error {
 		}
 		switch message.Message.(type) {
 		case *v1.ServerMessage_Heartbeat:
-			c.logger.Debug("heartbeat received")
+			c.logger.Trace("heartbeat received")
 		case *v1.ServerMessage_Restart:
 			go c.restart(ctx)
 		case *v1.ServerMessage_Shutdown:
