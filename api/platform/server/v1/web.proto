@@ -402,6 +402,7 @@ message PeerConfiguration {
   string public_key = 2;
   string private_key = 3;
   ClientRegistrationDetails client_details = 4;
+  string server_public_key = 5;
 }
 
 message ClientRegistrationDetails {
