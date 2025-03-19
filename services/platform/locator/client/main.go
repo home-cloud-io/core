@@ -158,12 +158,9 @@ func main() {
 	go keepAlive(c)
 
 	go func() {
-		for {
-			select {
-			case m := <-messages:
-				// TODO: just print messages for now
-				log.Println(m.text)
-			}
+		for m := range messages {
+			// TODO: just print messages for now
+			log.Println(m.text)
 		}
 	}()
 
@@ -208,7 +205,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(msg)
+	fmt.Println("Response from locator: ", msg)
 
 	peerAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", msg.Address, msg.Port))
 	if err != nil {
