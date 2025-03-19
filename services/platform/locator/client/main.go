@@ -21,7 +21,7 @@ import (
 
 const (
 	privateKey      = ""
-	remotePublicKey = "/jvFx2gwuLOEruFPmmj7U00pgDGc+AtCvpoZeu8Hxn8="
+	remotePublicKey = "DgsKlPzywIdx5e0039H+HgRibsGZvcNCIq90sHpzITw="
 	serverId        = "4a306461-e3fb-4b8c-a5f0-9052370fddcc"
 
 	stunServer    = "locator1.home-cloud.io:3478"

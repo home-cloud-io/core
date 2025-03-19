@@ -30,17 +30,12 @@ const (
 
 func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*v1.PeerConfiguration, error) {
 	// create pub/priv key
-	pubKey, err := wgtypes.GenerateKey()
-	if err != nil {
-		logger.WithError(err).Error(ErrFailedToGenPubKey)
-		return nil, errors.New(ErrFailedToGenPubKey)
-	}
-
 	privKey, err := wgtypes.GeneratePrivateKey()
 	if err != nil {
 		logger.WithError(err).Error(ErrFailedToGenPrivKey)
 		return nil, errors.New(ErrFailedToGenPrivKey)
 	}
+	pubKey := privKey.PublicKey()
 
 	clientID := uuid.NewString()
 
