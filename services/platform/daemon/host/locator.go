@@ -238,10 +238,19 @@ func (m *locatorController) connectToLocator(ctx context.Context, logger chassis
 		"interface_name":  wgInterface,
 	})
 	log.Debug("connecting to locator")
+
+	// TODO: remove this when the public key is available another way
+	config, err := parseConfig(wgInterface, serverId)
+	if err != nil {
+		log.WithError(err).Error("failed to parse wireguard config")
+	}
+	log.WithField("public_key", config.PublicKey).Debug("wireguard public key")
+
+
 	client := sdConnect.NewLocatorServiceClient(http.DefaultClient, locatorAddress)
 	stream := client.Connect(ctx)
 
-	err := stream.Send(&v1.ServerMessage{
+	err = stream.Send(&v1.ServerMessage{
 		AccessToken: fakeAccessToken,
 		Body: &v1.ServerMessage_Initialize{
 			Initialize: &v1.Initialize{
