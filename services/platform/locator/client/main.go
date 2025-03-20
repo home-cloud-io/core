@@ -29,7 +29,7 @@ const (
 )
 
 type message struct {
-	text string
+	body []byte
 	addr net.Addr
 }
 
@@ -102,7 +102,7 @@ func main() {
 	go func() {
 		for m := range messages {
 			// TODO: just print messages for now
-			log.Println(m.text)
+			log.Println(m.body)
 		}
 	}()
 
@@ -195,7 +195,7 @@ func demultiplex(conn *net.UDPConn, stunConn io.Writer, messages chan message) {
 			// If not, it is application data.
 			log.Printf("Demultiplex: [%s]: %s", raddr, buf[:n])
 			messages <- message{
-				text: string(buf[:n]),
+				body: buf[:n],
 				addr: raddr,
 			}
 		}
