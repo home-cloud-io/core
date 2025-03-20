@@ -191,7 +191,7 @@ func main() {
 }
 
 func demultiplex(conn *net.UDPConn, stunConn io.Writer, messages chan message) {
-	buf := make([]byte, 1024)
+	buf := make([]byte, 1500)
 	for {
 		n, raddr, err := conn.ReadFrom(buf)
 		if err != nil {

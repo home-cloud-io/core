@@ -105,7 +105,7 @@ func keepAlive(logger chassis.Logger, c *stun.Client) {
 // demultiplex reads messages from given UDP connection, checks if the messages are STUN messages and writes them to the given STUN writer if so. Otherwise,
 // the messages are treated as application data and are sent to the given message channel.
 func demultiplex(logger chassis.Logger, conn *net.UDPConn, stunConn io.Writer, messages chan message) {
-	buf := make([]byte, 1024)
+	buf := make([]byte, 1500)
 	for {
 		n, raddr, err := conn.ReadFrom(buf)
 		if err != nil {
