@@ -73,7 +73,7 @@ const (
 	DefaultWireguardInterface = "wg0"
 	// TODO: make this configurable
 	// DefaultSTUNServerAddress = "locator.home-cloud.io:3478"
-	DefaultSTUNServerAddress = "stunserver2024.stunprotocol.org:3478"
+	DefaultSTUNServerAddress = "stunserver2025.stunprotocol.org:3478"
 )
 
 // helper functions

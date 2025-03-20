@@ -367,11 +367,11 @@ func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[
 	dns := fmt.Sprintf("%s:%d", peerCfg.ClientDetails.ServerAddress, 53)
 
 	return connect.NewResponse(&v1.RegisterPeerResponse{
-		PrivateKey:      peerCfg.GetPrivateKey(),
-		PublicKey:       peerCfg.GetPublicKey(),
+		PrivateKey:      peerCfg.PrivateKey,
+		PublicKey:       peerCfg.PublicKey,
 		Addresses:       []string{peerCfg.ClientDetails.ServerAddress},
 		DnsServers:      []string{dns},
-		ServerPublicKey: peerCfg.PublicKey,
+		ServerPublicKey: peerCfg.ServerPublicKey,
 		ServerId:        peerCfg.Id,
 		LocatorUrl:      peerCfg.ClientDetails.LocatorAddress,
 	}), nil
