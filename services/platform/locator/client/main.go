@@ -28,67 +28,9 @@ const (
 	locatorServer = "https://locator1.home-cloud.io"
 )
 
-func copyAddr(dst *stun.XORMappedAddress, src stun.XORMappedAddress) {
-	dst.IP = append(dst.IP, src.IP...)
-	dst.Port = src.Port
-}
-
-func keepAlive(c *stun.Client) {
-	// Keep-alive for NAT binding.
-	t := time.NewTicker(time.Second * 5)
-	for range t.C {
-		if err := c.Do(stun.MustBuild(stun.TransactionID, stun.BindingRequest), func(res stun.Event) {
-			if res.Error != nil {
-				log.Panicf("Failed STUN transaction: %s", res.Error)
-			}
-		}); err != nil {
-			log.Panicf("Failed STUN transaction: %s", err)
-		}
-	}
-}
-
 type message struct {
 	text string
 	addr net.Addr
-}
-
-func demultiplex(conn *net.UDPConn, stunConn io.Writer, messages chan message) {
-	buf := make([]byte, 1024)
-	for {
-		n, raddr, err := conn.ReadFrom(buf)
-		if err != nil {
-			log.Panicf("Failed to read: %s", err)
-		}
-
-		// De-multiplexing incoming packets.
-		if stun.IsMessage(buf[:n]) {
-			// If buf looks like STUN message, send it to STUN client connection.
-			if _, err = stunConn.Write(buf[:n]); err != nil {
-				log.Panicf("Failed to write: %s", err)
-			}
-		} else {
-			// If not, it is application data.
-			log.Printf("Demultiplex: [%s]: %s", raddr, buf[:n])
-			messages <- message{
-				text: string(buf[:n]),
-				addr: raddr,
-			}
-		}
-	}
-}
-
-func multiplex(conn *net.UDPConn, stunAddr net.Addr, stunConn io.Reader) {
-	// Sending all data from stun client to stun server.
-	buf := make([]byte, 1024)
-	for {
-		n, err := stunConn.Read(buf)
-		if err != nil {
-			log.Panicf("Failed to read: %s", err)
-		}
-		if _, err = conn.WriteTo(buf[:n], stunAddr); err != nil {
-			log.Panicf("Failed to write: %s", err)
-		}
-	}
 }
 
 func main() {
@@ -149,7 +91,7 @@ func main() {
 		log.Panicf("Failed STUN transaction: %s", err)
 	}
 
-	log.Printf("Public address: %s", gotAddr)
+	log.Printf("Our STUN address: %s", gotAddr)
 
 	// Keep-alive is needed to keep our NAT port allocated.
 	// Any ping-pong will work, but we are just making binding requests.
@@ -205,11 +147,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Response from locator: ", msg)
+	theirAddress := fmt.Sprintf("%s:%d", msg.Address, msg.Port)
+	fmt.Println("Their STUN address: ", theirAddress)
 
-	peerAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", msg.Address, msg.Port))
+	peerAddr, err := net.ResolveUDPAddr("udp4", theirAddress)
 	if err != nil {
-		log.Panicf("Failed to resolve '%s': %s", fmt.Sprintf("%s:%d", msg.Address, msg.Port), err)
+		log.Panicf("Failed to resolve '%s': %s", theirAddress, err)
 	}
 
 	deadline := time.After(time.Second * 10)
@@ -232,4 +175,62 @@ func main() {
 		}
 	}
 
+}
+
+func demultiplex(conn *net.UDPConn, stunConn io.Writer, messages chan message) {
+	buf := make([]byte, 1024)
+	for {
+		n, raddr, err := conn.ReadFrom(buf)
+		if err != nil {
+			log.Panicf("Failed to read: %s", err)
+		}
+
+		// De-multiplexing incoming packets.
+		if stun.IsMessage(buf[:n]) {
+			// If buf looks like STUN message, send it to STUN client connection.
+			if _, err = stunConn.Write(buf[:n]); err != nil {
+				log.Panicf("Failed to write: %s", err)
+			}
+		} else {
+			// If not, it is application data.
+			log.Printf("Demultiplex: [%s]: %s", raddr, buf[:n])
+			messages <- message{
+				text: string(buf[:n]),
+				addr: raddr,
+			}
+		}
+	}
+}
+
+func multiplex(conn *net.UDPConn, stunAddr net.Addr, stunConn io.Reader) {
+	// Sending all data from stun client to stun server.
+	buf := make([]byte, 1024)
+	for {
+		n, err := stunConn.Read(buf)
+		if err != nil {
+			log.Panicf("Failed to read: %s", err)
+		}
+		if _, err = conn.WriteTo(buf[:n], stunAddr); err != nil {
+			log.Panicf("Failed to write: %s", err)
+		}
+	}
+}
+
+func copyAddr(dst *stun.XORMappedAddress, src stun.XORMappedAddress) {
+	dst.IP = append(dst.IP, src.IP...)
+	dst.Port = src.Port
+}
+
+func keepAlive(c *stun.Client) {
+	// Keep-alive for NAT binding.
+	t := time.NewTicker(time.Second * 5)
+	for range t.C {
+		if err := c.Do(stun.MustBuild(stun.TransactionID, stun.BindingRequest), func(res stun.Event) {
+			if res.Error != nil {
+				log.Panicf("Failed STUN transaction: %s", res.Error)
+			}
+		}); err != nil {
+			log.Panicf("Failed STUN transaction: %s", err)
+		}
+	}
 }
