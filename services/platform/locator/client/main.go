@@ -61,6 +61,16 @@ func main() {
 		log.Panicf("Failed to create client: %s", err)
 	}
 
+	// create channel for application messages
+	wgAddress, err := net.ResolveUDPAddr("udp", ":51820")
+	if err != nil {
+		log.Panicf("failed to resolve local wireguard address: %s", err)
+	}
+	wgConn, err := net.DialUDP("udp", nil, wgAddress)
+	if err != nil {
+		log.Panicf("failed to dial local wireguard address: %s", err)
+	}
+
 	// Starting multiplexing (writing back STUN messages) with de-multiplexing
 	// (passing STUN messages to STUN client and processing application
 	// data separately).
@@ -101,8 +111,11 @@ func main() {
 
 	go func() {
 		for m := range messages {
-			// TODO: just print messages for now
 			log.Println(m.body)
+			_, err := wgConn.Write(m.body)
+			if err != nil {
+				log.Panicf("failed to write message to wireguard connection: %s", err)
+			}
 		}
 	}()
 
