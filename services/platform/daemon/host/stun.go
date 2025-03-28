@@ -115,6 +115,7 @@ func demultiplex(logger chassis.Logger, conn *net.UDPConn, stunConn io.Writer, m
 
 		// De-multiplexing incoming packets.
 		if stun.IsMessage(buf[:n]) {
+			logger.Infof("Received STUN message: [%s]: %s", raddr, buf[:n])
 			// If buf looks like STUN message, send it to STUN client connection.
 			if _, err = stunConn.Write(buf[:n]); err != nil {
 				logger.WithError(err).Error("failed to write")
@@ -122,7 +123,7 @@ func demultiplex(logger chassis.Logger, conn *net.UDPConn, stunConn io.Writer, m
 			}
 		} else {
 			// If not, it is application data.
-			logger.Infof("Demultiplex: [%s]: %s", raddr, buf[:n])
+			logger.Infof("Received application message: [%s]: %s", raddr, buf[:n])
 			messages <- message{
 				body: buf[:n],
 				addr: raddr,
