@@ -25,7 +25,7 @@ type (
 	stunClient struct {
 		logger chassis.Logger
 		client *stun.Client
-		conn   *net.UDPConn
+		conn   net.PacketConn
 	}
 )
 
@@ -154,6 +154,7 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 	if err != nil {
 		panic(err)
 	}
+	c.conn = rawSock
 
 	// get a UDP port on the host to use for both STUN and application data
 	// addr, err := net.ResolveUDPAddr("udp4", "0.0.0.0:0")
