@@ -11,6 +11,7 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 
 	"github.com/google/uuid"
+	"github.com/netbirdio/netbird/sharedsock"
 	"github.com/pion/stun/v2"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
@@ -104,7 +105,7 @@ func keepAlive(logger chassis.Logger, c *stun.Client) {
 
 // demultiplex reads messages from given UDP connection, checks if the messages are STUN messages and writes them to the given STUN writer if so. Otherwise,
 // the messages are treated as application data and are sent to the given message channel.
-func demultiplex(logger chassis.Logger, conn *net.UDPConn, stunConn io.Writer, messages chan message) {
+func demultiplex(logger chassis.Logger, conn net.PacketConn, stunConn io.Writer, messages chan message) {
 	buf := make([]byte, 1500)
 	for {
 		n, raddr, err := conn.ReadFrom(buf)
@@ -134,7 +135,7 @@ func demultiplex(logger chassis.Logger, conn *net.UDPConn, stunConn io.Writer, m
 
 // multiplex reads messages from the given STUN connection and writes them to the given STUN address (server) using the
 // provided UDP connection.
-func multiplex(logger chassis.Logger, conn *net.UDPConn, stunAddr net.Addr, stunConn io.Reader) {
+func multiplex(logger chassis.Logger, conn net.PacketConn, stunAddr net.Addr, stunConn io.Reader) {
 	// Sending all data from stun client to stun server.
 	buf := make([]byte, 1024)
 	for {
@@ -154,22 +155,28 @@ func multiplex(logger chassis.Logger, conn *net.UDPConn, stunAddr net.Addr, stun
 // the found STUN address.
 func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XORMappedAddress, err error) {
 
-	// get a UDP port on the host to use for both STUN and application data
-	addr, err := net.ResolveUDPAddr("udp4", "0.0.0.0:0")
+	port := 51820
+	rawSock, err := sharedsock.Listen(port, sharedsock.NewIncomingSTUNFilter())
 	if err != nil {
-		logger.WithError(err).Error("failed to resolve local UDP socket")
-		return address, err
+		panic(err)
 	}
 
-	logger.WithField("stun_port", addr.Port).Debug("stun port")
+	// get a UDP port on the host to use for both STUN and application data
+	// addr, err := net.ResolveUDPAddr("udp4", "0.0.0.0:0")
+	// if err != nil {
+	// 	logger.WithError(err).Error("failed to resolve local UDP socket")
+	// 	return address, err
+	// }
+
+	// logger.WithField("stun_port", addr.Port).Debug("stun port")
 
 	// begin listening on the given port
-	conn, err := net.ListenUDP("udp4", addr)
-	if err != nil {
-		logger.WithError(err).Error("failed to listen on socket")
-		return address, err
-	}
-	c.conn = conn
+	// conn, err := net.ListenUDP("udp4", addr)
+	// if err != nil {
+	// 	logger.WithError(err).Error("failed to listen on socket")
+	// 	return address, err
+	// }
+	// c.conn = conn
 
 	// resolve the given STUN server address
 	stunAddr, err := net.ResolveUDPAddr("udp4", server)
@@ -222,8 +229,8 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 	}
 
 	// start de/multiplexing
-	go demultiplex(logger, conn, stunL, messages)
-	go multiplex(logger, conn, stunAddr, stunL)
+	go demultiplex(logger, rawSock, stunL, messages)
+	go multiplex(logger, rawSock, stunAddr, stunL)
 
 	// attempt to bind to the STUN server and aquire our STUN address
 	err = client.Do(stun.MustBuild(stun.TransactionID, stun.BindingRequest), func(res stun.Event) {
