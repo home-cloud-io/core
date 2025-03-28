@@ -1,11 +1,9 @@
 package host
 
 import (
-	"encoding/json"
-	"fmt"
+	"context"
 	"io"
 	"net"
-	"os"
 	"time"
 
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
@@ -105,29 +103,23 @@ func keepAlive(logger chassis.Logger, c *stun.Client) {
 
 // demultiplex reads messages from given UDP connection, checks if the messages are STUN messages and writes them to the given STUN writer if so. Otherwise,
 // the messages are treated as application data and are sent to the given message channel.
-func demultiplex(logger chassis.Logger, conn net.PacketConn, stunConn io.Writer, messages chan message) {
+func demultiplex(ctx context.Context, logger chassis.Logger, conn net.PacketConn, stunConn io.Writer) {
 	buf := make([]byte, 1500)
 	for {
-		n, raddr, err := conn.ReadFrom(buf)
-		if err != nil {
-			logger.WithError(err).Error("failed to read")
+		select {
+		case <-ctx.Done():
+			logger.Debugf("stopped reading from the shared socket")
 			return
-		}
-
-		// De-multiplexing incoming packets.
-		if stun.IsMessage(buf[:n]) {
-			logger.Infof("Received STUN message: [%s]: %s", raddr, buf[:n])
-			// If buf looks like STUN message, send it to STUN client connection.
-			if _, err = stunConn.Write(buf[:n]); err != nil {
+		default:
+			size, addr, err := conn.ReadFrom(buf)
+			if err != nil {
+				logger.Errorf("error while reading packet from the shared socket: %s", err)
+				continue
+			}
+			logger.Infof("read a STUN packet of size %d from %s", size, addr.String())
+			if _, err = stunConn.Write(buf[:size]); err != nil {
 				logger.WithError(err).Error("failed to write")
 				return
-			}
-		} else {
-			// If not, it is application data.
-			logger.Infof("Received application message: [%s]: %s", raddr, buf[:n])
-			messages <- message{
-				body: buf[:n],
-				addr: raddr,
 			}
 		}
 	}
@@ -154,6 +146,8 @@ func multiplex(logger chassis.Logger, conn net.PacketConn, stunAddr net.Addr, st
 // bind establishes a persistent connection with the given STUN server, initializes multiplexing for application data and returns
 // the found STUN address.
 func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XORMappedAddress, err error) {
+	// TODO: pass this in?
+	ctx := context.Background()
 
 	port := 51820
 	rawSock, err := sharedsock.Listen(port, sharedsock.NewIncomingSTUNFilter())
@@ -204,32 +198,32 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 	}
 
 	// read config
-	config := NetworkingConfig{}
-	f, err := os.ReadFile(NetworkingConfigFile())
-	if err != nil {
-		return address, err
-	}
-	err = json.Unmarshal(f, &config)
-	if err != nil {
-		return address, err
-	}
+	// config := NetworkingConfig{}
+	// f, err := os.ReadFile(NetworkingConfigFile())
+	// if err != nil {
+	// 	return address, err
+	// }
+	// err = json.Unmarshal(f, &config)
+	// if err != nil {
+	// 	return address, err
+	// }
 
 	// create channel for application messages
 	// TODO: this needs to pipe to wireguard
-	wgAddress, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", config.Wireguard.Interfaces["wg0"].ListenPort))
-	if err != nil {
-		logger.WithError(err).Error("failed to resolve local wireguard address")
-		return address, err
-	}
-	messages := make(chan message)
-	wgConn, err := net.DialUDP("udp", nil, wgAddress)
-	if err != nil {
-		logger.WithError(err).Error("failed to dial local wireguard address")
-		return address, err
-	}
+	// wgAddress, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", config.Wireguard.Interfaces["wg0"].ListenPort))
+	// if err != nil {
+	// 	logger.WithError(err).Error("failed to resolve local wireguard address")
+	// 	return address, err
+	// }
+	// messages := make(chan message)
+	// wgConn, err := net.DialUDP("udp", nil, wgAddress)
+	// if err != nil {
+	// 	logger.WithError(err).Error("failed to dial local wireguard address")
+	// 	return address, err
+	// }
 
 	// start de/multiplexing
-	go demultiplex(logger, rawSock, stunL, messages)
+	go demultiplex(ctx, logger, rawSock, stunL)
 	go multiplex(logger, rawSock, stunAddr, stunL)
 
 	// attempt to bind to the STUN server and aquire our STUN address
@@ -260,15 +254,15 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 	// go keepAlive(logger, client)
 
 	// TODO: forward application messages to wireguard
-	go func() {
-		for m := range messages {
-			fmt.Println("fowarding message to wireguard conn")
-			_, err := wgConn.Write(m.body)
-			if err != nil {
-				logger.WithError(err).Error("failed to write message to wireguard connection")
-			}
-		}
-	}()
+	// go func() {
+	// 	for m := range messages {
+	// 		fmt.Println("fowarding message to wireguard conn")
+	// 		_, err := wgConn.Write(m.body)
+	// 		if err != nil {
+	// 			logger.WithError(err).Error("failed to write message to wireguard connection")
+	// 		}
+	// 	}
+	// }()
 
 	logger.WithField("address", address.String()).Info("finished binding to STUN server")
 
