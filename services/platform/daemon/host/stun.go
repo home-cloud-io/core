@@ -254,7 +254,7 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 	// TODO: forward application messages to wireguard
 	go func() {
 		for m := range messages {
-			fmt.Println(m.body)
+			fmt.Println("fowarding message to wireguard conn")
 			_, err := wgConn.Write(m.body)
 			if err != nil {
 				logger.WithError(err).Error("failed to write message to wireguard connection")
