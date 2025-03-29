@@ -156,23 +156,6 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 	}
 	c.conn = rawSock
 
-	// get a UDP port on the host to use for both STUN and application data
-	// addr, err := net.ResolveUDPAddr("udp4", "0.0.0.0:0")
-	// if err != nil {
-	// 	logger.WithError(err).Error("failed to resolve local UDP socket")
-	// 	return address, err
-	// }
-
-	// logger.WithField("stun_port", addr.Port).Debug("stun port")
-
-	// begin listening on the given port
-	// conn, err := net.ListenUDP("udp4", addr)
-	// if err != nil {
-	// 	logger.WithError(err).Error("failed to listen on socket")
-	// 	return address, err
-	// }
-	// c.conn = conn
-
 	// resolve the given STUN server address
 	stunAddr, err := net.ResolveUDPAddr("udp4", server)
 	if err != nil {
@@ -197,31 +180,6 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 		logger.WithError(err).Error("failed to create STUN client")
 		return address, err
 	}
-
-	// read config
-	// config := NetworkingConfig{}
-	// f, err := os.ReadFile(NetworkingConfigFile())
-	// if err != nil {
-	// 	return address, err
-	// }
-	// err = json.Unmarshal(f, &config)
-	// if err != nil {
-	// 	return address, err
-	// }
-
-	// create channel for application messages
-	// TODO: this needs to pipe to wireguard
-	// wgAddress, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", config.Wireguard.Interfaces["wg0"].ListenPort))
-	// if err != nil {
-	// 	logger.WithError(err).Error("failed to resolve local wireguard address")
-	// 	return address, err
-	// }
-	// messages := make(chan message)
-	// wgConn, err := net.DialUDP("udp", nil, wgAddress)
-	// if err != nil {
-	// 	logger.WithError(err).Error("failed to dial local wireguard address")
-	// 	return address, err
-	// }
 
 	// start de/multiplexing
 	go demultiplex(ctx, logger, rawSock, stunL)
@@ -251,19 +209,8 @@ func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XO
 		return address, err
 	}
 
-	// TODO: we might need this if the application data doesn't do it for us
-	// go keepAlive(logger, client)
-
-	// TODO: forward application messages to wireguard
-	// go func() {
-	// 	for m := range messages {
-	// 		fmt.Println("fowarding message to wireguard conn")
-	// 		_, err := wgConn.Write(m.body)
-	// 		if err != nil {
-	// 			logger.WithError(err).Error("failed to write message to wireguard connection")
-	// 		}
-	// 	}
-	// }()
+	// TODO: pass in context so we can cancel this
+	go keepAlive(logger, client)
 
 	logger.WithField("address", address.String()).Info("finished binding to STUN server")
 
