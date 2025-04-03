@@ -47,6 +47,13 @@ service WebService {
   rpc SetDeviceSettings(SetDeviceSettingsRequest) returns (SetDeviceSettingsResponse) {}
   // Get all installed app storage volumes
   rpc GetAppStorage(GetAppStorageRequest) returns (GetAppStorageResponse) {}
+  // GetComponentVersions returns the versions of all system components (daemon, server, etc.)
+  rpc GetComponentVersions(GetComponentVersionsRequest) returns (GetComponentVersionsResponse) {}
+  // GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
+  rpc GetSystemLogs(GetSystemLogsRequest) returns (GetSystemLogsResponse) {}
+
+  // Secure Tunnelling
+
   // Enables the remote access feature
   rpc EnableSecureTunnelling(EnableSecureTunnellingRequest) returns (EnableSecureTunnellingResponse) {}
   // Disables the remote access feature
@@ -57,10 +64,6 @@ service WebService {
   rpc DeregisterFromLocator(DeregisterFromLocatorRequest) returns (DeregisterFromLocatorResponse) {}
   // RegisterPeer is used to connect a client to the home-cloud overlay network
   rpc RegisterPeer(RegisterPeerRequest) returns (RegisterPeerResponse) {}
-  // GetComponentVersions returns the versions of all system components (daemon, server, etc.)
-  rpc GetComponentVersions(GetComponentVersionsRequest) returns (GetComponentVersionsResponse) {}
-  // GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
-  rpc GetSystemLogs(GetSystemLogsRequest) returns (GetSystemLogsResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
@@ -241,18 +244,16 @@ message DisableSecureTunnellingResponse {}
 
 message RegisterToLocatorRequest {
   string locator_address = 1;
+  string wireguard_interface = 2;
   // TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
 }
-message RegisterToLocatorResponse {
-  platform.daemon.v1.Locator locator = 1;
-}
+message RegisterToLocatorResponse {}
 
 message DeregisterFromLocatorRequest {
   string locator_address = 1;
+  string wireguard_interface = 2;
 }
-message DeregisterFromLocatorResponse {
-  string locator_address = 1;
-}
+message DeregisterFromLocatorResponse {}
 
 message GetComponentVersionsRequest {
 }
@@ -346,13 +347,21 @@ message DeviceSettings {
   bool auto_update_os = 4;
   bool enable_ssh = 5;
   repeated string trusted_ssh_keys = 6;
-  LocatorSettings locator_settings = 7;
+  RemoteAccessSettings remote_access_settings = 7;
 }
 
-message LocatorSettings {
+message RemoteAccessSettings {
   bool enabled = 1;
-  repeated platform.daemon.v1.Locator locators = 2;
-  string stun_server_address = 3;
+  repeated WireguardInterface wireguard_interfaces = 2;
+}
+
+message WireguardInterface {
+  string id = 1;
+  string name = 2;
+  int32 port = 3;
+  string public_key = 4;
+  string stun_server = 5;
+  repeated string locator_servers = 6;
 }
 
 message User {
@@ -393,18 +402,5 @@ message RegisterPeerResponse{
   // server config
   string server_public_key = 5;
   string server_id = 6;
-  string locator_url = 7;
-}
-
-// Model to store config in key/val store
-message PeerConfiguration {
-  string id = 1;
-  string public_key = 2;
-  string private_key = 3;
-  ClientRegistrationDetails client_details = 4;
-}
-
-message ClientRegistrationDetails {
-  string server_address = 1;
-  string locator_address = 2;
+  repeated string locator_servers = 7;
 }
