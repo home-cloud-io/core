@@ -25,7 +25,6 @@ type (
 
 		AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error
 		RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error
-		RemoveAllLocators(ctx context.Context, wgInterfaceName string) error
 
 		BindSTUNServer(ctx context.Context, wgInterfaceName string, stunServer string) error
 	}
@@ -157,13 +156,11 @@ func (c remoteAccessController) RemoveInterface(ctx context.Context, wgInterface
 	}
 
 	// close all locator connections
-	err = c.RemoveAllLocators(ctx, wgInterfaceName)
-	if err != nil {
-		c.logger.WithError(err).Error("failed to remove all locators")
-		return err
+	for _, l := range wgInterface.LocatorServers {
+		c.locatorController.Close(wgInterface, l)
 	}
 
-	// close STUN binding
+	// cancel STUN binding
 	err = c.stunController.Cancel(int(wgInterface.Port))
 	if err != nil {
 		c.logger.WithError(err).Error("failed to cancel STUN binding")
@@ -281,35 +278,6 @@ func (c remoteAccessController) RemoveLocator(ctx context.Context, wgInterfaceNa
 
 	// close connection to locator
 	c.locatorController.Close(wgInterface, locatorAddress)
-
-	return nil
-}
-
-func (c remoteAccessController) RemoveAllLocators(ctx context.Context, wgInterfaceName string) error {
-	settings, err := secureTunnelingSettings()
-	if err != nil {
-		return err
-	}
-
-	var wgInterface *sv1.WireguardInterface
-	for _, inf := range settings.WireguardInterfaces {
-		if inf.Name == wgInterfaceName {
-			wgInterface = inf
-			break
-		}
-	}
-	if wgInterface == nil {
-		return errors.New("given wireguard interface not found in settings")
-	}
-
-	// close connection to all locators
-	for _, l := range wgInterface.LocatorServers {
-		c.locatorController.Close(wgInterface, l)
-	}
-
-	// update settings config
-	wgInterface.LocatorServers = []string{}
-	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
 
 	return nil
 }
