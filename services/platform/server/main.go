@@ -49,6 +49,7 @@ func main() {
 		WithRoute(&ntv1.Route{
 			Match: &ntv1.RouteMatch{
 				Prefix: "/",
+				Host: "home-cloud.local",
 			},
 			EnableHttp2: true,
 		}).

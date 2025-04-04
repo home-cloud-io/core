@@ -1,6 +1,6 @@
 package host
 
 const (
-	LocatorSettingsKey = "daemon.locatorSettings"
-	WireguardConfigKey = "daemon.wireguard"
+	// TODO: change to snake_case
+	SecureTunnelingSettingsKey = "daemon.secureTunnelingSettings"
 )

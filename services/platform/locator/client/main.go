@@ -15,95 +15,32 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/netbirdio/netbird/encryption"
+	"github.com/netbirdio/netbird/sharedsock"
 	"github.com/pion/stun/v2"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
 const (
 	privateKey      = ""
-	remotePublicKey = "/jvFx2gwuLOEruFPmmj7U00pgDGc+AtCvpoZeu8Hxn8="
-	serverId        = "76165d7c-8d4c-4fcc-8271-cd7767a2d966"
+	remotePublicKey = "DgsKlPzywIdx5e0039H+HgRibsGZvcNCIq90sHpzITw="
+	serverId        = "4a306461-e3fb-4b8c-a5f0-9052370fddcc"
 
-	stunServer    = "locator.home-cloud.io:3478"
-	locatorServer = "https://locator.home-cloud.io"
+	stunServer    = "locator1.home-cloud.io:3478"
+	locatorServer = "https://locator1.home-cloud.io"
 )
 
-func copyAddr(dst *stun.XORMappedAddress, src stun.XORMappedAddress) {
-	dst.IP = append(dst.IP, src.IP...)
-	dst.Port = src.Port
-}
-
-func keepAlive(c *stun.Client) {
-	// Keep-alive for NAT binding.
-	t := time.NewTicker(time.Second * 5)
-	for range t.C {
-		if err := c.Do(stun.MustBuild(stun.TransactionID, stun.BindingRequest), func(res stun.Event) {
-			if res.Error != nil {
-				log.Panicf("Failed STUN transaction: %s", res.Error)
-			}
-		}); err != nil {
-			log.Panicf("Failed STUN transaction: %s", err)
-		}
-	}
-}
-
 type message struct {
-	text string
+	body []byte
 	addr net.Addr
-}
-
-func demultiplex(conn *net.UDPConn, stunConn io.Writer, messages chan message) {
-	buf := make([]byte, 1024)
-	for {
-		n, raddr, err := conn.ReadFrom(buf)
-		if err != nil {
-			log.Panicf("Failed to read: %s", err)
-		}
-
-		// De-multiplexing incoming packets.
-		if stun.IsMessage(buf[:n]) {
-			// If buf looks like STUN message, send it to STUN client connection.
-			if _, err = stunConn.Write(buf[:n]); err != nil {
-				log.Panicf("Failed to write: %s", err)
-			}
-		} else {
-			// If not, it is application data.
-			log.Printf("Demultiplex: [%s]: %s", raddr, buf[:n])
-			messages <- message{
-				text: string(buf[:n]),
-				addr: raddr,
-			}
-		}
-	}
-}
-
-func multiplex(conn *net.UDPConn, stunAddr net.Addr, stunConn io.Reader) {
-	// Sending all data from stun client to stun server.
-	buf := make([]byte, 1024)
-	for {
-		n, err := stunConn.Read(buf)
-		if err != nil {
-			log.Panicf("Failed to read: %s", err)
-		}
-		if _, err = conn.WriteTo(buf[:n], stunAddr); err != nil {
-			log.Panicf("Failed to write: %s", err)
-		}
-	}
 }
 
 func main() {
 	ctx := context.Background()
 
-	// Allocating local UDP socket that will be used both for STUN and
-	// our application data.
-	addr, err := net.ResolveUDPAddr("udp4", "0.0.0.0:0")
+	port := 51820
+	rawSock, err := sharedsock.Listen(port, sharedsock.NewIncomingSTUNFilter())
 	if err != nil {
-		log.Panicf("Failed to resolve: %s", err)
-	}
-
-	conn, err := net.ListenUDP("udp4", addr)
-	if err != nil {
-		log.Panicf("Failed to listen: %s", err)
+		panic(err)
 	}
 
 	// Resolving STUN server address.
@@ -119,15 +56,8 @@ func main() {
 		log.Panicf("Failed to create client: %s", err)
 	}
 
-	// Starting multiplexing (writing back STUN messages) with de-multiplexing
-	// (passing STUN messages to STUN client and processing application
-	// data separately).
-	//
-	// stunL and stunR are virtual connections, see net.Pipe for reference.
-	messages := make(chan message)
-
-	go demultiplex(conn, stunL, messages)
-	go multiplex(conn, stunAddr, stunL)
+	go demultiplex(ctx, rawSock, stunL)
+	go multiplex(rawSock, stunAddr, stunL)
 
 	// Getting our "real" IP address from STUN Server.
 	// This will create a NAT binding on your provider/router NAT Server,
@@ -149,23 +79,13 @@ func main() {
 		log.Panicf("Failed STUN transaction: %s", err)
 	}
 
-	log.Printf("Public address: %s", gotAddr)
+	log.Printf("Our STUN address: %s", gotAddr)
 
 	// Keep-alive is needed to keep our NAT port allocated.
 	// Any ping-pong will work, but we are just making binding requests.
 	// Note that STUN Server is not mandatory for keep alive, application
 	// data will keep alive that binding too.
 	go keepAlive(c)
-
-	go func() {
-		for {
-			select {
-			case m := <-messages:
-				// TODO: just print messages for now
-				log.Println(m.text)
-			}
-		}
-	}()
 
 	// communicate with locator
 
@@ -208,11 +128,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(msg)
+	theirAddress := fmt.Sprintf("%s:%d", msg.Address, msg.Port)
+	fmt.Println("Their STUN address: ", theirAddress)
 
-	peerAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", msg.Address, msg.Port))
+	peerAddr, err := net.ResolveUDPAddr("udp4", theirAddress)
 	if err != nil {
-		log.Panicf("Failed to resolve '%s': %s", fmt.Sprintf("%s:%d", msg.Address, msg.Port), err)
+		log.Panicf("Failed to resolve '%s': %s", theirAddress, err)
 	}
 
 	deadline := time.After(time.Second * 10)
@@ -220,7 +141,7 @@ func main() {
 	sendMsg := func() {
 		msg := uuid.New().String()
 		log.Printf("sending: %s", msg)
-		if _, err := conn.WriteTo([]byte(msg), peerAddr); err != nil {
+		if _, err := rawSock.WriteTo([]byte(msg), peerAddr); err != nil {
 			log.Panicf("Failed to write: %s", err)
 		}
 	}
@@ -235,4 +156,65 @@ func main() {
 		}
 	}
 
+}
+
+// demultiplex reads messages from given UDP connection, checks if the messages are STUN messages and writes them to the given STUN writer if so. Otherwise,
+// the messages are treated as application data and are sent to the given message channel.
+func demultiplex(ctx context.Context, conn net.PacketConn, stunConn io.Writer) {
+	buf := make([]byte, 1500)
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("stopped reading from the shared socket")
+			return
+		default:
+			size, addr, err := conn.ReadFrom(buf)
+			if err != nil {
+				fmt.Printf("error while reading packet from the shared socket: %s\n", err)
+				continue
+			}
+			fmt.Printf("read a STUN packet of size %d from %s\n", size, addr.String())
+			if _, err = stunConn.Write(buf[:size]); err != nil {
+				fmt.Println("failed to write")
+				return
+			}
+		}
+	}
+}
+
+// multiplex reads messages from the given STUN connection and writes them to the given STUN address (server) using the
+// provided UDP connection.
+func multiplex(conn net.PacketConn, stunAddr net.Addr, stunConn io.Reader) {
+	// Sending all data from stun client to stun server.
+	buf := make([]byte, 1024)
+	for {
+		n, err := stunConn.Read(buf)
+		if err != nil {
+			fmt.Println("failed to read")
+			return
+		}
+		if _, err = conn.WriteTo(buf[:n], stunAddr); err != nil {
+			fmt.Println("failed to write")
+			return
+		}
+	}
+}
+
+func copyAddr(dst *stun.XORMappedAddress, src stun.XORMappedAddress) {
+	dst.IP = append(dst.IP, src.IP...)
+	dst.Port = src.Port
+}
+
+func keepAlive(c *stun.Client) {
+	// Keep-alive for NAT binding.
+	t := time.NewTicker(time.Second * 5)
+	for range t.C {
+		if err := c.Do(stun.MustBuild(stun.TransactionID, stun.BindingRequest), func(res stun.Event) {
+			if res.Error != nil {
+				log.Panicf("Failed STUN transaction: %s", res.Error)
+			}
+		}); err != nil {
+			log.Panicf("Failed STUN transaction: %s", err)
+		}
+	}
 }

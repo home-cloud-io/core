@@ -74,24 +74,28 @@ func NewClient(logger chassis.Logger) Client {
 	config := chassis.GetConfig()
 	kubeConfig, err := clientcmd.BuildConfigFromFlags(config.GetString("server.k8s.master_url"), config.GetString("server.k8s.config_path"))
 	if err != nil {
-		logger.WithError(err).Panic("failed to read kube config")
+		logger.WithError(err).Error("failed to read kube config")
+		panic(err)
 	}
 
 	c, err := crclient.New(kubeConfig, crclient.Options{})
 	if err != nil {
-		logger.WithError(err).Panic("failed to create new k8s client")
+		logger.WithError(err).Error("failed to create new k8s client")
+		panic(err)
 	} else {
 		opv1.AddToScheme(c.Scheme())
 	}
 
 	cs, err := kubernetes.NewForConfig(kubeConfig)
 	if err != nil {
-		logger.WithError(err).Panic("failed to create new k8s clientset")
+		logger.WithError(err).Error("failed to create new k8s clientset")
+		panic(err)
 	}
 
 	dc, err := discovery.NewDiscoveryClientForConfig(kubeConfig)
 	if err != nil {
-		logger.WithError(err).Panic("failed to create new k8s discovery client")
+		logger.WithError(err).Error("failed to create new k8s discovery client")
+		panic(err)
 	}
 
 	return &client{

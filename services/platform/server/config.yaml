@@ -7,12 +7,11 @@ service:
     level: debug
 
   network:
-    port: 8000
+    bind_address: localhost
+    bind_port: 8000
     internal:
-      host: localhost
+      host: host.docker.internal
       port: 8000
-    external:
-      host: localhost
 
 server:
   k8s:
