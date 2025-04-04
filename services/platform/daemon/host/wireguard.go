@@ -140,7 +140,7 @@ func (c wireguardController) RemoveInterface(ctx context.Context, logger chassis
 	// remove interface from NAT config
 	for i, inf := range config.NAT.InternalInterfaces {
 		if inf == wgInterfaceName {
-			config.NAT.InternalInterfaces = append(config.NAT.InternalInterfaces[:i], config.NAT.InternalInterfaces[i+1:]...)
+			config.NAT.InternalInterfaces = slices.Delete(config.NAT.InternalInterfaces, i, i+1)
 			break
 		}
 	}
