@@ -177,6 +177,8 @@ func (c remoteAccessController) RemoveInterface(ctx context.Context, wgInterface
 	// update settings config
 	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
 
+	c.logger.Info("finished removing wireguard interface")
+
 	return nil
 }
 

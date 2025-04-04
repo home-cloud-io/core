@@ -171,6 +171,7 @@ func keepAlive(ctx context.Context, logger chassis.Logger, binding *stunBinding)
 		select {
 		case <-ctx.Done():
 			logger.Debug("stopping STUN keep alive")
+			return
 		case <-ticker.C:
 			err := binding.bind()
 			if err != nil {
