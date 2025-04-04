@@ -37,6 +37,10 @@ type (
 	}
 )
 
+const (
+	SecureTunnelingNotEnabledError = "remote access not enabled"
+)
+
 func NewRemoteAccessController(logger chassis.Logger) RemoteAccessController {
 	stunController := NewSTUNController(logger)
 	return remoteAccessController{
@@ -45,10 +49,6 @@ func NewRemoteAccessController(logger chassis.Logger) RemoteAccessController {
 		locatorController:   NewLocatorController(logger, stunController),
 		wireguardController: NewWireguardController(),
 	}
-}
-
-func Enable() {
-
 }
 
 func (c remoteAccessController) Load() {
@@ -102,7 +102,36 @@ func (c remoteAccessController) Load() {
 }
 
 func (c remoteAccessController) AddInterface(ctx context.Context, wgInterface *v1.WireguardInterface) (publicKey string, err error) {
-	return c.wireguardController.AddInterface(ctx, c.logger, wgInterface)
+	settings, err := secureTunnelingSettings()
+	if err != nil && err.Error() != SecureTunnelingNotEnabledError {
+		return "", err
+	}
+
+	// TODO: add a command to enable/disable secure tunneling without modifying any other config (will need to figure out wireguard nixos config)
+	settings.Enabled = true
+
+	// make sure the interface doesn't already exist in settings
+	for _, existingInterface := range settings.WireguardInterfaces {
+		if existingInterface.Name == wgInterface.Name {
+			return "", errors.New("wireguard interface with same name already exists in settings")
+		}
+	}
+
+	publicKey, err = c.wireguardController.AddInterface(ctx, c.logger, wgInterface)
+	if err != nil {
+		return "", err
+	}
+
+	// update settings config
+	settings.WireguardInterfaces = append(settings.WireguardInterfaces, &sv1.WireguardInterface{
+		Id: wgInterface.Id,
+		Name: wgInterface.Name,
+		Port: int32(wgInterface.ListenPort),
+		PublicKey: publicKey,
+	})
+	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
+
+	return publicKey, nil
 }
 
 func (c remoteAccessController) RemoveInterface(ctx context.Context, wgInterfaceName string) error {
@@ -332,7 +361,7 @@ func secureTunnelingSettings() (*sv1.SecureTunnelingSettings, error) {
 
 	// make sure settings are enabled
 	if !settings.Enabled {
-		return nil, errors.New("remote access not enabled")
+		return nil, errors.New(SecureTunnelingNotEnabledError)
 	}
 
 	return settings, err
