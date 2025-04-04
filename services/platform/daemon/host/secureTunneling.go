@@ -331,12 +331,14 @@ func (c remoteAccessController) BindSTUNServer(ctx context.Context, wgInterfaceN
 		return errors.New("given wireguard interface not found in settings")
 	}
 
+	// first, attempt to cancel any current binding on the given interface port
 	err = c.stunController.Cancel(int(wgInterface.Port))
 	if err != nil {
 		c.logger.WithError(err).Error("failed to cancel STUN binding")
 		return err
 	}
 
+	// now, bind the new server on the given interface port
 	err = c.stunController.Bind(int(wgInterface.Port), stunServerAddress)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to bind to STUN server")
