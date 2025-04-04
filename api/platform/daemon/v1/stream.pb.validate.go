@@ -2193,34 +2193,7 @@ func (m *OSUpdateDiff) validate(all bool) error {
 
 	// no validation rules for Description
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, OSUpdateDiffValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, OSUpdateDiffValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return OSUpdateDiffValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return OSUpdateDiffMultiError(errors)
@@ -2327,34 +2300,7 @@ func (m *CurrentDaemonVersion) validate(all bool) error {
 
 	// no validation rules for SrcHash
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, CurrentDaemonVersionValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, CurrentDaemonVersionValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CurrentDaemonVersionValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return CurrentDaemonVersionMultiError(errors)
@@ -2458,34 +2404,7 @@ func (m *DeviceInitialized) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, DeviceInitializedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, DeviceInitializedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return DeviceInitializedValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return DeviceInitializedMultiError(errors)
@@ -2898,34 +2817,7 @@ func (m *SettingsSaved) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, SettingsSavedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, SettingsSavedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return SettingsSavedValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return SettingsSavedMultiError(errors)
@@ -3027,34 +2919,11 @@ func (m *WireguardInterfaceAdded) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, WireguardInterfaceAddedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, WireguardInterfaceAddedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return WireguardInterfaceAddedValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for WireguardInterface
+
+	// no validation rules for PublicKey
+
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return WireguardInterfaceAddedMultiError(errors)
@@ -3158,34 +3027,9 @@ func (m *WireguardInterfaceRemoved) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, WireguardInterfaceRemovedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, WireguardInterfaceRemovedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return WireguardInterfaceRemovedValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for WireguardInterface
+
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return WireguardInterfaceRemovedMultiError(errors)
@@ -3289,34 +3133,11 @@ func (m *WireguardPeerAdded) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, WireguardPeerAddedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, WireguardPeerAddedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return WireguardPeerAddedValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for WireguardInterface
+
+	// no validation rules for ClientPublicKey
+
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return WireguardPeerAddedMultiError(errors)
@@ -3420,34 +3241,11 @@ func (m *STUNServerSet) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, STUNServerSetValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, STUNServerSetValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return STUNServerSetValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for ServerAddress
+
+	// no validation rules for WireguardInterface
+
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return STUNServerSetMultiError(errors)
@@ -3549,63 +3347,11 @@ func (m *LocatorServerAdded) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetLocator()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LocatorServerAddedValidationError{
-					field:  "Locator",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LocatorServerAddedValidationError{
-					field:  "Locator",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetLocator()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LocatorServerAddedValidationError{
-				field:  "Locator",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for LocatorAddress
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LocatorServerAddedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LocatorServerAddedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LocatorServerAddedValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for WireguardInterface
+
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return LocatorServerAddedMultiError(errors)
@@ -3709,36 +3455,11 @@ func (m *LocatorServerRemoved) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Address
+	// no validation rules for LocatorAddress
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LocatorServerRemovedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LocatorServerRemovedValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LocatorServerRemovedValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for WireguardInterface
+
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return LocatorServerRemovedMultiError(errors)
@@ -3842,34 +3563,7 @@ func (m *AllLocatorsDisabled) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetError()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AllLocatorsDisabledValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AllLocatorsDisabledValidationError{
-					field:  "Error",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetError()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AllLocatorsDisabledValidationError{
-				field:  "Error",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return AllLocatorsDisabledMultiError(errors)
@@ -4153,6 +3847,8 @@ func (m *Logs) validate(all bool) error {
 		}
 
 	}
+
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return LogsMultiError(errors)
@@ -6475,6 +6171,8 @@ func (m *AddWireguardPeer) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for WireguardInterface
+
 	if len(errors) > 0 {
 		return AddWireguardPeerMultiError(errors)
 	}
@@ -6575,7 +6273,9 @@ func (m *SetSTUNServerCommand) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Server
+	// no validation rules for ServerAddress
+
+	// no validation rules for WireguardInterface
 
 	if len(errors) > 0 {
 		return SetSTUNServerCommandMultiError(errors)
@@ -6681,6 +6381,8 @@ func (m *AddLocatorServerCommand) validate(all bool) error {
 
 	// no validation rules for LocatorAddress
 
+	// no validation rules for WireguardInterface
+
 	if len(errors) > 0 {
 		return AddLocatorServerCommandMultiError(errors)
 	}
@@ -6784,6 +6486,8 @@ func (m *RemoveLocatorServerCommand) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for LocatorAddress
+
+	// no validation rules for WireguardInterface
 
 	if len(errors) > 0 {
 		return RemoveLocatorServerCommandMultiError(errors)

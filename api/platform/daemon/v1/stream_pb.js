@@ -5,7 +5,7 @@
 
 import { proto3 } from "@bufbuild/protobuf";
 import { ComponentVersion, Log, SystemStats } from "./system_pb.js";
-import { Locator, WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
+import { WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -94,7 +94,7 @@ export const OSUpdateDiff = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.OSUpdateDiff",
   () => [
     { no: 1, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -109,7 +109,7 @@ export const CurrentDaemonVersion = /*@__PURE__*/ proto3.makeMessageType(
     { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -121,7 +121,7 @@ export const CurrentDaemonVersion = /*@__PURE__*/ proto3.makeMessageType(
 export const DeviceInitialized = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.DeviceInitialized",
   () => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -166,7 +166,7 @@ export const UploadFileChunkCompleted = /*@__PURE__*/ proto3.makeMessageType(
 export const SettingsSaved = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.SettingsSaved",
   () => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -176,7 +176,9 @@ export const SettingsSaved = /*@__PURE__*/ proto3.makeMessageType(
 export const WireguardInterfaceAdded = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.WireguardInterfaceAdded",
   () => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -186,7 +188,8 @@ export const WireguardInterfaceAdded = /*@__PURE__*/ proto3.makeMessageType(
 export const WireguardInterfaceRemoved = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.WireguardInterfaceRemoved",
   () => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -196,7 +199,11 @@ export const WireguardInterfaceRemoved = /*@__PURE__*/ proto3.makeMessageType(
 export const WireguardPeerAdded = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.WireguardPeerAdded",
   () => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "client_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -206,7 +213,9 @@ export const WireguardPeerAdded = /*@__PURE__*/ proto3.makeMessageType(
 export const STUNServerSet = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.STUNServerSet",
   () => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -216,8 +225,9 @@ export const STUNServerSet = /*@__PURE__*/ proto3.makeMessageType(
 export const LocatorServerAdded = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.LocatorServerAdded",
   () => [
-    { no: 1, name: "locator", kind: "message", T: Locator },
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -227,18 +237,21 @@ export const LocatorServerAdded = /*@__PURE__*/ proto3.makeMessageType(
 export const LocatorServerRemoved = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.LocatorServerRemoved",
   () => [
-    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
 /**
+ * Deprecated
+ *
  * @generated from message platform.daemon.v1.AllLocatorsDisabled
  */
 export const AllLocatorsDisabled = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.AllLocatorsDisabled",
   () => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -260,6 +273,7 @@ export const Logs = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "request_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "logs", kind: "message", T: Log, repeated: true },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -487,6 +501,7 @@ export const AddWireguardPeer = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.AddWireguardPeer",
   () => [
     { no: 1, name: "peer", kind: "message", T: WireguardPeer },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -496,7 +511,8 @@ export const AddWireguardPeer = /*@__PURE__*/ proto3.makeMessageType(
 export const SetSTUNServerCommand = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.SetSTUNServerCommand",
   () => [
-    { no: 1, name: "server", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -507,6 +523,7 @@ export const AddLocatorServerCommand = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.AddLocatorServerCommand",
   () => [
     { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -517,10 +534,13 @@ export const RemoveLocatorServerCommand = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.RemoveLocatorServerCommand",
   () => [
     { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
 /**
+ * Deprecated
+ *
  * @generated from message platform.daemon.v1.DisableAllLocatorsCommand
  */
 export const DisableAllLocatorsCommand = /*@__PURE__*/ proto3.makeMessageType(

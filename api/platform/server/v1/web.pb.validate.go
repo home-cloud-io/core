@@ -5387,6 +5387,8 @@ func (m *RegisterToLocatorRequest) validate(all bool) error {
 
 	// no validation rules for LocatorAddress
 
+	// no validation rules for WireguardInterface
+
 	if len(errors) > 0 {
 		return RegisterToLocatorRequestMultiError(errors)
 	}
@@ -5488,35 +5490,6 @@ func (m *RegisterToLocatorResponse) validate(all bool) error {
 	}
 
 	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetLocator()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RegisterToLocatorResponseValidationError{
-					field:  "Locator",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RegisterToLocatorResponseValidationError{
-					field:  "Locator",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetLocator()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RegisterToLocatorResponseValidationError{
-				field:  "Locator",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
 
 	if len(errors) > 0 {
 		return RegisterToLocatorResponseMultiError(errors)
@@ -5622,6 +5595,8 @@ func (m *DeregisterFromLocatorRequest) validate(all bool) error {
 
 	// no validation rules for LocatorAddress
 
+	// no validation rules for WireguardInterface
+
 	if len(errors) > 0 {
 		return DeregisterFromLocatorRequestMultiError(errors)
 	}
@@ -5724,8 +5699,6 @@ func (m *DeregisterFromLocatorResponse) validate(all bool) error {
 	}
 
 	var errors []error
-
-	// no validation rules for LocatorAddress
 
 	if len(errors) > 0 {
 		return DeregisterFromLocatorResponseMultiError(errors)
@@ -7341,11 +7314,11 @@ func (m *DeviceSettings) validate(all bool) error {
 	// no validation rules for EnableSsh
 
 	if all {
-		switch v := interface{}(m.GetLocatorSettings()).(type) {
+		switch v := interface{}(m.GetSecureTunnelingSettings()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, DeviceSettingsValidationError{
-					field:  "LocatorSettings",
+					field:  "SecureTunnelingSettings",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -7353,16 +7326,16 @@ func (m *DeviceSettings) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, DeviceSettingsValidationError{
-					field:  "LocatorSettings",
+					field:  "SecureTunnelingSettings",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetLocatorSettings()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetSecureTunnelingSettings()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DeviceSettingsValidationError{
-				field:  "LocatorSettings",
+				field:  "SecureTunnelingSettings",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -7447,22 +7420,22 @@ var _ interface {
 	ErrorName() string
 } = DeviceSettingsValidationError{}
 
-// Validate checks the field values on LocatorSettings with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *LocatorSettings) Validate() error {
+// Validate checks the field values on SecureTunnelingSettings with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SecureTunnelingSettings) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on LocatorSettings with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on SecureTunnelingSettings with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// LocatorSettingsMultiError, or nil if none found.
-func (m *LocatorSettings) ValidateAll() error {
+// SecureTunnelingSettingsMultiError, or nil if none found.
+func (m *SecureTunnelingSettings) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *LocatorSettings) validate(all bool) error {
+func (m *SecureTunnelingSettings) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -7471,23 +7444,23 @@ func (m *LocatorSettings) validate(all bool) error {
 
 	// no validation rules for Enabled
 
-	for idx, item := range m.GetLocators() {
+	for idx, item := range m.GetWireguardInterfaces() {
 		_, _ = idx, item
 
 		if all {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, LocatorSettingsValidationError{
-						field:  fmt.Sprintf("Locators[%v]", idx),
+					errors = append(errors, SecureTunnelingSettingsValidationError{
+						field:  fmt.Sprintf("WireguardInterfaces[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, LocatorSettingsValidationError{
-						field:  fmt.Sprintf("Locators[%v]", idx),
+					errors = append(errors, SecureTunnelingSettingsValidationError{
+						field:  fmt.Sprintf("WireguardInterfaces[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -7495,8 +7468,8 @@ func (m *LocatorSettings) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return LocatorSettingsValidationError{
-					field:  fmt.Sprintf("Locators[%v]", idx),
+				return SecureTunnelingSettingsValidationError{
+					field:  fmt.Sprintf("WireguardInterfaces[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -7505,22 +7478,20 @@ func (m *LocatorSettings) validate(all bool) error {
 
 	}
 
-	// no validation rules for StunServerAddress
-
 	if len(errors) > 0 {
-		return LocatorSettingsMultiError(errors)
+		return SecureTunnelingSettingsMultiError(errors)
 	}
 
 	return nil
 }
 
-// LocatorSettingsMultiError is an error wrapping multiple validation errors
-// returned by LocatorSettings.ValidateAll() if the designated constraints
-// aren't met.
-type LocatorSettingsMultiError []error
+// SecureTunnelingSettingsMultiError is an error wrapping multiple validation
+// errors returned by SecureTunnelingSettings.ValidateAll() if the designated
+// constraints aren't met.
+type SecureTunnelingSettingsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m LocatorSettingsMultiError) Error() string {
+func (m SecureTunnelingSettingsMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -7529,11 +7500,11 @@ func (m LocatorSettingsMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m LocatorSettingsMultiError) AllErrors() []error { return m }
+func (m SecureTunnelingSettingsMultiError) AllErrors() []error { return m }
 
-// LocatorSettingsValidationError is the validation error returned by
-// LocatorSettings.Validate if the designated constraints aren't met.
-type LocatorSettingsValidationError struct {
+// SecureTunnelingSettingsValidationError is the validation error returned by
+// SecureTunnelingSettings.Validate if the designated constraints aren't met.
+type SecureTunnelingSettingsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -7541,22 +7512,24 @@ type LocatorSettingsValidationError struct {
 }
 
 // Field function returns field value.
-func (e LocatorSettingsValidationError) Field() string { return e.field }
+func (e SecureTunnelingSettingsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LocatorSettingsValidationError) Reason() string { return e.reason }
+func (e SecureTunnelingSettingsValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LocatorSettingsValidationError) Cause() error { return e.cause }
+func (e SecureTunnelingSettingsValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LocatorSettingsValidationError) Key() bool { return e.key }
+func (e SecureTunnelingSettingsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LocatorSettingsValidationError) ErrorName() string { return "LocatorSettingsValidationError" }
+func (e SecureTunnelingSettingsValidationError) ErrorName() string {
+	return "SecureTunnelingSettingsValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e LocatorSettingsValidationError) Error() string {
+func (e SecureTunnelingSettingsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -7568,14 +7541,14 @@ func (e LocatorSettingsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLocatorSettings.%s: %s%s",
+		"invalid %sSecureTunnelingSettings.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LocatorSettingsValidationError{}
+var _ error = SecureTunnelingSettingsValidationError{}
 
 var _ interface {
 	Field() string
@@ -7583,7 +7556,119 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LocatorSettingsValidationError{}
+} = SecureTunnelingSettingsValidationError{}
+
+// Validate checks the field values on WireguardInterface with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *WireguardInterface) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WireguardInterface with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// WireguardInterfaceMultiError, or nil if none found.
+func (m *WireguardInterface) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WireguardInterface) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for Name
+
+	// no validation rules for Port
+
+	// no validation rules for PublicKey
+
+	// no validation rules for StunServer
+
+	if len(errors) > 0 {
+		return WireguardInterfaceMultiError(errors)
+	}
+
+	return nil
+}
+
+// WireguardInterfaceMultiError is an error wrapping multiple validation errors
+// returned by WireguardInterface.ValidateAll() if the designated constraints
+// aren't met.
+type WireguardInterfaceMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WireguardInterfaceMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WireguardInterfaceMultiError) AllErrors() []error { return m }
+
+// WireguardInterfaceValidationError is the validation error returned by
+// WireguardInterface.Validate if the designated constraints aren't met.
+type WireguardInterfaceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WireguardInterfaceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WireguardInterfaceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WireguardInterfaceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WireguardInterfaceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WireguardInterfaceValidationError) ErrorName() string {
+	return "WireguardInterfaceValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WireguardInterfaceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWireguardInterface.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WireguardInterfaceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WireguardInterfaceValidationError{}
 
 // Validate checks the field values on User with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
@@ -8451,8 +8536,6 @@ func (m *RegisterPeerResponse) validate(all bool) error {
 
 	// no validation rules for ServerId
 
-	// no validation rules for LocatorUrl
-
 	if len(errors) > 0 {
 		return RegisterPeerResponseMultiError(errors)
 	}
@@ -8532,248 +8615,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RegisterPeerResponseValidationError{}
-
-// Validate checks the field values on PeerConfiguration with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *PeerConfiguration) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on PeerConfiguration with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// PeerConfigurationMultiError, or nil if none found.
-func (m *PeerConfiguration) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *PeerConfiguration) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Id
-
-	// no validation rules for PublicKey
-
-	// no validation rules for PrivateKey
-
-	if all {
-		switch v := interface{}(m.GetClientDetails()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, PeerConfigurationValidationError{
-					field:  "ClientDetails",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, PeerConfigurationValidationError{
-					field:  "ClientDetails",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetClientDetails()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return PeerConfigurationValidationError{
-				field:  "ClientDetails",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for ServerPublicKey
-
-	if len(errors) > 0 {
-		return PeerConfigurationMultiError(errors)
-	}
-
-	return nil
-}
-
-// PeerConfigurationMultiError is an error wrapping multiple validation errors
-// returned by PeerConfiguration.ValidateAll() if the designated constraints
-// aren't met.
-type PeerConfigurationMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m PeerConfigurationMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m PeerConfigurationMultiError) AllErrors() []error { return m }
-
-// PeerConfigurationValidationError is the validation error returned by
-// PeerConfiguration.Validate if the designated constraints aren't met.
-type PeerConfigurationValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e PeerConfigurationValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e PeerConfigurationValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e PeerConfigurationValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e PeerConfigurationValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e PeerConfigurationValidationError) ErrorName() string {
-	return "PeerConfigurationValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e PeerConfigurationValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPeerConfiguration.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = PeerConfigurationValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = PeerConfigurationValidationError{}
-
-// Validate checks the field values on ClientRegistrationDetails with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *ClientRegistrationDetails) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on ClientRegistrationDetails with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// ClientRegistrationDetailsMultiError, or nil if none found.
-func (m *ClientRegistrationDetails) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *ClientRegistrationDetails) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for ServerAddress
-
-	// no validation rules for LocatorAddress
-
-	if len(errors) > 0 {
-		return ClientRegistrationDetailsMultiError(errors)
-	}
-
-	return nil
-}
-
-// ClientRegistrationDetailsMultiError is an error wrapping multiple validation
-// errors returned by ClientRegistrationDetails.ValidateAll() if the
-// designated constraints aren't met.
-type ClientRegistrationDetailsMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m ClientRegistrationDetailsMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m ClientRegistrationDetailsMultiError) AllErrors() []error { return m }
-
-// ClientRegistrationDetailsValidationError is the validation error returned by
-// ClientRegistrationDetails.Validate if the designated constraints aren't met.
-type ClientRegistrationDetailsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e ClientRegistrationDetailsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e ClientRegistrationDetailsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e ClientRegistrationDetailsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e ClientRegistrationDetailsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e ClientRegistrationDetailsValidationError) ErrorName() string {
-	return "ClientRegistrationDetailsValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e ClientRegistrationDetailsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sClientRegistrationDetails.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = ClientRegistrationDetailsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = ClientRegistrationDetailsValidationError{}

@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { ComponentVersion, Log, SystemStats } from "./system_pb.js";
-import { Locator, WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
+import { WireguardInterface, WireguardPeer } from "./wireguard_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.DaemonMessage
@@ -109,6 +109,8 @@ export class DaemonMessage extends Message<DaemonMessage> {
     case: "locatorServerRemoved";
   } | {
     /**
+     * Deprecated
+     *
      * @generated from field: platform.daemon.v1.AllLocatorsDisabled all_locators_disabled = 16;
      */
     value: AllLocatorsDisabled;
@@ -313,6 +315,8 @@ export class ServerMessage extends Message<ServerMessage> {
     case: "removeLocatorServerCommand";
   } | {
     /**
+     * Deprecated
+     *
      * @generated from field: platform.daemon.v1.DisableAllLocatorsCommand disable_all_locators_command = 22;
      */
     value: DisableAllLocatorsCommand;
@@ -458,9 +462,9 @@ export class OSUpdateDiff extends Message<OSUpdateDiff> {
   description = "";
 
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string error = 16;
    */
-  error?: DaemonError;
+  error = "";
 
   constructor(data?: PartialMessage<OSUpdateDiff>) {
     super();
@@ -471,7 +475,7 @@ export class OSUpdateDiff extends Message<OSUpdateDiff> {
   static readonly typeName = "platform.daemon.v1.OSUpdateDiff";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): OSUpdateDiff {
@@ -513,9 +517,9 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
   srcHash = "";
 
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string error = 16;
    */
-  error?: DaemonError;
+  error = "";
 
   constructor(data?: PartialMessage<CurrentDaemonVersion>) {
     super();
@@ -528,7 +532,7 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
     { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CurrentDaemonVersion {
@@ -555,9 +559,9 @@ export class CurrentDaemonVersion extends Message<CurrentDaemonVersion> {
  */
 export class DeviceInitialized extends Message<DeviceInitialized> {
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string error = 16;
    */
-  error?: DaemonError;
+  error = "";
 
   constructor(data?: PartialMessage<DeviceInitialized>) {
     super();
@@ -567,7 +571,7 @@ export class DeviceInitialized extends Message<DeviceInitialized> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.DeviceInitialized";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeviceInitialized {
@@ -713,9 +717,9 @@ export class UploadFileChunkCompleted extends Message<UploadFileChunkCompleted> 
  */
 export class SettingsSaved extends Message<SettingsSaved> {
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string error = 16;
    */
-  error?: DaemonError;
+  error = "";
 
   constructor(data?: PartialMessage<SettingsSaved>) {
     super();
@@ -725,7 +729,7 @@ export class SettingsSaved extends Message<SettingsSaved> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.SettingsSaved";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SettingsSaved {
@@ -750,9 +754,19 @@ export class SettingsSaved extends Message<SettingsSaved> {
  */
 export class WireguardInterfaceAdded extends Message<WireguardInterfaceAdded> {
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string wireguard_interface = 1;
    */
-  error?: DaemonError;
+  wireguardInterface = "";
+
+  /**
+   * @generated from field: string public_key = 2;
+   */
+  publicKey = "";
+
+  /**
+   * @generated from field: string error = 16;
+   */
+  error = "";
 
   constructor(data?: PartialMessage<WireguardInterfaceAdded>) {
     super();
@@ -762,7 +776,9 @@ export class WireguardInterfaceAdded extends Message<WireguardInterfaceAdded> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.WireguardInterfaceAdded";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardInterfaceAdded {
@@ -787,9 +803,14 @@ export class WireguardInterfaceAdded extends Message<WireguardInterfaceAdded> {
  */
 export class WireguardInterfaceRemoved extends Message<WireguardInterfaceRemoved> {
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string wireguard_interface = 1;
    */
-  error?: DaemonError;
+  wireguardInterface = "";
+
+  /**
+   * @generated from field: string error = 16;
+   */
+  error = "";
 
   constructor(data?: PartialMessage<WireguardInterfaceRemoved>) {
     super();
@@ -799,7 +820,8 @@ export class WireguardInterfaceRemoved extends Message<WireguardInterfaceRemoved
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.WireguardInterfaceRemoved";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardInterfaceRemoved {
@@ -824,9 +846,29 @@ export class WireguardInterfaceRemoved extends Message<WireguardInterfaceRemoved
  */
 export class WireguardPeerAdded extends Message<WireguardPeerAdded> {
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string wireguard_interface = 1;
    */
-  error?: DaemonError;
+  wireguardInterface = "";
+
+  /**
+   * @generated from field: string client_public_key = 2;
+   */
+  clientPublicKey = "";
+
+  /**
+   * @generated from field: repeated string addresses = 3;
+   */
+  addresses: string[] = [];
+
+  /**
+   * @generated from field: repeated string dns_servers = 4;
+   */
+  dnsServers: string[] = [];
+
+  /**
+   * @generated from field: string error = 16;
+   */
+  error = "";
 
   constructor(data?: PartialMessage<WireguardPeerAdded>) {
     super();
@@ -836,7 +878,11 @@ export class WireguardPeerAdded extends Message<WireguardPeerAdded> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.WireguardPeerAdded";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "client_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardPeerAdded {
@@ -861,9 +907,19 @@ export class WireguardPeerAdded extends Message<WireguardPeerAdded> {
  */
 export class STUNServerSet extends Message<STUNServerSet> {
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string server_address = 1;
    */
-  error?: DaemonError;
+  serverAddress = "";
+
+  /**
+   * @generated from field: string wireguard_interface = 2;
+   */
+  wireguardInterface = "";
+
+  /**
+   * @generated from field: string error = 16;
+   */
+  error = "";
 
   constructor(data?: PartialMessage<STUNServerSet>) {
     super();
@@ -873,7 +929,9 @@ export class STUNServerSet extends Message<STUNServerSet> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.STUNServerSet";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): STUNServerSet {
@@ -898,14 +956,19 @@ export class STUNServerSet extends Message<STUNServerSet> {
  */
 export class LocatorServerAdded extends Message<LocatorServerAdded> {
   /**
-   * @generated from field: platform.daemon.v1.Locator locator = 1;
+   * @generated from field: string locator_address = 1;
    */
-  locator?: Locator;
+  locatorAddress = "";
 
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string wireguard_interface = 2;
    */
-  error?: DaemonError;
+  wireguardInterface = "";
+
+  /**
+   * @generated from field: string error = 16;
+   */
+  error = "";
 
   constructor(data?: PartialMessage<LocatorServerAdded>) {
     super();
@@ -915,8 +978,9 @@ export class LocatorServerAdded extends Message<LocatorServerAdded> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.LocatorServerAdded";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "locator", kind: "message", T: Locator },
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorServerAdded {
@@ -941,14 +1005,19 @@ export class LocatorServerAdded extends Message<LocatorServerAdded> {
  */
 export class LocatorServerRemoved extends Message<LocatorServerRemoved> {
   /**
-   * @generated from field: string address = 1;
+   * @generated from field: string locator_address = 1;
    */
-  address = "";
+  locatorAddress = "";
 
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string wireguard_interface = 2;
    */
-  error?: DaemonError;
+  wireguardInterface = "";
+
+  /**
+   * @generated from field: string error = 16;
+   */
+  error = "";
 
   constructor(data?: PartialMessage<LocatorServerRemoved>) {
     super();
@@ -958,8 +1027,9 @@ export class LocatorServerRemoved extends Message<LocatorServerRemoved> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.LocatorServerRemoved";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorServerRemoved {
@@ -980,13 +1050,15 @@ export class LocatorServerRemoved extends Message<LocatorServerRemoved> {
 }
 
 /**
+ * Deprecated
+ *
  * @generated from message platform.daemon.v1.AllLocatorsDisabled
  */
 export class AllLocatorsDisabled extends Message<AllLocatorsDisabled> {
   /**
-   * @generated from field: platform.daemon.v1.DaemonError error = 16;
+   * @generated from field: string error = 16;
    */
-  error?: DaemonError;
+  error = "";
 
   constructor(data?: PartialMessage<AllLocatorsDisabled>) {
     super();
@@ -996,7 +1068,7 @@ export class AllLocatorsDisabled extends Message<AllLocatorsDisabled> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.AllLocatorsDisabled";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 16, name: "error", kind: "message", T: DaemonError },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AllLocatorsDisabled {
@@ -1067,6 +1139,11 @@ export class Logs extends Message<Logs> {
    */
   logs: Log[] = [];
 
+  /**
+   * @generated from field: string error = 16;
+   */
+  error = "";
+
   constructor(data?: PartialMessage<Logs>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1077,6 +1154,7 @@ export class Logs extends Message<Logs> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "request_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "logs", kind: "message", T: Log, repeated: true },
+    { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Logs {
@@ -1902,6 +1980,11 @@ export class AddWireguardPeer extends Message<AddWireguardPeer> {
    */
   peer?: WireguardPeer;
 
+  /**
+   * @generated from field: string wireguard_interface = 2;
+   */
+  wireguardInterface = "";
+
   constructor(data?: PartialMessage<AddWireguardPeer>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1911,6 +1994,7 @@ export class AddWireguardPeer extends Message<AddWireguardPeer> {
   static readonly typeName = "platform.daemon.v1.AddWireguardPeer";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "peer", kind: "message", T: WireguardPeer },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddWireguardPeer {
@@ -1935,9 +2019,14 @@ export class AddWireguardPeer extends Message<AddWireguardPeer> {
  */
 export class SetSTUNServerCommand extends Message<SetSTUNServerCommand> {
   /**
-   * @generated from field: string server = 1;
+   * @generated from field: string server_address = 1;
    */
-  server = "";
+  serverAddress = "";
+
+  /**
+   * @generated from field: string wireguard_interface = 2;
+   */
+  wireguardInterface = "";
 
   constructor(data?: PartialMessage<SetSTUNServerCommand>) {
     super();
@@ -1947,7 +2036,8 @@ export class SetSTUNServerCommand extends Message<SetSTUNServerCommand> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.daemon.v1.SetSTUNServerCommand";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "server", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "server_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetSTUNServerCommand {
@@ -1972,11 +2062,16 @@ export class SetSTUNServerCommand extends Message<SetSTUNServerCommand> {
  */
 export class AddLocatorServerCommand extends Message<AddLocatorServerCommand> {
   /**
-   * TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
-   *
    * @generated from field: string locator_address = 1;
    */
   locatorAddress = "";
+
+  /**
+   * TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
+   *
+   * @generated from field: string wireguard_interface = 2;
+   */
+  wireguardInterface = "";
 
   constructor(data?: PartialMessage<AddLocatorServerCommand>) {
     super();
@@ -1987,6 +2082,7 @@ export class AddLocatorServerCommand extends Message<AddLocatorServerCommand> {
   static readonly typeName = "platform.daemon.v1.AddLocatorServerCommand";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddLocatorServerCommand {
@@ -2015,6 +2111,11 @@ export class RemoveLocatorServerCommand extends Message<RemoveLocatorServerComma
    */
   locatorAddress = "";
 
+  /**
+   * @generated from field: string wireguard_interface = 2;
+   */
+  wireguardInterface = "";
+
   constructor(data?: PartialMessage<RemoveLocatorServerCommand>) {
     super();
     proto3.util.initPartial(data, this);
@@ -2024,6 +2125,7 @@ export class RemoveLocatorServerCommand extends Message<RemoveLocatorServerComma
   static readonly typeName = "platform.daemon.v1.RemoveLocatorServerCommand";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "locator_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RemoveLocatorServerCommand {
@@ -2044,6 +2146,8 @@ export class RemoveLocatorServerCommand extends Message<RemoveLocatorServerComma
 }
 
 /**
+ * Deprecated
+ *
  * @generated from message platform.daemon.v1.DisableAllLocatorsCommand
  */
 export class DisableAllLocatorsCommand extends Message<DisableAllLocatorsCommand> {
