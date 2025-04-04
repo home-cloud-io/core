@@ -3,31 +3,32 @@ package system
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	"github.com/home-cloud-io/core/services/platform/server/async"
+	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 )
 
 type (
 	Locators interface {
-		AddLocator(ctx context.Context, locatorAddress string) (locator *dv1.Locator, err error)
+		AddLocator(ctx context.Context, locatorAddress string) (err error)
 		RemoveLocator(ctx context.Context, locatorAddress string) error
-		DisableAllLocators(ctx context.Context) error
 	}
 )
 
-func (c *controller) AddLocator(ctx context.Context, locatorAddress string) (locator *dv1.Locator, err error) {
+func (c *controller) AddLocator(ctx context.Context, locatorAddress string) (err error) {
 
 	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.LocatorServerAdded]{
 		Callback: func(event *dv1.LocatorServerAdded) (bool, error) {
-			if event.Error != nil {
-				return true, fmt.Errorf(event.Error.Error)
-			}
 			// not done yet if the locator doesn't match
-			if event.Locator.Address != locatorAddress {
+			if event.LocatorAddress != locatorAddress {
 				return false, nil
 			}
-			locator = event.Locator
+			if event.Error != "" {
+				return true, fmt.Errorf(event.Error)
+			}
 			return true, nil
 		},
 	})
@@ -39,26 +40,37 @@ func (c *controller) AddLocator(ctx context.Context, locatorAddress string) (loc
 		},
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
 	err = listener.Listen(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return locator, nil
+	settings := &v1.DeviceSettings{}
+	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return err
+	}
+	settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers = append(settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers, locatorAddress)
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return fmt.Errorf("failed to save settings")
+	}
+
+	return nil
 }
 
 func (c *controller) RemoveLocator(ctx context.Context, locatorAddress string) (err error) {
 
 	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.LocatorServerRemoved]{
 		Callback: func(event *dv1.LocatorServerRemoved) (bool, error) {
-			if event.Error != nil {
-				return true, fmt.Errorf(event.Error.Error)
-			}
 			// not done yet if the locator doesn't match
-			if event.Address != locatorAddress {
+			if event.LocatorAddress != locatorAddress {
 				return false, nil
+			}
+			if event.Error != "" {
+				return true, fmt.Errorf(event.Error)
 			}
 			return true, nil
 		},
@@ -78,30 +90,19 @@ func (c *controller) RemoveLocator(ctx context.Context, locatorAddress string) (
 		return err
 	}
 
-	return nil
-}
-
-func (c *controller) DisableAllLocators(ctx context.Context) (err error) {
-
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.AllLocatorsDisabled]{
-		Callback: func(event *dv1.AllLocatorsDisabled) (bool, error) {
-			if event.Error != nil {
-				return true, fmt.Errorf(event.Error.Error)
-			}
-			return true, nil
-		},
-	})
-	err = com.Send(&dv1.ServerMessage{
-		Message: &dv1.ServerMessage_DisableAllLocatorsCommand{
-			DisableAllLocatorsCommand: &dv1.DisableAllLocatorsCommand{},
-		},
-	})
+	settings := &v1.DeviceSettings{}
+	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
 		return err
 	}
-	err = listener.Listen(ctx)
+	for i, l := range settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers {
+		if l == locatorAddress {
+			settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers = slices.Delete(settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers, i, i)
+		}
+	}
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to save settings")
 	}
 
 	return nil

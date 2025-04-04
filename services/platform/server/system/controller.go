@@ -72,8 +72,7 @@ const (
 	// will probably want to support multiple interfaces (e.g. one for trusted mobile clients and another for federated servers)
 	DefaultWireguardInterface = "wg0"
 	// TODO: make this configurable
-	// DefaultSTUNServerAddress = "locator.home-cloud.io:3478"
-	DefaultSTUNServerAddress = "stunserver2025.stunprotocol.org:3478"
+	DefaultSTUNServerAddress = "locator1.home-cloud.io:3478"
 )
 
 // helper functions
@@ -82,8 +81,8 @@ func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cm
 	logger.Info("saving settings")
 	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.SettingsSaved]{
 		Callback: func(event *dv1.SettingsSaved) (bool, error) {
-			if event.Error != nil {
-				return true, errors.New(event.Error.Error)
+			if event.Error != "" {
+				return true, errors.New(event.Error)
 			}
 			return true, nil
 		},
