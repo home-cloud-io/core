@@ -53,6 +53,7 @@ func NewSTUNController(logger chassis.Logger) STUNController {
 }
 
 func (c *stunController) Bind(port int, server string) (err error) {
+	c.logger.WithField("port", port).WithField("stun_server", server).Info("binding to STUN server")
 	ctx, cancel := context.WithCancel(context.Background())
 	binding := &stunBinding{
 		cancel: cancel,
