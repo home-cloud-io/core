@@ -49,6 +49,7 @@ const (
 func NewSTUNController(logger chassis.Logger) STUNController {
 	return &stunController{
 		logger: logger,
+		bindings: make(map[int]*stunBinding),
 	}
 }
 
