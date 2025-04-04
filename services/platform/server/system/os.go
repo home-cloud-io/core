@@ -27,9 +27,9 @@ type (
 		AutoUpdateOS(logger chassis.Logger)
 		// UpdateOS will check for and install any OS (including Daemon) updates one time.
 		UpdateOS(ctx context.Context, logger chassis.Logger) error
-		// EnableWireguard will initialize the Wireguard server on the host and save the configuration to Blueprint
+		// EnableWireguard will initialize the Wireguard server on the host
 		EnableWireguard(ctx context.Context, logger chassis.Logger) error
-		// DisableWireguard will disable the Wireguard server on the host and delete the configuration from Blueprint
+		// DisableWireguard will disable the Wireguard server on the host
 		DisableWireguard(ctx context.Context, logger chassis.Logger) error
 	}
 )
@@ -255,7 +255,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	if err != nil {
 		return err
 	}
-	settings.RemoteAccessSettings = &v1.RemoteAccessSettings{
+	settings.SecureTunnelingSettings = &v1.SecureTunnelingSettings{
 		Enabled: true,
 		WireguardInterfaces: []*v1.WireguardInterface{
 			{
@@ -311,7 +311,7 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 	if err != nil {
 		return err
 	}
-	settings.RemoteAccessSettings = &v1.RemoteAccessSettings{
+	settings.SecureTunnelingSettings = &v1.SecureTunnelingSettings{
 		Enabled: false,
 		WireguardInterfaces: []*v1.WireguardInterface{},
 	}

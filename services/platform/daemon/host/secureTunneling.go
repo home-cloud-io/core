@@ -53,7 +53,7 @@ func Enable() {
 
 func (c remoteAccessController) Load() {
 	ctx := context.Background()
-	settings, err := remoteAccessSettings()
+	settings, err := secureTunnelingSettings()
 	if err != nil {
 		c.logger.WithError(err).Error("failed to read remote access settings")
 		return
@@ -106,7 +106,7 @@ func (c remoteAccessController) AddInterface(ctx context.Context, wgInterface *v
 }
 
 func (c remoteAccessController) RemoveInterface(ctx context.Context, wgInterfaceName string) error {
-	settings, err := remoteAccessSettings()
+	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return err
 	}
@@ -146,13 +146,13 @@ func (c remoteAccessController) RemoveInterface(ctx context.Context, wgInterface
 	}
 
 	// update settings config
-	chassis.GetConfig().SetAndWrite(RemoteAccessSettingsKey, settings)
+	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
 
 	return nil
 }
 
 func (c remoteAccessController) AddPeer(ctx context.Context, wgInterfaceName string, peer *v1.WireguardPeer) (addresses []string, dnsServers []string, err error) {
-	settings, err := remoteAccessSettings()
+	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -184,7 +184,7 @@ func (c remoteAccessController) AddPeer(ctx context.Context, wgInterfaceName str
 }
 
 func (c remoteAccessController) AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error {
-	settings, err := remoteAccessSettings()
+	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return err
 	}
@@ -211,7 +211,7 @@ func (c remoteAccessController) AddLocator(ctx context.Context, wgInterfaceName 
 	wgInterface.LocatorServers = append(wgInterface.LocatorServers, locatorAddress)
 
 	// update settings config
-	chassis.GetConfig().SetAndWrite(RemoteAccessSettingsKey, settings)
+	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
 
 	// open connection to new locator
 	c.locatorController.Connect(ctx, wgInterface, locatorAddress)
@@ -220,7 +220,7 @@ func (c remoteAccessController) AddLocator(ctx context.Context, wgInterfaceName 
 }
 
 func (c remoteAccessController) RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error {
-	settings, err := remoteAccessSettings()
+	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return err
 	}
@@ -245,7 +245,7 @@ func (c remoteAccessController) RemoveLocator(ctx context.Context, wgInterfaceNa
 	}
 
 	// update settings config
-	chassis.GetConfig().SetAndWrite(RemoteAccessSettingsKey, settings)
+	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
 
 	// close connection to locator
 	c.locatorController.Close(wgInterface, locatorAddress)
@@ -254,7 +254,7 @@ func (c remoteAccessController) RemoveLocator(ctx context.Context, wgInterfaceNa
 }
 
 func (c remoteAccessController) RemoveAllLocators(ctx context.Context, wgInterfaceName string) error {
-	settings, err := remoteAccessSettings()
+	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return err
 	}
@@ -277,13 +277,13 @@ func (c remoteAccessController) RemoveAllLocators(ctx context.Context, wgInterfa
 
 	// update settings config
 	wgInterface.LocatorServers = []string{}
-	chassis.GetConfig().SetAndWrite(RemoteAccessSettingsKey, settings)
+	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
 
 	return nil
 }
 
 func (c remoteAccessController) BindSTUNServer(ctx context.Context, wgInterfaceName string, stunServerAddress string) error {
-	settings, err := remoteAccessSettings()
+	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return err
 	}
@@ -313,19 +313,19 @@ func (c remoteAccessController) BindSTUNServer(ctx context.Context, wgInterfaceN
 
 	// update settings config
 	wgInterface.StunServer = stunServerAddress
-	chassis.GetConfig().SetAndWrite(RemoteAccessSettingsKey, settings)
+	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
 
 	return nil
 }
 
-func remoteAccessSettings() (*sv1.RemoteAccessSettings, error) {
+func secureTunnelingSettings() (*sv1.SecureTunnelingSettings, error) {
 	var (
-		settings = &sv1.RemoteAccessSettings{}
+		settings = &sv1.SecureTunnelingSettings{}
 		err      error
 	)
 
 	// check if locator already is configured for the given interface
-	err = chassis.GetConfig().UnmarshalKey(RemoteAccessSettingsKey, settings)
+	err = chassis.GetConfig().UnmarshalKey(SecureTunnelingSettingsKey, settings)
 	if err != nil {
 		return nil, err
 	}

@@ -35,12 +35,12 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		return nil, err
 	}
 
-	if !settings.RemoteAccessSettings.Enabled {
-		return nil, errors.New("secure tunnelling not enabled")
+	if !settings.SecureTunnelingSettings.Enabled {
+		return nil, errors.New("secure tunneling not enabled")
 	}
 
 	// TODO: handle multiple interfaces
-	wgInterface := settings.RemoteAccessSettings.WireguardInterfaces[0]
+	wgInterface := settings.SecureTunnelingSettings.WireguardInterfaces[0]
 
 	// create pub/priv key
 	privKey, err := wgtypes.GeneratePrivateKey()

@@ -52,7 +52,7 @@ func (c *controller) AddLocator(ctx context.Context, locatorAddress string) (err
 	if err != nil {
 		return err
 	}
-	settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers = append(settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers, locatorAddress)
+	settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers = append(settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers, locatorAddress)
 	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
 		return fmt.Errorf("failed to save settings")
@@ -95,9 +95,9 @@ func (c *controller) RemoveLocator(ctx context.Context, locatorAddress string) (
 	if err != nil {
 		return err
 	}
-	for i, l := range settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers {
+	for i, l := range settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers {
 		if l == locatorAddress {
-			settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers = slices.Delete(settings.RemoteAccessSettings.WireguardInterfaces[0].LocatorServers, i, i)
+			settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers = slices.Delete(settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers, i, i)
 		}
 	}
 	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)

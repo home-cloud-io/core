@@ -249,7 +249,7 @@ func (h *rpcHandler) InitializeDevice(ctx context.Context, request *connect.Requ
 		Timezone:       msg.GetTimezone(),
 		AutoUpdateApps: msg.GetAutoUpdateApps(),
 		AutoUpdateOs:   msg.GetAutoUpdateOs(),
-		RemoteAccessSettings: &v1.RemoteAccessSettings{
+		SecureTunnelingSettings: &v1.SecureTunnelingSettings{
 			Enabled: false,
 		},
 	}

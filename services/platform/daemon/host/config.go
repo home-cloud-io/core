@@ -1,5 +1,5 @@
 package host
 
 const (
-	RemoteAccessSettingsKey = "daemon.remoteAccessSettings"
+	SecureTunnelingSettingsKey = "daemon.secureTunnelingSettings"
 )
