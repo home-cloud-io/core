@@ -207,7 +207,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 			publicKey = event.PublicKey
 			return true, nil
 		},
-		Timeout: 30 * time.Second,
+		Timeout: 300 * time.Second,
 	})
 
 	err = com.Send(&dv1.ServerMessage{
@@ -289,7 +289,7 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 			}
 			return true, nil
 		},
-		Timeout: 30 * time.Second,
+		Timeout: 300 * time.Second,
 	})
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RemoveWireguardInterface{
