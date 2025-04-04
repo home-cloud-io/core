@@ -7,43 +7,6 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3 } from "@bufbuild/protobuf";
 
 /**
- * @generated from message platform.daemon.v1.WireguardConfig
- */
-export class WireguardConfig extends Message<WireguardConfig> {
-  /**
-   * @generated from field: repeated platform.daemon.v1.WireguardInterface interfaces = 1;
-   */
-  interfaces: WireguardInterface[] = [];
-
-  constructor(data?: PartialMessage<WireguardConfig>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.daemon.v1.WireguardConfig";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "interfaces", kind: "message", T: WireguardInterface, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardConfig {
-    return new WireguardConfig().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WireguardConfig {
-    return new WireguardConfig().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WireguardConfig {
-    return new WireguardConfig().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: WireguardConfig | PlainMessage<WireguardConfig> | undefined, b: WireguardConfig | PlainMessage<WireguardConfig> | undefined): boolean {
-    return proto3.util.equals(WireguardConfig, a, b);
-  }
-}
-
-/**
  * @generated from message platform.daemon.v1.WireguardInterface
  */
 export class WireguardInterface extends Message<WireguardInterface> {
@@ -58,22 +21,17 @@ export class WireguardInterface extends Message<WireguardInterface> {
   name = "";
 
   /**
-   * @generated from field: string private_key = 3;
-   */
-  privateKey = "";
-
-  /**
-   * @generated from field: repeated string ips = 4;
+   * @generated from field: repeated string ips = 3;
    */
   ips: string[] = [];
 
   /**
-   * @generated from field: uint32 listen_port = 5;
+   * @generated from field: uint32 listen_port = 4;
    */
   listenPort = 0;
 
   /**
-   * @generated from field: repeated platform.daemon.v1.WireguardPeer peers = 6;
+   * @generated from field: repeated platform.daemon.v1.WireguardPeer peers = 5;
    */
   peers: WireguardPeer[] = [];
 
@@ -87,10 +45,9 @@ export class WireguardInterface extends Message<WireguardInterface> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "ips", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "listen_port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 6, name: "peers", kind: "message", T: WireguardPeer, repeated: true },
+    { no: 3, name: "ips", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "listen_port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 5, name: "peers", kind: "message", T: WireguardPeer, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WireguardInterface {
@@ -150,100 +107,6 @@ export class WireguardPeer extends Message<WireguardPeer> {
 
   static equals(a: WireguardPeer | PlainMessage<WireguardPeer> | undefined, b: WireguardPeer | PlainMessage<WireguardPeer> | undefined): boolean {
     return proto3.util.equals(WireguardPeer, a, b);
-  }
-}
-
-/**
- * @generated from message platform.daemon.v1.Locator
- */
-export class Locator extends Message<Locator> {
-  /**
-   * address is the full web address (e.g. https://locator.home-cloud.io) of the locator server
-   *
-   * @generated from field: string address = 1;
-   */
-  address = "";
-
-  /**
-   * @generated from field: repeated platform.daemon.v1.LocatorConnection connections = 2;
-   */
-  connections: LocatorConnection[] = [];
-
-  constructor(data?: PartialMessage<Locator>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.daemon.v1.Locator";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "connections", kind: "message", T: LocatorConnection, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Locator {
-    return new Locator().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Locator {
-    return new Locator().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Locator {
-    return new Locator().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Locator | PlainMessage<Locator> | undefined, b: Locator | PlainMessage<Locator> | undefined): boolean {
-    return proto3.util.equals(Locator, a, b);
-  }
-}
-
-/**
- * @generated from message platform.daemon.v1.LocatorConnection
- */
-export class LocatorConnection extends Message<LocatorConnection> {
-  /**
-   * server_id is the globally unique identifier for the Home Cloud server instance
-   * it is used by clients as part of the locator query
-   *
-   * @generated from field: string server_id = 1;
-   */
-  serverId = "";
-
-  /**
-   * wireguard_interface is the internal wireguard instance to share the connection information
-   * of through this locator
-   *
-   * @generated from field: string wireguard_interface = 2;
-   */
-  wireguardInterface = "";
-
-  constructor(data?: PartialMessage<LocatorConnection>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.daemon.v1.LocatorConnection";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LocatorConnection {
-    return new LocatorConnection().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LocatorConnection {
-    return new LocatorConnection().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LocatorConnection {
-    return new LocatorConnection().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: LocatorConnection | PlainMessage<LocatorConnection> | undefined, b: LocatorConnection | PlainMessage<LocatorConnection> | undefined): boolean {
-    return proto3.util.equals(LocatorConnection, a, b);
   }
 }
 

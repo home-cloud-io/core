@@ -311,6 +311,38 @@ export const getAppStorage = {
 };
 
 /**
+ * GetComponentVersions returns the versions of all system components (daemon, server, etc.)
+ *
+ * @generated from rpc platform.server.v1.WebService.GetComponentVersions
+ */
+export const getComponentVersions = {
+  localName: "getComponentVersions",
+  name: "GetComponentVersions",
+  kind: MethodKind.Unary,
+  I: GetComponentVersionsRequest,
+  O: GetComponentVersionsResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
+ *
+ * @generated from rpc platform.server.v1.WebService.GetSystemLogs
+ */
+export const getSystemLogs = {
+  localName: "getSystemLogs",
+  name: "GetSystemLogs",
+  kind: MethodKind.Unary,
+  I: GetSystemLogsRequest,
+  O: GetSystemLogsResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
  * Enables the remote access feature
  *
  * @generated from rpc platform.server.v1.WebService.EnableSecureTunnelling
@@ -385,38 +417,6 @@ export const registerPeer = {
   kind: MethodKind.Unary,
   I: RegisterPeerRequest,
   O: RegisterPeerResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-};
-
-/**
- * GetComponentVersions returns the versions of all system components (daemon, server, etc.)
- *
- * @generated from rpc platform.server.v1.WebService.GetComponentVersions
- */
-export const getComponentVersions = {
-  localName: "getComponentVersions",
-  name: "GetComponentVersions",
-  kind: MethodKind.Unary,
-  I: GetComponentVersionsRequest,
-  O: GetComponentVersionsResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-};
-
-/**
- * GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
- *
- * @generated from rpc platform.server.v1.WebService.GetSystemLogs
- */
-export const getSystemLogs = {
-  localName: "getSystemLogs",
-  name: "GetSystemLogs",
-  kind: MethodKind.Unary,
-  I: GetSystemLogsRequest,
-  O: GetSystemLogsResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

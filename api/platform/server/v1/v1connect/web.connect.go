@@ -84,6 +84,12 @@ const (
 	// WebServiceGetAppStorageProcedure is the fully-qualified name of the WebService's GetAppStorage
 	// RPC.
 	WebServiceGetAppStorageProcedure = "/platform.server.v1.WebService/GetAppStorage"
+	// WebServiceGetComponentVersionsProcedure is the fully-qualified name of the WebService's
+	// GetComponentVersions RPC.
+	WebServiceGetComponentVersionsProcedure = "/platform.server.v1.WebService/GetComponentVersions"
+	// WebServiceGetSystemLogsProcedure is the fully-qualified name of the WebService's GetSystemLogs
+	// RPC.
+	WebServiceGetSystemLogsProcedure = "/platform.server.v1.WebService/GetSystemLogs"
 	// WebServiceEnableSecureTunnellingProcedure is the fully-qualified name of the WebService's
 	// EnableSecureTunnelling RPC.
 	WebServiceEnableSecureTunnellingProcedure = "/platform.server.v1.WebService/EnableSecureTunnelling"
@@ -98,12 +104,6 @@ const (
 	WebServiceDeregisterFromLocatorProcedure = "/platform.server.v1.WebService/DeregisterFromLocator"
 	// WebServiceRegisterPeerProcedure is the fully-qualified name of the WebService's RegisterPeer RPC.
 	WebServiceRegisterPeerProcedure = "/platform.server.v1.WebService/RegisterPeer"
-	// WebServiceGetComponentVersionsProcedure is the fully-qualified name of the WebService's
-	// GetComponentVersions RPC.
-	WebServiceGetComponentVersionsProcedure = "/platform.server.v1.WebService/GetComponentVersions"
-	// WebServiceGetSystemLogsProcedure is the fully-qualified name of the WebService's GetSystemLogs
-	// RPC.
-	WebServiceGetSystemLogsProcedure = "/platform.server.v1.WebService/GetSystemLogs"
 	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
 	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
 )
@@ -130,13 +130,13 @@ var (
 	webServiceGetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("GetDeviceSettings")
 	webServiceSetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("SetDeviceSettings")
 	webServiceGetAppStorageMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("GetAppStorage")
+	webServiceGetComponentVersionsMethodDescriptor     = webServiceServiceDescriptor.Methods().ByName("GetComponentVersions")
+	webServiceGetSystemLogsMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("GetSystemLogs")
 	webServiceEnableSecureTunnellingMethodDescriptor   = webServiceServiceDescriptor.Methods().ByName("EnableSecureTunnelling")
 	webServiceDisableSecureTunnellingMethodDescriptor  = webServiceServiceDescriptor.Methods().ByName("DisableSecureTunnelling")
 	webServiceRegisterToLocatorMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("RegisterToLocator")
 	webServiceDeregisterFromLocatorMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("DeregisterFromLocator")
 	webServiceRegisterPeerMethodDescriptor             = webServiceServiceDescriptor.Methods().ByName("RegisterPeer")
-	webServiceGetComponentVersionsMethodDescriptor     = webServiceServiceDescriptor.Methods().ByName("GetComponentVersions")
-	webServiceGetSystemLogsMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("GetSystemLogs")
 	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
 )
 
@@ -180,6 +180,10 @@ type WebServiceClient interface {
 	SetDeviceSettings(context.Context, *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error)
 	// Get all installed app storage volumes
 	GetAppStorage(context.Context, *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error)
+	// GetComponentVersions returns the versions of all system components (daemon, server, etc.)
+	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
+	// GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
+	GetSystemLogs(context.Context, *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error)
 	// Enables the remote access feature
 	EnableSecureTunnelling(context.Context, *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error)
 	// Disables the remote access feature
@@ -190,10 +194,6 @@ type WebServiceClient interface {
 	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
 	// RegisterPeer is used to connect a client to the home-cloud overlay network
 	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
-	// GetComponentVersions returns the versions of all system components (daemon, server, etc.)
-	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
-	// GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
-	GetSystemLogs(context.Context, *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
 }
@@ -322,6 +322,18 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceGetAppStorageMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getComponentVersions: connect.NewClient[v1.GetComponentVersionsRequest, v1.GetComponentVersionsResponse](
+			httpClient,
+			baseURL+WebServiceGetComponentVersionsProcedure,
+			connect.WithSchema(webServiceGetComponentVersionsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getSystemLogs: connect.NewClient[v1.GetSystemLogsRequest, v1.GetSystemLogsResponse](
+			httpClient,
+			baseURL+WebServiceGetSystemLogsProcedure,
+			connect.WithSchema(webServiceGetSystemLogsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		enableSecureTunnelling: connect.NewClient[v1.EnableSecureTunnellingRequest, v1.EnableSecureTunnellingResponse](
 			httpClient,
 			baseURL+WebServiceEnableSecureTunnellingProcedure,
@@ -350,18 +362,6 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			httpClient,
 			baseURL+WebServiceRegisterPeerProcedure,
 			connect.WithSchema(webServiceRegisterPeerMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getComponentVersions: connect.NewClient[v1.GetComponentVersionsRequest, v1.GetComponentVersionsResponse](
-			httpClient,
-			baseURL+WebServiceGetComponentVersionsProcedure,
-			connect.WithSchema(webServiceGetComponentVersionsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getSystemLogs: connect.NewClient[v1.GetSystemLogsRequest, v1.GetSystemLogsResponse](
-			httpClient,
-			baseURL+WebServiceGetSystemLogsProcedure,
-			connect.WithSchema(webServiceGetSystemLogsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		subscribe: connect.NewClient[v1.SubscribeRequest, v1.ServerEvent](
@@ -394,13 +394,13 @@ type webServiceClient struct {
 	getDeviceSettings        *connect.Client[v1.GetDeviceSettingsRequest, v1.GetDeviceSettingsResponse]
 	setDeviceSettings        *connect.Client[v1.SetDeviceSettingsRequest, v1.SetDeviceSettingsResponse]
 	getAppStorage            *connect.Client[v1.GetAppStorageRequest, v1.GetAppStorageResponse]
+	getComponentVersions     *connect.Client[v1.GetComponentVersionsRequest, v1.GetComponentVersionsResponse]
+	getSystemLogs            *connect.Client[v1.GetSystemLogsRequest, v1.GetSystemLogsResponse]
 	enableSecureTunnelling   *connect.Client[v1.EnableSecureTunnellingRequest, v1.EnableSecureTunnellingResponse]
 	disableSecureTunnelling  *connect.Client[v1.DisableSecureTunnellingRequest, v1.DisableSecureTunnellingResponse]
 	registerToLocator        *connect.Client[v1.RegisterToLocatorRequest, v1.RegisterToLocatorResponse]
 	deregisterFromLocator    *connect.Client[v1.DeregisterFromLocatorRequest, v1.DeregisterFromLocatorResponse]
 	registerPeer             *connect.Client[v1.RegisterPeerRequest, v1.RegisterPeerResponse]
-	getComponentVersions     *connect.Client[v1.GetComponentVersionsRequest, v1.GetComponentVersionsResponse]
-	getSystemLogs            *connect.Client[v1.GetSystemLogsRequest, v1.GetSystemLogsResponse]
 	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
 }
 
@@ -499,6 +499,16 @@ func (c *webServiceClient) GetAppStorage(ctx context.Context, req *connect.Reque
 	return c.getAppStorage.CallUnary(ctx, req)
 }
 
+// GetComponentVersions calls platform.server.v1.WebService.GetComponentVersions.
+func (c *webServiceClient) GetComponentVersions(ctx context.Context, req *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error) {
+	return c.getComponentVersions.CallUnary(ctx, req)
+}
+
+// GetSystemLogs calls platform.server.v1.WebService.GetSystemLogs.
+func (c *webServiceClient) GetSystemLogs(ctx context.Context, req *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error) {
+	return c.getSystemLogs.CallUnary(ctx, req)
+}
+
 // EnableSecureTunnelling calls platform.server.v1.WebService.EnableSecureTunnelling.
 func (c *webServiceClient) EnableSecureTunnelling(ctx context.Context, req *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error) {
 	return c.enableSecureTunnelling.CallUnary(ctx, req)
@@ -522,16 +532,6 @@ func (c *webServiceClient) DeregisterFromLocator(ctx context.Context, req *conne
 // RegisterPeer calls platform.server.v1.WebService.RegisterPeer.
 func (c *webServiceClient) RegisterPeer(ctx context.Context, req *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
 	return c.registerPeer.CallUnary(ctx, req)
-}
-
-// GetComponentVersions calls platform.server.v1.WebService.GetComponentVersions.
-func (c *webServiceClient) GetComponentVersions(ctx context.Context, req *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error) {
-	return c.getComponentVersions.CallUnary(ctx, req)
-}
-
-// GetSystemLogs calls platform.server.v1.WebService.GetSystemLogs.
-func (c *webServiceClient) GetSystemLogs(ctx context.Context, req *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error) {
-	return c.getSystemLogs.CallUnary(ctx, req)
 }
 
 // Subscribe calls platform.server.v1.WebService.Subscribe.
@@ -579,6 +579,10 @@ type WebServiceHandler interface {
 	SetDeviceSettings(context.Context, *connect.Request[v1.SetDeviceSettingsRequest]) (*connect.Response[v1.SetDeviceSettingsResponse], error)
 	// Get all installed app storage volumes
 	GetAppStorage(context.Context, *connect.Request[v1.GetAppStorageRequest]) (*connect.Response[v1.GetAppStorageResponse], error)
+	// GetComponentVersions returns the versions of all system components (daemon, server, etc.)
+	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
+	// GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
+	GetSystemLogs(context.Context, *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error)
 	// Enables the remote access feature
 	EnableSecureTunnelling(context.Context, *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error)
 	// Disables the remote access feature
@@ -589,10 +593,6 @@ type WebServiceHandler interface {
 	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
 	// RegisterPeer is used to connect a client to the home-cloud overlay network
 	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
-	// GetComponentVersions returns the versions of all system components (daemon, server, etc.)
-	GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error)
-	// GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
-	GetSystemLogs(context.Context, *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
 }
@@ -717,6 +717,18 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceGetAppStorageMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceGetComponentVersionsHandler := connect.NewUnaryHandler(
+		WebServiceGetComponentVersionsProcedure,
+		svc.GetComponentVersions,
+		connect.WithSchema(webServiceGetComponentVersionsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	webServiceGetSystemLogsHandler := connect.NewUnaryHandler(
+		WebServiceGetSystemLogsProcedure,
+		svc.GetSystemLogs,
+		connect.WithSchema(webServiceGetSystemLogsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	webServiceEnableSecureTunnellingHandler := connect.NewUnaryHandler(
 		WebServiceEnableSecureTunnellingProcedure,
 		svc.EnableSecureTunnelling,
@@ -745,18 +757,6 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		WebServiceRegisterPeerProcedure,
 		svc.RegisterPeer,
 		connect.WithSchema(webServiceRegisterPeerMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	webServiceGetComponentVersionsHandler := connect.NewUnaryHandler(
-		WebServiceGetComponentVersionsProcedure,
-		svc.GetComponentVersions,
-		connect.WithSchema(webServiceGetComponentVersionsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	webServiceGetSystemLogsHandler := connect.NewUnaryHandler(
-		WebServiceGetSystemLogsProcedure,
-		svc.GetSystemLogs,
-		connect.WithSchema(webServiceGetSystemLogsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	webServiceSubscribeHandler := connect.NewServerStreamHandler(
@@ -805,6 +805,10 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceSetDeviceSettingsHandler.ServeHTTP(w, r)
 		case WebServiceGetAppStorageProcedure:
 			webServiceGetAppStorageHandler.ServeHTTP(w, r)
+		case WebServiceGetComponentVersionsProcedure:
+			webServiceGetComponentVersionsHandler.ServeHTTP(w, r)
+		case WebServiceGetSystemLogsProcedure:
+			webServiceGetSystemLogsHandler.ServeHTTP(w, r)
 		case WebServiceEnableSecureTunnellingProcedure:
 			webServiceEnableSecureTunnellingHandler.ServeHTTP(w, r)
 		case WebServiceDisableSecureTunnellingProcedure:
@@ -815,10 +819,6 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceDeregisterFromLocatorHandler.ServeHTTP(w, r)
 		case WebServiceRegisterPeerProcedure:
 			webServiceRegisterPeerHandler.ServeHTTP(w, r)
-		case WebServiceGetComponentVersionsProcedure:
-			webServiceGetComponentVersionsHandler.ServeHTTP(w, r)
-		case WebServiceGetSystemLogsProcedure:
-			webServiceGetSystemLogsHandler.ServeHTTP(w, r)
 		case WebServiceSubscribeProcedure:
 			webServiceSubscribeHandler.ServeHTTP(w, r)
 		default:
@@ -906,6 +906,14 @@ func (UnimplementedWebServiceHandler) GetAppStorage(context.Context, *connect.Re
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetAppStorage is not implemented"))
 }
 
+func (UnimplementedWebServiceHandler) GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetComponentVersions is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) GetSystemLogs(context.Context, *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetSystemLogs is not implemented"))
+}
+
 func (UnimplementedWebServiceHandler) EnableSecureTunnelling(context.Context, *connect.Request[v1.EnableSecureTunnellingRequest]) (*connect.Response[v1.EnableSecureTunnellingResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.EnableSecureTunnelling is not implemented"))
 }
@@ -924,14 +932,6 @@ func (UnimplementedWebServiceHandler) DeregisterFromLocator(context.Context, *co
 
 func (UnimplementedWebServiceHandler) RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.RegisterPeer is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) GetComponentVersions(context.Context, *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetComponentVersions is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) GetSystemLogs(context.Context, *connect.Request[v1.GetSystemLogsRequest]) (*connect.Response[v1.GetSystemLogsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetSystemLogs is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {

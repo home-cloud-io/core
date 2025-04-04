@@ -222,6 +222,28 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
+     * GetComponentVersions returns the versions of all system components (daemon, server, etc.)
+     *
+     * @generated from rpc platform.server.v1.WebService.GetComponentVersions
+     */
+    getComponentVersions: {
+      name: "GetComponentVersions",
+      I: GetComponentVersionsRequest,
+      O: GetComponentVersionsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
+     *
+     * @generated from rpc platform.server.v1.WebService.GetSystemLogs
+     */
+    getSystemLogs: {
+      name: "GetSystemLogs",
+      I: GetSystemLogsRequest,
+      O: GetSystemLogsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
      * Enables the remote access feature
      *
      * @generated from rpc platform.server.v1.WebService.EnableSecureTunnelling
@@ -274,28 +296,6 @@ export const WebService = {
       name: "RegisterPeer",
       I: RegisterPeerRequest,
       O: RegisterPeerResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * GetComponentVersions returns the versions of all system components (daemon, server, etc.)
-     *
-     * @generated from rpc platform.server.v1.WebService.GetComponentVersions
-     */
-    getComponentVersions: {
-      name: "GetComponentVersions",
-      I: GetComponentVersionsRequest,
-      O: GetComponentVersionsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
-     *
-     * @generated from rpc platform.server.v1.WebService.GetSystemLogs
-     */
-    getSystemLogs: {
-      name: "GetSystemLogs",
-      I: GetSystemLogsRequest,
-      O: GetSystemLogsResponse,
       kind: MethodKind.Unary,
     },
     /**

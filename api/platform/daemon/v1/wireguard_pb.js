@@ -6,16 +6,6 @@
 import { proto3 } from "@bufbuild/protobuf";
 
 /**
- * @generated from message platform.daemon.v1.WireguardConfig
- */
-export const WireguardConfig = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.daemon.v1.WireguardConfig",
-  () => [
-    { no: 1, name: "interfaces", kind: "message", T: WireguardInterface, repeated: true },
-  ],
-);
-
-/**
  * @generated from message platform.daemon.v1.WireguardInterface
  */
 export const WireguardInterface = /*@__PURE__*/ proto3.makeMessageType(
@@ -23,10 +13,9 @@ export const WireguardInterface = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "ips", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "listen_port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 6, name: "peers", kind: "message", T: WireguardPeer, repeated: true },
+    { no: 3, name: "ips", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "listen_port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 5, name: "peers", kind: "message", T: WireguardPeer, repeated: true },
   ],
 );
 
@@ -38,28 +27,6 @@ export const WireguardPeer = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "allowed_ips", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-  ],
-);
-
-/**
- * @generated from message platform.daemon.v1.Locator
- */
-export const Locator = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.daemon.v1.Locator",
-  () => [
-    { no: 1, name: "address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "connections", kind: "message", T: LocatorConnection, repeated: true },
-  ],
-);
-
-/**
- * @generated from message platform.daemon.v1.LocatorConnection
- */
-export const LocatorConnection = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.daemon.v1.LocatorConnection",
-  () => [
-    { no: 1, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "wireguard_interface", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
