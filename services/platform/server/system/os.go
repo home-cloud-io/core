@@ -237,7 +237,8 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SetStunServerCommand{
 			SetStunServerCommand: &dv1.SetSTUNServerCommand{
-				ServerAddress: DefaultSTUNServerAddress,
+				ServerAddress:      DefaultSTUNServerAddress,
+				WireguardInterface: DefaultWireguardInterface,
 			},
 		},
 	})
@@ -312,7 +313,7 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 		return err
 	}
 	settings.SecureTunnelingSettings = &v1.SecureTunnelingSettings{
-		Enabled: false,
+		Enabled:             false,
 		WireguardInterfaces: []*v1.WireguardInterface{},
 	}
 	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
