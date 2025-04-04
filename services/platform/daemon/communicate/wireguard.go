@@ -43,6 +43,7 @@ func (c *client) removeWireguardInterface(ctx context.Context, def *v1.RemoveWir
 		msg.Error = err.Error()
 	}
 
+	c.logger.Info("sending WireguardInterfaceRemoved message")
 	c.Send(resp)
 }
 

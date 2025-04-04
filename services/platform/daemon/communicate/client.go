@@ -120,7 +120,6 @@ func newInsecureClient() *http.Client {
 }
 
 func (c *client) Send(message *v1.DaemonMessage) {
-	c.logger.Debug("sending message to server")
 	if c.stream == nil {
 		c.logger.WithError(ErrNoStream).Error("failed to send message to server")
 		return
@@ -135,7 +134,6 @@ func (c *client) Send(message *v1.DaemonMessage) {
 }
 
 func (c *client) SendWithError(message *v1.DaemonMessage) error {
-	c.logger.Debug("sending message to server")
 	if c.stream == nil {
 		return ErrNoStream
 	}
