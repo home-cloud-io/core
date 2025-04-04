@@ -105,6 +105,9 @@ func (c *stunController) Bind(port int, server string) (err error) {
 	// keep binding alive until canceled
 	go keepAlive(ctx, logger, binding)
 
+	// save binding config
+	c.bindings[port] = binding
+
 	logger.WithField("address", binding.address.String()).Info("finished binding to STUN server")
 
 	return nil
@@ -192,7 +195,7 @@ func demultiplex(ctx context.Context, logger chassis.Logger, conn net.PacketConn
 				logger.Errorf("error while reading packet from the shared socket: %s", err)
 				continue
 			}
-			logger.WithField("packet_size", size).WithField("address", addr).Trace("read a STUN packet")
+			logger.WithField("packet_size", size).WithField("address", addr).Debug("read a STUN packet")
 			if _, err = stunConn.Write(buf[:size]); err != nil {
 				logger.WithError(err).Error("failed to write")
 				return
