@@ -148,7 +148,7 @@ func (c remoteAccessController) RemoveInterface(ctx context.Context, wgInterface
 		if inf.Name == wgInterfaceName {
 			wgInterface = inf
 			// remove interface from settings
-			settings.WireguardInterfaces = slices.Delete(settings.WireguardInterfaces, i, i)
+			settings.WireguardInterfaces = slices.Delete(settings.WireguardInterfaces, i, i+1)
 			break
 		}
 	}
