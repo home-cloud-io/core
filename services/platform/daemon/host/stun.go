@@ -2,11 +2,10 @@ package host
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net"
 	"time"
-
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 
 	"github.com/google/uuid"
 	"github.com/netbirdio/netbird/sharedsock"
@@ -15,24 +14,31 @@ import (
 )
 
 type (
-	STUNClient interface {
-		// Bind restarts the STUN client using the given STUN server
-		Bind(server string) (stun.XORMappedAddress, error)
-		// Connect initializes a short period of connection attempts to the given STUN address of a peer.
-		// This opens a hole in the NAT for inbound connection attempts from the peer.
-		Connect(address net.Addr)
+	STUNController interface {
+		// Bind creates a persistent connection to the given STUN server from the given port. All data received on this port will
+		// be multiplexed between the STUN client and the upstream service listening on the given host port (e.g. Wireguard).
+		Bind(port int, server string) error
+		// Address returns the current STUN address for the given port (if there is one).
+		Address(port int) (stun.XORMappedAddress, error)
+		// Connect initializes a short period of connection attempts to the given STUN address of a peer from the
+		// given port. This opens a hole in the NAT for inbound connection attempts from the peer.
+		Connect(port int, address net.Addr)
+		// Cancel destructs an existing STUN binding on the given port.
+		Cancel(port int) error
 	}
-	stunClient struct {
-		logger chassis.Logger
-		client *stun.Client
-		conn   net.PacketConn
+	stunController struct {
+		logger   chassis.Logger
+		bindings map[int]*stunBinding
+	}
+	stunBinding struct {
+		cancel  context.CancelFunc
+		port    int
+		server  string
+		client  *stun.Client
+		conn    net.PacketConn
+		address stun.XORMappedAddress
 	}
 )
-
-type message struct {
-	body []byte
-	addr net.Addr
-}
 
 const (
 	keepAliveInterval = 5 * time.Second
@@ -40,30 +46,84 @@ const (
 	connectInterval   = 1 * time.Second
 )
 
-func NewSTUNClient(logger chassis.Logger) STUNClient {
-	return &stunClient{
+func NewSTUNController(logger chassis.Logger) STUNController {
+	return &stunController{
 		logger: logger,
 	}
 }
 
-func (c *stunClient) Bind(server string) (address stun.XORMappedAddress, err error) {
-	// get current settings
-	settings := &v1.LocatorSettings{}
-	err = chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
-	if err != nil {
-		return address, err
-	}
-	// update settings
-	settings.StunServerAddress = server
-	err = chassis.GetConfig().SetAndWrite(LocatorSettingsKey, settings)
-	if err != nil {
-		return address, err
+func (c *stunController) Bind(port int, server string) (err error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	binding := &stunBinding{
+		cancel: cancel,
+		port:   port,
+		server: server,
 	}
 
-	return c.bind(c.logger, server)
+	logger := c.logger.WithFields(chassis.Fields{
+		"host_port":   port,
+		"stun_server": server,
+	})
+
+	rawSocket, err := sharedsock.Listen(port, sharedsock.NewIncomingSTUNFilter())
+	if err != nil {
+		logger.WithError(err).Error("failed to listen on shared socket")
+		return err
+	}
+	binding.conn = rawSocket
+
+	// resolve the given STUN server address
+	stunAddr, err := net.ResolveUDPAddr("udp4", server)
+	if err != nil {
+		logger.WithError(err).Error("failed to resolve STUN server address")
+		return err
+	}
+
+	// in-memory network pipe between stun client and multiplexer
+	stunL, stunR := net.Pipe()
+
+	// create new STUN client
+	client, err := stun.NewClient(stunR)
+	if err != nil {
+		logger.WithError(err).Error("failed to create STUN client")
+		return err
+	}
+	binding.client = client
+
+	// start de/multiplexing
+	go demultiplex(ctx, logger, rawSocket, stunL)
+	go multiplex(ctx, logger, rawSocket, stunAddr, stunL)
+
+	// attempt to bind to the STUN server and aquire our STUN address
+	err = binding.bind()
+	if err != nil {
+		logger.WithError(err).Error("failed to bind to STUN server")
+		return err
+	}
+
+	// keep binding alive until canceled
+	go keepAlive(ctx, logger, binding)
+
+	logger.WithField("address", binding.address.String()).Info("finished binding to STUN server")
+
+	return nil
 }
 
-func (c *stunClient) Connect(address net.Addr) {
+func (c *stunController) Address(port int) (address stun.XORMappedAddress, err error) {
+	binding, ok := c.bindings[port]
+	if !ok {
+		return address, errors.New("no STUN binding for given port")
+	}
+	return binding.address, nil
+}
+
+func (c *stunController) Connect(port int, address net.Addr) {
+	binding, ok := c.bindings[port]
+	if !ok {
+		c.logger.WithField("host_port", port).WithField("remote_address", address.String()).Error("no STUN binding for given port")
+		return
+	}
+
 	deadline := time.After(connectDuration)
 	for {
 		select {
@@ -77,7 +137,7 @@ func (c *stunClient) Connect(address net.Addr) {
 				"address": address,
 			})
 			log.Debug("sending message")
-			_, err := c.conn.WriteTo([]byte(msg), address)
+			_, err := binding.conn.WriteTo([]byte(msg), address)
 			if err != nil {
 				log.Warn("failed to send connect message to peer")
 			}
@@ -85,18 +145,33 @@ func (c *stunClient) Connect(address net.Addr) {
 	}
 }
 
+func (c *stunController) Cancel(port int) error {
+	binding, ok := c.bindings[port]
+	if !ok {
+		c.logger.WithField("host_port", port).Warn("no STUN binding for given port")
+		return nil
+	}
+
+	// cancel binding context to kill child routines
+	binding.cancel()
+
+	// close binding stun client
+	return binding.client.Close()
+}
+
 // keepAlive sends periodic binding requests to the STUN server to maintain the opening in the NAT
-func keepAlive(logger chassis.Logger, c *stun.Client) {
-	t := time.NewTicker(keepAliveInterval)
-	for range t.C {
-		if err := c.Do(stun.MustBuild(stun.TransactionID, stun.BindingRequest), func(res stun.Event) {
-			if res.Error != nil {
-				logger.WithError(res.Error).Error("failed STUN transaction")
+func keepAlive(ctx context.Context, logger chassis.Logger, binding *stunBinding) {
+	ticker := time.NewTicker(keepAliveInterval)
+	for {
+		select {
+		case <-ctx.Done():
+			logger.Debug("stopping STUN keep alive")
+		case <-ticker.C:
+			err := binding.bind()
+			if err != nil {
+				logger.WithError(err).Error("failed STUN transaction")
 				return
 			}
-		}); err != nil {
-			logger.WithError(err).Error("failed STUN transaction")
-			return
 		}
 	}
 }
@@ -108,7 +183,7 @@ func demultiplex(ctx context.Context, logger chassis.Logger, conn net.PacketConn
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Debugf("stopped reading from the shared socket")
+			logger.Debug("stopping STUN demultiplexer")
 			return
 		default:
 			size, addr, err := conn.ReadFrom(buf)
@@ -127,94 +202,50 @@ func demultiplex(ctx context.Context, logger chassis.Logger, conn net.PacketConn
 
 // multiplex reads messages from the given STUN connection and writes them to the given STUN address (server) using the
 // provided UDP connection.
-func multiplex(logger chassis.Logger, conn net.PacketConn, stunAddr net.Addr, stunConn io.Reader) {
+func multiplex(ctx context.Context, logger chassis.Logger, conn net.PacketConn, stunAddr net.Addr, stunConn io.Reader) {
 	// Sending all data from stun client to stun server.
 	buf := make([]byte, 1024)
 	for {
-		n, err := stunConn.Read(buf)
-		if err != nil {
-			logger.WithError(err).Error("failed to read")
+		select {
+		case <-ctx.Done():
+			logger.Debug("stopping STUN multiplexer")
 			return
-		}
-		if _, err = conn.WriteTo(buf[:n], stunAddr); err != nil {
-			logger.WithError(err).Error("failed to write")
-			return
+		default:
+			n, err := stunConn.Read(buf)
+			if err != nil {
+				logger.WithError(err).Error("failed to read")
+				return
+			}
+			if _, err = conn.WriteTo(buf[:n], stunAddr); err != nil {
+				logger.WithError(err).Error("failed to write")
+				return
+			}
 		}
 	}
 }
 
-// bind establishes a persistent connection with the given STUN server, initializes multiplexing for application data and returns
-// the found STUN address.
-func (c *stunClient) bind(logger chassis.Logger, server string) (address stun.XORMappedAddress, err error) {
-	// TODO: pass this in?
-	ctx := context.Background()
-
-	port := 51820
-	rawSock, err := sharedsock.Listen(port, sharedsock.NewIncomingSTUNFilter())
-	if err != nil {
-		panic(err)
-	}
-	c.conn = rawSock
-
-	// resolve the given STUN server address
-	stunAddr, err := net.ResolveUDPAddr("udp4", server)
-	if err != nil {
-		logger.WithError(err).Error("failed to resolve STUN server address")
-		return address, err
-	}
-
-	stunL, stunR := net.Pipe()
-
-	// attempt to close existing client before creating new one
-	if c.client != nil {
-		err := c.client.Close()
-		if err != nil {
-			c.logger.WithError(err).Error("failed to close client")
-			return address, err
-		}
-	}
-
-	// create new STUN client
-	client, err := stun.NewClient(stunR)
-	if err != nil {
-		logger.WithError(err).Error("failed to create STUN client")
-		return address, err
-	}
-
-	// start de/multiplexing
-	go demultiplex(ctx, logger, rawSock, stunL)
-	go multiplex(logger, rawSock, stunAddr, stunL)
-
-	// attempt to bind to the STUN server and aquire our STUN address
-	err = client.Do(stun.MustBuild(stun.TransactionID, stun.BindingRequest), func(res stun.Event) {
-		// check for error during bind
+// bind wraps the Do() method on the STUN client within the binding so that the address is updated on each binding request.
+func (b *stunBinding) bind() error {
+	var eventErr error
+	err := b.client.Do(stun.MustBuild(stun.TransactionID, stun.BindingRequest), func(res stun.Event) {
 		if res.Error != nil {
-			logger.WithError(res.Error).Error("failed STUN transaction")
-			return
+			eventErr = res.Error
 		}
 
 		// parse the returned address from the response
 		var foundAddress stun.XORMappedAddress
 		err := foundAddress.GetFrom(res.Message)
 		if err != nil {
-			logger.WithError(err).Error("failed to get XOR-MAPPED-ADDRESS")
-			return
+			eventErr = err
 		}
 
-		// save the found address for future use
-		copyAddress(&address, foundAddress)
+		// save the found address
+		copyAddress(&b.address, foundAddress)
 	})
 	if err != nil {
-		logger.WithError(err).Error("failed to bind to STUN server")
-		return address, err
+		return err
 	}
-
-	// TODO: pass in context so we can cancel this
-	go keepAlive(logger, client)
-
-	logger.WithField("address", address.String()).Info("finished binding to STUN server")
-
-	return address, nil
+	return eventErr
 }
 
 func copyAddress(dst *stun.XORMappedAddress, src stun.XORMappedAddress) {

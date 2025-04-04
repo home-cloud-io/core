@@ -9,14 +9,12 @@ import (
 	"os"
 	"strings"
 
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/locator/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/locator/v1/v1connect"
 	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	"github.com/home-cloud-io/core/services/platform/daemon/host/encryption"
 
 	"connectrpc.com/connect"
-	"github.com/pion/stun/v2"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
@@ -29,23 +27,12 @@ type (
 		Peers      []wgtypes.Key
 	}
 	LocatorController interface {
-		// Load will load all saved Locators from the config and create background connections to them.
-		// Meant to be called at daemon startup.
-		Load()
-		// AddLocator will start a background connection to the given Locator and will serve up connection
-		// information to locate requests from that Locator for all Wireguard interfaces. The Locator connection
-		// can be killed by calling RemoveLocator or RemoveAll.
-		AddLocator(ctx context.Context, locatorAddress string) (locator *dv1.Locator, err error)
-		// RemoveLocator will remove a background Locator connection that was started through Load or
-		// AddLocator and will delete it from the config.
-		RemoveLocator(ctx context.Context, locatorAddress string) error
-		// Disable will remove all background Locator connections and delete them from the config.
-		Disable(ctx context.Context) error
+		Connect(ctx context.Context, wgInterface *sv1.WireguardInterface, locatorAddress string) error
+		Close(wgInterface *sv1.WireguardInterface, locatorAddress string)
 	}
 	locatorController struct {
-		logger      chassis.Logger
-		stunClient  STUNClient
-		stunAddress stun.XORMappedAddress
+		logger         chassis.Logger
+		stunController STUNController
 		// map of unique keys ("serverId@locatorAddress") to locator
 		locators map[string]locator
 	}
@@ -60,201 +47,54 @@ const (
 	fakeAccessToken = "fake_access_token"
 )
 
-func NewLocatorController(logger chassis.Logger, stun STUNClient) LocatorController {
+func NewLocatorController(logger chassis.Logger, stunController STUNController) LocatorController {
 	return &locatorController{
-		logger:     logger,
-		locators:   make(map[string]locator),
-		stunClient: stun,
+		logger:         logger,
+		locators:       make(map[string]locator),
+		stunController: stunController,
 	}
 }
 
-func (m *locatorController) Load() {
-
-	// get settings from config
-	settings := &sv1.LocatorSettings{}
-	err := chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
-	if err != nil {
-		m.logger.WithError(err).Error("failed to read locator settings from config")
-		return
+func (m *locatorController) Connect(ctx context.Context, wgInterface *sv1.WireguardInterface, locatorAddress string) error {
+	// save locator information in memory
+	ctx, cancel := context.WithCancel(context.Background())
+	m.locators[locatorKey(locatorAddress, wgInterface.Id)] = locator{
+		serverId: wgInterface.Id,
+		address:  locatorAddress,
+		cancel:   cancel,
 	}
 
-	if settings.StunServerAddress != "" {
-		address, err := m.stunClient.Bind(settings.StunServerAddress)
-		if err != nil {
-			m.logger.WithError(err).Error("failed to get public address using STUN client")
-			return
-		}
-		m.stunAddress = address
-	}
-
-	if !settings.Enabled {
-		return
-	}
-
-	for _, l := range settings.Locators {
-		m.logger.WithFields(chassis.Fields{
-			"locator_address": l.Address,
-		}).Info("loading locator connection")
-
-		for _, c := range l.Connections {
-			// save locator information in memory
-			ctx, cancel := context.WithCancel(context.Background())
-			m.locators[locatorKey(l.Address, c.ServerId)] = locator{
-				serverId: c.ServerId,
-				address:  l.Address,
-				cancel:   cancel,
-			}
-
-			// run connection in background (can be cancelled through context)
-			go m.connectToLocator(ctx, m.logger, l.Address, c.ServerId, c.WireguardInterface)
-		}
-	}
-}
-
-func (m *locatorController) AddLocator(ctx context.Context, locatorAddress string) (*dv1.Locator, error) {
-	// check if locator already exists in config and reject if so
-	settings := &sv1.LocatorSettings{}
-	err := chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
-	if err != nil {
-		return nil, err
-	}
-	if settings == nil {
-		settings = &sv1.LocatorSettings{}
-	}
-	settings.Enabled = true
-	if settings.Locators == nil {
-		settings.Locators = make([]*dv1.Locator, 0)
-	}
-	for _, l := range settings.Locators {
-		if l.Address == locatorAddress {
-			return nil, fmt.Errorf("requested locator is already registered")
-		}
-	}
-
-	// get the server's wireguard wgConfig
-	wgConfig := &dv1.WireguardConfig{}
-	err = chassis.GetConfig().UnmarshalKey(WireguardConfigKey, wgConfig)
-	if err != nil {
-		m.logger.WithError(err).Error("failed to get wireguard config")
-		return nil, err
-	}
-
-	connections := make([]*dv1.LocatorConnection, len(wgConfig.Interfaces))
-	for index, inf := range wgConfig.Interfaces {
-		// save locator information in memory
-		ctx, cancel := context.WithCancel(context.Background())
-		m.locators[locatorKey(locatorAddress, inf.Id)] = locator{
-			serverId: inf.Id,
-			address:  locatorAddress,
-			cancel:   cancel,
-		}
-
-		// run connection in background (can be cancelled later through context)
-		go m.connectToLocator(ctx, m.logger, locatorAddress, inf.Id, inf.Name)
-
-		connections[index] = &dv1.LocatorConnection{
-			ServerId:           inf.Id,
-			WireguardInterface: inf.Name,
-		}
-	}
-
-	// save locator to config
-	locator := &dv1.Locator{
-		Address:     locatorAddress,
-		Connections: connections,
-	}
-	settings.Locators = append(settings.Locators, locator)
-	err = chassis.GetConfig().SetAndWrite(LocatorSettingsKey, settings)
-	if err != nil {
-		return nil, err
-	}
-
-	return locator, nil
-}
-
-func (m *locatorController) RemoveLocator(ctx context.Context, locatorAddress string) error {
-
-	// filter out all locators to be deleted
-	locators := make(map[string]locator)
-	for key, l := range m.locators {
-		// save those not matching
-		if !strings.HasSuffix(key, locatorAddress) {
-			locators[locatorKey(locatorAddress, l.serverId)] = l
-			continue
-		}
-		// cancel those matching
-		l.cancel()
-	}
-	m.locators = locators
-
-	// delete from config
-	settings := &sv1.LocatorSettings{}
-	err := chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
-	if err != nil {
-		return err
-	}
-	for i, l := range settings.Locators {
-		if locatorAddress == l.Address {
-			settings.Locators = append(settings.Locators[:i], settings.Locators[i+1:]...)
-			err = chassis.GetConfig().SetAndWrite(LocatorSettingsKey, settings)
-			if err != nil {
-				return err
-			}
-			break
-		}
-	}
+	// run connection in background (can be cancelled through context)
+	go m.connectToLocator(ctx, m.logger, wgInterface, locatorAddress)
 
 	return nil
 }
 
-func (m *locatorController) Disable(ctx context.Context) error {
-	// TODO: this can be more efficient
-	for _, l := range m.locators {
-		err := m.RemoveLocator(ctx, l.address)
-		if err != nil {
-			return err
-		}
+func (m *locatorController) Close(wgInterface *sv1.WireguardInterface, locatorAddress string) {
+	locator, ok := m.locators[locatorKey(locatorAddress, wgInterface.Id)]
+	if !ok {
+		return
 	}
-
-	// disable feature in config
-	settings := &sv1.LocatorSettings{}
-	err := chassis.GetConfig().UnmarshalKey(LocatorSettingsKey, settings)
-	if err != nil {
-		return err
-	}
-	settings.Enabled = false
-	err = chassis.GetConfig().SetAndWrite(LocatorSettingsKey, settings)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	locator.cancel()
+	delete(m.locators, locatorKey(locatorAddress, wgInterface.Id))
 }
 
-func (m *locatorController) connectToLocator(ctx context.Context, logger chassis.Logger, locatorAddress, serverId, wgInterface string) {
+func (m *locatorController) connectToLocator(ctx context.Context, logger chassis.Logger, wgInterface *sv1.WireguardInterface, locatorAddress string) {
 	log := logger.WithFields(chassis.Fields{
 		"locator_address": locatorAddress,
-		"server_id":       serverId,
-		"interface_name":  wgInterface,
+		"server_id":       wgInterface.Id,
+		"interface_name":  wgInterface.Name,
 	})
 	log.Debug("connecting to locator")
-
-	// TODO: remove this when the public key is available another way
-	config, err := parseConfig(wgInterface, serverId)
-	if err != nil {
-		log.WithError(err).Error("failed to parse wireguard config")
-	}
-	log.WithField("public_key", config.PublicKey).Debug("wireguard public key")
-
 
 	client := sdConnect.NewLocatorServiceClient(http.DefaultClient, locatorAddress)
 	stream := client.Connect(ctx)
 
-	err = stream.Send(&v1.ServerMessage{
+	err := stream.Send(&v1.ServerMessage{
 		AccessToken: fakeAccessToken,
 		Body: &v1.ServerMessage_Initialize{
 			Initialize: &v1.Initialize{
-				ServerId: serverId,
+				ServerId: wgInterface.Id,
 			},
 		},
 	})
@@ -279,32 +119,9 @@ func (m *locatorController) connectToLocator(ctx context.Context, logger chassis
 		}
 	}
 }
-func (m *locatorController) authorizeLocate(ctx context.Context, logger chassis.Logger, wgInterface string, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate) {
-	// get wireguard config from blueprint
-	wgConfig := &dv1.WireguardConfig{}
-	err := chassis.GetConfig().UnmarshalKey(WireguardConfigKey, wgConfig)
-	if err != nil {
-		m.logger.WithError(err).Error("failed to get wireguard config")
-		reject(logger, locate.RequestId, stream)
-		return
-	}
-
-	// make sure the wireguard interface exists (this is just protection if something desyncs and the interface is removed but this goroutine is not cancelled)
-	var interfaceConfig *dv1.WireguardInterface
-	for _, inf := range wgConfig.Interfaces {
-		if inf.Name == wgInterface {
-			interfaceConfig = inf
-			break
-		}
-	}
-	if interfaceConfig == nil {
-		logger.WithError(fmt.Errorf("wireguard interface [%s] does not exist in config", wgInterface)).Error("failed to get wireguard interface from config")
-		reject(logger, locate.RequestId, stream)
-		return
-	}
-
+func (m *locatorController) authorizeLocate(ctx context.Context, logger chassis.Logger, wgInterface *sv1.WireguardInterface, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate) {
 	// convert server settings to internal wireguard types
-	iConfig, err := parseConfig(interfaceConfig.Name, interfaceConfig.Id)
+	wgConfig, err := parseConfig(wgInterface.Name, wgInterface.Id)
 	if err != nil {
 		logger.WithError(err).Error("failed to parse wireguard config")
 		reject(logger, locate.RequestId, stream)
@@ -321,9 +138,9 @@ func (m *locatorController) authorizeLocate(ctx context.Context, logger chassis.
 	}
 
 	// attempt to validate the locate request and reject if we can't validate it
-	authorized, request, err := validate(logger, iConfig, remoteKey, locate.Body.Body)
+	authorized, request, err := validate(logger, wgConfig, remoteKey, locate.Body.Body)
 	if authorized && err == nil {
-		m.accept(logger, iConfig, remoteKey, stream, locate, request)
+		m.accept(logger, wgInterface, wgConfig, remoteKey, stream, locate, request)
 		return
 	}
 	if err != nil {
@@ -358,16 +175,25 @@ func validate(logger chassis.Logger, config WireGuardConfig, remoteKey wgtypes.K
 	return false, nil, nil
 }
 
-func (m *locatorController) accept(logger chassis.Logger, config WireGuardConfig, remoteKey wgtypes.Key, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate, request *v1.LocateRequestBody) {
+func (m *locatorController) accept(logger chassis.Logger, wgInterface *sv1.WireguardInterface, config WireGuardConfig, remoteKey wgtypes.Key, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage], locate *v1.Locate, request *v1.LocateRequestBody) {
 	logger.Info("approving request")
 
+	// get the current address from the STUN binding
+	address, err := m.stunController.Address(int(wgInterface.Port))
+	if err != nil {
+		logger.WithError(err).Error("failed to get STUN address")
+		reject(logger, locate.RequestId, stream)
+		return
+	}
+
 	msg := &v1.LocateResponseBody{
-		Address: m.stunAddress.IP.String(),
-		Port:    uint32(m.stunAddress.Port),
+		Address: address.IP.String(),
+		Port:    uint32(address.Port),
 	}
 
 	// encrypt the response before sending
 	body, err := encryption.EncryptMessage(remoteKey, config.PrivateKey, msg)
+
 	err = stream.Send(&v1.ServerMessage{
 		AccessToken: fakeAccessToken,
 		Body: &v1.ServerMessage_Accept{
@@ -393,7 +219,7 @@ func (m *locatorController) accept(logger chassis.Logger, config WireGuardConfig
 		logger.WithError(err).Error("failed to resolve UDP address")
 		return
 	}
-	m.stunClient.Connect(peerAddr)
+	m.stunController.Connect(int(wgInterface.Port), peerAddr)
 }
 
 func reject(logger chassis.Logger, requestId string, stream *connect.BidiStreamForClient[v1.ServerMessage, v1.LocatorMessage]) {

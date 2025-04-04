@@ -12,9 +12,8 @@ func main() {
 	var (
 		logger   = zerolog.New()
 		mdns     = host.NewDNSPublisher(logger)
-		stun     = host.NewSTUNClient(logger)
-		locator  = host.NewLocatorController(logger, stun)
-		client   = communicate.NewClient(logger, mdns, stun, locator)
+		remoteAccess = host.NewRemoteAccessController(logger)
+		client   = communicate.NewClient(logger, mdns, remoteAccess)
 		migrator = host.NewMigrator(logger)
 	)
 
@@ -23,7 +22,7 @@ func main() {
 		WithRunner(client.Listen).
 		WithRunner(mdns.Start).
 		WithRunner(migrator.Migrate).
-		WithRunner(locator.Load)
+		WithRunner(remoteAccess.Load)
 
 	// start daemon runtime
 	runtime.Start()
