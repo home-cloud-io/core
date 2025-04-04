@@ -3,3 +3,11 @@ repo: github.com/home-cloud-io/core
 trunk_branch: main
 api:
   image_name: ghcr.io/home-cloud-io/core-api-builder:main
+infra:
+  blueprint:
+    image_name: ghcr.io/steady-bytes/draft-core-blueprint:edge
+  catalyst:
+    image_name: ghcr.io/steady-bytes/draft-core-catalyst:edge
+  fuse:
+    image_name: ghcr.io/steady-bytes/draft-core-fuse:edge
+  envoy:

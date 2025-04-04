@@ -103,8 +103,11 @@ func (c remoteAccessController) Load() {
 
 func (c remoteAccessController) AddInterface(ctx context.Context, wgInterface *v1.WireguardInterface) (publicKey string, err error) {
 	settings, err := secureTunnelingSettings()
-	if err != nil && err.Error() != SecureTunnelingNotEnabledError {
-		return "", err
+	if err != nil {
+		if err.Error() != SecureTunnelingNotEnabledError {
+			return "", err
+		}
+		settings = &sv1.SecureTunnelingSettings{}
 	}
 
 	// TODO: add a command to enable/disable secure tunneling without modifying any other config (will need to figure out wireguard nixos config)
@@ -124,9 +127,9 @@ func (c remoteAccessController) AddInterface(ctx context.Context, wgInterface *v
 
 	// update settings config
 	settings.WireguardInterfaces = append(settings.WireguardInterfaces, &sv1.WireguardInterface{
-		Id: wgInterface.Id,
-		Name: wgInterface.Name,
-		Port: int32(wgInterface.ListenPort),
+		Id:        wgInterface.Id,
+		Name:      wgInterface.Name,
+		Port:      int32(wgInterface.ListenPort),
 		PublicKey: publicKey,
 	})
 	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
