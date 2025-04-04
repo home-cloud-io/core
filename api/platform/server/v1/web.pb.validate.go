@@ -7314,11 +7314,11 @@ func (m *DeviceSettings) validate(all bool) error {
 	// no validation rules for EnableSsh
 
 	if all {
-		switch v := interface{}(m.GetRemoteAccessSettings()).(type) {
+		switch v := interface{}(m.GetSecureTunnelingSettings()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, DeviceSettingsValidationError{
-					field:  "RemoteAccessSettings",
+					field:  "SecureTunnelingSettings",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -7326,16 +7326,16 @@ func (m *DeviceSettings) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, DeviceSettingsValidationError{
-					field:  "RemoteAccessSettings",
+					field:  "SecureTunnelingSettings",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetRemoteAccessSettings()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetSecureTunnelingSettings()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DeviceSettingsValidationError{
-				field:  "RemoteAccessSettings",
+				field:  "SecureTunnelingSettings",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -7420,22 +7420,22 @@ var _ interface {
 	ErrorName() string
 } = DeviceSettingsValidationError{}
 
-// Validate checks the field values on RemoteAccessSettings with the rules
+// Validate checks the field values on SecureTunnelingSettings with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *RemoteAccessSettings) Validate() error {
+func (m *SecureTunnelingSettings) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on RemoteAccessSettings with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on SecureTunnelingSettings with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// RemoteAccessSettingsMultiError, or nil if none found.
-func (m *RemoteAccessSettings) ValidateAll() error {
+// SecureTunnelingSettingsMultiError, or nil if none found.
+func (m *SecureTunnelingSettings) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *RemoteAccessSettings) validate(all bool) error {
+func (m *SecureTunnelingSettings) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -7451,7 +7451,7 @@ func (m *RemoteAccessSettings) validate(all bool) error {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, RemoteAccessSettingsValidationError{
+					errors = append(errors, SecureTunnelingSettingsValidationError{
 						field:  fmt.Sprintf("WireguardInterfaces[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -7459,7 +7459,7 @@ func (m *RemoteAccessSettings) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, RemoteAccessSettingsValidationError{
+					errors = append(errors, SecureTunnelingSettingsValidationError{
 						field:  fmt.Sprintf("WireguardInterfaces[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -7468,7 +7468,7 @@ func (m *RemoteAccessSettings) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return RemoteAccessSettingsValidationError{
+				return SecureTunnelingSettingsValidationError{
 					field:  fmt.Sprintf("WireguardInterfaces[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -7479,19 +7479,19 @@ func (m *RemoteAccessSettings) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return RemoteAccessSettingsMultiError(errors)
+		return SecureTunnelingSettingsMultiError(errors)
 	}
 
 	return nil
 }
 
-// RemoteAccessSettingsMultiError is an error wrapping multiple validation
-// errors returned by RemoteAccessSettings.ValidateAll() if the designated
+// SecureTunnelingSettingsMultiError is an error wrapping multiple validation
+// errors returned by SecureTunnelingSettings.ValidateAll() if the designated
 // constraints aren't met.
-type RemoteAccessSettingsMultiError []error
+type SecureTunnelingSettingsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m RemoteAccessSettingsMultiError) Error() string {
+func (m SecureTunnelingSettingsMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -7500,11 +7500,11 @@ func (m RemoteAccessSettingsMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m RemoteAccessSettingsMultiError) AllErrors() []error { return m }
+func (m SecureTunnelingSettingsMultiError) AllErrors() []error { return m }
 
-// RemoteAccessSettingsValidationError is the validation error returned by
-// RemoteAccessSettings.Validate if the designated constraints aren't met.
-type RemoteAccessSettingsValidationError struct {
+// SecureTunnelingSettingsValidationError is the validation error returned by
+// SecureTunnelingSettings.Validate if the designated constraints aren't met.
+type SecureTunnelingSettingsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -7512,24 +7512,24 @@ type RemoteAccessSettingsValidationError struct {
 }
 
 // Field function returns field value.
-func (e RemoteAccessSettingsValidationError) Field() string { return e.field }
+func (e SecureTunnelingSettingsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e RemoteAccessSettingsValidationError) Reason() string { return e.reason }
+func (e SecureTunnelingSettingsValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e RemoteAccessSettingsValidationError) Cause() error { return e.cause }
+func (e SecureTunnelingSettingsValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e RemoteAccessSettingsValidationError) Key() bool { return e.key }
+func (e SecureTunnelingSettingsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e RemoteAccessSettingsValidationError) ErrorName() string {
-	return "RemoteAccessSettingsValidationError"
+func (e SecureTunnelingSettingsValidationError) ErrorName() string {
+	return "SecureTunnelingSettingsValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e RemoteAccessSettingsValidationError) Error() string {
+func (e SecureTunnelingSettingsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -7541,14 +7541,14 @@ func (e RemoteAccessSettingsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sRemoteAccessSettings.%s: %s%s",
+		"invalid %sSecureTunnelingSettings.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = RemoteAccessSettingsValidationError{}
+var _ error = SecureTunnelingSettingsValidationError{}
 
 var _ interface {
 	Field() string
@@ -7556,7 +7556,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = RemoteAccessSettingsValidationError{}
+} = SecureTunnelingSettingsValidationError{}
 
 // Validate checks the field values on WireguardInterface with the rules
 // defined in the proto definition for this message. If any rules are

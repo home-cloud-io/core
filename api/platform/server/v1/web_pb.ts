@@ -2594,9 +2594,9 @@ export class DeviceSettings extends Message<DeviceSettings> {
   trustedSshKeys: string[] = [];
 
   /**
-   * @generated from field: platform.server.v1.RemoteAccessSettings remote_access_settings = 7;
+   * @generated from field: platform.server.v1.SecureTunnelingSettings secure_tunneling_settings = 7;
    */
-  remoteAccessSettings?: RemoteAccessSettings;
+  secureTunnelingSettings?: SecureTunnelingSettings;
 
   constructor(data?: PartialMessage<DeviceSettings>) {
     super();
@@ -2612,7 +2612,7 @@ export class DeviceSettings extends Message<DeviceSettings> {
     { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 5, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 6, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 7, name: "remote_access_settings", kind: "message", T: RemoteAccessSettings },
+    { no: 7, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeviceSettings {
@@ -2633,9 +2633,16 @@ export class DeviceSettings extends Message<DeviceSettings> {
 }
 
 /**
- * @generated from message platform.server.v1.RemoteAccessSettings
+ * NOTE: These settings are written to the daemon config on the host so that tunneling can be
+ * configured on device boot even if the server and/or blueprint are down.
+ *
+ * This means that these settings are written in two places (blueprint and host filesystem) and
+ * must be kept in sync. In the future we probably want to move to a sync pattern where the daemon
+ * can connect directly to blueprint and syncs settings periodically.
+ *
+ * @generated from message platform.server.v1.SecureTunnelingSettings
  */
-export class RemoteAccessSettings extends Message<RemoteAccessSettings> {
+export class SecureTunnelingSettings extends Message<SecureTunnelingSettings> {
   /**
    * @generated from field: bool enabled = 1;
    */
@@ -2646,32 +2653,32 @@ export class RemoteAccessSettings extends Message<RemoteAccessSettings> {
    */
   wireguardInterfaces: WireguardInterface[] = [];
 
-  constructor(data?: PartialMessage<RemoteAccessSettings>) {
+  constructor(data?: PartialMessage<SecureTunnelingSettings>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.RemoteAccessSettings";
+  static readonly typeName = "platform.server.v1.SecureTunnelingSettings";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "wireguard_interfaces", kind: "message", T: WireguardInterface, repeated: true },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RemoteAccessSettings {
-    return new RemoteAccessSettings().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SecureTunnelingSettings {
+    return new SecureTunnelingSettings().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RemoteAccessSettings {
-    return new RemoteAccessSettings().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SecureTunnelingSettings {
+    return new SecureTunnelingSettings().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RemoteAccessSettings {
-    return new RemoteAccessSettings().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SecureTunnelingSettings {
+    return new SecureTunnelingSettings().fromJsonString(jsonString, options);
   }
 
-  static equals(a: RemoteAccessSettings | PlainMessage<RemoteAccessSettings> | undefined, b: RemoteAccessSettings | PlainMessage<RemoteAccessSettings> | undefined): boolean {
-    return proto3.util.equals(RemoteAccessSettings, a, b);
+  static equals(a: SecureTunnelingSettings | PlainMessage<SecureTunnelingSettings> | undefined, b: SecureTunnelingSettings | PlainMessage<SecureTunnelingSettings> | undefined): boolean {
+    return proto3.util.equals(SecureTunnelingSettings, a, b);
   }
 }
 

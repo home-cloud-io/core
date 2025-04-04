@@ -347,10 +347,16 @@ message DeviceSettings {
   bool auto_update_os = 4;
   bool enable_ssh = 5;
   repeated string trusted_ssh_keys = 6;
-  RemoteAccessSettings remote_access_settings = 7;
+  SecureTunnelingSettings secure_tunneling_settings = 7;
 }
 
-message RemoteAccessSettings {
+// NOTE: These settings are written to the daemon config on the host so that tunneling can be
+// configured on device boot even if the server and/or blueprint are down.
+//
+// This means that these settings are written in two places (blueprint and host filesystem) and
+// must be kept in sync. In the future we probably want to move to a sync pattern where the daemon
+// can connect directly to blueprint and syncs settings periodically.
+message SecureTunnelingSettings {
   bool enabled = 1;
   repeated WireguardInterface wireguard_interfaces = 2;
 }
