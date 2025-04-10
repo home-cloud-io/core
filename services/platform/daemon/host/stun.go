@@ -161,7 +161,15 @@ func (c *stunController) Cancel(port int) error {
 	binding.cancel()
 
 	// close binding stun client
-	return binding.client.Close()
+	err := binding.client.Close()
+	if err != nil {
+		return err
+	}
+
+	// remove binding
+	delete(c.bindings, port)
+
+	return nil
 }
 
 // keepAlive sends periodic binding requests to the STUN server to maintain the opening in the NAT
