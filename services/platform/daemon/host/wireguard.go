@@ -181,6 +181,7 @@ func (c wireguardController) AddPeer(ctx context.Context, logger chassis.Logger,
 		return nil, errors.New("wireguard interface does not exist")
 	}
 
+	// find the first unused ip in the address space
 	existingAddresses := []string{}
 	for _, existingPeer := range wgInterface.Peers {
 		if existingPeer.PublicKey == wgPeer.PublicKey {
@@ -188,13 +189,6 @@ func (c wireguardController) AddPeer(ctx context.Context, logger chassis.Logger,
 		}
 		existingAddresses = append(existingAddresses, existingPeer.AllowedIPs...)
 	}
-	wgInterface.Peers = append(wgInterface.Peers, WireguardPeer{
-		PublicKey:  wgPeer.PublicKey,
-		AllowedIPs: wgPeer.AllowedIps,
-	})
-	config.Wireguard.Interfaces[wgInterfaceName] = wgInterface
-
-	// find the first unused ip in the address space
 	var address string
 	for i := 2; i < 255; i++ {
 		address = fmt.Sprintf("10.100.0.%d/32", i)
@@ -205,6 +199,12 @@ func (c wireguardController) AddPeer(ctx context.Context, logger chassis.Logger,
 	if address == "" {
 		return nil, errors.New("no available ip address for peer found")
 	}
+
+	wgInterface.Peers = append(wgInterface.Peers, WireguardPeer{
+		PublicKey:  wgPeer.PublicKey,
+		AllowedIPs: []string{address},
+	})
+	config.Wireguard.Interfaces[wgInterfaceName] = wgInterface
 
 	// write config
 	b, err := json.MarshalIndent(config, "", "  ")
