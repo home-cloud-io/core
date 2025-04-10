@@ -14,21 +14,29 @@ import (
 )
 
 type (
-	RemoteAccessController interface {
-		// Enable()
-		// Disable()
+	SecureTunnelingController interface {
+		// Load is intended to be called at start up and will read secure tunneling configured resources and start
+		// them (e.g. Wireguard interfaces and their respective STUN servers and Locator connections).
 		Load()
 
+		// AddInterface will add a Wireguard interface to the host.
 		AddInterface(ctx context.Context, wireguardInterface *v1.WireguardInterface) (publicKey string, err error)
+		// RemoveInterface will remove a Wireguard interface from the host and also remove any dependent
+		// resources (STUN bindings and Locator connections).
 		RemoveInterface(ctx context.Context, wgInterfaceName string) error
+		// AddPeer will add a Wireguard peer to the given interface.
 		AddPeer(ctx context.Context, wgInterfaceName string, peer *v1.WireguardPeer) (addresses []string, dnsServers []string, err error)
+		// TODO: add RemovePeer()
 
+		// AddLocator will add a Locator conneciton to the given interface.
 		AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error
+		// RemoveLocator will remove a Locator connection from the given interface.
 		RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error
 
+		// BindSTUNServer will add (or replace) a STUN bunding to the given Wireguard interface.
 		BindSTUNServer(ctx context.Context, wgInterfaceName string, stunServer string) error
 	}
-	remoteAccessController struct {
+	secureTunnelingController struct {
 		logger              chassis.Logger
 		locatorController   LocatorController
 		stunController      STUNController
@@ -37,12 +45,12 @@ type (
 )
 
 const (
-	SecureTunnelingNotEnabledError = "remote access not enabled"
+	SecureTunnelingNotEnabledError = "secure tunneling not enabled"
 )
 
-func NewRemoteAccessController(logger chassis.Logger) RemoteAccessController {
+func NewSecureTunnelingController(logger chassis.Logger) SecureTunnelingController {
 	stunController := NewSTUNController(logger)
-	return remoteAccessController{
+	return secureTunnelingController{
 		logger:              logger,
 		stunController:      stunController,
 		locatorController:   NewLocatorController(logger, stunController),
@@ -50,11 +58,11 @@ func NewRemoteAccessController(logger chassis.Logger) RemoteAccessController {
 	}
 }
 
-func (c remoteAccessController) Load() {
+func (c secureTunnelingController) Load() {
 	ctx := context.Background()
 	settings, err := secureTunnelingSettings()
 	if err != nil {
-		c.logger.WithError(err).Error("failed to read remote access settings")
+		c.logger.WithError(err).Error("failed to read secure tunneling settings")
 		return
 	}
 	// get networking configuration from NixOS config file
@@ -100,7 +108,7 @@ func (c remoteAccessController) Load() {
 
 }
 
-func (c remoteAccessController) AddInterface(ctx context.Context, wgInterface *v1.WireguardInterface) (publicKey string, err error) {
+func (c secureTunnelingController) AddInterface(ctx context.Context, wgInterface *v1.WireguardInterface) (publicKey string, err error) {
 	settings, err := secureTunnelingSettings()
 	if err != nil {
 		if err.Error() != SecureTunnelingNotEnabledError {
@@ -136,7 +144,7 @@ func (c remoteAccessController) AddInterface(ctx context.Context, wgInterface *v
 	return publicKey, nil
 }
 
-func (c remoteAccessController) RemoveInterface(ctx context.Context, wgInterfaceName string) error {
+func (c secureTunnelingController) RemoveInterface(ctx context.Context, wgInterfaceName string) error {
 	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return err
@@ -182,7 +190,7 @@ func (c remoteAccessController) RemoveInterface(ctx context.Context, wgInterface
 	return nil
 }
 
-func (c remoteAccessController) AddPeer(ctx context.Context, wgInterfaceName string, peer *v1.WireguardPeer) (addresses []string, dnsServers []string, err error) {
+func (c secureTunnelingController) AddPeer(ctx context.Context, wgInterfaceName string, peer *v1.WireguardPeer) (addresses []string, dnsServers []string, err error) {
 	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return nil, nil, err
@@ -214,7 +222,7 @@ func (c remoteAccessController) AddPeer(ctx context.Context, wgInterfaceName str
 	return addresses, []string{dnsAddress}, nil
 }
 
-func (c remoteAccessController) AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error {
+func (c secureTunnelingController) AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error {
 	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return err
@@ -250,7 +258,7 @@ func (c remoteAccessController) AddLocator(ctx context.Context, wgInterfaceName 
 	return nil
 }
 
-func (c remoteAccessController) RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error {
+func (c secureTunnelingController) RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error {
 	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return err
@@ -284,7 +292,7 @@ func (c remoteAccessController) RemoveLocator(ctx context.Context, wgInterfaceNa
 	return nil
 }
 
-func (c remoteAccessController) BindSTUNServer(ctx context.Context, wgInterfaceName string, stunServerAddress string) error {
+func (c secureTunnelingController) BindSTUNServer(ctx context.Context, wgInterfaceName string, stunServerAddress string) error {
 	settings, err := secureTunnelingSettings()
 	if err != nil {
 		return err

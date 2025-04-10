@@ -10,11 +10,11 @@ import (
 
 func main() {
 	var (
-		logger   = zerolog.New()
-		mdns     = host.NewDNSPublisher(logger)
-		remoteAccess = host.NewRemoteAccessController(logger)
-		client   = communicate.NewClient(logger, mdns, remoteAccess)
-		migrator = host.NewMigrator(logger)
+		logger          = zerolog.New()
+		mdns            = host.NewDNSPublisher(logger)
+		secureTunneling = host.NewSecureTunnelingController(logger)
+		client          = communicate.NewClient(logger, mdns, secureTunneling)
+		migrator        = host.NewMigrator(logger)
 	)
 
 	// setup runtime
@@ -22,7 +22,7 @@ func main() {
 		WithRunner(client.Listen).
 		WithRunner(mdns.Start).
 		WithRunner(migrator.Migrate).
-		WithRunner(remoteAccess.Load)
+		WithRunner(secureTunneling.Load)
 
 	// start daemon runtime
 	runtime.Start()

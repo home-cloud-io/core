@@ -28,11 +28,11 @@ type (
 		Send(*v1.DaemonMessage)
 	}
 	client struct {
-		mutex        sync.Mutex
-		logger       chassis.Logger
-		stream       *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
-		mdns         host.DNSPublisher
-		remoteAccess host.RemoteAccessController
+		mutex           sync.Mutex
+		logger          chassis.Logger
+		stream          *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
+		mdns            host.DNSPublisher
+		secureTunneling host.SecureTunnelingController
 	}
 )
 
@@ -47,12 +47,12 @@ var (
 	ErrNoStream = fmt.Errorf("no stream")
 )
 
-func NewClient(logger chassis.Logger, mdns host.DNSPublisher, remoteAccess host.RemoteAccessController) Client {
+func NewClient(logger chassis.Logger, mdns host.DNSPublisher, secureTunneling host.SecureTunnelingController) Client {
 	clientSingleton = &client{
-		mutex:        sync.Mutex{},
-		logger:       logger,
-		mdns:         mdns,
-		remoteAccess: remoteAccess,
+		mutex:           sync.Mutex{},
+		logger:          logger,
+		mdns:            mdns,
+		secureTunneling: secureTunneling,
 	}
 	return clientSingleton
 }
@@ -390,7 +390,7 @@ func (c *client) setSTUNServer(ctx context.Context, def *v1.SetSTUNServerCommand
 		},
 	}
 
-	err := c.remoteAccess.BindSTUNServer(ctx, def.WireguardInterface, def.ServerAddress)
+	err := c.secureTunneling.BindSTUNServer(ctx, def.WireguardInterface, def.ServerAddress)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to bind to new stun server")
 		msg := resp.GetStunServerSet()
@@ -410,7 +410,7 @@ func (c *client) addLocatorServer(ctx context.Context, cmd *v1.AddLocatorServerC
 		},
 	}
 
-	err := c.remoteAccess.AddLocator(ctx, cmd.WireguardInterface, cmd.LocatorAddress)
+	err := c.secureTunneling.AddLocator(ctx, cmd.WireguardInterface, cmd.LocatorAddress)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to add locator server")
 		msg := resp.GetLocatorServerAdded()
@@ -430,7 +430,7 @@ func (c *client) removeLocatorServer(ctx context.Context, cmd *v1.RemoveLocatorS
 		},
 	}
 
-	err := c.remoteAccess.RemoveLocator(ctx, cmd.WireguardInterface, cmd.LocatorAddress)
+	err := c.secureTunneling.RemoveLocator(ctx, cmd.WireguardInterface, cmd.LocatorAddress)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to remove locator server")
 		msg := resp.GetLocatorServerRemoved()

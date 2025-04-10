@@ -15,7 +15,7 @@ func (c *client) addWireguardInterface(ctx context.Context, def *v1.AddWireguard
 		},
 	}
 
-	publicKey, err := c.remoteAccess.AddInterface(ctx, def.Interface)
+	publicKey, err := c.secureTunneling.AddInterface(ctx, def.Interface)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to add wireguard interface")
 		msg := resp.GetWireguardInterfaceAdded()
@@ -36,7 +36,7 @@ func (c *client) removeWireguardInterface(ctx context.Context, def *v1.RemoveWir
 		},
 	}
 
-	err := c.remoteAccess.RemoveInterface(ctx, def.Name)
+	err := c.secureTunneling.RemoveInterface(ctx, def.Name)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to remove wireguard interface")
 		msg := resp.GetWireguardInterfaceRemoved()
@@ -56,7 +56,7 @@ func (c *client) addWireguardPeer(ctx context.Context, def *v1.AddWireguardPeer)
 		},
 	}
 
-	addresses, dnsServers, err := c.remoteAccess.AddPeer(ctx, def.WireguardInterface, def.Peer)
+	addresses, dnsServers, err := c.secureTunneling.AddPeer(ctx, def.WireguardInterface, def.Peer)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to add wireguard peer")
 		msg := resp.GetWireguardPeerAdded()
