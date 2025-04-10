@@ -80,6 +80,7 @@ func (c *stunController) Bind(port int, server string) (err error) {
 		logger.WithError(err).Error("failed to resolve STUN server address")
 		return err
 	}
+	logger.WithField("stun_address", stunAddr).Info("resolved STUN server to address")
 
 	// in-memory network pipe between stun client and multiplexer
 	stunL, stunR := net.Pipe()
