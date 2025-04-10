@@ -146,10 +146,10 @@ func (c wireguardController) RemoveInterface(ctx context.Context, logger chassis
 	}
 
 	// if we just removed the last Wireguard interface we can disable NAT
-	if len(config.Wireguard.Interfaces) == 0 {
-		config.NAT.Enable = false
-		config.NAT.ExternalInterface = ""
-	}
+	// if len(config.Wireguard.Interfaces) == 0 {
+	// 	config.NAT.Enable = false
+	// 	config.NAT.ExternalInterface = ""
+	// }
 
 	// write config
 	b, err := json.MarshalIndent(config, "", "  ")
