@@ -48,7 +48,7 @@ const (
 
 func NewSTUNController(logger chassis.Logger) STUNController {
 	return &stunController{
-		logger: logger,
+		logger:   logger,
 		bindings: make(map[int]*stunBinding),
 	}
 }
@@ -255,15 +255,10 @@ func (b *stunBinding) bind() error {
 		}
 
 		// save the found address
-		copyAddress(&b.address, foundAddress)
+		b.address = foundAddress
 	})
 	if err != nil {
 		return err
 	}
 	return eventErr
-}
-
-func copyAddress(dst *stun.XORMappedAddress, src stun.XORMappedAddress) {
-	dst.IP = append(dst.IP, src.IP...)
-	dst.Port = src.Port
 }
