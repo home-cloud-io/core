@@ -193,6 +193,11 @@ func (m *locatorController) accept(logger chassis.Logger, wgInterface *sv1.Wireg
 
 	// encrypt the response before sending
 	body, err := encryption.EncryptMessage(remoteKey, config.PrivateKey, msg)
+	if err != nil {
+		logger.WithError(err).Error("failed to encrypt accept message")
+		reject(logger, locate.RequestId, stream)
+		return
+	}
 
 	err = stream.Send(&v1.ServerMessage{
 		AccessToken: fakeAccessToken,
