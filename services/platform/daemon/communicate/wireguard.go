@@ -44,7 +44,31 @@ func (c *client) removeWireguardInterface(ctx context.Context, def *v1.RemoveWir
 	}
 
 	c.logger.Info("sending WireguardInterfaceRemoved message")
-	c.Send(resp)
+	// TODO: this message doesn't get to or is not processed by the server but only on the actual home cloud server. it works when running locally
+	/*
+I start to get these messages below on the daemin
+
+5:30PM ERR stream failure error="internal: stream error: stream ID 1; NO_ERROR; received from peer" function=Listen service=home-cloud-daemon
+5:30PM ERR failed to send message to server error="no stream" function=Send service=home-cloud-daemon
+5:30PM INF listening for messages from server function=listen service=home-cloud-daemon
+5:30PM ERR failed to send message to server error="no stream" function=Send service=home-cloud-daemon
+5:30PM ERR stream failure error="unavailable: HTTP status 503 Service Unavailable" function=Listen service=home-cloud-daemon
+
+And these on the server
+
+{"level":"info","service":"server","function":"DisableSecureTunnelling","time":"2025-04-04T22:27:46Z","message":"disabling secure tunnelling"}
+{"level":"error","service":"server","error":"canceled: client disconnected","function":"Communicate","time":"2025-04-04T22:30:30Z","message":"failed to recieve message"}
+{"level":"error","service":"server","error":"canceled: context canceled","function":"DisableSecureTunnelling","time":"2025-04-04T22:30:58Z","message":" failed to disable secure tunnelling"}
+
+And this on blueprint
+
+{"level":"error","service":"blueprint","error":"canceled: client disconnected","function":"Synchronize","time":"2025-04-04T22:30:26Z","message":"connection error"}
+	*/
+	err = c.SendWithError(resp)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to send WireguardInterfaceRemoved message")
+	}
+	c.logger.Error("finished sending WireguardInterfaceRemoved message")
 }
 
 func (c *client) addWireguardPeer(ctx context.Context, def *v1.AddWireguardPeer) {

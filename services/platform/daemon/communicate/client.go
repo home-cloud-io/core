@@ -138,8 +138,8 @@ func (c *client) SendWithError(message *v1.DaemonMessage) error {
 		return ErrNoStream
 	}
 	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	err := c.stream.Send(message)
-	c.mutex.Unlock()
 	return err
 }
 
