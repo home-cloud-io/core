@@ -60,6 +60,8 @@ func (m *DaemonMessage) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for Subject
+
 	switch v := m.Message.(type) {
 	case *DaemonMessage_Heartbeat:
 		if v == nil {
@@ -902,6 +904,8 @@ func (m *ServerMessage) validate(all bool) error {
 	}
 
 	var errors []error
+
+	// no validation rules for Subject
 
 	switch v := m.Message.(type) {
 	case *ServerMessage_Heartbeat:
@@ -2485,107 +2489,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeviceInitializedValidationError{}
-
-// Validate checks the field values on DaemonError with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *DaemonError) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on DaemonError with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in DaemonErrorMultiError, or
-// nil if none found.
-func (m *DaemonError) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *DaemonError) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Error
-
-	if len(errors) > 0 {
-		return DaemonErrorMultiError(errors)
-	}
-
-	return nil
-}
-
-// DaemonErrorMultiError is an error wrapping multiple validation errors
-// returned by DaemonError.ValidateAll() if the designated constraints aren't met.
-type DaemonErrorMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m DaemonErrorMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m DaemonErrorMultiError) AllErrors() []error { return m }
-
-// DaemonErrorValidationError is the validation error returned by
-// DaemonError.Validate if the designated constraints aren't met.
-type DaemonErrorValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e DaemonErrorValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e DaemonErrorValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e DaemonErrorValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e DaemonErrorValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e DaemonErrorValidationError) ErrorName() string { return "DaemonErrorValidationError" }
-
-// Error satisfies the builtin error interface
-func (e DaemonErrorValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sDaemonError.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = DaemonErrorValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = DaemonErrorValidationError{}
 
 // Validate checks the field values on UploadFileReady with the rules defined
 // in the proto definition for this message. If any rules are violated, the

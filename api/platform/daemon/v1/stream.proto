@@ -39,6 +39,9 @@ message DaemonMessage {
     ComponentVersions component_versions = 17;
     Logs logs = 18;
   }
+
+  // ref: https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#subject
+  string subject = 64;
 }
 
 message ServerMessage {
@@ -76,6 +79,9 @@ message ServerMessage {
     RequestComponentVersionsCommand request_component_versions_command = 23;
     RequestLogsCommand request_logs_command = 24;
   }
+
+  // ref: https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#subject
+  string subject = 64;
 }
 
 // Bidirectional
@@ -106,10 +112,6 @@ message CurrentDaemonVersion {
 // Deprecated: use SettingsSaved instead
 message DeviceInitialized {
   string error = 16;
-}
-
-message DaemonError {
-  string error = 1;
 }
 
 // UploadFileReady tells the server that the daemon is ready to start receiving file data chunks

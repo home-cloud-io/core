@@ -18,6 +18,8 @@ type (
 		// It will return when the Timeout is reached, an error is returned from the Callback, or
 		// done=true is returned from the Callback; whichever happens first.
 		Listen(ctx context.Context) error
+		// Deregister will deregister the listener from the broadcaster.
+		Deregister()
 	}
 	listener[T proto.Message] struct {
 		broadcaster Broadcaster
@@ -74,6 +76,10 @@ func RegisterListener[T proto.Message](_ context.Context, broadcaster Broadcaste
 		ch:          ch,
 		options:     options,
 	}
+}
+
+func (a *listener[T]) Deregister() {
+	a.broadcaster.Deregister(a.id)
 }
 
 func (a *listener[T]) Listen(ctx context.Context) error {

@@ -29,6 +29,7 @@ func main() {
 		webHTTP     = web.NewHttp(logger, actl, sctl)
 		internalRPC = internal.New(logger, sctl)
 	)
+	system.NewCommander(broadcaster)
 
 	runner := func() {
 		kvclient.Init()
