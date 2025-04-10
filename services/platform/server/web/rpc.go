@@ -370,7 +370,7 @@ func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Req
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	err := h.sctl.AddLocator(ctx, request.Msg.LocatorAddress)
+	err := h.sctl.AddLocator(ctx, request.Msg.WireguardInterface, request.Msg.LocatorAddress)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to add locator")
 		return nil, fmt.Errorf("failed to add locator")
@@ -382,7 +382,7 @@ func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Req
 func (h *rpcHandler) DeregisterFromLocator(ctx context.Context, request *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error) {
 	h.logger.Info("deregistering from locator")
 
-	err := h.sctl.RemoveLocator(ctx, request.Msg.LocatorAddress)
+	err := h.sctl.RemoveLocator(ctx, request.Msg.WireguardInterface, request.Msg.LocatorAddress)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to remove locator")
 		return nil, fmt.Errorf("failed to remove locator")
@@ -442,10 +442,10 @@ func (h *rpcHandler) GetSystemLogs(ctx context.Context, request *connect.Request
 	}
 
 	return connect.NewResponse(&v1.GetSystemLogsResponse{
-		Logs:    logs,
-		Domains: domains,
+		Logs:       logs,
+		Domains:    domains,
 		Namespaces: namespaces,
-		Sources: sources,
+		Sources:    sources,
 	}), nil
 }
 

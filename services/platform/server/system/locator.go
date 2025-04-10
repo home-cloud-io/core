@@ -13,12 +13,12 @@ import (
 
 type (
 	Locators interface {
-		AddLocator(ctx context.Context, locatorAddress string) (err error)
-		RemoveLocator(ctx context.Context, locatorAddress string) error
+		AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) (err error)
+		RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error
 	}
 )
 
-func (c *controller) AddLocator(ctx context.Context, locatorAddress string) (err error) {
+func (c *controller) AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) (err error) {
 
 	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.LocatorServerAdded]{
 		Callback: func(event *dv1.LocatorServerAdded) (bool, error) {
@@ -35,7 +35,8 @@ func (c *controller) AddLocator(ctx context.Context, locatorAddress string) (err
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddLocatorServerCommand{
 			AddLocatorServerCommand: &dv1.AddLocatorServerCommand{
-				LocatorAddress: locatorAddress,
+				LocatorAddress:     locatorAddress,
+				WireguardInterface: wgInterfaceName,
 			},
 		},
 	})
@@ -61,7 +62,7 @@ func (c *controller) AddLocator(ctx context.Context, locatorAddress string) (err
 	return nil
 }
 
-func (c *controller) RemoveLocator(ctx context.Context, locatorAddress string) (err error) {
+func (c *controller) RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) (err error) {
 
 	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.LocatorServerRemoved]{
 		Callback: func(event *dv1.LocatorServerRemoved) (bool, error) {
@@ -78,7 +79,8 @@ func (c *controller) RemoveLocator(ctx context.Context, locatorAddress string) (
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RemoveLocatorServerCommand{
 			RemoveLocatorServerCommand: &dv1.RemoveLocatorServerCommand{
-				LocatorAddress: locatorAddress,
+				LocatorAddress:     locatorAddress,
+				WireguardInterface: wgInterfaceName,
 			},
 		},
 	})
