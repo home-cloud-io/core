@@ -62,8 +62,9 @@ func (c wireguardController) AddInterface(ctx context.Context, logger chassis.Lo
 		return "", err
 	}
 
-	// configure NAT
+	// make sure NAT is enabled and configured
 	config.NAT.Enable = true
+	// TODO: make this configureable - could be different depending on hardware
 	config.NAT.ExternalInterface = "eth0"
 
 	// add interface to existing array if necessary
@@ -144,12 +145,6 @@ func (c wireguardController) RemoveInterface(ctx context.Context, logger chassis
 			break
 		}
 	}
-
-	// if we just removed the last Wireguard interface we can disable NAT
-	// if len(config.Wireguard.Interfaces) == 0 {
-	// 	config.NAT.Enable = false
-	// 	config.NAT.ExternalInterface = ""
-	// }
 
 	// write config
 	b, err := json.MarshalIndent(config, "", "  ")
