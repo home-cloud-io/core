@@ -284,12 +284,14 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 
 	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceRemoved]{
 		Callback: func(event *dv1.WireguardInterfaceRemoved) (bool, error) {
+			logger.Info("processing WireguardInterfaceRemoved event")
 			if event.Error != "" {
+				logger.Errorf("WireguardInterfaceRemoved event error: %s", event.Error)
 				return true, fmt.Errorf(event.Error)
 			}
 			return true, nil
 		},
-		Timeout: 300 * time.Second,
+		Timeout: 30 * time.Second,
 	})
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RemoveWireguardInterface{
