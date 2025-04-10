@@ -115,6 +115,9 @@ func newInsecureClient() *http.Client {
 				return net.Dial(network, addr)
 			},
 			// Don't forget timeouts!
+			IdleConnTimeout:  5 * time.Second,
+			ReadIdleTimeout:  5 * time.Second,
+			WriteByteTimeout: 5 * time.Second,
 		},
 	}
 }
