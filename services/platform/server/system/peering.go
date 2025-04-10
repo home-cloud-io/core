@@ -50,8 +50,8 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 	}
 
 	peerConfig := &v1.RegisterPeerResponse{
-		PrivateKey: privKey.String(),
-		PublicKey:  privKey.PublicKey().String(),
+		PrivateKey:      privKey.String(),
+		PublicKey:       privKey.PublicKey().String(),
 		ServerPublicKey: wgInterface.PublicKey,
 		ServerId:        wgInterface.Id,
 		LocatorServers:  wgInterface.LocatorServers,
@@ -76,7 +76,7 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 			AddWireguardPeer: &dv1.AddWireguardPeer{
 				Peer: &dv1.WireguardPeer{
 					PublicKey:  peerConfig.PublicKey,
-					AllowedIps: peerConfig.Addresses,
+					AllowedIps: []string{"0.0.0.0/0"},
 				},
 				WireguardInterface: wgInterface.Name,
 			},
