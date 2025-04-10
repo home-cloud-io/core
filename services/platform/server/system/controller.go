@@ -80,27 +80,20 @@ const (
 
 func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cmd *dv1.SaveSettingsCommand) error {
 	logger.Info("saving settings")
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.SettingsSaved]{
-		Callback: func(event *dv1.SettingsSaved) (bool, error) {
-			if event.Error != nil {
-				return true, errors.New(event.Error.Error)
-			}
-			return true, nil
-		},
-		Timeout: 30 * time.Second,
-	})
-	err := com.Send(&dv1.ServerMessage{
+
+	response, err := com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SaveSettingsCommand{
 			SaveSettingsCommand: cmd,
 		},
-	})
+	}, nil)
 	if err != nil {
 		return err
 	}
-	err = listener.Listen(ctx)
-	if err != nil {
-		return err
+	e := response.GetSettingsSaved()
+	if e.Error != "" {
+		return errors.New(e.Error)
 	}
+
 	logger.Info("settings saved successfully")
 	return nil
 }
@@ -262,6 +255,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 			log.Debug("waiting for work")
 			options := &async.ListenerOptions[*dv1.UploadFileChunkCompleted]{
 				Callback: func(event *dv1.UploadFileChunkCompleted) (bool, error) {
+					// TODO: do we ever deregister these listeners?
 					return false, nil
 				},
 				Timeout: 30 * time.Minute,

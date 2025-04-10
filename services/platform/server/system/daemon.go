@@ -5,7 +5,6 @@ import (
 	"io"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	"github.com/home-cloud-io/core/services/platform/server/async"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
@@ -91,17 +90,8 @@ func (c *controller) RemoveMdnsHost(hostname string) error {
 
 func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger, buf io.Reader, fileId, fileName string) (string, error) {
 	logger.Info("uploading file")
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.UploadFileReady]{
-		Callback: func(event *dv1.UploadFileReady) (bool, error) {
-			if event.Id == fileId {
-				return true, nil
-			}
-			return false, nil
-		},
-	})
 
-	// prepare upload to daemon
-	err := com.Send(&dv1.ServerMessage{
+	_, err := com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_UploadFileRequest{
 			UploadFileRequest: &dv1.UploadFileRequest{
 				Data: &dv1.UploadFileRequest_Info{
@@ -112,17 +102,12 @@ func (c *controller) UploadFileStream(ctx context.Context, logger chassis.Logger
 				},
 			},
 		},
-	})
+	}, nil)
 	if err != nil {
 		logger.WithError(err).Error("failed to ready daemon for file upload")
 		return fileId, err
 	}
-	logger.Info("waiting for ready signal")
-	err = listener.Listen(ctx)
-	if err != nil {
-		logger.WithError(err).Error("failed to ready daemon for file upload")
-		return fileId, err
-	}
+
 	logger.Info("daemon ready for file upload")
 
 	// chunk file and upload
