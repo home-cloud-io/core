@@ -16,7 +16,7 @@ require (
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/netbirdio/netbird v0.39.2
 	github.com/pion/stun/v2 v2.0.0
-	github.com/steady-bytes/draft/pkg/chassis v0.4.4
+	github.com/steady-bytes/draft/pkg/chassis v0.4.5
 	github.com/steady-bytes/draft/pkg/loggers v0.2.3
 	golang.org/x/crypto v0.36.0
 	golang.org/x/mod v0.24.0

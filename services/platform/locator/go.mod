@@ -15,7 +15,7 @@ require (
 	github.com/netbirdio/netbird v0.39.2
 	github.com/pion/stun/v2 v2.0.0
 	github.com/pion/turn/v4 v4.0.0
-	github.com/steady-bytes/draft/pkg/chassis v0.3.5
+	github.com/steady-bytes/draft/pkg/chassis v0.4.5
 	github.com/steady-bytes/draft/pkg/loggers v0.2.2
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.65.0
@@ -87,7 +87,7 @@ require (
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.18.2 // indirect
-	github.com/steady-bytes/draft/api v0.3.2 // indirect
+	github.com/steady-bytes/draft/api v1.0.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/things-go/go-socks5 v0.0.4 // indirect
 	github.com/vishvananda/netlink v1.2.1-beta.2 // indirect
