@@ -15,6 +15,15 @@ type (
 		Enable bool `json:"enable"`
 	}
 
+	NixConfig struct {
+		GC NixConfigGC `json:"gc"`
+	}
+	NixConfigGC struct {
+		Automatic bool   `json:"automatic"`
+		Dates     string `json:"dates"`
+		Options   string `json:"options"`
+	}
+
 	NetworkingConfig struct {
 		Hostname       string                         `json:"hostName"`
 		Domain         string                         `json:"domain"`

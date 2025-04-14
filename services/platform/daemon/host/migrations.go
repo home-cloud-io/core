@@ -49,6 +49,12 @@ var (
 			Run:      m2,
 			Required: true,
 		},
+		{
+			Id:       "b5a63e29-4b35-48e9-b78f-8f3522225f6f",
+			Name:     "Add a nix.json config file which enables automatic, weekly garbage collection",
+			Run:      m3,
+			Required: true,
+		},
 	}
 )
 
@@ -333,6 +339,31 @@ in
 	}
 
 	err = os.WriteFile(NixosConfigFile(), []byte(nixConfigurationContents), 0600)
+	if err != nil {
+		return err
+	}
+
+	err = RebuildAndSwitchOS(ctx, logger)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func m3(logger chassis.Logger) error {
+	var (
+		ctx           = context.Background()
+		nixConfigFile = NixConfig{
+			GC: NixConfigGC{
+				Automatic: true,
+				Dates:     "weekly",
+				Options:   "--delete-older-than 30d",
+			},
+		}
+	)
+
+	err := WriteJsonFile(NixConfigFile(), nixConfigFile, 0600)
 	if err != nil {
 		return err
 	}
