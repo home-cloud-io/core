@@ -40,6 +40,7 @@ func (h *rpcHandler) RegisterRPC(server chassis.Rpcer) {
 }
 
 func (h *rpcHandler) Locate(ctx context.Context, request *connect.Request[v1.LocateRequest]) (*connect.Response[v1.LocateResponse], error) {
+	h.logger.Debug("locate request received")
 
 	s, ok := h.registry.Load(request.Msg.ServerId)
 	if !ok {

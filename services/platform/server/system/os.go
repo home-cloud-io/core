@@ -10,7 +10,6 @@ import (
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	"github.com/robfig/cron/v3"
-	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 
 	"github.com/home-cloud-io/core/services/platform/server/async"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
@@ -28,9 +27,9 @@ type (
 		AutoUpdateOS(logger chassis.Logger)
 		// UpdateOS will check for and install any OS (including Daemon) updates one time.
 		UpdateOS(ctx context.Context, logger chassis.Logger) error
-		// EnableWireguard will initialize the Wireguard server on the host and save the configuration to Blueprint
+		// EnableWireguard will initialize the Wireguard server on the host
 		EnableWireguard(ctx context.Context, logger chassis.Logger) error
-		// DisableWireguard will disable the Wireguard server on the host and delete the configuration from Blueprint
+		// DisableWireguard will disable the Wireguard server on the host
 		DisableWireguard(ctx context.Context, logger chassis.Logger) error
 	}
 )
@@ -71,9 +70,9 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	// get the current daemon version from the daemon
 	listener = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.CurrentDaemonVersion]{
 		Callback: func(event *dv1.CurrentDaemonVersion) (bool, error) {
-			if event.Error != nil {
-				logger.WithError(errors.New(event.Error.Error)).Error("failed to get current daemon version")
-				return true, errors.New(event.Error.Error)
+			if event.Error != "" {
+				logger.WithError(errors.New(event.Error)).Error("failed to get current daemon version")
+				return true, errors.New(event.Error)
 			}
 			response.DaemonVersions = &v1.DaemonVersions{
 				Current: &v1.DaemonVersion{
@@ -184,57 +183,37 @@ func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error 
 
 func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger) error {
 	var (
-		err    error
-		config = &dv1.WireguardConfig{}
+		err error
 	)
 
-	// check if wireguard is already enabled
-	result, err := kvclient.List(ctx, config)
-	if err != nil {
-		return err
-	}
-	if result != nil {
-		logger.Warn("the Wireguard server is already enabled")
-		return nil
-	}
-
-	key, err := wgtypes.GeneratePrivateKey()
-	if err != nil {
-		return err
-	}
-
 	// create wireguard config
-	config = &dv1.WireguardConfig{
-		Interfaces: []*dv1.WireguardInterface{
-			{
-				Id:         uuid.New().String(),
-				Name:       DefaultWireguardInterface,
-				PrivateKey: key.String(),
-				Ips: []string{
-					"10.100.0.1/24",
-				},
-				ListenPort: 51820,
-				Peers:      []*dv1.WireguardPeer{},
-			},
+	wgInterface := &dv1.WireguardInterface{
+		Id:   uuid.New().String(),
+		Name: DefaultWireguardInterface,
+		Ips: []string{
+			"10.100.0.1/24",
 		},
+		ListenPort: 51820,
+		Peers:      []*dv1.WireguardPeer{},
 	}
 
 	// command daemon to initialize
+	var publicKey string
 	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceAdded]{
 		Callback: func(event *dv1.WireguardInterfaceAdded) (bool, error) {
-			if event.Error != nil {
-				return true, fmt.Errorf(event.Error.Error)
+			if event.Error != "" {
+				return true, fmt.Errorf(event.Error)
 			}
+			publicKey = event.PublicKey
 			return true, nil
 		},
-		Timeout: 30 * time.Second,
+		Timeout: 300 * time.Second,
 	})
 
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardInterface{
 			AddWireguardInterface: &dv1.AddWireguardInterface{
-				// TODO: handle this better
-				Interface: config.Interfaces[0],
+				Interface: wgInterface,
 			},
 		},
 	})
@@ -249,8 +228,8 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	// set STUN server on daemon
 	listener = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.STUNServerSet]{
 		Callback: func(event *dv1.STUNServerSet) (bool, error) {
-			if event.Error != nil {
-				return true, fmt.Errorf(event.Error.Error)
+			if event.Error != "" {
+				return true, fmt.Errorf(event.Error)
 			}
 			return true, nil
 		},
@@ -258,7 +237,8 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	err = com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SetStunServerCommand{
 			SetStunServerCommand: &dv1.SetSTUNServerCommand{
-				Server: DefaultSTUNServerAddress,
+				ServerAddress:      DefaultSTUNServerAddress,
+				WireguardInterface: DefaultWireguardInterface,
 			},
 		},
 	})
@@ -270,22 +250,24 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 		return err
 	}
 
-	// save config to blueprint
-	_, err = kvclient.Set(ctx, kvclient.WIREGUARD_CONFIG_KEY, config)
-	if err != nil {
-		return err
-	}
-
 	// enable feature in blueprint
 	settings := &v1.DeviceSettings{}
 	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
 		return err
 	}
-	settings.LocatorSettings = &v1.LocatorSettings{
-		Enabled:           true,
-		Locators:          make([]*dv1.Locator, 0),
-		StunServerAddress: DefaultSTUNServerAddress,
+	settings.SecureTunnelingSettings = &v1.SecureTunnelingSettings{
+		Enabled: true,
+		WireguardInterfaces: []*v1.WireguardInterface{
+			{
+				Id:             wgInterface.Id,
+				Name:           wgInterface.Name,
+				Port:           int32(wgInterface.ListenPort),
+				PublicKey:      publicKey,
+				StunServer:     DefaultSTUNServerAddress,
+				LocatorServers: []string{},
+			},
+		},
 	}
 	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
@@ -300,11 +282,10 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 		err error
 	)
 
-	// disable on daemon
 	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceRemoved]{
 		Callback: func(event *dv1.WireguardInterfaceRemoved) (bool, error) {
-			if event.Error != nil {
-				return true, fmt.Errorf(event.Error.Error)
+			if event.Error != "" {
+				return true, fmt.Errorf(event.Error)
 			}
 			return true, nil
 		},
@@ -325,10 +306,19 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 		return err
 	}
 
-	// delete config from blueprint
-	_, err = kvclient.Delete(ctx, kvclient.WIREGUARD_CONFIG_KEY, &dv1.WireguardConfig{})
+	// disable feature in blueprint
+	settings := &v1.DeviceSettings{}
+	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
 		return err
+	}
+	settings.SecureTunnelingSettings = &v1.SecureTunnelingSettings{
+		Enabled:             false,
+		WireguardInterfaces: []*v1.WireguardInterface{},
+	}
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		return fmt.Errorf("failed to save settings")
 	}
 
 	return nil

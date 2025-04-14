@@ -3,51 +3,80 @@ package host
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
-func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.AddWireguardInterface) error {
+type (
+	WireguardController interface {
+		AddInterface(ctx context.Context, logger chassis.Logger, wgInterface *v1.WireguardInterface) (publicKey string, err error)
+		RemoveInterface(ctx context.Context, logger chassis.Logger, wgInterfaceName string) error
+		AddPeer(ctx context.Context, logger chassis.Logger, wgInterfaceName string, peer *v1.WireguardPeer) (addresses []string, err error)
+	}
+	wireguardController struct{}
+)
+
+func NewWireguardController() WireguardController {
+	return wireguardController{}
+}
+
+func (c wireguardController) AddInterface(ctx context.Context, logger chassis.Logger, wgInterface *v1.WireguardInterface) (publicKey string, err error) {
+	logger.Info("adding wireguard interface")
 
 	// read config
 	config := NetworkingConfig{}
 	f, err := os.ReadFile(NetworkingConfigFile())
 	if err != nil {
-		return err
+		return "", err
 	}
 	err = json.Unmarshal(f, &config)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	// write the private key file
-	err = os.MkdirAll(fullWireguardKeyPath(def.Interface.Name), 0700)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(fullWireguardKeyPath(def.Interface.Name)+"/private", []byte(def.Interface.PrivateKey), 0600)
-	if err != nil {
-		return err
+	// check to see if the interface already exists
+	_, ok := config.Wireguard.Interfaces[wgInterface.Name]
+	if ok {
+		return "", errors.New("wireguard interface already exists")
 	}
 
-	// configure NAT
+	// generate a private key and write to file system
+	privateKey, err := wgtypes.GeneratePrivateKey()
+	if err != nil {
+		return "", err
+	}
+	err = os.MkdirAll(fullWireguardKeyPath(wgInterface.Name), 0700)
+	if err != nil {
+		return "", err
+	}
+	err = os.WriteFile(fullWireguardKeyPath(wgInterface.Name)+"/private", []byte(privateKey.String()), 0600)
+	if err != nil {
+		return "", err
+	}
+
+	// make sure NAT is enabled and configured
 	config.NAT.Enable = true
+	// TODO: make this configureable - could be different depending on hardware
 	config.NAT.ExternalInterface = "eth0"
 
 	// add interface to existing array if necessary
 	if config.NAT.InternalInterfaces == nil {
-		config.NAT.InternalInterfaces = []string{def.Interface.Name}
+		config.NAT.InternalInterfaces = []string{wgInterface.Name}
 	} else {
-		config.NAT.InternalInterfaces = append(config.NAT.InternalInterfaces, def.Interface.Name)
+		config.NAT.InternalInterfaces = append(config.NAT.InternalInterfaces, wgInterface.Name)
 	}
 
 	// build out Wireguard peers
-	peers := make([]WireguardPeer, len(def.Interface.Peers))
-	for _, peer := range def.Interface.Peers {
+	peers := make([]WireguardPeer, len(wgInterface.Peers))
+	for _, peer := range wgInterface.Peers {
 		peers = append(peers, WireguardPeer{
 			PublicKey:  peer.PublicKey,
 			AllowedIPs: peer.AllowedIps,
@@ -60,48 +89,34 @@ func AddWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.A
 	}
 
 	// add interface to existing map
-	config.Wireguard.Interfaces[def.Interface.Name] = WireguardInterface{
-		IPs:            def.Interface.Ips,
-		ListenPort:     def.Interface.ListenPort,
-		PrivateKeyFile: fullWireguardKeyPath(def.Interface.Name) + "/private",
+	config.Wireguard.Interfaces[wgInterface.Name] = WireguardInterface{
+		IPs:            wgInterface.Ips,
+		ListenPort:     wgInterface.ListenPort,
+		PrivateKeyFile: fullWireguardKeyPath(wgInterface.Name) + "/private",
 		Peers:          peers,
 	}
 
 	// write config
 	b, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = os.WriteFile(NetworkingConfigFile(), b, 0777)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = RebuildAndSwitchOS(ctx, logger)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	// add to daemon config
-	wgConfig := &v1.WireguardConfig{}
-	err = chassis.GetConfig().UnmarshalKey(WireguardConfigKey, wgConfig)
-	if err != nil {
-		return err
-	}
-	wgConfig.Interfaces = append(wgConfig.Interfaces, &v1.WireguardInterface{
-		Id:   def.Interface.Id,
-		Name: def.Interface.Name,
-	})
-	err = chassis.GetConfig().SetAndWrite(WireguardConfigKey, wgConfig)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return privateKey.PublicKey().String(), nil
 }
 
-func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v1.RemoveWireguardInterface) error {
+func (c wireguardController) RemoveInterface(ctx context.Context, logger chassis.Logger, wgInterfaceName string) error {
+	logger.Info("removing wireguard interface")
 
 	// read config
 	config := NetworkingConfig{}
@@ -115,26 +130,20 @@ func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v
 	}
 
 	// remove private key file
-	err = os.RemoveAll(fullWireguardKeyPath(def.Name))
+	err = os.RemoveAll(fullWireguardKeyPath(wgInterfaceName))
 	if err != nil {
 		return err
 	}
 
 	// remove interface from Wireguard config
-	delete(config.Wireguard.Interfaces, def.Name)
+	delete(config.Wireguard.Interfaces, wgInterfaceName)
 
 	// remove interface from NAT config
 	for i, inf := range config.NAT.InternalInterfaces {
-		if inf == def.Name {
-			config.NAT.InternalInterfaces = append(config.NAT.InternalInterfaces[:i], config.NAT.InternalInterfaces[i+1:]...)
+		if inf == wgInterfaceName {
+			config.NAT.InternalInterfaces = slices.Delete(config.NAT.InternalInterfaces, i, i+1)
 			break
 		}
-	}
-
-	// if we just removed the last Wireguard interface we can disable NAT
-	if len(config.Wireguard.Interfaces) == 0 {
-		config.NAT.Enable = false
-		config.NAT.ExternalInterface = ""
 	}
 
 	// write config
@@ -152,66 +161,70 @@ func RemoveWireguardInterface(ctx context.Context, logger chassis.Logger, def *v
 		return err
 	}
 
-	// remove from daemon config
-	wgConfig := &v1.WireguardConfig{}
-	err = chassis.GetConfig().UnmarshalKey(WireguardConfigKey, wgConfig)
-	if err != nil {
-		return err
-	}
-	for i, inf := range wgConfig.Interfaces {
-		if inf.Name == def.Name {
-			wgConfig.Interfaces = append(wgConfig.Interfaces[:i], wgConfig.Interfaces[i+1:]...)
-			break
-		}
-	}
-	err = chassis.GetConfig().SetAndWrite(WireguardConfigKey, wgConfig)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
-func fullWireguardKeyPath(interfaceName string) string {
-	return filepath.Join(WireguardKeyPath(), interfaceName)
-}
-
-func AddWireguardPeer(ctx context.Context, logger chassis.Logger, peer *v1.WireguardPeer) error {
+func (c wireguardController) AddPeer(ctx context.Context, logger chassis.Logger, wgInterfaceName string, wgPeer *v1.WireguardPeer) (addresses []string, err error) {
 	// read config
 	config := NetworkingConfig{}
 	f, err := os.ReadFile(NetworkingConfigFile())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = json.Unmarshal(f, &config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// Adding peer to all `wg` interfaces. This will need to change when peering to other devices is built.
-	// currently the interface name is unknown
-	for _, v := range config.Wireguard.Interfaces {
-		v.Peers = append(v.Peers, WireguardPeer{
-			PublicKey:  peer.PublicKey,
-			AllowedIPs: peer.AllowedIps,
-		})
+	wgInterface, ok := config.Wireguard.Interfaces[wgInterfaceName]
+	if !ok {
+		return nil, errors.New("wireguard interface does not exist")
 	}
+
+	// find the first unused ip in the address space
+	existingAddresses := []string{}
+	for _, existingPeer := range wgInterface.Peers {
+		if existingPeer.PublicKey == wgPeer.PublicKey {
+			return nil, errors.New("peer with requested public key already registered with given interface")
+		}
+		existingAddresses = append(existingAddresses, existingPeer.AllowedIPs...)
+	}
+	var address string
+	for i := 2; i < 255; i++ {
+		address = fmt.Sprintf("10.100.0.%d/32", i)
+		if !slices.Contains(existingAddresses, address) {
+			break
+		}
+	}
+	if address == "" {
+		return nil, errors.New("no available ip address for peer found")
+	}
+
+	wgInterface.Peers = append(wgInterface.Peers, WireguardPeer{
+		PublicKey:  wgPeer.PublicKey,
+		AllowedIPs: []string{address},
+	})
+	config.Wireguard.Interfaces[wgInterfaceName] = wgInterface
 
 	// write config
 	b, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = os.WriteFile(NetworkingConfigFile(), b, 0777)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = RebuildAndSwitchOS(ctx, logger)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return []string{address}, nil
+}
+
+func fullWireguardKeyPath(interfaceName string) string {
+	return filepath.Join(WireguardKeyPath(), interfaceName)
 }

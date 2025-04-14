@@ -249,7 +249,7 @@ func (h *rpcHandler) InitializeDevice(ctx context.Context, request *connect.Requ
 		Timezone:       msg.GetTimezone(),
 		AutoUpdateApps: msg.GetAutoUpdateApps(),
 		AutoUpdateOs:   msg.GetAutoUpdateOs(),
-		LocatorSettings: &v1.LocatorSettings{
+		SecureTunnelingSettings: &v1.SecureTunnelingSettings{
 			Enabled: false,
 		},
 	}
@@ -341,12 +341,7 @@ func (h *rpcHandler) EnableSecureTunnelling(ctx context.Context, request *connec
 func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *connect.Request[v1.DisableSecureTunnellingRequest]) (*connect.Response[v1.DisableSecureTunnellingResponse], error) {
 	h.logger.Info("disabling secure tunnelling")
 
-	err := h.sctl.DisableAllLocators(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	err = h.sctl.DisableWireguard(ctx, h.logger)
+	err := h.sctl.DisableWireguard(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to disable secure tunnelling")
 		return nil, errors.New("failed to disable secure tunnelling")
@@ -358,23 +353,13 @@ func (h *rpcHandler) DisableSecureTunnelling(ctx context.Context, request *conne
 func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
 	h.logger.Info("register a peer")
 
-	peerCfg, err := h.sctl.RegisterPeer(ctx, h.logger)
+	resp, err := h.sctl.RegisterPeer(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error(ErrFailedPeerRegistration)
 		return nil, errors.New(ErrFailedPeerRegistration)
 	}
 
-	dns := fmt.Sprintf("%s:%d", peerCfg.ClientDetails.ServerAddress, 53)
-
-	return connect.NewResponse(&v1.RegisterPeerResponse{
-		PrivateKey:      peerCfg.GetPrivateKey(),
-		PublicKey:       peerCfg.GetPublicKey(),
-		Addresses:       []string{peerCfg.ClientDetails.ServerAddress},
-		DnsServers:      []string{dns},
-		ServerPublicKey: peerCfg.PublicKey,
-		ServerId:        peerCfg.Id,
-		LocatorUrl:      peerCfg.ClientDetails.LocatorAddress,
-	}), nil
+	return connect.NewResponse(resp), nil
 }
 
 func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
@@ -385,29 +370,25 @@ func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Req
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	locator, err := h.sctl.AddLocator(ctx, request.Msg.LocatorAddress)
+	err := h.sctl.AddLocator(ctx, request.Msg.WireguardInterface, request.Msg.LocatorAddress)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to add locator")
 		return nil, fmt.Errorf("failed to add locator")
 	}
 
-	return connect.NewResponse(&v1.RegisterToLocatorResponse{
-		Locator: locator,
-	}), nil
+	return connect.NewResponse(&v1.RegisterToLocatorResponse{}), nil
 }
 
 func (h *rpcHandler) DeregisterFromLocator(ctx context.Context, request *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error) {
 	h.logger.Info("deregistering from locator")
 
-	err := h.sctl.RemoveLocator(ctx, request.Msg.LocatorAddress)
+	err := h.sctl.RemoveLocator(ctx, request.Msg.WireguardInterface, request.Msg.LocatorAddress)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to remove locator")
 		return nil, fmt.Errorf("failed to remove locator")
 	}
 
-	return connect.NewResponse(&v1.DeregisterFromLocatorResponse{
-		LocatorAddress: request.Msg.LocatorAddress,
-	}), nil
+	return connect.NewResponse(&v1.DeregisterFromLocatorResponse{}), nil
 }
 
 func (h *rpcHandler) GetComponentVersions(ctx context.Context, request *connect.Request[v1.GetComponentVersionsRequest]) (*connect.Response[v1.GetComponentVersionsResponse], error) {
@@ -461,10 +442,10 @@ func (h *rpcHandler) GetSystemLogs(ctx context.Context, request *connect.Request
 	}
 
 	return connect.NewResponse(&v1.GetSystemLogsResponse{
-		Logs:    logs,
-		Domains: domains,
+		Logs:       logs,
+		Domains:    domains,
 		Namespaces: namespaces,
-		Sources: sources,
+		Sources:    sources,
 	}), nil
 }
 

@@ -28,12 +28,11 @@ type (
 		Send(*v1.DaemonMessage)
 	}
 	client struct {
-		mutex             sync.Mutex
-		logger            chassis.Logger
-		stream            *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
-		mdns              host.DNSPublisher
-		stun              host.STUNClient
-		locatorController host.LocatorController
+		mutex           sync.Mutex
+		logger          chassis.Logger
+		stream          *connect.BidiStreamForClient[v1.DaemonMessage, v1.ServerMessage]
+		mdns            host.DNSPublisher
+		secureTunneling host.SecureTunnelingController
 	}
 )
 
@@ -48,13 +47,12 @@ var (
 	ErrNoStream = fmt.Errorf("no stream")
 )
 
-func NewClient(logger chassis.Logger, mdns host.DNSPublisher, stun host.STUNClient, locatorController host.LocatorController) Client {
+func NewClient(logger chassis.Logger, mdns host.DNSPublisher, secureTunneling host.SecureTunnelingController) Client {
 	clientSingleton = &client{
-		mutex:             sync.Mutex{},
-		logger:            logger,
-		mdns:              mdns,
-		stun:              stun,
-		locatorController: locatorController,
+		mutex:           sync.Mutex{},
+		logger:          logger,
+		mdns:            mdns,
+		secureTunneling: secureTunneling,
 	}
 	return clientSingleton
 }
@@ -117,6 +115,9 @@ func newInsecureClient() *http.Client {
 				return net.Dial(network, addr)
 			},
 			// Don't forget timeouts!
+			IdleConnTimeout:  5 * time.Second,
+			ReadIdleTimeout:  5 * time.Second,
+			WriteByteTimeout: 5 * time.Second,
 		},
 	}
 }
@@ -140,8 +141,8 @@ func (c *client) SendWithError(message *v1.DaemonMessage) error {
 		return ErrNoStream
 	}
 	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	err := c.stream.Send(message)
-	c.mutex.Unlock()
 	return err
 }
 
@@ -156,7 +157,7 @@ func (c *client) listen(ctx context.Context) error {
 		}
 		switch message.Message.(type) {
 		case *v1.ServerMessage_Heartbeat:
-			c.logger.Debug("heartbeat received")
+			c.logger.Trace("heartbeat received")
 		case *v1.ServerMessage_Restart:
 			go c.restart(ctx)
 		case *v1.ServerMessage_Shutdown:
@@ -189,10 +190,8 @@ func (c *client) listen(ctx context.Context) error {
 			go c.addLocatorServer(ctx, message.GetAddLocatorServerCommand())
 		case *v1.ServerMessage_RemoveLocatorServerCommand:
 			go c.removeLocatorServer(ctx, message.GetRemoveLocatorServerCommand())
-		case *v1.ServerMessage_DisableAllLocatorsCommand:
-			go c.disableAllLocators(ctx, message.GetDisableAllLocatorsCommand())
 		case *v1.ServerMessage_AddWireguardPeer:
-			go c.addWireguardPeer(ctx, message.GetAddWireguardPeer().GetPeer())
+			go c.addWireguardPeer(ctx, message.GetAddWireguardPeer())
 		case *v1.ServerMessage_RequestComponentVersionsCommand:
 			go c.componentVersions(ctx, message.GetRequestComponentVersionsCommand())
 		case *v1.ServerMessage_RequestLogsCommand:
@@ -271,9 +270,7 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 		c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_OsUpdateDiff{
 				OsUpdateDiff: &v1.OSUpdateDiff{
-					Error: &v1.DaemonError{
-						Error: err.Error(),
-					},
+					Error: err.Error(),
 				},
 			},
 		})
@@ -298,9 +295,7 @@ func (c *client) currentDaemonVersion() {
 		c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_CurrentDaemonVersion{
 				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
-					Error: &v1.DaemonError{
-						Error: err.Error(),
-					},
+					Error: err.Error(),
 				},
 			},
 		})
@@ -371,9 +366,7 @@ func (c *client) saveSettings(ctx context.Context, def *v1.SaveSettingsCommand) 
 		c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_SettingsSaved{
 				SettingsSaved: &v1.SettingsSaved{
-					Error: &v1.DaemonError{
-						Error: fmt.Sprintf("failed to save settings: %s", err.Error()),
-					},
+					Error: fmt.Sprintf("failed to save settings: %s", err.Error()),
 				},
 			},
 		})
@@ -387,17 +380,21 @@ func (c *client) saveSettings(ctx context.Context, def *v1.SaveSettingsCommand) 
 	})
 }
 
-func (c *client) setSTUNServer(_ context.Context, def *v1.SetSTUNServerCommand) {
+func (c *client) setSTUNServer(ctx context.Context, def *v1.SetSTUNServerCommand) {
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_StunServerSet{
-			StunServerSet: &v1.STUNServerSet{},
+			StunServerSet: &v1.STUNServerSet{
+				ServerAddress:      def.ServerAddress,
+				WireguardInterface: def.WireguardInterface,
+			},
 		},
 	}
 
-	_, err := c.stun.Bind(def.Server)
+	err := c.secureTunneling.BindSTUNServer(ctx, def.WireguardInterface, def.ServerAddress)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to bind to new stun server")
-		resp.GetStunServerSet().Error = &v1.DaemonError{Error: err.Error()}
+		msg := resp.GetStunServerSet()
+		msg.Error = err.Error()
 	}
 
 	c.Send(resp)
@@ -406,16 +403,19 @@ func (c *client) setSTUNServer(_ context.Context, def *v1.SetSTUNServerCommand) 
 func (c *client) addLocatorServer(ctx context.Context, cmd *v1.AddLocatorServerCommand) {
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_LocatorServerAdded{
-			LocatorServerAdded: &v1.LocatorServerAdded{},
+			LocatorServerAdded: &v1.LocatorServerAdded{
+				LocatorAddress:     cmd.LocatorAddress,
+				WireguardInterface: cmd.WireguardInterface,
+			},
 		},
 	}
 
-	locator, err := c.locatorController.AddLocator(ctx, cmd.LocatorAddress)
+	err := c.secureTunneling.AddLocator(ctx, cmd.WireguardInterface, cmd.LocatorAddress)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to add locator server")
-		resp.GetLocatorServerAdded().Error = &v1.DaemonError{Error: err.Error()}
+		msg := resp.GetLocatorServerAdded()
+		msg.Error = err.Error()
 	}
-	resp.GetLocatorServerAdded().Locator = locator
 
 	c.Send(resp)
 }
@@ -424,31 +424,17 @@ func (c *client) removeLocatorServer(ctx context.Context, cmd *v1.RemoveLocatorS
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_LocatorServerRemoved{
 			LocatorServerRemoved: &v1.LocatorServerRemoved{
-				Address: cmd.LocatorAddress,
+				LocatorAddress:     cmd.LocatorAddress,
+				WireguardInterface: cmd.WireguardInterface,
 			},
 		},
 	}
 
-	err := c.locatorController.RemoveLocator(ctx, cmd.LocatorAddress)
+	err := c.secureTunneling.RemoveLocator(ctx, cmd.WireguardInterface, cmd.LocatorAddress)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to remove locator server")
-		resp.GetLocatorServerRemoved().Error = &v1.DaemonError{Error: err.Error()}
-	}
-
-	c.Send(resp)
-}
-
-func (c *client) disableAllLocators(ctx context.Context, cmd *v1.DisableAllLocatorsCommand) {
-	resp := &v1.DaemonMessage{
-		Message: &v1.DaemonMessage_AllLocatorsDisabled{
-			AllLocatorsDisabled: &v1.AllLocatorsDisabled{},
-		},
-	}
-
-	err := c.locatorController.Disable(ctx)
-	if err != nil {
-		c.logger.WithError(err).Error("failed to disable all locators")
-		resp.GetAllLocatorsDisabled().Error = &v1.DaemonError{Error: err.Error()}
+		msg := resp.GetLocatorServerRemoved()
+		msg.Error = err.Error()
 	}
 
 	c.Send(resp)
@@ -490,16 +476,13 @@ func (c *client) componentVersions(ctx context.Context, _ *v1.RequestComponentVe
 		})
 	}
 
-	err = c.stream.Send(&v1.DaemonMessage{
+	c.Send(&v1.DaemonMessage{
 		Message: &v1.DaemonMessage_ComponentVersions{
 			ComponentVersions: &v1.ComponentVersions{
 				Components: components,
 			},
 		},
 	})
-	if err != nil {
-		c.logger.WithError(err).Error("failed to send complete message to server")
-	}
 }
 
 func (c *client) logs(ctx context.Context, cmd *v1.RequestLogsCommand) {
@@ -507,11 +490,16 @@ func (c *client) logs(ctx context.Context, cmd *v1.RequestLogsCommand) {
 	logs, err := host.DaemonLogs(ctx, c.logger, cmd.SinceSeconds)
 	if err != nil {
 		c.logger.WithError(err).Error("failed to get daemon logs")
-		// TODO: send error event to server
+		c.Send(&v1.DaemonMessage{
+			Message: &v1.DaemonMessage_Logs{
+				Logs: &v1.Logs{
+					Error: err.Error(),
+				},
+			},
+		})
 		return
 	}
-
-	err = c.stream.Send(&v1.DaemonMessage{
+	c.Send(&v1.DaemonMessage{
 		Message: &v1.DaemonMessage_Logs{
 			Logs: &v1.Logs{
 				RequestId: cmd.RequestId,
@@ -519,7 +507,4 @@ func (c *client) logs(ctx context.Context, cmd *v1.RequestLogsCommand) {
 			},
 		},
 	})
-	if err != nil {
-		c.logger.WithError(err).Error("failed to send logs message to server")
-	}
 }
