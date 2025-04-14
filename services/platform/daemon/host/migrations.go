@@ -49,6 +49,12 @@ var (
 			Run:      m2,
 			Required: true,
 		},
+		{
+			Id:       "b5a63e29-4b35-48e9-b78f-8f3522225f6f",
+			Name:     "Add a nix.json config file which enables automatic, weekly garbage collection",
+			Run:      m3,
+			Required: true,
+		},
 	}
 )
 
@@ -333,6 +339,47 @@ in
 	}
 
 	err = os.WriteFile(NixosConfigFile(), []byte(nixConfigurationContents), 0600)
+	if err != nil {
+		return err
+	}
+
+	err = RebuildAndSwitchOS(ctx, logger)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func m3(logger chassis.Logger) error {
+	var (
+		ctx           = context.Background()
+		nixConfigFile = NixConfig{
+			GC: NixConfigGC{
+				Automatic: true,
+				Dates:     "weekly",
+				Options:   "--delete-older-than 30d",
+			},
+		}
+		replacers = []Replacer{
+			func(line string) string {
+				if strings.Contains(line, "boot = lib.importJSON") {
+					line = `  boot = lib.importJSON (lib.concatStrings [ config.vars.root "/config/boot.json" ]);
+  nix = lib.importJSON (lib.concatStrings [ config.vars.root "/config/nix.json" ]);`
+				}
+				return line
+			},
+		}
+	)
+
+	// create new nix.json file
+	err := WriteJsonFile(NixConfigFile(), nixConfigFile, 0600)
+	if err != nil {
+		return err
+	}
+
+	// reference nix.json file in configuration.json file
+	err = LineByLineReplace(NixosConfigFile(), replacers)
 	if err != nil {
 		return err
 	}

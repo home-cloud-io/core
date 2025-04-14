@@ -74,6 +74,10 @@ func BootConfigFile() string {
 	return FilePath(nixosRoot, nixosConfigsPath, "boot.json")
 }
 
+func NixConfigFile() string {
+	return FilePath(nixosRoot, nixosConfigsPath, "nix.json")
+}
+
 func NetworkingConfigFile() string {
 	return FilePath(nixosRoot, nixosConfigsPath, "networking.json")
 }
