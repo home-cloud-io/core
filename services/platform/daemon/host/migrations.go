@@ -361,9 +361,25 @@ func m3(logger chassis.Logger) error {
 				Options:   "--delete-older-than 30d",
 			},
 		}
+		replacers = []Replacer{
+			func(line string) string {
+				if strings.Contains(line, "boot = lib.importJSON") {
+					line = `  boot = lib.importJSON (lib.concatStrings [ config.vars.root "/config/boot.json" ]);
+  nix = lib.importJSON (lib.concatStrings [ config.vars.root "/config/nix.json" ]);`
+				}
+				return line
+			},
+		}
 	)
 
+	// create new nix.json file
 	err := WriteJsonFile(NixConfigFile(), nixConfigFile, 0600)
+	if err != nil {
+		return err
+	}
+
+	// reference nix.json file in configuration.json file
+	err = LineByLineReplace(NixosConfigFile(), replacers)
 	if err != nil {
 		return err
 	}
