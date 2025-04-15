@@ -404,6 +404,7 @@ func (c *client) setSTUNServer(ctx context.Context, def *v1.SetSTUNServerCommand
 }
 
 func (c *client) addLocatorServer(ctx context.Context, cmd *v1.AddLocatorServerCommand) {
+	c.logger.WithField("locator_address", cmd.LocatorAddress).WithField("wireguard_interface", cmd.WireguardInterface).Info("adding locator server")
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_LocatorServerAdded{
 			LocatorServerAdded: &v1.LocatorServerAdded{
@@ -424,6 +425,7 @@ func (c *client) addLocatorServer(ctx context.Context, cmd *v1.AddLocatorServerC
 }
 
 func (c *client) removeLocatorServer(ctx context.Context, cmd *v1.RemoveLocatorServerCommand) {
+	c.logger.WithField("locator_address", cmd.LocatorAddress).WithField("wireguard_interface", cmd.WireguardInterface).Info("removing locator server")
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_LocatorServerRemoved{
 			LocatorServerRemoved: &v1.LocatorServerRemoved{
