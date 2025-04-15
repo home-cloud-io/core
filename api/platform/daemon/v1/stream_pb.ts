@@ -129,6 +129,13 @@ export class DaemonMessage extends Message<DaemonMessage> {
     case: "logs";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * ref: https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#subject
+   *
+   * @generated from field: string subject = 64;
+   */
+  subject = "";
+
   constructor(data?: PartialMessage<DaemonMessage>) {
     super();
     proto3.util.initPartial(data, this);
@@ -155,6 +162,7 @@ export class DaemonMessage extends Message<DaemonMessage> {
     { no: 16, name: "all_locators_disabled", kind: "message", T: AllLocatorsDisabled, oneof: "message" },
     { no: 17, name: "component_versions", kind: "message", T: ComponentVersions, oneof: "message" },
     { no: 18, name: "logs", kind: "message", T: Logs, oneof: "message" },
+    { no: 64, name: "subject", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonMessage {
@@ -335,6 +343,13 @@ export class ServerMessage extends Message<ServerMessage> {
     case: "requestLogsCommand";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * ref: https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#subject
+   *
+   * @generated from field: string subject = 64;
+   */
+  subject = "";
+
   constructor(data?: PartialMessage<ServerMessage>) {
     super();
     proto3.util.initPartial(data, this);
@@ -367,6 +382,7 @@ export class ServerMessage extends Message<ServerMessage> {
     { no: 22, name: "disable_all_locators_command", kind: "message", T: DisableAllLocatorsCommand, oneof: "message" },
     { no: 23, name: "request_component_versions_command", kind: "message", T: RequestComponentVersionsCommand, oneof: "message" },
     { no: 24, name: "request_logs_command", kind: "message", T: RequestLogsCommand, oneof: "message" },
+    { no: 64, name: "subject", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
@@ -588,43 +604,6 @@ export class DeviceInitialized extends Message<DeviceInitialized> {
 
   static equals(a: DeviceInitialized | PlainMessage<DeviceInitialized> | undefined, b: DeviceInitialized | PlainMessage<DeviceInitialized> | undefined): boolean {
     return proto3.util.equals(DeviceInitialized, a, b);
-  }
-}
-
-/**
- * @generated from message platform.daemon.v1.DaemonError
- */
-export class DaemonError extends Message<DaemonError> {
-  /**
-   * @generated from field: string error = 1;
-   */
-  error = "";
-
-  constructor(data?: PartialMessage<DaemonError>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.daemon.v1.DaemonError";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonError {
-    return new DaemonError().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DaemonError {
-    return new DaemonError().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DaemonError {
-    return new DaemonError().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: DaemonError | PlainMessage<DaemonError> | undefined, b: DaemonError | PlainMessage<DaemonError> | undefined): boolean {
-    return proto3.util.equals(DaemonError, a, b);
   }
 }
 
