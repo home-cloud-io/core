@@ -46,7 +46,9 @@ export default function HomePage() {
 }
 
 export function DeviceDetails() {
-  const { data, error, isLoading } = useQuery(getSystemStats);
+  const { data, error, isLoading } = useQuery(getSystemStats, undefined, {
+    refetchInterval: 2000,
+  });
   const { connected } = useEvents() as ProviderValue;
 
   var stats = new SystemStats();
@@ -84,48 +86,43 @@ export function DeviceDetails() {
           />
         )}
         {!isLoading && !error && <DriveList stats={stats} />}
+        <strong>System</strong>
+        {isLoading && (
+          <Spin indicator={<LoadingOutlined spin />} size="large" />
+        )}
+        {error && (
+          <Alert
+            message="Failed to load system stats"
+            description={error.message}
+            type="error"
+            showIcon
+          />
+        )}
+        {!isLoading && !error && <System stats={stats} />}
       </Space>
     </Card>
   );
 }
 
-type DriveListProps = {
+type SystemStatsProps = {
   stats: SystemStats;
 };
 
-export function DriveList(props: DriveListProps) {
-  const formatBytes = (bytes: number, decimals = 2) => {
-    if (bytes === 0) return "0 Bytes";
-
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-  };
-
-  const formatPercentage = (free: number, total: number) => {
-    return Math.round(((total - free) / total) * 100);
-  };
-
+export function DriveList(props: SystemStatsProps) {
   return (
     <Flex gap="large" justify="space-around" wrap>
       {props.stats.drives.map((drive) => {
         return (
           <Tooltip
+            key={drive.mountPoint}
             title={`Free: ${formatBytes(Number(drive.freeBytes))}`}
             placement={"bottom"}
           >
             <Flex vertical justify="center" gap="small">
-              <Badge
-                count={driveName(drive.mountPoint)}
-                color={"#643f91"}
-              >
+              <Badge count={driveName(drive.mountPoint)} color={"#643f91"}>
                 <Progress
                   type="dashboard"
-                  strokeColor={driveColors}
+                  strokeColor={progressColors}
                   status="normal"
                   percent={formatPercentage(
                     Number(drive.freeBytes),
@@ -142,20 +139,41 @@ export function DriveList(props: DriveListProps) {
   );
 }
 
-function driveName(mountPoint: string) {
-  switch (mountPoint) {
-    case "/":
-      return "system";
-    default:
-      return "apps";
-  }
+export function System(props: SystemStatsProps) {
+  let totalFreeMemory =
+    Number(props.stats.memory?.totalBytes) -
+    Number(props.stats.memory?.usedBytes);
+  return (
+    <Flex gap="large" justify="space-around" wrap>
+      <Badge count={"CPU"} color={"#643f91"}>
+        <Progress
+          type="dashboard"
+          strokeColor={progressColors}
+          status="normal"
+          percent={Math.round(Number(props.stats.compute?.userPercent))}
+          percentPosition={{ align: "start", type: "outer" }}
+        />
+      </Badge>
+      <Tooltip
+        title={`Free: ${formatBytes(totalFreeMemory)}`}
+        placement={"bottom"}
+      >
+        <Badge count={"Memory"} color={"#643f91"}>
+          <Progress
+            type="dashboard"
+            strokeColor={progressColors}
+            status="normal"
+            percent={formatPercentage(
+              totalFreeMemory,
+              Number(props.stats.memory?.totalBytes)
+            )}
+            percentPosition={{ align: "start", type: "outer" }}
+          />
+        </Badge>
+      </Tooltip>
+    </Flex>
+  );
 }
-
-const driveColors: ProgressProps["strokeColor"] = {
-  "0%": "#643f91",
-  "75%": "#ffe58f",
-  "100%": "#ff4d4f",
-};
 
 export function InstalledApplicationsList() {
   const { data, error, isLoading } = useQuery(appsHealthCheck);
@@ -229,3 +247,36 @@ function Application(props: Props) {
     </div>
   );
 }
+
+// HELPERS
+
+function driveName(mountPoint: string) {
+  switch (mountPoint) {
+    case "/":
+      return "System";
+    default:
+      return "Apps";
+  }
+}
+
+const progressColors: ProgressProps["strokeColor"] = {
+  "0%": "#643f91",
+  "75%": "#ffe58f",
+  "100%": "#ff4d4f",
+};
+
+const formatBytes = (bytes: number, decimals = 2) => {
+  if (bytes === 0) return "0 Bytes";
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+};
+
+const formatPercentage = (free: number, total: number) => {
+  return Math.round(((total - free) / total) * 100);
+};
