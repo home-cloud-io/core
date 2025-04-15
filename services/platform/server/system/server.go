@@ -56,6 +56,12 @@ func (h *server) Communicate(ctx context.Context, stream *connect.BidiStream[v1.
 			com.CloseStream()
 			return err
 		}
-		h.broadcaster.Send(message)
+
+		switch message.Message.(type) {
+		case *v1.DaemonMessage_SystemStats:
+			CurrentStats = message.GetSystemStats()
+		default:
+			h.broadcaster.Send(message)
+		}
 	}
 }
