@@ -31,6 +31,7 @@ export const DaemonMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 16, name: "all_locators_disabled", kind: "message", T: AllLocatorsDisabled, oneof: "message" },
     { no: 17, name: "component_versions", kind: "message", T: ComponentVersions, oneof: "message" },
     { no: 18, name: "logs", kind: "message", T: Logs, oneof: "message" },
+    { no: 64, name: "subject", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -64,6 +65,7 @@ export const ServerMessage = /*@__PURE__*/ proto3.makeMessageType(
     { no: 22, name: "disable_all_locators_command", kind: "message", T: DisableAllLocatorsCommand, oneof: "message" },
     { no: 23, name: "request_component_versions_command", kind: "message", T: RequestComponentVersionsCommand, oneof: "message" },
     { no: 24, name: "request_logs_command", kind: "message", T: RequestLogsCommand, oneof: "message" },
+    { no: 64, name: "subject", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -122,16 +124,6 @@ export const DeviceInitialized = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.DeviceInitialized",
   () => [
     { no: 16, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.daemon.v1.DaemonError
- */
-export const DaemonError = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.daemon.v1.DaemonError",
-  () => [
-    { no: 1, name: "error", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
