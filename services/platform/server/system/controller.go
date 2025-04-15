@@ -79,27 +79,22 @@ const (
 
 func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cmd *dv1.SaveSettingsCommand) error {
 	logger.Info("saving settings")
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.SettingsSaved]{
-		Callback: func(event *dv1.SettingsSaved) (bool, error) {
-			if event.Error != "" {
-				return true, errors.New(event.Error)
-			}
-			return true, nil
-		},
-		Timeout: 120 * time.Second,
-	})
-	err := com.Send(&dv1.ServerMessage{
+
+	response, err := com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SaveSettingsCommand{
 			SaveSettingsCommand: cmd,
 		},
+	}, &async.ListenerOptions[*dv1.DaemonMessage]{
+		Timeout: 120 * time.Second,
 	})
 	if err != nil {
 		return err
 	}
-	err = listener.Listen(ctx)
-	if err != nil {
-		return err
+	e := response.GetSettingsSaved()
+	if e.Error != "" {
+		return errors.New(e.Error)
 	}
+
 	logger.Info("settings saved successfully")
 	return nil
 }
@@ -259,10 +254,7 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 		log := log.WithField("worker", i)
 		g.Go(func() error {
 			log.Debug("waiting for work")
-			options := &async.ListenerOptions[*dv1.UploadFileChunkCompleted]{
-				Callback: func(event *dv1.UploadFileChunkCompleted) (bool, error) {
-					return false, nil
-				},
+			options := &async.ListenerOptions[*dv1.DaemonMessage]{
 				Timeout: 30 * time.Minute,
 				Buffer:  64,
 			}
@@ -278,7 +270,11 @@ func (c *controller) streamFile(ctx context.Context, logger chassis.Logger, buf 
 				log.Debug("uploading chunk")
 
 				// update callback function for the current chunk
-				options.Callback = func(event *dv1.UploadFileChunkCompleted) (bool, error) {
+				options.Callback = func(msg *dv1.DaemonMessage) (bool, error) {
+					event := msg.GetUploadFileChunkCompleted()
+					if event == nil {
+						return false, nil
+					}
 					if event.FileId == fileId && event.Index == uint32(chunk.index) {
 						done <- true
 					}

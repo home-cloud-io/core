@@ -7,14 +7,11 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	"github.com/home-cloud-io/core/services/platform/server/async"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 
-	"github.com/google/uuid"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
@@ -220,18 +217,11 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 	}
 
 	logger.Info("requesting component versions from daemon")
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.ComponentVersions]{
-		Callback: func(event *dv1.ComponentVersions) (bool, error) {
-			versions = append(versions, event.Components...)
-			return true, nil
-		},
-		Timeout: 30 * time.Second,
-	})
-	err = com.Send(&dv1.ServerMessage{
+	response, err := com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestComponentVersionsCommand{
 			RequestComponentVersionsCommand: &dv1.RequestComponentVersionsCommand{},
 		},
-	})
+	}, nil)
 	if err != nil {
 		versions = append(versions, &dv1.ComponentVersion{
 			Name:    "daemon",
@@ -242,21 +232,9 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 			Domain:  "system",
 			Version: err.Error(),
 		})
-	} else {
-		err = listener.Listen(ctx)
-		if err != nil {
-			versions = append(versions, &dv1.ComponentVersion{
-				Name:    "daemon",
-				Domain:  "platform",
-				Version: err.Error(),
-			}, &dv1.ComponentVersion{
-				Name:    "nixos",
-				Domain:  "system",
-				Version: err.Error(),
-			})
-		}
-		logger.Info("settings saved successfully")
 	}
+	e := response.GetComponentVersions()
+	versions = append(versions, e.Components...)
 
 	// sort versions
 	sort.Slice(versions, func(i, j int) bool {
@@ -267,42 +245,22 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 }
 
 func (c *controller) GetDeviceLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error) {
-
-	var (
-		logs      = []*dv1.Log{}
-		requestId = uuid.New().String()
-	)
-
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.Logs]{
-		Callback: func(event *dv1.Logs) (bool, error) {
-			if event.RequestId == requestId {
-				logs = event.Logs
-				return true, nil
-			}
-			return false, nil
-		},
-		Timeout: 30 * time.Second,
-	})
-	err := com.Send(&dv1.ServerMessage{
+	response, err := com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestLogsCommand{
 			RequestLogsCommand: &dv1.RequestLogsCommand{
-				RequestId:    requestId,
 				SinceSeconds: uint32(sinceSeconds),
 			},
 		},
-	})
+	}, nil)
 	if err != nil {
-		logger.WithError(err).Error("failed to send logs request to daemon")
-		return logs, err
-	} else {
-		err = listener.Listen(ctx)
-		if err != nil {
-			logger.WithError(err).Error("failed to receive logs from daemon")
-			return logs, err
-		}
+		return nil, err
+	}
+	e := response.GetLogs()
+	if e.Error != "" {
+		return nil, errors.New(e.Error)
 	}
 
-	return logs, nil
+	return e.Logs, nil
 }
 
 // HELPERS

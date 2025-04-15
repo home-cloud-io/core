@@ -44,55 +44,42 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	defer c.systemUpdateLock.Unlock()
 
 	var (
-		response = &v1.CheckForSystemUpdatesResponse{}
+		resp = &v1.CheckForSystemUpdatesResponse{}
 	)
 
 	// get the os update diff from the daemon
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.OSUpdateDiff]{
-		Callback: func(event *dv1.OSUpdateDiff) (bool, error) {
-			response.OsDiff = event.Description
-			return true, nil
-		},
-		// compiling the new OS can take a while
-		Timeout: 30 * time.Minute,
-	})
-	err := com.Send(&dv1.ServerMessage{
+	response, err := com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestOsUpdateDiff{},
+	}, &async.ListenerOptions[*dv1.DaemonMessage]{
+		// compiling the new OS can take a while
+		Timeout: 5 * time.Minute,
 	})
 	if err != nil {
 		return nil, err
 	}
-	err = listener.Listen(ctx)
-	if err != nil {
-		return nil, err
+	e1 := response.GetOsUpdateDiff()
+	if e1.Error != "" {
+		return nil, errors.New(e1.Error)
 	}
+	resp.OsDiff = e1.Description
 
 	// get the current daemon version from the daemon
-	listener = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.CurrentDaemonVersion]{
-		Callback: func(event *dv1.CurrentDaemonVersion) (bool, error) {
-			if event.Error != "" {
-				logger.WithError(errors.New(event.Error)).Error("failed to get current daemon version")
-				return true, errors.New(event.Error)
-			}
-			response.DaemonVersions = &v1.DaemonVersions{
-				Current: &v1.DaemonVersion{
-					Version:    event.Version,
-					VendorHash: event.VendorHash,
-					SrcHash:    event.SrcHash,
-				},
-			}
-			return true, nil
-		},
-	})
-	err = com.Send(&dv1.ServerMessage{
+	response, err = com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RequestCurrentDaemonVersion{},
-	})
+	}, nil)
 	if err != nil {
 		return nil, err
 	}
-	err = listener.Listen(ctx)
-	if err != nil {
-		return nil, err
+	e2 := response.GetCurrentDaemonVersion()
+	if e2.Error != "" {
+		return nil, errors.New(e2.Error)
+	}
+	resp.DaemonVersions = &v1.DaemonVersions{
+		Current: &v1.DaemonVersion{
+			Version:    e2.Version,
+			VendorHash: e2.VendorHash,
+			SrcHash:    e2.SrcHash,
+		},
 	}
 
 	// get latest available daemon version
@@ -100,9 +87,9 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	if err != nil {
 		return nil, err
 	}
-	response.DaemonVersions.Latest = latest
+	resp.DaemonVersions.Latest = latest
 
-	return response, nil
+	return resp, nil
 }
 
 func (c *controller) InstallOSUpdate() error {
@@ -198,56 +185,39 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	}
 
 	// command daemon to initialize
-	var publicKey string
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceAdded]{
-		Callback: func(event *dv1.WireguardInterfaceAdded) (bool, error) {
-			if event.Error != "" {
-				return true, fmt.Errorf(event.Error)
-			}
-			publicKey = event.PublicKey
-			return true, nil
-		},
-		Timeout: 300 * time.Second,
-	})
-
-	err = com.Send(&dv1.ServerMessage{
+	response, err := com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardInterface{
 			AddWireguardInterface: &dv1.AddWireguardInterface{
 				Interface: wgInterface,
 			},
 		},
+	}, &async.ListenerOptions[*dv1.DaemonMessage]{
+		Timeout: 15 * time.Second,
 	})
 	if err != nil {
 		return err
 	}
-	err = listener.Listen(ctx)
-	if err != nil {
-		return err
+	e1 := response.GetWireguardInterfaceAdded()
+	if e1.Error != "" {
+		return errors.New(e1.Error)
 	}
+	publicKey := e1.PublicKey
 
 	// set STUN server on daemon
-	listener = async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.STUNServerSet]{
-		Callback: func(event *dv1.STUNServerSet) (bool, error) {
-			if event.Error != "" {
-				return true, fmt.Errorf(event.Error)
-			}
-			return true, nil
-		},
-	})
-	err = com.Send(&dv1.ServerMessage{
+	response, err = com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SetStunServerCommand{
 			SetStunServerCommand: &dv1.SetSTUNServerCommand{
 				ServerAddress:      DefaultSTUNServerAddress,
 				WireguardInterface: DefaultWireguardInterface,
 			},
 		},
-	})
+	}, nil)
 	if err != nil {
 		return err
 	}
-	err = listener.Listen(ctx)
-	if err != nil {
-		return err
+	e2 := response.GetStunServerSet()
+	if e2.Error != "" {
+		return errors.New(e2.Error)
 	}
 
 	// enable feature in blueprint
@@ -282,28 +252,21 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 		err error
 	)
 
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardInterfaceRemoved]{
-		Callback: func(event *dv1.WireguardInterfaceRemoved) (bool, error) {
-			if event.Error != "" {
-				return true, fmt.Errorf(event.Error)
-			}
-			return true, nil
-		},
-		Timeout: 30 * time.Second,
-	})
-	err = com.Send(&dv1.ServerMessage{
+	response, err := com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_RemoveWireguardInterface{
 			RemoveWireguardInterface: &dv1.RemoveWireguardInterface{
 				Name: DefaultWireguardInterface,
 			},
 		},
+	}, &async.ListenerOptions[*dv1.DaemonMessage]{
+		Timeout: 30 * time.Second,
 	})
 	if err != nil {
 		return err
 	}
-	err = listener.Listen(ctx)
-	if err != nil {
-		return err
+	e := response.GetWireguardInterfaceRemoved()
+	if e.Error != "" {
+		return errors.New(e.Error)
 	}
 
 	// disable feature in blueprint

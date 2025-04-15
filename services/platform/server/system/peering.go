@@ -3,7 +3,6 @@ package system
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
@@ -57,21 +56,7 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		LocatorServers:  wgInterface.LocatorServers,
 	}
 
-	listener := async.RegisterListener(ctx, c.broadcaster, &async.ListenerOptions[*dv1.WireguardPeerAdded]{
-		Callback: func(event *dv1.WireguardPeerAdded) (bool, error) {
-			if event.ClientPublicKey != peerConfig.PublicKey || event.WireguardInterface != wgInterface.Name {
-				return false, nil
-			}
-			if event.Error != "" {
-				return true, fmt.Errorf(event.Error)
-			}
-			peerConfig.Addresses = event.Addresses
-			peerConfig.DnsServers = event.DnsServers
-			return true, nil
-		},
-		Timeout: 30 * time.Second,
-	})
-	err = com.Send(&dv1.ServerMessage{
+	response, err := com.Request(ctx, &dv1.ServerMessage{
 		Message: &dv1.ServerMessage_AddWireguardPeer{
 			AddWireguardPeer: &dv1.AddWireguardPeer{
 				Peer: &dv1.WireguardPeer{
@@ -81,14 +66,18 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 				WireguardInterface: wgInterface.Name,
 			},
 		},
+	}, &async.ListenerOptions[*dv1.DaemonMessage]{
+		Timeout: 30 * time.Second,
 	})
 	if err != nil {
 		return nil, err
 	}
-	err = listener.Listen(ctx)
-	if err != nil {
-		return nil, err
+	e := response.GetWireguardPeerAdded()
+	if e.Error != "" {
+		return nil, errors.New(e.Error)
 	}
+	peerConfig.Addresses = e.Addresses
+	peerConfig.DnsServers = e.DnsServers
 
 	return peerConfig, nil
 }
