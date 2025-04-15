@@ -421,6 +421,7 @@ func (c *client) addLocatorServer(ctx context.Context, cmd *v1.AddLocatorServerC
 		msg.Error = err.Error()
 	}
 
+	c.logger.WithField("locator_address", cmd.LocatorAddress).WithField("wireguard_interface", cmd.WireguardInterface).Info("finished adding locator server")
 	c.Send(resp)
 }
 
@@ -442,6 +443,7 @@ func (c *client) removeLocatorServer(ctx context.Context, cmd *v1.RemoveLocatorS
 		msg.Error = err.Error()
 	}
 
+	c.logger.WithField("locator_address", cmd.LocatorAddress).WithField("wireguard_interface", cmd.WireguardInterface).Info("finished removing locator server")
 	c.Send(resp)
 }
 
