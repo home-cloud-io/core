@@ -86,7 +86,7 @@ func (c *controller) saveSettings(ctx context.Context, logger chassis.Logger, cm
 			}
 			return true, nil
 		},
-		Timeout: 30 * time.Second,
+		Timeout: 120 * time.Second,
 	})
 	err := com.Send(&dv1.ServerMessage{
 		Message: &dv1.ServerMessage_SaveSettingsCommand{
