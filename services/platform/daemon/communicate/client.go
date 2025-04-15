@@ -25,7 +25,8 @@ import (
 type (
 	Client interface {
 		Listen()
-		Send(*v1.DaemonMessage)
+		Send(message *v1.DaemonMessage, request *v1.ServerMessage)
+		SendWithError(message *v1.DaemonMessage, request *v1.ServerMessage) error
 	}
 	client struct {
 		mutex           sync.Mutex
@@ -90,7 +91,7 @@ func (c *client) Listen() {
 				Message: &v1.DaemonMessage_SettingsSaved{
 					SettingsSaved: &v1.SettingsSaved{},
 				},
-			})
+			}, nil)
 			return nil
 		})
 
@@ -122,7 +123,12 @@ func newInsecureClient() *http.Client {
 	}
 }
 
-func (c *client) Send(message *v1.DaemonMessage) {
+func (c *client) Send(message *v1.DaemonMessage, request *v1.ServerMessage) {
+	// default message subject to the same subject as the request
+	if request != nil && message.Subject == "" {
+		message.Subject = request.Subject
+	}
+
 	if c.stream == nil {
 		c.logger.WithError(ErrNoStream).Error("failed to send message to server")
 		return
@@ -136,7 +142,12 @@ func (c *client) Send(message *v1.DaemonMessage) {
 	}
 }
 
-func (c *client) SendWithError(message *v1.DaemonMessage) error {
+func (c *client) SendWithError(message *v1.DaemonMessage, request *v1.ServerMessage) error {
+	// default message subject to the same subject as the request
+	if request != nil && message.Subject == "" {
+		message.Subject = request.Subject
+	}
+
 	if c.stream == nil {
 		return ErrNoStream
 	}
@@ -163,9 +174,9 @@ func (c *client) listen(ctx context.Context) error {
 		case *v1.ServerMessage_Shutdown:
 			go c.shutdown(ctx)
 		case *v1.ServerMessage_RequestOsUpdateDiff:
-			go c.osUpdateDiff(ctx)
+			go c.osUpdateDiff(ctx, message)
 		case *v1.ServerMessage_RequestCurrentDaemonVersion:
-			go c.currentDaemonVersion()
+			go c.currentDaemonVersion(ctx, message)
 		case *v1.ServerMessage_ChangeDaemonVersionCommand:
 			go c.changeDaemonVersion(ctx, message.GetChangeDaemonVersionCommand())
 		case *v1.ServerMessage_InstallOsUpdateCommand:
@@ -177,25 +188,25 @@ func (c *client) listen(ctx context.Context) error {
 		case *v1.ServerMessage_RemoveMdnsHostCommand:
 			go c.removeMdnsHost(ctx, message.GetRemoveMdnsHostCommand())
 		case *v1.ServerMessage_UploadFileRequest:
-			go c.uploadFile(ctx, message.GetUploadFileRequest())
+			go c.uploadFile(ctx, message)
 		case *v1.ServerMessage_SaveSettingsCommand:
-			go c.saveSettings(ctx, message.GetSaveSettingsCommand())
+			go c.saveSettings(ctx, message)
 		case *v1.ServerMessage_AddWireguardInterface:
-			go c.addWireguardInterface(ctx, message.GetAddWireguardInterface())
+			go c.addWireguardInterface(ctx, message)
 		case *v1.ServerMessage_RemoveWireguardInterface:
-			go c.removeWireguardInterface(ctx, message.GetRemoveWireguardInterface())
+			go c.removeWireguardInterface(ctx, message)
 		case *v1.ServerMessage_SetStunServerCommand:
-			go c.setSTUNServer(ctx, message.GetSetStunServerCommand())
+			go c.setSTUNServer(ctx, message)
 		case *v1.ServerMessage_AddLocatorServerCommand:
-			go c.addLocatorServer(ctx, message.GetAddLocatorServerCommand())
+			go c.addLocatorServer(ctx, message)
 		case *v1.ServerMessage_RemoveLocatorServerCommand:
-			go c.removeLocatorServer(ctx, message.GetRemoveLocatorServerCommand())
+			go c.removeLocatorServer(ctx, message)
 		case *v1.ServerMessage_AddWireguardPeer:
-			go c.addWireguardPeer(ctx, message.GetAddWireguardPeer())
+			go c.addWireguardPeer(ctx, message)
 		case *v1.ServerMessage_RequestComponentVersionsCommand:
-			go c.componentVersions(ctx, message.GetRequestComponentVersionsCommand())
+			go c.componentVersions(ctx, message)
 		case *v1.ServerMessage_RequestLogsCommand:
-			go c.logs(ctx, message.GetRequestLogsCommand())
+			go c.logs(ctx, message)
 		default:
 			c.logger.WithField("message", message).Warn("unknown message type received")
 		}
@@ -206,7 +217,7 @@ func (c *client) heartbeat() error {
 	for {
 		err := c.SendWithError(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_Heartbeat{},
-		})
+		}, nil)
 		if err != nil {
 			return err
 		}
@@ -231,7 +242,7 @@ func (c *client) systemStats(ctx context.Context) error {
 				Message: &v1.DaemonMessage_SystemStats{
 					SystemStats: stats,
 				},
-			})
+			}, nil)
 		}()
 		time.Sleep(host.ComputeMeasurementDuration)
 	}
@@ -265,7 +276,7 @@ func (c *client) shutdown(ctx context.Context) {
 	}
 }
 
-func (c *client) osUpdateDiff(ctx context.Context) {
+func (c *client) osUpdateDiff(ctx context.Context, msg *v1.ServerMessage) {
 	c.logger.Info("os update diff command")
 	osUpdateDiff, err := host.GetOSVersionDiff(ctx, c.logger)
 	if err != nil {
@@ -276,7 +287,7 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 					Error: err.Error(),
 				},
 			},
-		})
+		}, msg)
 		return
 	} else {
 		c.Send(&v1.DaemonMessage{
@@ -285,12 +296,12 @@ func (c *client) osUpdateDiff(ctx context.Context) {
 					Description: osUpdateDiff,
 				},
 			},
-		})
+		}, msg)
 	}
 	c.logger.Info("finished generating os version diff successfully")
 }
 
-func (c *client) currentDaemonVersion() {
+func (c *client) currentDaemonVersion(ctx context.Context, msg *v1.ServerMessage) {
 	c.logger.Info("current daemon version command")
 	current, err := host.GetDaemonVersion(c.logger)
 	if err != nil {
@@ -301,14 +312,14 @@ func (c *client) currentDaemonVersion() {
 					Error: err.Error(),
 				},
 			},
-		})
+		}, msg)
 		return
 	} else {
 		c.Send(&v1.DaemonMessage{
 			Message: &v1.DaemonMessage_CurrentDaemonVersion{
 				CurrentDaemonVersion: current,
 			},
-		})
+		}, msg)
 	}
 	c.logger.Info("finished getting current daemon version successfully")
 }
@@ -363,7 +374,8 @@ func (c *client) removeMdnsHost(_ context.Context, def *v1.RemoveMdnsHostCommand
 	}
 }
 
-func (c *client) saveSettings(ctx context.Context, def *v1.SaveSettingsCommand) {
+func (c *client) saveSettings(ctx context.Context, msg *v1.ServerMessage) {
+	def := msg.GetSaveSettingsCommand()
 	err := host.SaveSettings(ctx, c.logger, def)
 	if err != nil {
 		c.Send(&v1.DaemonMessage{
@@ -372,7 +384,7 @@ func (c *client) saveSettings(ctx context.Context, def *v1.SaveSettingsCommand) 
 					Error: fmt.Sprintf("failed to save settings: %s", err.Error()),
 				},
 			},
-		})
+		}, msg)
 		return
 	}
 
@@ -380,10 +392,11 @@ func (c *client) saveSettings(ctx context.Context, def *v1.SaveSettingsCommand) 
 		Message: &v1.DaemonMessage_SettingsSaved{
 			SettingsSaved: &v1.SettingsSaved{},
 		},
-	})
+	}, msg)
 }
 
-func (c *client) setSTUNServer(ctx context.Context, def *v1.SetSTUNServerCommand) {
+func (c *client) setSTUNServer(ctx context.Context, msg *v1.ServerMessage) {
+	def := msg.GetSetStunServerCommand()
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_StunServerSet{
 			StunServerSet: &v1.STUNServerSet{
@@ -400,10 +413,11 @@ func (c *client) setSTUNServer(ctx context.Context, def *v1.SetSTUNServerCommand
 		msg.Error = err.Error()
 	}
 
-	c.Send(resp)
+	c.Send(resp, msg)
 }
 
-func (c *client) addLocatorServer(ctx context.Context, cmd *v1.AddLocatorServerCommand) {
+func (c *client) addLocatorServer(ctx context.Context, msg *v1.ServerMessage) {
+	cmd := msg.GetAddLocatorServerCommand()
 	c.logger.WithField("locator_address", cmd.LocatorAddress).WithField("wireguard_interface", cmd.WireguardInterface).Info("adding locator server")
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_LocatorServerAdded{
@@ -422,10 +436,11 @@ func (c *client) addLocatorServer(ctx context.Context, cmd *v1.AddLocatorServerC
 	}
 
 	c.logger.WithField("locator_address", cmd.LocatorAddress).WithField("wireguard_interface", cmd.WireguardInterface).Info("finished adding locator server")
-	c.Send(resp)
+	c.Send(resp, msg)
 }
 
-func (c *client) removeLocatorServer(ctx context.Context, cmd *v1.RemoveLocatorServerCommand) {
+func (c *client) removeLocatorServer(ctx context.Context, msg *v1.ServerMessage) {
+	cmd := msg.GetRemoveLocatorServerCommand()
 	c.logger.WithField("locator_address", cmd.LocatorAddress).WithField("wireguard_interface", cmd.WireguardInterface).Info("removing locator server")
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_LocatorServerRemoved{
@@ -444,10 +459,10 @@ func (c *client) removeLocatorServer(ctx context.Context, cmd *v1.RemoveLocatorS
 	}
 
 	c.logger.WithField("locator_address", cmd.LocatorAddress).WithField("wireguard_interface", cmd.WireguardInterface).Info("finished removing locator server")
-	c.Send(resp)
+	c.Send(resp, msg)
 }
 
-func (c *client) componentVersions(ctx context.Context, _ *v1.RequestComponentVersionsCommand) {
+func (c *client) componentVersions(ctx context.Context, msg *v1.ServerMessage) {
 
 	var (
 		components = []*v1.ComponentVersion{}
@@ -489,10 +504,11 @@ func (c *client) componentVersions(ctx context.Context, _ *v1.RequestComponentVe
 				Components: components,
 			},
 		},
-	})
+	}, msg)
 }
 
-func (c *client) logs(ctx context.Context, cmd *v1.RequestLogsCommand) {
+func (c *client) logs(ctx context.Context, msg *v1.ServerMessage) {
+	cmd := msg.GetRequestLogsCommand()
 
 	logs, err := host.DaemonLogs(ctx, c.logger, cmd.SinceSeconds)
 	if err != nil {
@@ -503,7 +519,7 @@ func (c *client) logs(ctx context.Context, cmd *v1.RequestLogsCommand) {
 					Error: err.Error(),
 				},
 			},
-		})
+		}, msg)
 		return
 	}
 	c.Send(&v1.DaemonMessage{
@@ -513,5 +529,5 @@ func (c *client) logs(ctx context.Context, cmd *v1.RequestLogsCommand) {
 				Logs:      logs,
 			},
 		},
-	})
+	}, msg)
 }

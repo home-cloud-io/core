@@ -276,12 +276,16 @@ func (c secureTunnelingController) RemoveLocator(ctx context.Context, wgInterfac
 	}
 
 	// find and remove the locator from the wireguard interface
+	c.logger.WithField("locators", wgInterface.LocatorServers).Info("locators")
 	for i, l := range wgInterface.LocatorServers {
 		if l == locatorAddress {
-			wgInterface.LocatorServers = slices.Delete(wgInterface.LocatorServers, i, i)
+			c.logger.WithField("i", i).Info("found locator")
+			wgInterface.LocatorServers = slices.Delete(wgInterface.LocatorServers, i, i+1)
 			break
 		}
 	}
+	c.logger.WithField("locators", wgInterface.LocatorServers).Info("locators")
+
 
 	// update settings config
 	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
