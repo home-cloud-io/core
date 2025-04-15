@@ -12,7 +12,7 @@ require (
 	connectrpc.com/connect v1.18.1
 	github.com/golang/protobuf v1.5.4
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.8.6
+	github.com/home-cloud-io/core/api v0.8.7
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/netbirdio/netbird v0.39.2
 	github.com/pion/stun/v2 v2.0.0
