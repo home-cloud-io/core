@@ -12,7 +12,8 @@ import (
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
-func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
+func (c *client) uploadFile(_ context.Context, msg *v1.ServerMessage) {
+	def := msg.GetUploadFileRequest()
 	switch def.Data.(type) {
 	case *v1.UploadFileRequest_Info:
 		info := def.GetInfo()
@@ -43,7 +44,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 					Id: info.FileId,
 				},
 			},
-		})
+		}, msg)
 		if err != nil {
 			log.WithError(err).Error("failed to alert server with ready state for file upload")
 			cleanupFailedFileUpload(log, info.FileId)
@@ -85,7 +86,7 @@ func (c *client) uploadFile(_ context.Context, def *v1.UploadFileRequest) {
 					Index:  chunk.Index,
 				},
 			},
-		})
+		}, msg)
 		if err != nil {
 			log.WithError(err).Error("failed to alert server with completed state for chunk upload")
 			cleanupFailedFileUpload(log, chunk.FileId)

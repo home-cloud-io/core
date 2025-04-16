@@ -6,7 +6,8 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 )
 
-func (c *client) addWireguardInterface(ctx context.Context, def *v1.AddWireguardInterface) {
+func (c *client) addWireguardInterface(ctx context.Context, msg *v1.ServerMessage) {
+	def := msg.GetAddWireguardInterface()
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_WireguardInterfaceAdded{
 			WireguardInterfaceAdded: &v1.WireguardInterfaceAdded{
@@ -21,13 +22,14 @@ func (c *client) addWireguardInterface(ctx context.Context, def *v1.AddWireguard
 		msg := resp.GetWireguardInterfaceAdded()
 		msg.Error = err.Error()
 	}
-	msg := resp.GetWireguardInterfaceAdded()
-	msg.PublicKey = publicKey
+	message := resp.GetWireguardInterfaceAdded()
+	message.PublicKey = publicKey
 
-	c.Send(resp)
+	c.Send(resp, msg)
 }
 
-func (c *client) removeWireguardInterface(ctx context.Context, def *v1.RemoveWireguardInterface) {
+func (c *client) removeWireguardInterface(ctx context.Context, msg *v1.ServerMessage) {
+	def := msg.GetRemoveWireguardInterface()
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_WireguardInterfaceRemoved{
 			WireguardInterfaceRemoved: &v1.WireguardInterfaceRemoved{
@@ -43,10 +45,11 @@ func (c *client) removeWireguardInterface(ctx context.Context, def *v1.RemoveWir
 		msg.Error = err.Error()
 	}
 
-	c.Send(resp)
+	c.Send(resp, msg)
 }
 
-func (c *client) addWireguardPeer(ctx context.Context, def *v1.AddWireguardPeer) {
+func (c *client) addWireguardPeer(ctx context.Context, msg *v1.ServerMessage) {
+	def := msg.GetAddWireguardPeer()
 	resp := &v1.DaemonMessage{
 		Message: &v1.DaemonMessage_WireguardPeerAdded{
 			WireguardPeerAdded: &v1.WireguardPeerAdded{
@@ -62,9 +65,9 @@ func (c *client) addWireguardPeer(ctx context.Context, def *v1.AddWireguardPeer)
 		msg := resp.GetWireguardPeerAdded()
 		msg.Error = err.Error()
 	}
-	msg := resp.GetWireguardPeerAdded()
-	msg.Addresses = addresses
-	msg.DnsServers = dnsServers
+	message := resp.GetWireguardPeerAdded()
+	message.Addresses = addresses
+	message.DnsServers = dnsServers
 
-	c.Send(resp)
+	c.Send(resp, msg)
 }
