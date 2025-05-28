@@ -164,20 +164,35 @@ func LineByLineReplace(filename string, replacers []Replacer) error {
 	line.Last = !scanner.Scan()
 	line.Next = scanner.Text()
 
-	for _, r := range replacers {
-		line = r(line)
+	// update first line in all replacers
+	line, err = updateLine(line, replacers, writer)
+	if err != nil {
+		return err
 	}
 
 	for scanner.Scan() {
-		cur := scanner.Text()
-		for _, r := range replacers {
-			line = r(line)
-		}
-		_, err := io.WriteString(writer, line+"\n")
+		line.First = false
+		line.Previous = line.Current
+		line.Current = line.Next
+		line.Next = scanner.Text()
+		line, err = updateLine(line, replacers, writer)
 		if err != nil {
 			return err
 		}
 	}
+
+	if !line.First {
+		line.Last = true
+		line.First = false
+		line.Previous = line.Current
+		line.Current = line.Next
+		line.Next = scanner.Text()
+		line, err = updateLine(line, replacers, writer)
+		if err != nil {
+			return err
+		}
+	}
+
 	err = scanner.Err()
 	if err != nil {
 		return err
@@ -202,6 +217,14 @@ func LineByLineReplace(filename string, replacers []Replacer) error {
 	}
 
 	return nil
+}
+
+func updateLine(line ReplacerLine, replacers []Replacer, writer io.Writer) (ReplacerLine, error) {
+	for _, r := range replacers {
+		line.Current = r(line)
+	}
+	_, err := io.WriteString(writer, line.Current+"\n")
+	return line, err
 }
 
 // FilePath cleans the given path and makes it a local path by prefixing a "./tmp/" if
