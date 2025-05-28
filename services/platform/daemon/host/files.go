@@ -17,7 +17,7 @@ type (
 	// Replacer take in a line in a file and outputs the replacement line (which could be the same if no change is needed)
 	Replacer func(line ReplacerLine) string
 
-	// Create first and last bool for...
+	// ReplacerLine is struct to hold scanner.Text() of requested file to allow user to look at previous and next lines
 	ReplacerLine struct {
 		Previous string
 		Current  string
@@ -150,8 +150,26 @@ func LineByLineReplace(filename string, replacers []Replacer) error {
 
 	// execute replacers (writing into the temp file)
 	scanner := bufio.NewScanner(reader)
+
+	// check if file empty
+	if !scanner.Scan() {
+		return nil
+	}
+
+	// create and populate first line in file
+	line := ReplacerLine{}
+	line.First = true
+	line.Previous = ""
+	line.Current = scanner.Text()
+	line.Last = !scanner.Scan()
+	line.Next = scanner.Text()
+
+	for _, r := range replacers {
+		line = r(line)
+	}
+
 	for scanner.Scan() {
-		line := scanner.Text()
+		cur := scanner.Text()
 		for _, r := range replacers {
 			line = r(line)
 		}
