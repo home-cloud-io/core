@@ -102,24 +102,24 @@ func ChangeDaemonVersion(ctx context.Context, logger chassis.Logger, def *v1.Cha
 	var (
 		err       error
 		replacers = []Replacer{
-			func(prev string, cur string, next string) string {
-				if strings.Contains(cur, "version =") {
-					cur = fmt.Sprintf("  version = \"%s\";", def.Version)
+			func(line ReplacerLine) string {
+				if strings.Contains(line.Current, "version =") {
+					line.Current = fmt.Sprintf("  version = \"%s\";", def.Version)
 				}
-				return cur
+				return line.Current
 			},
-			func(prev string, cur string, next string) string {
-				if strings.Contains(cur, "vendorHash =") {
-					cur = fmt.Sprintf("  vendorHash = \"%s\";", def.VendorHash)
+			func(line ReplacerLine) string {
+				if strings.Contains(line.Current, "vendorHash =") {
+					line.Current = fmt.Sprintf("  vendorHash = \"%s\";", def.VendorHash)
 				}
-				return cur
+				return line.Current
 			},
-			func(prev string, cur string, next string) string {
-				if strings.Contains(cur, "hash =") {
+			func(line ReplacerLine) string {
+				if strings.Contains(line.Current, "hash =") {
 					// NOTE: the double indentation is deliberate
-					cur = fmt.Sprintf("    hash = \"%s\";", def.SrcHash)
+					line.Current = fmt.Sprintf("    hash = \"%s\";", def.SrcHash)
 				}
-				return cur
+				return line.Current
 			},
 		}
 	)
