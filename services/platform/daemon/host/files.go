@@ -15,7 +15,7 @@ import (
 
 type (
 	// Replacer take in a line in a file and outputs the replacement line (which could be the same if no change is needed)
-	Replacer func(line string) string
+	Replacer func(prev string, cur string, next string) string
 )
 
 var (
