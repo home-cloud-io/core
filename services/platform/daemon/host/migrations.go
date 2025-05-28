@@ -362,8 +362,8 @@ func m3(logger chassis.Logger) error {
 			},
 		}
 		replacers = []Replacer{
-			func(line string) string {
-				if strings.Contains(line, "boot = lib.importJSON") {
+			func(line ReplacerLine) string {
+				if strings.Contains(line.Current, "boot = lib.importJSON") && !strings.Contains(line.Next, "nix = lib.importJSON") {
 					line = `  boot = lib.importJSON (lib.concatStrings [ config.vars.root "/config/boot.json" ]);
   nix = lib.importJSON (lib.concatStrings [ config.vars.root "/config/nix.json" ]);`
 				}
