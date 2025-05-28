@@ -136,17 +136,17 @@ func m1(logger chassis.Logger) error {
 		fileName  = ServerManifestFile()
 	)
 
-	replacers = append(replacers, func(line string) string {
-		if line == "  - pods" {
-			line = "  - \"*\""
+	replacers = append(replacers, func(line ReplacerLine) string {
+		if line.Current == "  - pods" {
+			line.Current = "  - \"*\""
 		}
-		return line
+		return line.Current
 	})
-	replacers = append(replacers, func(line string) string {
-		if strings.Contains(line, "read-pods") {
-			line = strings.ReplaceAll(line, "read-pods", "read-all")
+	replacers = append(replacers, func(line ReplacerLine) string {
+		if strings.Contains(line.Current, "read-pods") {
+			line.Current = strings.ReplaceAll(line.Current, "read-pods", "read-all")
 		}
-		return line
+		return line.Current
 	})
 
 	err := LineByLineReplace(fileName, replacers)
