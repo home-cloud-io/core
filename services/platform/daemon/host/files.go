@@ -15,7 +15,16 @@ import (
 
 type (
 	// Replacer take in a line in a file and outputs the replacement line (which could be the same if no change is needed)
-	Replacer func(prev string, cur string, next string) string
+	Replacer func(line ReplacerLine) string
+
+	// Create first and last bool for...
+	ReplacerLine struct {
+		Previous string
+		Current  string
+		Next     string
+		First    bool
+		Last     bool
+	}
 )
 
 var (
