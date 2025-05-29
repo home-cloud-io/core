@@ -170,6 +170,7 @@ func LineByLineReplace(filename string, replacers []Replacer) error {
 		return err
 	}
 
+	// create and populate subsequent lines in file
 	for scanner.Scan() {
 		line.First = false
 		line.Previous = line.Current
@@ -181,6 +182,7 @@ func LineByLineReplace(filename string, replacers []Replacer) error {
 		}
 	}
 
+	// create and populate last line in file
 	if !line.First {
 		line.Last = true
 		line.First = false
