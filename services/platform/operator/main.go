@@ -17,6 +17,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	appsv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller"
@@ -32,6 +33,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(appsv1.AddToScheme(scheme))
+	utilruntime.Must(gwv1.Install(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 

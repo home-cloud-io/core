@@ -2,38 +2,66 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"os"
 
 	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sv1Connect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
 
 	"connectrpc.com/connect"
-	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
-	ntv1Connect "github.com/steady-bytes/draft/api/core/control_plane/networking/v1/v1connect"
-	kvv1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
-	kvv1Connect "github.com/steady-bytes/draft/api/core/registry/key_value/v1/v1connect"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 const (
-	FuseAddressBlueprintKey = "fuse_address"
-	// TODO: retrieve this from blueprint
+	// TODO: retrieve this from blueprint?
 	HomeCloudServerAddress = "http://server.home-cloud-system.svc.cluster.local:8090"
+	// HomeCloudServerAddress = "http://localhost:8090" // for local dev
+
+	GatewayName = "ingress-gateway"
 )
 
-func (r *AppReconciler) createRoute(ctx context.Context, route *ntv1.Route) error {
-	fuseAddress, err := getFuseAddress(ctx)
-	if err != nil {
-		return err
-	}
+var (
+	GatewayNamespace = gwv1.Namespace("istio-system")
+)
 
-	// add route to fuse
-	_, err = ntv1Connect.NewNetworkingServiceClient(http.DefaultClient, fuseAddress).
-		AddRoute(ctx, connect.NewRequest(&ntv1.AddRouteRequest{
-			Route: route,
-		}))
+func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route AppRoute) error {
+
+	// create httproute
+	port := gwv1.PortNumber(int32(route.Service.Port))
+	err := r.Client.Create(ctx, &gwv1.HTTPRoute{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      route.Name,
+			Namespace: namespace,
+		},
+		Spec: gwv1.HTTPRouteSpec{
+			CommonRouteSpec: gwv1.CommonRouteSpec{
+				ParentRefs: []gwv1.ParentReference{
+					{
+						Name:      GatewayName,
+						Namespace: &GatewayNamespace,
+					},
+				},
+			},
+			// TODO: change this to subdomain? (*.home-cloud.local)
+			Hostnames: []gwv1.Hostname{gwv1.Hostname(fmt.Sprintf("%s.local", route.Name))},
+			Rules: []gwv1.HTTPRouteRule{
+				{
+					BackendRefs: []gwv1.HTTPBackendRef{
+						{
+							BackendRef: gwv1.BackendRef{
+								BackendObjectReference: gwv1.BackendObjectReference{
+									Name: gwv1.ObjectName(route.Service.Name),
+									Port: &port,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
 	if err != nil {
 		return err
 	}
@@ -50,20 +78,17 @@ func (r *AppReconciler) createRoute(ctx context.Context, route *ntv1.Route) erro
 	return nil
 }
 
-func (r *AppReconciler) deleteRoute(ctx context.Context, route string) error {
-	fuseAddress, err := getFuseAddress(ctx)
-	if err != nil {
-		return err
-	}
+func (r *AppReconciler) deleteRoute(ctx context.Context, namespace string, route string) error {
 
-	// delete route from fuse
-	_, err = ntv1Connect.NewNetworkingServiceClient(http.DefaultClient, fuseAddress).
-		DeleteRoute(ctx, connect.NewRequest(&ntv1.DeleteRouteRequest{
-			Name: route,
-		}))
-	if err != nil {
-		// TODO: return error when fuse implements deletes
-		// return err
+	// delete httproute
+	err := r.Client.Delete(ctx, &gwv1.HTTPRoute{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      route,
+			Namespace: namespace,
+		},
+	})
+	if !errors.IsNotFound(err) {
+		return err
 	}
 
 	// remove route (mDNS hostname) from server
@@ -76,30 +101,4 @@ func (r *AppReconciler) deleteRoute(ctx context.Context, route string) error {
 	}
 
 	return nil
-}
-
-func getFuseAddress(ctx context.Context) (string, error) {
-	val, err := anypb.New(&kvv1.Value{})
-	if err != nil {
-		return "", err
-	}
-
-	// get fuse address from blueprint
-	// TODO: replace os.Getenv with making this a draft process?
-	response, err := kvv1Connect.NewKeyValueServiceClient(http.DefaultClient, os.Getenv("DRAFT_SERVICE_ENTRYPOINT")).
-		Get(ctx, connect.NewRequest(&kvv1.GetRequest{
-			Key:   FuseAddressBlueprintKey,
-			Value: val,
-		}))
-	if err != nil {
-		return "", err
-	}
-
-	// unmarshal value
-	value := &kvv1.Value{}
-	if err := anypb.UnmarshalTo(response.Msg.GetValue(), value, proto.UnmarshalOptions{}); err != nil {
-		return "", err
-	}
-
-	return value.Data, nil
 }

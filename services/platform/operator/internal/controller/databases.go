@@ -15,6 +15,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+const (
+	PostgresHostname = "postgres.postgres.svc.cluster.local"
+	// PostgresHostname = "localhost" // for local dev
+)
+
 func (r *AppReconciler) createDatabase(ctx context.Context, d AppDatabase, namespace string) error {
 
 	secret := &corev1.Secret{}
@@ -29,7 +34,7 @@ func (r *AppReconciler) createDatabase(ctx context.Context, d AppDatabase, names
 	switch d.Type {
 	case "postgres":
 		// create db client
-		dsn := fmt.Sprintf("postgres://postgres:%s@postgres.postgres.svc.cluster.local:5432/postgres?sslmode=disable", secret.Data["password"])
+		dsn := fmt.Sprintf("postgres://postgres:%s@%s:5432/postgres?sslmode=disable", secret.Data["password"], PostgresHostname)
 		sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
 		db := bun.NewDB(sqldb, pgdialect.New())
 
@@ -124,7 +129,7 @@ func createPostgresUserDatabase(ctx context.Context, db *bun.DB, d AppDatabase, 
 	// execute init script (if provided)
 	if len(d.Init) > 0 {
 		// create db client (for user database)
-		dsn := fmt.Sprintf("postgres://postgres:%s@postgres.postgres.svc.cluster.local:5432/%s?sslmode=disable", secret.Data["password"], d.Name)
+		dsn := fmt.Sprintf("postgres://postgres:%s@%s:5432/%s?sslmode=disable", secret.Data["password"], PostgresHostname, d.Name)
 		sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
 		db := bun.NewDB(sqldb, pgdialect.New())
 		_, err := db.ExecContext(ctx, d.Init)

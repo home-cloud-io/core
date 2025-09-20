@@ -10,7 +10,6 @@ import (
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 
 	"github.com/imdario/mergo"
-	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
@@ -205,7 +204,7 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 
 	// delete all routes
 	for _, route := range appConfig.Routes {
-		err = r.deleteRoute(ctx, route.Name)
+		err = r.deleteRoute(ctx, appConfig.Namespace, route.Name)
 		if err != nil {
 			return err
 		}
@@ -257,17 +256,7 @@ func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, app
 
 	// create routes
 	for _, route := range appConfig.Routes {
-		err = r.createRoute(ctx, &ntv1.Route{
-			Name: route.Name,
-			Match: &ntv1.RouteMatch{
-				Prefix: "/",
-				Host:   fmt.Sprintf("%s.local", route.Name),
-			},
-			Endpoint: &ntv1.Endpoint{
-				Host: fmt.Sprintf("%s.%s.svc.cluster.local", route.Service.Name, appConfig.Namespace),
-				Port: route.Service.Port,
-			},
-		})
+		err = r.createRoute(ctx, appConfig.Namespace, route)
 		if err != nil {
 			return err
 		}
