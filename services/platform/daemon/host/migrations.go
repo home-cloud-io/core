@@ -425,7 +425,7 @@ func m4(logger chassis.Logger) error {
 }
 
 func m5(logger chassis.Logger) error {
-	const manifest = `apiVersion: v1
+	const istioManifest = `apiVersion: v1
 kind: Namespace
 metadata:
   name: istio-system
@@ -513,5 +513,43 @@ spec:
       port: 8090
 `
 
-	return os.WriteFile(IstioManifestFile(), []byte(manifest), 0600)
+	var (
+		draftReplacer = []Replacer{
+			func(line string) string {
+				if line == "  name: draft-system" {
+					line = `  name: draft-system
+  labels:
+    istio.io/dataplane-mode: ambient`
+				}
+				return line
+			},
+		}
+		serverReplacer = []Replacer{
+			func(line string) string {
+				if line == "  name: home-cloud-system" {
+					line = `  name: home-cloud-system
+  labels:
+    istio.io/dataplane-mode: ambient`
+				}
+				return line
+			},
+		}
+	)
+
+	err := os.WriteFile(IstioManifestFile(), []byte(istioManifest), 0600)
+	if err != nil {
+		return err
+	}
+
+	err = LineByLineReplace(DraftManifestFile(), draftReplacer)
+	if err != nil {
+		return err
+	}
+
+	err = LineByLineReplace(ServerManifestFile(), serverReplacer)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
