@@ -112,6 +112,14 @@ func ServerManifestFile() string {
 	return FilePath(k3sRoot, "server/manifests/server.yaml")
 }
 
+func GatewayAPIManifestFile() string {
+	return FilePath(k3sRoot, "server/manifests/gateway-api.yaml")
+}
+
+func IstioManifestFile() string {
+	return FilePath(k3sRoot, "server/manifests/istio.yaml")
+}
+
 // data paths
 
 func DataPath() string {

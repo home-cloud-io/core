@@ -3,6 +3,8 @@ package host
 import (
 	"context"
 	"errors"
+	"io"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -53,6 +55,18 @@ var (
 			Id:       "b5a63e29-4b35-48e9-b78f-8f3522225f6f",
 			Name:     "Add a nix.json config file which enables automatic, weekly garbage collection",
 			Run:      m3,
+			Required: true,
+		},
+		{
+			Id:       "deda2d99-d791-4c93-8980-fd460a083f40",
+			Name:     "Install Kubernetes Gateway API manifests",
+			Run:      m4,
+			Required: true,
+		},
+		{
+			Id:       "9b970d3e-fbf8-44df-a21e-793e9b76f438",
+			Name:     "Install istio in ambient mode with an ingress gateway and a default route to the home-cloud server",
+			Run:      m5,
 			Required: true,
 		},
 	}
@@ -390,4 +404,114 @@ func m3(logger chassis.Logger) error {
 	}
 
 	return nil
+}
+
+func m4(logger chassis.Logger) error {
+	// get crd
+	resp, err := http.Get("https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// write to file
+	out, err := os.Create(GatewayAPIManifestFile())
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(out, resp.Body)
+	return err
+}
+
+func m5(logger chassis.Logger) error {
+	const manifest = `apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-base
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: base
+  targetNamespace: istio-system
+  version: 1.27.1
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-istiod
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: istiod
+  targetNamespace: istio-system
+  version: 1.27.1
+  valuesContent: |-
+    profile: ambient
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-cni
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: cni
+  targetNamespace: istio-system
+  version: 1.27.1
+  valuesContent: |-
+    profile: ambient
+    global:
+      platform: k3s
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-ztunnel
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: ztunnel
+  targetNamespace: istio-system
+  version: 1.27.1
+# ingress gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ingress-gateway
+  namespace: istio-system
+spec:
+  gatewayClassName: istio
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: All
+# default route to home-cloud server
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: home-cloud
+  namespace: home-cloud-system
+spec:
+  parentRefs:
+  - name: ingress-gateway
+    namespace: istio-system
+  hostnames: ["home-cloud.local"]
+  rules:
+  - backendRefs:
+    - name: server
+      port: 8090
+`
+
+	return os.WriteFile(IstioManifestFile(), []byte(manifest), 0600)
 }
