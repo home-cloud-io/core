@@ -99,7 +99,6 @@ func (r *AppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		return ctrl.Result{}, r.upgrade(ctx, app)
 	}
 
-	// Run on a timer
 	return ctrl.Result{}, nil
 }
 
@@ -227,6 +226,18 @@ func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, app
 		},
 	})
 	if client.IgnoreAlreadyExists(err) != nil {
+		return err
+	}
+	// TODO: probably a better way to do this
+	err = r.Client.Update(ctx, &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: appConfig.Namespace,
+			Labels: map[string]string{
+				"istio.io/dataplane-mode": "ambient",
+			},
+		},
+	})
+	if err != nil {
 		return err
 	}
 
