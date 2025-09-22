@@ -11,6 +11,10 @@ import (
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"gopkg.in/yaml.v3"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type (
@@ -407,7 +411,7 @@ func m3(logger chassis.Logger) error {
 }
 
 func m4(logger chassis.Logger) error {
-	// get crd
+	// get crds
 	resp, err := http.Get("https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml")
 	if err != nil {
 		return err
@@ -421,7 +425,26 @@ func m4(logger chassis.Logger) error {
 	}
 	defer out.Close()
 	_, err = io.Copy(out, resp.Body)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// wait for crd to be populated (yes this is hacky, but it works and I'm lazy)
+	kube := KubeClient()
+	for range 30 {
+		response, err := kube.RESTClient().Get().AbsPath("/apis/apiextensions.k8s.io/v1/customresourcedefinitions").DoRaw(context.TODO())
+		if err != nil {
+			return err
+		}
+		if strings.Count(string(response), "\"group\":\"gateway.networking.k8s.io\"") == 5 {
+			break
+		}
+		logger.Info("Gateway APIs not yet installed...")
+		time.Sleep(2 * time.Second)
+	}
+	logger.Info("Gateway APIs installed")
+
+	return nil
 }
 
 func m5(logger chassis.Logger) error {
@@ -550,6 +573,34 @@ spec:
 	if err != nil {
 		return err
 	}
+
+	// wait for the ingress gateway to be available
+	kube := KubeClient()
+	for range 30 {
+		deploy, err := kube.AppsV1().Deployments("istio-system").Get(context.Background(), "ingress-gateway-istio", v1.GetOptions{})
+		if err != nil {
+			if kerrors.IsNotFound(err) {
+				logger.Info("waiting on istio ingress gateway to deploy...")
+				time.Sleep(2 * time.Second)
+				continue
+			}
+			return err
+		}
+		var ready bool
+		for _, c := range deploy.Status.Conditions {
+			if c.Type == appsv1.DeploymentAvailable && c.Status == corev1.ConditionTrue {
+				ready = true
+			}
+		}
+		if !ready {
+			logger.Info("waiting on istio ingress gateway to be available...")
+			time.Sleep(2 * time.Second)
+			continue
+		}
+
+		break
+	}
+	logger.Info("istio ingress gateway available")
 
 	return nil
 }

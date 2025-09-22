@@ -100,6 +100,10 @@ func UsersConfigFile() string {
 
 // k3s paths
 
+func KubeConfigFile() string {
+	return FilePath("/etc/rancher/k3s/k3s.yaml")
+}
+
 func DraftManifestFile() string {
 	return FilePath(k3sRoot, "server/manifests/draft.yaml")
 }
