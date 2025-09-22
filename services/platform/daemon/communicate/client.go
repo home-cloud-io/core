@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/exec"
 	"sync"
 	"time"
 
@@ -170,9 +169,9 @@ func (c *client) listen(ctx context.Context) error {
 		case *v1.ServerMessage_Heartbeat:
 			c.logger.Trace("heartbeat received")
 		case *v1.ServerMessage_Restart:
-			go c.restart(ctx)
+			go execute.Restart(ctx, c.logger)
 		case *v1.ServerMessage_Shutdown:
-			go c.shutdown(ctx)
+			go execute.Shutdown(ctx, c.logger)
 		case *v1.ServerMessage_RequestOsUpdateDiff:
 			go c.osUpdateDiff(ctx, message)
 		case *v1.ServerMessage_RequestCurrentDaemonVersion:
@@ -249,32 +248,6 @@ func (c *client) systemStats(ctx context.Context) error {
 }
 
 // COMMAND HANDLERS
-
-func (c *client) restart(ctx context.Context) {
-	c.logger.Info("restart command")
-	if chassis.GetConfig().Env() == "test" {
-		c.logger.Info("mocking restart")
-		return
-	}
-	err := execute.ExecuteCommand(ctx, exec.Command("reboot", "now"))
-	if err != nil {
-		c.logger.WithError(err).Error("failed to execute restart command")
-		// TODO: send error back to server
-	}
-}
-
-func (c *client) shutdown(ctx context.Context) {
-	c.logger.Info("shutdown command")
-	if chassis.GetConfig().Env() == "test" {
-		c.logger.Info("mocking shutdown")
-		return
-	}
-	err := execute.ExecuteCommand(ctx, exec.Command("shutdown", "now"))
-	if err != nil {
-		c.logger.WithError(err).Error("failed to execute shutdown command")
-		// TODO: send error back to server
-	}
-}
 
 func (c *client) osUpdateDiff(ctx context.Context, msg *v1.ServerMessage) {
 	c.logger.Info("os update diff command")

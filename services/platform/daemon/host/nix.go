@@ -97,6 +97,91 @@ func RebuildAndSwitchOS(ctx context.Context, logger chassis.Logger) error {
 	return nil
 }
 
+// NOTE: should reboot after successfully executing this.
+func RebuildUpgradeBoot(ctx context.Context, logger chassis.Logger) error {
+	osMutex.Lock()
+	defer osMutex.Unlock()
+
+	config := chassis.GetConfig()
+	if config.Env() == "test" {
+		logger.Info("mocking nixos rebuild upgrade boot")
+		return nil
+	}
+
+	var (
+		cmd *exec.Cmd
+		err error
+	)
+
+	logger.Info("building and switching to upgraded nixos")
+	cmd = exec.Command("nixos-rebuild", "--upgrade", "boot")
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+	err = execute.ExecuteCommand(ctx, cmd)
+	if err != nil {
+		logger.WithError(err).Error("failed to run `nixos-rebuild --upgrade boot`")
+		return err
+	}
+	logger.Info("nixos rebuild upgrade command completed")
+
+	return nil
+}
+
+func AddChannel(ctx context.Context, logger chassis.Logger, channel string, name string) error {
+	osMutex.Lock()
+	defer osMutex.Unlock()
+
+	config := chassis.GetConfig()
+	if config.Env() == "test" {
+		logger.Info("mocking nixos add channel")
+		return nil
+	}
+
+	var (
+		cmd *exec.Cmd
+		err error
+	)
+
+	logger.Info("adding nixos channel")
+	cmd = exec.Command("nix-channel", "--add", channel, name)
+	err = execute.ExecuteCommand(ctx, cmd)
+	if err != nil {
+		logger.WithError(err).Error("failed to run `nixos-channel --add ...`")
+		return err
+	}
+	logger.Info("nix channel added")
+
+	return nil
+}
+
+func UpdateChannel(ctx context.Context, logger chassis.Logger) error {
+	osMutex.Lock()
+	defer osMutex.Unlock()
+
+	config := chassis.GetConfig()
+	if config.Env() == "test" {
+		logger.Info("mocking nixos update channel")
+		return nil
+	}
+
+	var (
+		cmd *exec.Cmd
+		err error
+	)
+
+	logger.Info("updating nixos channel")
+	cmd = exec.Command("nix-channel", "--update")
+	err = execute.ExecuteCommand(ctx, cmd)
+	if err != nil {
+		logger.WithError(err).Error("failed to run `nixos-channel --update`")
+		return err
+	}
+	logger.Info("nix channel updated")
+
+	return nil
+}
+
 func GetNixOSVersion(ctx context.Context, logger chassis.Logger) (string, error) {
 	var (
 		cmd *exec.Cmd

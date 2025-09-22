@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/home-cloud-io/core/services/platform/daemon/execute"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"gopkg.in/yaml.v3"
 )
@@ -53,6 +54,12 @@ var (
 			Id:       "b5a63e29-4b35-48e9-b78f-8f3522225f6f",
 			Name:     "Add a nix.json config file which enables automatic, weekly garbage collection",
 			Run:      m3,
+			Required: true,
+		},
+		{
+			Id:       "51af2d46-e8e1-4d6f-a578-ea8d62dda7f5",
+			Name:     "Upgrade NixOS to the 25.05 channel",
+			Run:      m4,
 			Required: true,
 		},
 	}
@@ -388,6 +395,29 @@ func m3(logger chassis.Logger) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func m4(logger chassis.Logger) error {
+	ctx := context.Background()
+
+	err := AddChannel(ctx, logger, "https://nixos.org/channels/nixos-25.05", "nixos")
+	if err != nil {
+		return err
+	}
+
+	err = UpdateChannel(ctx, logger)
+	if err != nil {
+		return err
+	}
+
+	err = RebuildUpgradeBoot(ctx, logger)
+	if err != nil {
+		return err
+	}
+
+	execute.Restart(ctx, logger)
 
 	return nil
 }
