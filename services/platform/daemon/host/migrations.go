@@ -3,6 +3,8 @@ package host
 import (
 	"context"
 	"errors"
+	"io"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -10,6 +12,10 @@ import (
 	"github.com/home-cloud-io/core/services/platform/daemon/execute"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"gopkg.in/yaml.v3"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type (
@@ -60,6 +66,18 @@ var (
 			Id:       "51af2d46-e8e1-4d6f-a578-ea8d62dda7f5",
 			Name:     "Upgrade NixOS to the 25.05 channel",
 			Run:      m4,
+			Required: true,
+		},
+		{
+			Id:       "deda2d99-d791-4c93-8980-fd460a083f40",
+			Name:     "Install Kubernetes Gateway API manifests",
+			Run:      m5,
+			Required: true,
+		},
+		{
+			Id:       "9b970d3e-fbf8-44df-a21e-793e9b76f438",
+			Name:     "Install istio in ambient mode with an ingress gateway and a default route to the home-cloud server",
+			Run:      m6,
 			Required: true,
 		},
 	}
@@ -418,6 +436,201 @@ func m4(logger chassis.Logger) error {
 	}
 
 	execute.Restart(ctx, logger)
+
+	return nil
+}
+
+func m5(logger chassis.Logger) error {
+	// get crds
+	resp, err := http.Get("https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// write to file
+	out, err := os.Create(GatewayAPIManifestFile())
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	// wait for crd to be populated (yes this is hacky, but it works and I'm lazy)
+	kube := KubeClient()
+	for range 30 {
+		response, err := kube.RESTClient().Get().AbsPath("/apis/apiextensions.k8s.io/v1/customresourcedefinitions").DoRaw(context.TODO())
+		if err != nil {
+			return err
+		}
+		if strings.Count(string(response), "\"group\":\"gateway.networking.k8s.io\"") == 5 {
+			break
+		}
+		logger.Info("Gateway APIs not yet installed...")
+		time.Sleep(2 * time.Second)
+	}
+	logger.Info("Gateway APIs installed")
+
+	return nil
+}
+
+func m6(logger chassis.Logger) error {
+	const istioManifest = `apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-base
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: base
+  targetNamespace: istio-system
+  version: 1.27.1
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-istiod
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: istiod
+  targetNamespace: istio-system
+  version: 1.27.1
+  valuesContent: |-
+    profile: ambient
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-cni
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: cni
+  targetNamespace: istio-system
+  version: 1.27.1
+  valuesContent: |-
+    profile: ambient
+    global:
+      platform: k3s
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-ztunnel
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: ztunnel
+  targetNamespace: istio-system
+  version: 1.27.1
+# ingress gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ingress-gateway
+  namespace: istio-system
+spec:
+  gatewayClassName: istio
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: All
+# default route to home-cloud server
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: home-cloud
+  namespace: home-cloud-system
+spec:
+  parentRefs:
+  - name: ingress-gateway
+    namespace: istio-system
+  hostnames: ["home-cloud.local"]
+  rules:
+  - backendRefs:
+    - name: server
+      port: 8090
+`
+
+	var (
+		draftReplacer = []Replacer{
+			func(line string) string {
+				if line == "  name: draft-system" {
+					line = `  name: draft-system
+  labels:
+    istio.io/dataplane-mode: ambient`
+				}
+				return line
+			},
+		}
+		serverReplacer = []Replacer{
+			func(line string) string {
+				if line == "  name: home-cloud-system" {
+					line = `  name: home-cloud-system
+  labels:
+    istio.io/dataplane-mode: ambient`
+				}
+				return line
+			},
+		}
+	)
+
+	err := os.WriteFile(IstioManifestFile(), []byte(istioManifest), 0600)
+	if err != nil {
+		return err
+	}
+
+	err = LineByLineReplace(DraftManifestFile(), draftReplacer)
+	if err != nil {
+		return err
+	}
+
+	err = LineByLineReplace(ServerManifestFile(), serverReplacer)
+	if err != nil {
+		return err
+	}
+
+	// wait for the ingress gateway to be available
+	kube := KubeClient()
+	for range 30 {
+		deploy, err := kube.AppsV1().Deployments("istio-system").Get(context.Background(), "ingress-gateway-istio", v1.GetOptions{})
+		if err != nil {
+			if kerrors.IsNotFound(err) {
+				logger.Info("waiting on istio ingress gateway to deploy...")
+				time.Sleep(2 * time.Second)
+				continue
+			}
+			return err
+		}
+		var ready bool
+		for _, c := range deploy.Status.Conditions {
+			if c.Type == appsv1.DeploymentAvailable && c.Status == corev1.ConditionTrue {
+				ready = true
+			}
+		}
+		if !ready {
+			logger.Info("waiting on istio ingress gateway to be available...")
+			time.Sleep(2 * time.Second)
+			continue
+		}
+
+		break
+	}
+	logger.Info("istio ingress gateway available")
 
 	return nil
 }

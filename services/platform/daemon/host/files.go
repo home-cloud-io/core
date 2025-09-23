@@ -100,6 +100,10 @@ func UsersConfigFile() string {
 
 // k3s paths
 
+func KubeConfigFile() string {
+	return FilePath("/etc/rancher/k3s/k3s.yaml")
+}
+
 func DraftManifestFile() string {
 	return FilePath(k3sRoot, "server/manifests/draft.yaml")
 }
@@ -110,6 +114,14 @@ func OperatorManifestFile() string {
 
 func ServerManifestFile() string {
 	return FilePath(k3sRoot, "server/manifests/server.yaml")
+}
+
+func GatewayAPIManifestFile() string {
+	return FilePath(k3sRoot, "server/manifests/gateway-api.yaml")
+}
+
+func IstioManifestFile() string {
+	return FilePath(k3sRoot, "server/manifests/istio.yaml")
 }
 
 // data paths
