@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/home-cloud-io/core/services/platform/daemon/execute"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"gopkg.in/yaml.v3"
 	appsv1 "k8s.io/api/apps/v1"
@@ -62,15 +63,21 @@ var (
 			Required: true,
 		},
 		{
+			Id:       "51af2d46-e8e1-4d6f-a578-ea8d62dda7f5",
+			Name:     "Upgrade NixOS to the 25.05 channel",
+			Run:      m4,
+			Required: true,
+		},
+		{
 			Id:       "deda2d99-d791-4c93-8980-fd460a083f40",
 			Name:     "Install Kubernetes Gateway API manifests",
-			Run:      m4,
+			Run:      m5,
 			Required: true,
 		},
 		{
 			Id:       "9b970d3e-fbf8-44df-a21e-793e9b76f438",
 			Name:     "Install istio in ambient mode with an ingress gateway and a default route to the home-cloud server",
-			Run:      m5,
+			Run:      m6,
 			Required: true,
 		},
 	}
@@ -411,6 +418,29 @@ func m3(logger chassis.Logger) error {
 }
 
 func m4(logger chassis.Logger) error {
+	ctx := context.Background()
+
+	err := AddChannel(ctx, logger, "https://nixos.org/channels/nixos-25.05", "nixos")
+	if err != nil {
+		return err
+	}
+
+	err = UpdateChannel(ctx, logger)
+	if err != nil {
+		return err
+	}
+
+	err = RebuildUpgradeBoot(ctx, logger)
+	if err != nil {
+		return err
+	}
+
+	execute.Restart(ctx, logger)
+
+	return nil
+}
+
+func m5(logger chassis.Logger) error {
 	// get crds
 	resp, err := http.Get("https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml")
 	if err != nil {
@@ -447,7 +477,7 @@ func m4(logger chassis.Logger) error {
 	return nil
 }
 
-func m5(logger chassis.Logger) error {
+func m6(logger chassis.Logger) error {
 	const istioManifest = `apiVersion: v1
 kind: Namespace
 metadata:
