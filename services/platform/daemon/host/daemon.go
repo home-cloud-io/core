@@ -182,7 +182,7 @@ func journalLogs(ctx context.Context, logger chassis.Logger, unit string, sinceS
 	}
 
 	logger.Debug("getting journal logs")
-	cmd = exec.Command("journalctl", "-u", unit, "--since", fmt.Sprintf("%dsec ago", sinceSeconds), "-o", "short-iso-precise")
+	cmd = execute.NewElevatedCommand("journalctl", "-u", unit, "--since", fmt.Sprintf("%dsec ago", sinceSeconds), "-o", "short-iso-precise")
 	output, err := execute.ExecuteCommandReturnStdout(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to get journal logs")

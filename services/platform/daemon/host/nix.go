@@ -37,7 +37,7 @@ Closure size: 970 -> 970 (0 paths added, 0 paths removed, delta +0, disk usage +
 	)
 
 	logger.Info("updating nix channel")
-	cmd = exec.Command("nix-channel", "--update")
+	cmd = execute.NewElevatedCommand("nix-channel", "--update")
 	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nix-channel --update`")
@@ -46,7 +46,7 @@ Closure size: 970 -> 970 (0 paths added, 0 paths removed, delta +0, disk usage +
 	logger.Info("updating nix channel: DONE")
 
 	logger.Info("building updated nixos")
-	cmd = exec.Command("nixos-rebuild", "build")
+	cmd = execute.NewElevatedCommand("nixos-rebuild", "build")
 	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nixos-rebuild build`")
@@ -55,7 +55,7 @@ Closure size: 970 -> 970 (0 paths added, 0 paths removed, delta +0, disk usage +
 	logger.Info("building updated nixos: DONE")
 
 	logger.Info("calculating system diff")
-	cmd = exec.Command("nvd", "diff", "/run/current-system", "./result")
+	cmd = execute.NewElevatedCommand("nvd", "diff", "/run/current-system", "./result")
 	output, err = execute.ExecuteCommandReturnStdout(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nvd diff /run/current-system ./result`")
@@ -83,7 +83,7 @@ func RebuildAndSwitchOS(ctx context.Context, logger chassis.Logger) error {
 	)
 
 	logger.Info("building and switching to updated nixos")
-	cmd = exec.Command("nixos-rebuild", "switch")
+	cmd = execute.NewElevatedCommand("nixos-rebuild", "switch")
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}
@@ -114,7 +114,7 @@ func RebuildUpgradeBoot(ctx context.Context, logger chassis.Logger) error {
 	)
 
 	logger.Info("building and switching to upgraded nixos")
-	cmd = exec.Command("nixos-rebuild", "--upgrade", "boot")
+	cmd = execute.NewElevatedCommand("nixos-rebuild", "--upgrade", "boot")
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}
@@ -144,7 +144,7 @@ func AddChannel(ctx context.Context, logger chassis.Logger, channel string, name
 	)
 
 	logger.Info("adding nixos channel")
-	cmd = exec.Command("nix-channel", "--add", channel, name)
+	cmd = execute.NewElevatedCommand("nix-channel", "--add", channel, name)
 	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nixos-channel --add ...`")
@@ -171,7 +171,7 @@ func UpdateChannel(ctx context.Context, logger chassis.Logger) error {
 	)
 
 	logger.Info("updating nixos channel")
-	cmd = exec.Command("nix-channel", "--update")
+	cmd = execute.NewElevatedCommand("nix-channel", "--update")
 	err = execute.ExecuteCommand(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to run `nixos-channel --update`")
@@ -194,7 +194,7 @@ func GetNixOSVersion(ctx context.Context, logger chassis.Logger) (string, error)
 	}
 
 	logger.Info("getting NixOS version")
-	cmd = exec.Command("nixos-version")
+	cmd = execute.NewElevatedCommand("nixos-version")
 	output, err := execute.ExecuteCommandReturnStdout(ctx, cmd)
 	if err != nil {
 		logger.WithError(err).Error("failed to get NixOS version")
