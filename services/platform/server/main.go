@@ -10,7 +10,6 @@ import (
 	"github.com/home-cloud-io/core/services/platform/server/system"
 	"github.com/home-cloud-io/core/services/platform/server/web"
 
-	ntv1 "github.com/steady-bytes/draft/api/core/control_plane/networking/v1"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
 )
@@ -47,12 +46,5 @@ func main() {
 		WithRPCHandler(webHTTP).
 		WithRPCHandler(internalRPC).
 		WithRunner(runner).
-		WithRoute(&ntv1.Route{
-			Match: &ntv1.RouteMatch{
-				Prefix: "/",
-				Host: "home-cloud.local",
-			},
-			EnableHttp2: true,
-		}).
 		Start()
 }
