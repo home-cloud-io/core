@@ -113,86 +113,30 @@ func (r *InstallReconciler) install(ctx context.Context, install *v1.Install) er
 
 	// istio base
 	act.ReleaseName = "base"
-	values := map[string]interface{}{}
-	exists, err := helmExists(actionConfiguration, act.ReleaseName)
+	err = tryHelmInstall(ctx, actionConfiguration, act, install.Spec.Istio.Base.Values)
 	if err != nil {
 		return err
-	}
-	if !exists {
-		l.Info("installing istio chart", "chart", act.ReleaseName)
-		c, err := getChart(act.ChartPathOptions, act.ReleaseName)
-		if err != nil {
-			return err
-		}
-		_, err = act.Run(c, values)
-		if err != nil {
-			return err
-		}
 	}
 
 	// istio istiod
 	act.ReleaseName = "istiod"
-	values = map[string]interface{}{
-		"profile": "ambient",
-	}
-	exists, err = helmExists(actionConfiguration, act.ReleaseName)
+	err = tryHelmInstall(ctx, actionConfiguration, act, install.Spec.Istio.Istiod.Values)
 	if err != nil {
 		return err
-	}
-	if !exists {
-		l.Info("installing istio chart", "chart", act.ReleaseName)
-		c, err := getChart(act.ChartPathOptions, act.ReleaseName)
-		if err != nil {
-			return err
-		}
-		_, err = act.Run(c, values)
-		if err != nil {
-			return err
-		}
 	}
 
 	// istio cni
 	act.ReleaseName = "cni"
-	values = map[string]interface{}{
-		"profile": "ambient",
-		// TODO: need this only for k3s install
-		"global": map[string]interface{}{
-			"platform": "k3s",
-		},
-	}
-	exists, err = helmExists(actionConfiguration, act.ReleaseName)
+	err = tryHelmInstall(ctx, actionConfiguration, act, install.Spec.Istio.CNI.Values)
 	if err != nil {
 		return err
-	}
-	if !exists {
-		l.Info("installing istio chart", "chart", act.ReleaseName)
-		c, err := getChart(act.ChartPathOptions, act.ReleaseName)
-		if err != nil {
-			return err
-		}
-		_, err = act.Run(c, values)
-		if err != nil {
-			return err
-		}
 	}
 
 	// istio ztunnel
 	act.ReleaseName = "ztunnel"
-	values = map[string]interface{}{}
-	exists, err = helmExists(actionConfiguration, act.ReleaseName)
+	err = tryHelmInstall(ctx, actionConfiguration, act, install.Spec.Istio.Ztunnel.Values)
 	if err != nil {
 		return err
-	}
-	if !exists {
-		l.Info("installing istio chart", "chart", act.ReleaseName)
-		c, err := getChart(act.ChartPathOptions, act.ReleaseName)
-		if err != nil {
-			return err
-		}
-		_, err = act.Run(c, values)
-		if err != nil {
-			return err
-		}
 	}
 
 	l.Info("installing common components")
@@ -307,6 +251,42 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 	// TODO: save current spec?
 	// install.Status.Values = install.Spec.Values
 	return r.Status().Update(ctx, install)
+}
+
+func tryHelmInstall(ctx context.Context, config *action.Configuration, act *action.Install, values string) error {
+	l := log.FromContext(ctx)
+
+	// get user values
+	v := map[string]interface{}{}
+	err := yaml.Unmarshal([]byte(values), &v)
+	if err != nil {
+		return err
+	}
+	if act.ReleaseName != "ztunnel" {
+		v["profile"] = "ambient"
+	}
+
+	// skip if already installed
+	exists, err := helmExists(config, act.ReleaseName)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return nil
+	}
+
+	// run install
+	l.Info("installing helm chart", "chart", act.ReleaseName)
+	c, err := getChart(act.ChartPathOptions, act.ReleaseName)
+	if err != nil {
+		return err
+	}
+	_, err = act.Run(c, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Apply applies the given YAML manifests to kubernetes
