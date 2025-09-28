@@ -124,14 +124,20 @@ service:
 					Spec: corev1.PodSpec{
 						Containers: []corev1.Container{
 							{
-								Name: "server",
-								// TODO: change me
-								Image: "nginx:1.29.1",
+								Name:  "server",
+								Image: "ghcr.io/home-cloud-io/core-platform-server:sha-590cb46",
 								Ports: []corev1.ContainerPort{
 									{
 										Name:          "http",
 										Protocol:      corev1.ProtocolTCP,
 										ContainerPort: 8090,
+									},
+								},
+								VolumeMounts: []corev1.VolumeMount{
+									{
+										Name:      "config",
+										MountPath: "/etc/config.yaml",
+										SubPath:   "config.yaml",
 									},
 								},
 								LivenessProbe: &corev1.Probe{
@@ -149,6 +155,15 @@ service:
 											Port: intstr.FromString("http"),
 										},
 									},
+								},
+							},
+						},
+						Volumes: []corev1.Volume{
+							{
+								Name: "config",
+								VolumeSource: corev1.VolumeSource{ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{Name: "server"},
+								},
 								},
 							},
 						},
