@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 	"slices"
 	"time"
 
 	"dario.cat/mergo"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/release"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -70,25 +72,15 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, r.tryDeletions(ctx, install)
 	}
 
-	// if the status doesn't signal installed, needs install
-	if !install.Status.Installed {
-		l.Info("Installing Install")
-		return ctrl.Result{}, r.install(ctx, install)
-	}
-
-	// upgrade if conditions are met
-	if shouldUpgradeInstall(install) {
-		l.Info("Upgrading Install")
-		return ctrl.Result{}, r.upgrade(ctx, install)
-	}
-
-	return ctrl.Result{}, nil
+	l.Info("Reconciling Install")
+	return ctrl.Result{}, r.reconcile(ctx, install)
 }
 
-func (r *InstallReconciler) install(ctx context.Context, install *v1.Install) error {
+func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) error {
 	l := log.FromContext(ctx)
+	var err error
 
-	// install gateway api
+	l.Info("reconciling gateway api crds")
 	resp, err := http.Get(fmt.Sprintf("https://github.com/kubernetes-sigs/gateway-api/releases/download/%s/standard-install.yaml", install.Spec.GatewayAPI.Version))
 	if err != nil {
 		return err
@@ -98,67 +90,32 @@ func (r *InstallReconciler) install(ctx context.Context, install *v1.Install) er
 		return err
 	}
 
-	// helm installs for istio
-	actionConfiguration, err := createHelmAction(install.Spec.Istio.Namespace)
-	if err != nil {
-		return err
-	}
-	act := action.NewInstall(actionConfiguration)
-	act.Version = install.Spec.Istio.Version
-	act.Namespace = install.Spec.Istio.Namespace
-	act.RepoURL = install.Spec.Istio.Repo
-	act.CreateNamespace = true
-	act.Wait = true
-	act.Timeout = 5 * time.Minute
-
-	// istio base
-	act.ReleaseName = "base"
-	err = tryHelmInstall(ctx, actionConfiguration, act, install.Spec.Istio.Base.Values)
+	l.Info("reconciling istio install")
+	err = reconcileIstio(ctx, install)
 	if err != nil {
 		return err
 	}
 
-	// istio istiod
-	act.ReleaseName = "istiod"
-	err = tryHelmInstall(ctx, actionConfiguration, act, install.Spec.Istio.Istiod.Values)
-	if err != nil {
-		return err
-	}
-
-	// istio cni
-	act.ReleaseName = "cni"
-	err = tryHelmInstall(ctx, actionConfiguration, act, install.Spec.Istio.CNI.Values)
-	if err != nil {
-		return err
-	}
-
-	// istio ztunnel
-	act.ReleaseName = "ztunnel"
-	err = tryHelmInstall(ctx, actionConfiguration, act, install.Spec.Istio.Ztunnel.Values)
-	if err != nil {
-		return err
-	}
-
-	l.Info("installing common components")
+	l.Info("reconciling common components")
 	for _, o := range resources.CommonObjects(install) {
-		err = r.Client.Create(ctx, o)
-		if client.IgnoreAlreadyExists(err) != nil {
+		err = kubeCreateOrUpdate(ctx, r.Client, o)
+		if err != nil {
 			return err
 		}
 	}
 
-	l.Info("installing draft components")
+	l.Info("reconciling draft components")
 	for _, o := range resources.DraftObjects(install) {
-		err = r.Client.Create(ctx, o)
-		if client.IgnoreAlreadyExists(err) != nil {
+		err = kubeCreateOrUpdate(ctx, r.Client, o)
+		if err != nil {
 			return err
 		}
 	}
 
-	l.Info("installing home cloud server components")
+	l.Info("reconciling home cloud server components")
 	for _, o := range resources.HomeCloudServerObjects(install) {
-		err = r.Client.Create(ctx, o)
-		if client.IgnoreAlreadyExists(err) != nil {
+		err = kubeCreateOrUpdate(ctx, r.Client, o)
+		if err != nil {
 			return err
 		}
 	}
@@ -166,10 +123,56 @@ func (r *InstallReconciler) install(ctx context.Context, install *v1.Install) er
 	return r.updateStatus(ctx, install)
 }
 
-func (r *InstallReconciler) upgrade(ctx context.Context, install *v1.Install) error {
-	// TODO
+func reconcileIstio(ctx context.Context, install *v1.Install) error {
 
-	return r.updateStatus(ctx, install)
+	cfg, err := createHelmAction(install.Spec.Istio.Namespace)
+	if err != nil {
+		return err
+	}
+	iAct := action.NewInstall(cfg)
+	iAct.Version = install.Spec.Istio.Version
+	iAct.Namespace = install.Spec.Istio.Namespace
+	iAct.RepoURL = install.Spec.Istio.Repo
+	iAct.CreateNamespace = true
+	iAct.Wait = true
+	iAct.Timeout = 5 * time.Minute
+
+	uAct := action.NewUpgrade(cfg)
+	uAct.Version = install.Spec.Istio.Version
+	uAct.Namespace = install.Spec.Istio.Namespace
+	uAct.RepoURL = install.Spec.Istio.Repo
+	uAct.Wait = true
+	uAct.Timeout = 5 * time.Minute
+
+	// istio base
+	iAct.ReleaseName = "base"
+	err = helmInstallOrUpgrade(ctx, cfg, iAct, uAct, install.Spec.Istio.Base.Values)
+	if err != nil {
+		return err
+	}
+
+	// istio istiod
+	iAct.ReleaseName = "istiod"
+	err = helmInstallOrUpgrade(ctx, cfg, iAct, uAct, install.Spec.Istio.Istiod.Values)
+	if err != nil {
+		return err
+	}
+
+	// istio cni
+	iAct.ReleaseName = "cni"
+	err = helmInstallOrUpgrade(ctx, cfg, iAct, uAct, install.Spec.Istio.CNI.Values)
+	if err != nil {
+		return err
+	}
+
+	// istio ztunnel
+	iAct.ReleaseName = "ztunnel"
+	err = helmInstallOrUpgrade(ctx, cfg, iAct, uAct, install.Spec.Istio.Ztunnel.Values)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) error {
@@ -234,16 +237,44 @@ func (r *InstallReconciler) tryDeletions(ctx context.Context, install *v1.Instal
 	return nil
 }
 
-func helmExists(actionConfiguration *action.Configuration, releaseName string) (bool, error) {
-	get := action.NewGet(actionConfiguration)
-	_, err := get.Run(releaseName)
+func kubeCreateOrUpdate(ctx context.Context, kube client.Client, obj client.Object) error {
+	l := log.FromContext(ctx).WithValues(
+		"object", fmt.Sprintf("%s/%s", obj.GetNamespace(), obj.GetName()),
+		"kind", obj.GetObjectKind().GroupVersionKind().Kind,
+	)
+	err := kube.Get(ctx, client.ObjectKeyFromObject(obj), obj)
 	if err != nil {
-		if err.Error() == "release: not found" {
-			return false, nil
+		if kerrors.IsNotFound(err) {
+			l.Info("creating object")
+			return kube.Create(ctx, obj)
 		}
+		return err
+	}
+	l.Info("updating object")
+	return kube.Update(ctx, obj)
+}
+
+func helmExists(cfg *action.Configuration, releaseName string) (bool, error) {
+	release, err := helmGet(cfg, releaseName)
+	if err != nil {
 		return false, err
 	}
-	return true, nil
+	if release != nil {
+		return true, nil
+	}
+	return false, nil
+}
+
+func helmGet(cfg *action.Configuration, releaseName string) (*release.Release, error) {
+	get := action.NewGet(cfg)
+	release, err := get.Run(releaseName)
+	if err != nil {
+		if err.Error() == "release: not found" {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return release, nil
 }
 
 func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Install) error {
@@ -253,7 +284,7 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 	return r.Status().Update(ctx, install)
 }
 
-func tryHelmInstall(ctx context.Context, config *action.Configuration, act *action.Install, values string) error {
+func helmInstallOrUpgrade(ctx context.Context, cfg *action.Configuration, iAct *action.Install, uAct *action.Upgrade, values string) error {
 	l := log.FromContext(ctx)
 
 	// get user values
@@ -262,30 +293,62 @@ func tryHelmInstall(ctx context.Context, config *action.Configuration, act *acti
 	if err != nil {
 		return err
 	}
-	if act.ReleaseName != "ztunnel" {
+
+	// force ambient profile for istio charts
+	if slices.Contains([]string{"base", "istiod", "cni"}, iAct.ReleaseName) {
 		v["profile"] = "ambient"
 	}
 
-	// skip if already installed
-	exists, err := helmExists(config, act.ReleaseName)
+	// get existing release
+	release, err := helmGet(cfg, iAct.ReleaseName)
 	if err != nil {
 		return err
 	}
-	if exists {
+
+	// install if no release found
+	if release == nil {
+		return helmInstall(ctx, cfg, iAct, v)
+	}
+
+	// ignore if no changes
+	if len(v) == 0 {
+		// maps of length 0 != nil maps
+		v = nil
+	}
+	if release.Chart.Metadata.Version == uAct.Version && (reflect.DeepEqual(release.Config, v)) {
+		l.Info("ignoring unchanged helm release", "release", iAct.ReleaseName)
 		return nil
 	}
 
-	// run install
-	l.Info("installing helm chart", "chart", act.ReleaseName)
+	// upgrade
+	return helmUpgrade(ctx, cfg, iAct.ReleaseName, uAct, v)
+}
+
+func helmInstall(ctx context.Context, cfg *action.Configuration, act *action.Install, values map[string]interface{}) error {
+	l := log.FromContext(ctx)
+	l.Info("installing helm chart", "chart", act.ChartPathOptions.RepoURL)
 	c, err := getChart(act.ChartPathOptions, act.ReleaseName)
 	if err != nil {
 		return err
 	}
-	_, err = act.Run(c, v)
+	_, err = act.RunWithContext(ctx, c, values)
 	if err != nil {
 		return err
 	}
+	return nil
+}
 
+func helmUpgrade(ctx context.Context, cfg *action.Configuration, releaseName string, act *action.Upgrade, values map[string]interface{}) error {
+	l := log.FromContext(ctx)
+	l.Info("upgrading helm release", "release", releaseName)
+	c, err := getChart(act.ChartPathOptions, releaseName)
+	if err != nil {
+		return err
+	}
+	_, err = act.RunWithContext(ctx, releaseName, c, values)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
