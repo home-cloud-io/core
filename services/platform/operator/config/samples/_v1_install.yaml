@@ -11,4 +11,6 @@ metadata:
     app.kubernetes.io/created-by: home-cloud
   name: install-sample
 spec:
-  version: v1
+  homeCloud:
+    server:
+      tag: sha-590cb46

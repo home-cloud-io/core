@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 
 	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sv1Connect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
@@ -16,13 +15,10 @@ import (
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-var (
-	HomeCloudServerAddress = func() string {
-		if os.Getenv("DRAFT_SERVICE_ENV") == "test" {
-			return "http://localhost:8000"
-		}
-		return "http://server.home-cloud-system.svc.cluster.local:8090"
-	}()
+const (
+	// TODO: build this from install crd?
+	HomeCloudServerAddress = "http://server.home-cloud-system:8090"
+	// HomeCloudServerAddress = "http://localhost:8090" // for local dev
 
 	GatewayName = "ingress-gateway"
 )
