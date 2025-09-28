@@ -72,14 +72,34 @@ spec:
                 type: object
               istio:
                 properties:
+                  base:
+                    properties:
+                      values:
+                        type: string
+                    type: object
+                  cni:
+                    properties:
+                      values:
+                        type: string
+                    type: object
                   ingressGatewayName:
                     type: string
                   istio:
                     type: string
+                  istiod:
+                    properties:
+                      values:
+                        type: string
+                    type: object
                   repo:
                     type: string
                   version:
                     type: string
+                  ztunnel:
+                    properties:
+                      values:
+                        type: string
+                    type: object
                 type: object
               volumeMountHostPath:
                 type: string

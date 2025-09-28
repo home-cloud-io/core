@@ -23,6 +23,27 @@ type IstioSpec struct {
 	Version            string `json:"version,omitempty"`
 	Repo               string `json:"repo,omitempty"`
 	IngressGatewayName string `json:"ingressGatewayName,omitempty"`
+
+	Base    BaseSpec    `json:"base,omitempty"`
+	Istiod  IstiodSpec  `json:"istiod,omitempty"`
+	CNI     CNISpec     `json:"cni,omitempty"`
+	Ztunnel ZtunnelSpec `json:"ztunnel,omitempty"`
+}
+
+type BaseSpec struct {
+	Values string `json:"values,omitempty"`
+}
+
+type IstiodSpec struct {
+	Values string `json:"values,omitempty"`
+}
+
+type CNISpec struct {
+	Values string `json:"values,omitempty"`
+}
+
+type ZtunnelSpec struct {
+	Values string `json:"values,omitempty"`
 }
 
 type DraftSpec struct {

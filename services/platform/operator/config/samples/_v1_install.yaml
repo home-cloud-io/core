@@ -11,6 +11,11 @@ metadata:
     app.kubernetes.io/created-by: home-cloud
   name: install-sample
 spec:
+  istio:
+    cni:
+      values: |
+        global:
+          platform: k3s
   homeCloud:
     server:
       tag: sha-590cb46
