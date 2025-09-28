@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	"github.com/home-cloud-io/core/services/platform/daemon/execute"
@@ -129,7 +128,7 @@ func setUserPassword(ctx context.Context, logger chassis.Logger, password string
 		return nil
 	}
 
-	cmd := exec.Command("chpasswd")
+	cmd := execute.NewElevatedCommand("chpasswd")
 
 	// write the username:password to stdin when the command executes
 	stdin, err := cmd.StdinPipe()

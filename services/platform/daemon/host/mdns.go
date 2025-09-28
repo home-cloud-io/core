@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"os/exec"
 	"time"
 
 	"github.com/home-cloud-io/core/services/platform/daemon/execute"
@@ -118,7 +117,7 @@ func publish(ctx context.Context, logger chassis.Logger, fqdn, address string) {
 			return
 		}
 		logger = logger.WithField("address", address)
-		cmd := exec.Command("avahi-publish", "-a", "-R", fqdn, address)
+		cmd := execute.NewElevatedCommand("avahi-publish", "-a", "-R", fqdn, address)
 		err := execute.ExecuteCommand(ctx, cmd)
 		if err != nil {
 			logger.WithError(err).Error("failed to publish mDNS")
