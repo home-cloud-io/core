@@ -3,11 +3,13 @@ package controller
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"slices"
 	"time"
 
+	"dario.cat/mergo"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -56,14 +58,20 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
+	// set defaults
+	err = mergo.Merge(install, resources.DefaultInstall)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	// if marked for deletion, try to delete/uninstall
 	if install.GetDeletionTimestamp() != nil {
 		l.Info("Uninstalling Install")
 		return ctrl.Result{}, r.tryDeletions(ctx, install)
 	}
 
-	// if the version isn't set in the status, installation is needed
-	if install.Status.Version == "" {
+	// if the status doesn't signal installed, needs install
+	if !install.Status.Installed {
 		l.Info("Installing Install")
 		return ctrl.Result{}, r.install(ctx, install)
 	}
@@ -81,7 +89,7 @@ func (r *InstallReconciler) install(ctx context.Context, install *v1.Install) er
 	l := log.FromContext(ctx)
 
 	// install gateway api
-	resp, err := http.Get("https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml")
+	resp, err := http.Get(fmt.Sprintf("https://github.com/kubernetes-sigs/gateway-api/releases/download/%s/standard-install.yaml", install.Spec.GatewayAPI.Version))
 	if err != nil {
 		return err
 	}
@@ -91,14 +99,14 @@ func (r *InstallReconciler) install(ctx context.Context, install *v1.Install) er
 	}
 
 	// helm installs for istio
-	actionConfiguration, err := createHelmAction(resources.DefaultIstioNamespace)
+	actionConfiguration, err := createHelmAction(install.Spec.Istio.Namespace)
 	if err != nil {
 		return err
 	}
 	act := action.NewInstall(actionConfiguration)
-	act.Version = resources.DefaultIstioVersion
-	act.Namespace = resources.DefaultIstioNamespace
-	act.RepoURL = resources.DefaultIstioRepoURL
+	act.Version = install.Spec.Istio.Version
+	act.Namespace = install.Spec.Istio.Namespace
+	act.RepoURL = install.Spec.Istio.Repo
 	act.CreateNamespace = true
 	act.Wait = true
 	act.Timeout = 5 * time.Minute
@@ -187,14 +195,16 @@ func (r *InstallReconciler) install(ctx context.Context, install *v1.Install) er
 		}
 	}
 
-	l.Info("installing ingress gateway")
-	err = r.Client.Create(ctx, resources.IngressGateway)
-	if client.IgnoreAlreadyExists(err) != nil {
-		return err
+	l.Info("installing common components")
+	for _, o := range resources.CommonObjects(install) {
+		err = r.Client.Create(ctx, o)
+		if client.IgnoreAlreadyExists(err) != nil {
+			return err
+		}
 	}
 
 	l.Info("installing draft components")
-	for _, o := range resources.DraftObjects {
+	for _, o := range resources.DraftObjects(install) {
 		err = r.Client.Create(ctx, o)
 		if client.IgnoreAlreadyExists(err) != nil {
 			return err
@@ -202,7 +212,7 @@ func (r *InstallReconciler) install(ctx context.Context, install *v1.Install) er
 	}
 
 	l.Info("installing home cloud server components")
-	for _, o := range resources.HomeCloudServerObjects {
+	for _, o := range resources.HomeCloudServerObjects(install) {
 		err = r.Client.Create(ctx, o)
 		if client.IgnoreAlreadyExists(err) != nil {
 			return err
@@ -222,26 +232,28 @@ func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) 
 
 	// NOTE: we do not delete any CRDs (gateway API/istio) as they could be in use by other applications
 
-	for _, o := range slices.Backward(resources.HomeCloudServerObjects) {
+	for _, o := range slices.Backward(resources.HomeCloudServerObjects(install)) {
 		err := r.Client.Delete(ctx, o)
 		if client.IgnoreNotFound(err) != nil {
 			return err
 		}
 	}
 
-	for _, o := range slices.Backward(resources.DraftObjects) {
+	for _, o := range slices.Backward(resources.DraftObjects(install)) {
 		err := r.Client.Delete(ctx, o)
 		if client.IgnoreNotFound(err) != nil {
 			return err
 		}
 	}
 
-	err := r.Client.Delete(ctx, resources.IngressGateway)
-	if client.IgnoreNotFound(err) != nil {
-		return err
+	for _, o := range slices.Backward(resources.CommonObjects(install)) {
+		err := r.Client.Delete(ctx, o)
+		if client.IgnoreNotFound(err) != nil {
+			return err
+		}
 	}
 
-	actionConfiguration, err := createHelmAction(resources.DefaultIstioNamespace)
+	actionConfiguration, err := createHelmAction(install.Spec.Istio.Namespace)
 	if err != nil {
 		return err
 	}
@@ -291,7 +303,8 @@ func helmExists(actionConfiguration *action.Configuration, releaseName string) (
 }
 
 func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Install) error {
-	install.Status.Version = install.Spec.Version
+	install.Status.Installed = true
+	// TODO: save current spec?
 	// install.Status.Values = install.Spec.Values
 	return r.Status().Update(ctx, install)
 }

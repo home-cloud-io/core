@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	// TODO: retrieve this from blueprint?
-	HomeCloudServerAddress = "http://server.home-cloud-system.svc.cluster.local:8090"
+	// TODO: build this from install crd?
+	HomeCloudServerAddress = "http://server.home-cloud-system:8090"
 	// HomeCloudServerAddress = "http://localhost:8090" // for local dev
 
 	GatewayName = "ingress-gateway"

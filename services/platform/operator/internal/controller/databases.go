@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	PostgresHostname = "postgres.postgres.svc.cluster.local"
+	PostgresHostname = "postgres.postgres"
 	// PostgresHostname = "localhost" // for local dev
 )
 
@@ -104,12 +104,12 @@ func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d Ap
 		},
 		Type: corev1.SecretTypeOpaque,
 		Data: map[string][]byte{
-			"hostname": []byte("postgres.postgres.svc.cluster.local"),
+			"hostname": []byte("postgres.postgres"),
 			"database": []byte(d.Name),
 			"username": []byte(d.Name),
 			"password": []byte(password),
 			"port":     []byte("5432"),
-			"uri":      []byte(fmt.Sprintf("postgres://%s:%s@postgres.postgres.svc.cluster.local:5432/%s?sslmode=disable", d.Name, password, d.Name)),
+			"uri":      []byte(fmt.Sprintf("postgres://%s:%s@postgres.postgres:5432/%s?sslmode=disable", d.Name, password, d.Name)),
 		},
 	})
 	if client.IgnoreAlreadyExists(err) != nil {
