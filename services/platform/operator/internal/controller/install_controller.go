@@ -90,18 +90,18 @@ func (r *InstallReconciler) install(ctx context.Context, install *v1.Install) er
 		return err
 	}
 
+	// helm installs for istio
 	actionConfiguration, err := createHelmAction(resources.DefaultIstioNamespace)
 	if err != nil {
 		return err
 	}
-
-	// TODO: genericize this
 	act := action.NewInstall(actionConfiguration)
 	act.Version = resources.DefaultIstioVersion
 	act.Namespace = resources.DefaultIstioNamespace
 	act.RepoURL = resources.DefaultIstioRepoURL
 	act.CreateNamespace = true
 	act.Wait = true
+	act.Timeout = 5 * time.Minute
 
 	// istio base
 	act.ReleaseName = "base"
@@ -234,6 +234,11 @@ func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) 
 		if client.IgnoreNotFound(err) != nil {
 			return err
 		}
+	}
+
+	err := r.Client.Delete(ctx, resources.IngressGateway)
+	if client.IgnoreNotFound(err) != nil {
+		return err
 	}
 
 	actionConfiguration, err := createHelmAction(resources.DefaultIstioNamespace)

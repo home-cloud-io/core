@@ -38,8 +38,8 @@ var (
 			},
 			Spec: corev1.PersistentVolumeSpec{
 				Capacity: corev1.ResourceList{corev1.ResourceName("storage"): resource.MustParse("5G")},
-				// TODO: test this mount
-				PersistentVolumeSource: corev1.PersistentVolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/mnt/k8s-pvs/blueprint"}},
+				// TODO: change this
+				PersistentVolumeSource: corev1.PersistentVolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/mnt"}},
 				AccessModes:            []corev1.PersistentVolumeAccessMode{corev1.PersistentVolumeAccessMode("ReadWriteMany")},
 				ClaimRef: &corev1.ObjectReference{
 					Namespace: "draft-system",
@@ -69,6 +69,11 @@ var (
 			Spec: corev1.PersistentVolumeClaimSpec{
 				AccessModes:      []corev1.PersistentVolumeAccessMode{corev1.PersistentVolumeAccessMode("ReadWriteMany")},
 				StorageClassName: ptr.To[string]("manual"),
+				Resources: corev1.VolumeResourceRequirements{
+					Requests: corev1.ResourceList{
+						corev1.ResourceStorage: resource.MustParse("5G"),
+					},
+				},
 			},
 		},
 		&corev1.ConfigMap{
@@ -120,7 +125,7 @@ raft:
 						Containers: []corev1.Container{
 							{
 								Name:  "blueprint",
-								Image: "ghcr.io/steady-bytes/draft-core-blueprint:v0.0.4",
+								Image: "ghcr.io/steady-bytes/draft-core-blueprint:v0.0.6",
 								Ports: []corev1.ContainerPort{
 									{
 										Name:          "grpc",
