@@ -37,9 +37,8 @@ var (
 				Labels: map[string]string{"type": "local"},
 			},
 			Spec: corev1.PersistentVolumeSpec{
-				Capacity: corev1.ResourceList{corev1.ResourceName("storage"): resource.MustParse("5G")},
-				// TODO: change this
-				PersistentVolumeSource: corev1.PersistentVolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/mnt"}},
+				Capacity:               corev1.ResourceList{corev1.ResourceName("storage"): resource.MustParse("5G")},
+				PersistentVolumeSource: corev1.PersistentVolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/mnt/k8s-pvs/blueprint"}},
 				AccessModes:            []corev1.PersistentVolumeAccessMode{corev1.PersistentVolumeAccessMode("ReadWriteMany")},
 				ClaimRef: &corev1.ObjectReference{
 					Namespace: "draft-system",
