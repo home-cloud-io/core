@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mdns
+  namespace: home-cloud-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: home-cloud-mdns
+rules:
+  - apiGroups: ['']
+    resources: ['services']
+    verbs: ['list', 'watch']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: mdns-viewer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: home-cloud-mdns
+subjects:
+  - kind: ServiceAccount
+    name: mdns
+    namespace: home-cloud-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mdns
+  namespace: home-cloud-system
+data:
+  config.yaml: |
+    service:
+      name: mdns
+      domain: home-cloud
+      env: prod
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mdns
+  namespace: home-cloud-system
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mdns
+  template:
+    metadata:
+      labels:
+        app: mdns
+    spec:
+      # need to be on host for creating the mDNS server on :5353
+      hostNetwork: true
+      serviceAccountName: mdns
+      containers:
+        - name: mdns
+          image: ghcr.io/home-cloud-io/core-platform-mdns:latest
+          # we don't need any other privilages so remove everything else
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: HOST_NAME
+              # TODO: make this configurable
+              value: home-cloud
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: mdns
