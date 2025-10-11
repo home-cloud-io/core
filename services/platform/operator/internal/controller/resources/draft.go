@@ -2,12 +2,10 @@ package resources
 
 import (
 	"fmt"
-	"path/filepath"
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -16,14 +14,6 @@ import (
 var (
 	DraftObjects = func(install *v1.Install) []client.Object {
 		return []client.Object{
-			&corev1.Namespace{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: install.Spec.Draft.Namespace,
-					Labels: map[string]string{
-						"istio.io/dataplane-mode": "ambient",
-					},
-				},
-			},
 			&corev1.Service{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "blueprint",
@@ -39,51 +29,52 @@ var (
 					Selector: map[string]string{"app": "blueprint"},
 				},
 			},
-			&corev1.PersistentVolume{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:   "blueprint",
-					Labels: map[string]string{"type": "local"},
-				},
-				// TODO: make this more configurable for things like NFS, etc.
-				Spec: corev1.PersistentVolumeSpec{
-					Capacity:               corev1.ResourceList{corev1.ResourceName("storage"): resource.MustParse("5G")},
-					PersistentVolumeSource: corev1.PersistentVolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: filepath.Join(install.Spec.VolumeMountHostPath, "blueprint")}},
-					AccessModes:            []corev1.PersistentVolumeAccessMode{corev1.PersistentVolumeAccessMode("ReadWriteMany")},
-					ClaimRef: &corev1.ObjectReference{
-						Namespace: install.Spec.Draft.Namespace,
-						Name:      "blueprint",
-					},
-					PersistentVolumeReclaimPolicy: corev1.PersistentVolumeReclaimPolicy("Retain"),
-					StorageClassName:              "manual",
-					NodeAffinity: &corev1.VolumeNodeAffinity{Required: &corev1.NodeSelector{NodeSelectorTerms: []corev1.NodeSelectorTerm{
-						{
-							MatchExpressions: []corev1.NodeSelectorRequirement{
-								{
-									Key:      "kubernetes.io/hostname",
-									Operator: corev1.NodeSelectorOperator("In"),
-									Values:   []string{"home-cloud"},
-								},
-							},
-						},
-					}},
-					},
-				},
-			},
-			&corev1.PersistentVolumeClaim{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "blueprint",
-					Namespace: install.Spec.Draft.Namespace,
-				},
-				Spec: corev1.PersistentVolumeClaimSpec{
-					AccessModes:      []corev1.PersistentVolumeAccessMode{corev1.PersistentVolumeAccessMode("ReadWriteMany")},
-					StorageClassName: ptr.To[string]("manual"),
-					Resources: corev1.VolumeResourceRequirements{
-						Requests: corev1.ResourceList{
-							corev1.ResourceStorage: resource.MustParse("5G"),
-						},
-					},
-				},
-			},
+			// &corev1.PersistentVolume{
+			// 	ObjectMeta: metav1.ObjectMeta{
+			// 		Name:   "blueprint",
+			// 		Labels: map[string]string{"type": "local"},
+			// 	},
+			// 	// TODO: make this more configurable for things like NFS, etc.
+			// 	Spec: corev1.PersistentVolumeSpec{
+			// 		Capacity:               corev1.ResourceList{corev1.ResourceName("storage"): resource.MustParse("5G")},
+			// 		PersistentVolumeSource: corev1.PersistentVolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: filepath.Join(install.Spec.VolumeMountHostPath, "blueprint")}},
+			// 		AccessModes:            []corev1.PersistentVolumeAccessMode{corev1.PersistentVolumeAccessMode("ReadWriteMany")},
+			// 		ClaimRef: &corev1.ObjectReference{
+			// 			Namespace: install.Spec.Draft.Namespace,
+			// 			Name:      "blueprint",
+			// 		},
+			// 		PersistentVolumeReclaimPolicy: corev1.PersistentVolumeReclaimPolicy("Retain"),
+			// 		StorageClassName:              "manual",
+			// 		NodeAffinity: &corev1.VolumeNodeAffinity{Required: &corev1.NodeSelector{NodeSelectorTerms: []corev1.NodeSelectorTerm{
+			// 			{
+			// 				MatchExpressions: []corev1.NodeSelectorRequirement{
+			// 					{
+			// 						Key:      "kubernetes.io/hostname",
+			// 						Operator: corev1.NodeSelectorOperator("In"),
+			// 						// TODO: change back to home-cloud
+			// 						Values:   []string{"talos-dzc-j08"},
+			// 					},
+			// 				},
+			// 			},
+			// 		}},
+			// 		},
+			// 	},
+			// },
+			// &corev1.PersistentVolumeClaim{
+			// 	ObjectMeta: metav1.ObjectMeta{
+			// 		Name:      "blueprint",
+			// 		Namespace: install.Spec.Draft.Namespace,
+			// 	},
+			// 	Spec: corev1.PersistentVolumeClaimSpec{
+			// 		AccessModes:      []corev1.PersistentVolumeAccessMode{corev1.PersistentVolumeAccessMode("ReadWriteMany")},
+			// 		StorageClassName: ptr.To[string]("manual"),
+			// 		Resources: corev1.VolumeResourceRequirements{
+			// 			Requests: corev1.ResourceList{
+			// 				corev1.ResourceStorage: resource.MustParse("5G"),
+			// 			},
+			// 		},
+			// 	},
+			// },
 			&corev1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "blueprint",
@@ -95,7 +86,7 @@ service:
   domain: core
   env: prod
 badger:
-  path: /etc/badger/data
+  path: /etc/badger
 raft:
   node-id: node_1
   address: blueprint.%s
@@ -125,10 +116,10 @@ raft:
 									},
 									},
 								},
-								{
-									Name:         "badger",
-									VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: "blueprint"}},
-								},
+								// {
+								// 	Name:         "badger",
+								// 	VolumeSource: corev1.VolumeSource{PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{ClaimName: "blueprint"}},
+								// },
 							},
 							Containers: []corev1.Container{
 								{
@@ -152,10 +143,10 @@ raft:
 											MountPath: "/etc/config.yaml",
 											SubPath:   "config.yaml",
 										},
-										{
-											Name:      "badger",
-											MountPath: "/etc/badger/data",
-										},
+										// {
+										// 	Name:      "badger",
+										// 	MountPath: "/etc/badger/data",
+										// },
 									},
 								},
 							},

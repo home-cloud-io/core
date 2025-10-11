@@ -18,14 +18,6 @@ import (
 var (
 	HomeCloudServerObjects = func(install *v1.Install) []client.Object {
 		return []client.Object{
-			&corev1.Namespace{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: install.Spec.HomeCloud.Namespace,
-					Labels: map[string]string{
-						"istio.io/dataplane-mode": "ambient",
-					},
-				},
-			},
 			&rbacv1.Role{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "manage-home-cloud-apps",
