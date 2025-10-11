@@ -12,10 +12,18 @@ metadata:
   name: install-sample
 spec:
   istio:
-    cni:
+    istiod:
       values: |
-        global:
-          platform: k3s
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+    ztunnel:
+      values: |
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
   homeCloud:
     server:
       tag: sha-590cb46
