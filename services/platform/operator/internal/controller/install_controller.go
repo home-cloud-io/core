@@ -14,10 +14,12 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
+	corev1 "k8s.io/api/core/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -28,6 +30,9 @@ import (
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	resources "github.com/home-cloud-io/core/services/platform/operator/internal/controller/resources"
 )
+
+// TODO: cancel install on crd update so that failed installs don't get stuck until timeout
+// might also need a lock on reconcile?
 
 // InstallReconciler reconciles a Install object
 type InstallReconciler struct {
@@ -90,6 +95,14 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		return err
 	}
 
+	l.Info("reconciling namespaces")
+	for _, o := range resources.NamespaceObjects(install) {
+		err = kubeCreateOrUpdate(ctx, r.Client, o)
+		if err != nil {
+			return err
+		}
+	}
+
 	l.Info("reconciling istio install")
 	err = reconcileIstio(ctx, install)
 	if err != nil {
@@ -120,6 +133,29 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		}
 	}
 
+	l.Info("setting ingress service node port")
+	service := &corev1.Service{}
+	err = r.Client.Get(ctx, types.NamespacedName{
+		Namespace: install.Spec.Istio.Namespace,
+		Name:      fmt.Sprintf("%s-istio", install.Spec.Istio.IngressGatewayName),
+	}, service)
+	if err != nil {
+		// TODO: loop until service exists
+		return err
+	}
+	for i, p := range service.Spec.Ports {
+		if p.Port != 80 {
+			continue
+		}
+		p.NodePort = 80
+		service.Spec.Ports[i] = p
+		break
+	}
+	err = r.Client.Update(ctx, service)
+	if err != nil {
+		return err
+	}
+
 	return r.updateStatus(ctx, install)
 }
 
@@ -133,7 +169,6 @@ func reconcileIstio(ctx context.Context, install *v1.Install) error {
 	iAct.Version = install.Spec.Istio.Version
 	iAct.Namespace = install.Spec.Istio.Namespace
 	iAct.RepoURL = install.Spec.Istio.Repo
-	iAct.CreateNamespace = true
 	iAct.Wait = true
 	iAct.Timeout = 5 * time.Minute
 
@@ -214,6 +249,13 @@ func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) 
 	for _, release := range releases {
 		_, err = act.Run(release)
 		if err != nil {
+			return err
+		}
+	}
+
+	for _, o := range slices.Backward(resources.NamespaceObjects(install)) {
+		err := r.Client.Delete(ctx, o)
+		if client.IgnoreNotFound(err) != nil {
 			return err
 		}
 	}
