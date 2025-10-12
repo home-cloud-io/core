@@ -50,15 +50,15 @@ func (r *Runner) run() {
 
 	// run listener in the background
 	factory := informers.NewSharedInformerFactory(k8sClient, 0)
-	serviceController, err := services.NewServicesWatcher(r.logger, factory, namespace, notifyMdns)
+	serviceController, err := services.NewServicesWatcher(factory, notifyMdns)
 	if err != nil {
 		r.logger.WithError(err).Panic("failed to initialize services watcher")
 	}
-	go serviceController.Run(stopper)
-
+	go serviceController.Run(r.logger, stopper)
 
 	// initialize server and add host
 	mdnsServer := mdns.New(r.logger)
+	// TODO: get config from blueprint
 	err = mdnsServer.AddHost(ctx, fmt.Sprintf("%s.local", os.Getenv("HOST_NAME")))
 	if err != nil {
 		panic(err)
@@ -67,17 +67,15 @@ func (r *Runner) run() {
 	// listen for resource events
 	for {
 		select {
-		case advertiseResource := <-notifyMdns:
-			hostname := fmt.Sprintf("%s-home-cloud.local", advertiseResource.Name)
-			r.logger.Infof("advertising: %s", hostname)
-			switch advertiseResource.Action {
+		case resource := <-notifyMdns:
+			switch resource.Action {
 			case services.Added:
-				err := mdnsServer.AddHost(ctx, hostname)
+				err := mdnsServer.AddHost(ctx, resource.Hostname)
 				if err != nil {
 					panic(err)
 				}
 			case services.Deleted:
-				err := mdnsServer.RemoveHost(ctx, hostname)
+				err := mdnsServer.RemoveHost(ctx, resource.Hostname)
 				if err != nil {
 					panic(err)
 				}
