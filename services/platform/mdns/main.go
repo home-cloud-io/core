@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	k8sclient "github.com/home-cloud-io/services/platform/mdns/k8s-client"
 	"github.com/home-cloud-io/services/platform/mdns/mdns"
@@ -56,13 +54,8 @@ func (r *Runner) run() {
 	}
 	go serviceController.Run(r.logger, stopper)
 
-	// initialize server and add host
+	// initialize server
 	mdnsServer := mdns.New(r.logger)
-	// TODO: get config from blueprint
-	err = mdnsServer.AddHost(ctx, fmt.Sprintf("%s.local", os.Getenv("HOST_NAME")))
-	if err != nil {
-		panic(err)
-	}
 
 	// listen for resource events
 	for {
@@ -84,5 +77,4 @@ func (r *Runner) run() {
 			r.logger.Info("stopping program")
 		}
 	}
-
 }

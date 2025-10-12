@@ -126,7 +126,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	}
 
 	l.Info("reconciling home cloud server components")
-	for _, o := range resources.HomeCloudServerObjects(install) {
+	for _, o := range resources.HomeCloudObjects(install) {
 		err = kubeCreateOrUpdate(ctx, r.Client, o)
 		if err != nil {
 			return err
@@ -214,7 +214,7 @@ func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) 
 
 	// NOTE: we do not delete any CRDs (gateway API/istio) as they could be in use by other applications
 
-	for _, o := range slices.Backward(resources.HomeCloudServerObjects(install)) {
+	for _, o := range slices.Backward(resources.HomeCloudObjects(install)) {
 		err := r.Client.Delete(ctx, o)
 		if client.IgnoreNotFound(err) != nil {
 			return err
