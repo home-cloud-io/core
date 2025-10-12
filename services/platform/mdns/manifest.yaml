@@ -72,12 +72,12 @@ spec:
             capabilities:
               drop: ["ALL"]
           env:
+            # TODO: read these from blueprint
             - name: HOST_IP
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
             - name: HOST_NAME
-              # TODO: make this configurable
               value: home-cloud
           volumeMounts:
             - name: config

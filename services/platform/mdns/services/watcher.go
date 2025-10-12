@@ -1,16 +1,13 @@
 package services
 
 import (
-	"github.com/steady-bytes/draft/pkg/chassis"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/tools/cache"
 )
 
-func NewServicesWatcher(logger chassis.Logger, factory informers.SharedInformerFactory, namespace string, notifyChan chan<- Resource) (*EventHandler, error) {
+func NewServicesWatcher(factory informers.SharedInformerFactory, notifyChan chan<- Resource) (*EventHandler, error) {
 	servicesInformer := factory.Core().V1().Services().Informer()
 	s := &EventHandler{
-		logger:         logger,
-		namespace:      namespace,
 		notifyChan:     notifyChan,
 		sharedInformer: servicesInformer,
 	}
