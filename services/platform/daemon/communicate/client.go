@@ -174,10 +174,6 @@ func (c *client) listen(ctx context.Context) error {
 			go execute.Shutdown(ctx, c.logger)
 		case *v1.ServerMessage_RequestOsUpdateDiff:
 			go c.osUpdateDiff(ctx, message)
-		case *v1.ServerMessage_RequestCurrentDaemonVersion:
-			go c.currentDaemonVersion(ctx, message)
-		case *v1.ServerMessage_ChangeDaemonVersionCommand:
-			go c.changeDaemonVersion(ctx, message.GetChangeDaemonVersionCommand())
 		case *v1.ServerMessage_InstallOsUpdateCommand:
 			go c.installOsUpdate(ctx)
 		case *v1.ServerMessage_SetSystemImageCommand:
@@ -272,44 +268,6 @@ func (c *client) osUpdateDiff(ctx context.Context, msg *v1.ServerMessage) {
 		}, msg)
 	}
 	c.logger.Info("finished generating os version diff successfully")
-}
-
-func (c *client) currentDaemonVersion(ctx context.Context, msg *v1.ServerMessage) {
-	c.logger.Info("current daemon version command")
-	current, err := host.GetDaemonVersion(c.logger)
-	if err != nil {
-		c.logger.WithError(err).Error("failed to get current daemon version")
-		c.Send(&v1.DaemonMessage{
-			Message: &v1.DaemonMessage_CurrentDaemonVersion{
-				CurrentDaemonVersion: &v1.CurrentDaemonVersion{
-					Error: err.Error(),
-				},
-			},
-		}, msg)
-		return
-	} else {
-		c.Send(&v1.DaemonMessage{
-			Message: &v1.DaemonMessage_CurrentDaemonVersion{
-				CurrentDaemonVersion: current,
-			},
-		}, msg)
-	}
-	c.logger.Info("finished getting current daemon version successfully")
-}
-
-func (c *client) changeDaemonVersion(ctx context.Context, def *v1.ChangeDaemonVersionCommand) {
-	logger := c.logger.WithFields(chassis.Fields{
-		"version":     def.Version,
-		"src_hash":    def.SrcHash,
-		"vendor_hash": def.VendorHash,
-	})
-	logger.Info("change daemon version command")
-	err := host.ChangeDaemonVersion(ctx, c.logger, def)
-	if err != nil {
-		logger.WithError(err).Error("failed to change daemon version")
-		// TODO: return error to the server?
-	}
-	logger.Info("daemon version changed successfully")
 }
 
 func (c *client) installOsUpdate(ctx context.Context) {
