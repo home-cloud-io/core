@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	HomeCloudServerObjects = func(install *v1.Install) []client.Object {
+	HomeCloudObjects = func(install *v1.Install) []client.Object {
 		return []client.Object{
+			// server
 			&rbacv1.Role{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "manage-home-cloud-apps",
@@ -173,6 +174,9 @@ service:
 					Labels: map[string]string{
 						"app": "server",
 					},
+					Annotations: map[string]string{
+						"home-cloud.io/dns": "home-cloud.local",
+					},
 				},
 				Spec: corev1.ServiceSpec{
 					Type: corev1.ServiceTypeClusterIP,
@@ -217,6 +221,113 @@ service:
 								},
 							},
 						},
+					},
+				},
+			},
+			// daemon
+			&corev1.ConfigMap{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "daemon",
+					Namespace: install.Spec.HomeCloud.Namespace,
+				},
+				Data: map[string]string{
+					"config.yaml": fmt.Sprintf(`
+service:
+  name: daemon
+  domain: home-cloud
+  env: prod
+  entrypoint: http://blueprint.%s:8090
+
+daemon:
+  domain: local
+`, install.Spec.Draft.Namespace)},
+			},
+			&appsv1.Deployment{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "daemon",
+					Namespace: install.Spec.HomeCloud.Namespace,
+				},
+				Spec: appsv1.DeploymentSpec{
+					Replicas: ptr.To[int32](1),
+					Selector: &metav1.LabelSelector{
+						MatchLabels: map[string]string{
+							"app": "daemon",
+						},
+					},
+					Template: corev1.PodTemplateSpec{
+						ObjectMeta: metav1.ObjectMeta{
+							Labels: map[string]string{
+								"app": "daemon",
+							},
+						},
+						Spec: corev1.PodSpec{
+							Containers: []corev1.Container{
+								{
+									Name:  "daemon",
+									Image: fmt.Sprintf("%s:%s", install.Spec.HomeCloud.Daemon.Image, install.Spec.HomeCloud.Daemon.Tag),
+									Ports: []corev1.ContainerPort{
+										{
+											Name:          "http",
+											Protocol:      corev1.ProtocolTCP,
+											ContainerPort: 8090,
+										},
+									},
+									VolumeMounts: []corev1.VolumeMount{
+										{
+											Name:      "config",
+											MountPath: "/etc/config.yaml",
+											SubPath:   "config.yaml",
+										},
+									},
+									LivenessProbe: &corev1.Probe{
+										ProbeHandler: corev1.ProbeHandler{
+											HTTPGet: &corev1.HTTPGetAction{
+												Path: "/",
+												Port: intstr.FromString("http"),
+											},
+										},
+									},
+									ReadinessProbe: &corev1.Probe{
+										ProbeHandler: corev1.ProbeHandler{
+											HTTPGet: &corev1.HTTPGetAction{
+												Path: "/",
+												Port: intstr.FromString("http"),
+											},
+										},
+									},
+								},
+							},
+							Volumes: []corev1.Volume{
+								{
+									Name: "config",
+									VolumeSource: corev1.VolumeSource{ConfigMap: &corev1.ConfigMapVolumeSource{
+										LocalObjectReference: corev1.LocalObjectReference{Name: "daemon"},
+									},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			&corev1.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "daemon",
+					Namespace: install.Spec.HomeCloud.Namespace,
+					Labels: map[string]string{
+						"app": "daemon",
+					},
+				},
+				Spec: corev1.ServiceSpec{
+					Type: corev1.ServiceTypeClusterIP,
+					Ports: []corev1.ServicePort{
+						{
+							Name: "http",
+							Port: 8090,
+						},
+					},
+					Selector: map[string]string{
+						"app": "daemon",
 					},
 				},
 			},

@@ -60,9 +60,15 @@ type HomeCloudSpec struct {
 	Namespace string     `json:"namespace,omitempty"`
 	Hostname  string     `json:"hostname,omitempty"`
 	Server    ServerSpec `json:"server,omitempty"`
+	Daemon    DaemonSpec `json:"daemon,omitempty"`
 }
 
 type ServerSpec struct {
+	Image string `json:"image,omitempty"`
+	Tag   string `json:"tag,omitempty"`
+}
+
+type DaemonSpec struct {
 	Image string `json:"image,omitempty"`
 	Tag   string `json:"tag,omitempty"`
 }
