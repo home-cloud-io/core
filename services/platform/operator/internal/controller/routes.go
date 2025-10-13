@@ -3,22 +3,13 @@ package controller
 import (
 	"context"
 	"fmt"
-	"net/http"
 
-	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	sv1Connect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
-
-	"connectrpc.com/connect"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 const (
-	// TODO: build this from install crd?
-	HomeCloudServerAddress = "http://server.home-cloud-system:8090"
-	// HomeCloudServerAddress = "http://localhost:8090" // for local dev
-
 	GatewayName = "ingress-gateway"
 )
 
@@ -39,6 +30,7 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 			CommonRouteSpec: gwv1.CommonRouteSpec{
 				ParentRefs: []gwv1.ParentReference{
 					{
+						// TODO: derive these from Install CRD
 						Name:      GatewayName,
 						Namespace: &GatewayNamespace,
 					},
@@ -66,15 +58,6 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 		return err
 	}
 
-	// add route (mDNS hostname) to server
-	_, err = sv1Connect.NewInternalServiceClient(http.DefaultClient, HomeCloudServerAddress).
-		AddMdnsHost(ctx, connect.NewRequest(&sv1.AddMdnsHostRequest{
-			Hostname: route.Name,
-		}))
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -88,15 +71,6 @@ func (r *AppReconciler) deleteRoute(ctx context.Context, namespace string, route
 		},
 	})
 	if !errors.IsNotFound(err) {
-		return err
-	}
-
-	// remove route (mDNS hostname) from server
-	_, err = sv1Connect.NewInternalServiceClient(http.DefaultClient, HomeCloudServerAddress).
-		RemoveMdnsHost(ctx, connect.NewRequest(&sv1.RemoveMdnsHostRequest{
-			Hostname: route,
-		}))
-	if err != nil {
 		return err
 	}
 
