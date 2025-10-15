@@ -2,32 +2,30 @@ package execute
 
 import (
 	"context"
+	"os/exec"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
-func Restart(ctx context.Context, logger chassis.Logger) {
-	logger.Info("restart command")
+// TODO: need to wire up talosctl access
+// https://docs.siderolabs.com/kubernetes-guides/advanced-guides/talos-api-access-from-k8s
+
+func Reboot(ctx context.Context, logger chassis.Logger) error {
+	logger.Info("reboot command")
 	if chassis.GetConfig().Env() == "test" {
-		logger.Info("mocking restart")
-		return
+		logger.Info("mocking reboot")
+		return nil
 	}
-	err := ExecuteCommand(ctx, NewElevatedCommand("reboot", "now"))
-	if err != nil {
-		logger.WithError(err).Error("failed to execute restart command")
-		// TODO: send error back to server
-	}
+	// TODO: option to use "powercycle" mode?
+	return ExecuteCommandAndRelease(ctx, exec.Command("talosctl", "reboot"))
 }
 
-func Shutdown(ctx context.Context, logger chassis.Logger) {
+func Shutdown(ctx context.Context, logger chassis.Logger) error {
 	logger.Info("shutdown command")
 	if chassis.GetConfig().Env() == "test" {
 		logger.Info("mocking shutdown")
-		return
+		return nil
 	}
-	err := ExecuteCommand(ctx, NewElevatedCommand("shutdown", "now"))
-	if err != nil {
-		logger.WithError(err).Error("failed to execute shutdown command")
-		// TODO: send error back to server
-	}
+	// TODO: option to force after timeout?
+	return ExecuteCommandAndRelease(ctx, exec.Command("talosctl", "shutdown"))
 }

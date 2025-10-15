@@ -1,29 +1,8 @@
 package host
 
+// TODO: shift these to protos and r/w them with blueprint?
+
 type (
-	BootConfig struct {
-		Loader BootConfigLoader `json:"loader"`
-		BCache BootConfigBCache `json:"bcache"`
-	}
-	BootConfigLoader struct {
-		SystemdBoot BootConfigLoaderSystemdBoot `json:"systemd-boot"`
-	}
-	BootConfigLoaderSystemdBoot struct {
-		Enable bool `json:"enable"`
-	}
-	BootConfigBCache struct {
-		Enable bool `json:"enable"`
-	}
-
-	NixConfig struct {
-		GC NixConfigGC `json:"gc"`
-	}
-	NixConfigGC struct {
-		Automatic bool   `json:"automatic"`
-		Dates     string `json:"dates"`
-		Options   string `json:"options"`
-	}
-
 	NetworkingConfig struct {
 		Hostname       string                         `json:"hostName"`
 		Domain         string                         `json:"domain"`
@@ -59,63 +38,5 @@ type (
 	WireguardPeer struct {
 		PublicKey  string   `json:"publicKey"`
 		AllowedIPs []string `json:"allowedIPs"`
-	}
-
-	SecurityConfig struct {
-		Sudo SecurityConfigSudo `json:"sudo"`
-	}
-	SecurityConfigSudo struct {
-		WheelNeedsPassword bool `json:"wheelNeedsPassword"`
-	}
-
-	ServicesConfig struct {
-		Resolved ServicesConfigResolved `json:"resolved"`
-		K3s      ServicesConfigK3s      `json:"k3s"`
-		OpenSSH  ServicesConfigOpenSSH  `json:"openssh"`
-		Avahi    ServicesConfigAvahi    `json:"avahi"`
-	}
-	ServicesConfigResolved struct {
-		Enable  bool     `json:"enable"`
-		Domains []string `json:"domains"`
-	}
-	ServicesConfigK3s struct {
-		Enable     bool   `json:"enable"`
-		Role       string `json:"role"`
-		ExtraFlags string `json:"extraFlags"`
-	}
-	ServicesConfigOpenSSH struct {
-		Enable bool `json:"enable"`
-	}
-	ServicesConfigAvahi struct {
-		Enable   bool                       `json:"enable"`
-		IPv4     bool                       `json:"ipv4"`
-		IPv6     bool                       `json:"ipv6"`
-		NSSmDNS4 bool                       `json:"nssmdns4"`
-		Publish  ServicesConfigAvahiPublish `json:"publish"`
-	}
-	ServicesConfigAvahiPublish struct {
-		Enable       bool `json:"enable"`
-		Domain       bool `json:"domain"`
-		Addresses    bool `json:"addresses"`
-		UserServices bool `json:"userServices"`
-	}
-
-	TimeConfig struct {
-		TimeZone string `json:"timeZone"`
-	}
-
-	UsersConfig struct {
-		Users map[string]User `json:"users"`
-	}
-	User struct {
-		IsNormalUser bool        `json:"isNormalUser"`
-		ExtraGroups  []string    `json:"extraGroups"`
-		OpenSSH      UserOpenSSH `json:"openssh"`
-	}
-	UserOpenSSH struct {
-		AuthorizedKeys UserOpenSSHAuthorizedKeys `json:"authorizedKeys"`
-	}
-	UserOpenSSHAuthorizedKeys struct {
-		Keys []string `json:"keys"`
 	}
 )

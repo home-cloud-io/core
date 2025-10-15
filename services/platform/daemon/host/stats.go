@@ -9,6 +9,8 @@ import (
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// TODO: rethink this to use talos api / can we get cpu/ram of host from pod?
+
 const (
 	ComputeMeasurementDuration = 1 * time.Second
 )

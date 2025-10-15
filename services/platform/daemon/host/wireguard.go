@@ -2,7 +2,6 @@ package host
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -14,6 +13,8 @@ import (
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
+
+// TODO: change this to use embedded wireguard instead of NixOS
 
 type (
 	WireguardController interface {
@@ -31,16 +32,8 @@ func NewWireguardController() WireguardController {
 func (c wireguardController) AddInterface(ctx context.Context, logger chassis.Logger, wgInterface *v1.WireguardInterface) (publicKey string, err error) {
 	logger.Info("adding wireguard interface")
 
-	// read config
+	// TODO: read from blueprint
 	config := NetworkingConfig{}
-	f, err := os.ReadFile(NetworkingConfigFile())
-	if err != nil {
-		return "", err
-	}
-	err = json.Unmarshal(f, &config)
-	if err != nil {
-		return "", err
-	}
 
 	// check to see if the interface already exists
 	_, ok := config.Wireguard.Interfaces[wgInterface.Name]
@@ -96,21 +89,23 @@ func (c wireguardController) AddInterface(ctx context.Context, logger chassis.Lo
 		Peers:          peers,
 	}
 
+	// TODO: write and restart wg?
+
 	// write config
-	b, err := json.MarshalIndent(config, "", "  ")
-	if err != nil {
-		return "", err
-	}
+	// b, err := json.MarshalIndent(config, "", "  ")
+	// if err != nil {
+	// 	return "", err
+	// }
 
-	err = os.WriteFile(NetworkingConfigFile(), b, 0777)
-	if err != nil {
-		return "", err
-	}
+	// err = os.WriteFile(NetworkingConfigFile(), b, 0777)
+	// if err != nil {
+	// 	return "", err
+	// }
 
-	err = RebuildAndSwitchOS(ctx, logger)
-	if err != nil {
-		return "", err
-	}
+	// err = RebuildAndSwitchOS(ctx, logger)
+	// if err != nil {
+	// 	return "", err
+	// }
 
 	return privateKey.PublicKey().String(), nil
 }
@@ -118,19 +113,11 @@ func (c wireguardController) AddInterface(ctx context.Context, logger chassis.Lo
 func (c wireguardController) RemoveInterface(ctx context.Context, logger chassis.Logger, wgInterfaceName string) error {
 	logger.Info("removing wireguard interface")
 
-	// read config
+	// TODO: read from blueprint
 	config := NetworkingConfig{}
-	f, err := os.ReadFile(NetworkingConfigFile())
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(f, &config)
-	if err != nil {
-		return err
-	}
 
 	// remove private key file
-	err = os.RemoveAll(fullWireguardKeyPath(wgInterfaceName))
+	err := os.RemoveAll(fullWireguardKeyPath(wgInterfaceName))
 	if err != nil {
 		return err
 	}
@@ -146,35 +133,29 @@ func (c wireguardController) RemoveInterface(ctx context.Context, logger chassis
 		}
 	}
 
-	// write config
-	b, err := json.MarshalIndent(config, "", "  ")
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(NetworkingConfigFile(), b, 0777)
-	if err != nil {
-		return err
-	}
+	// TODO: write and restart wg?
 
-	err = RebuildAndSwitchOS(ctx, logger)
-	if err != nil {
-		return err
-	}
+	// // write config
+	// b, err := json.MarshalIndent(config, "", "  ")
+	// if err != nil {
+	// 	return err
+	// }
+	// err = os.WriteFile(NetworkingConfigFile(), b, 0777)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// err = RebuildAndSwitchOS(ctx, logger)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
 
 func (c wireguardController) AddPeer(ctx context.Context, logger chassis.Logger, wgInterfaceName string, wgPeer *v1.WireguardPeer) (addresses []string, err error) {
-	// read config
+	// TODO: read from blueprint
 	config := NetworkingConfig{}
-	f, err := os.ReadFile(NetworkingConfigFile())
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(f, &config)
-	if err != nil {
-		return nil, err
-	}
 
 	wgInterface, ok := config.Wireguard.Interfaces[wgInterfaceName]
 	if !ok {
@@ -206,21 +187,23 @@ func (c wireguardController) AddPeer(ctx context.Context, logger chassis.Logger,
 	})
 	config.Wireguard.Interfaces[wgInterfaceName] = wgInterface
 
-	// write config
-	b, err := json.MarshalIndent(config, "", "  ")
-	if err != nil {
-		return nil, err
-	}
+	// TODO: write and restart wg?
 
-	err = os.WriteFile(NetworkingConfigFile(), b, 0777)
-	if err != nil {
-		return nil, err
-	}
+	// // write config
+	// b, err := json.MarshalIndent(config, "", "  ")
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	err = RebuildAndSwitchOS(ctx, logger)
-	if err != nil {
-		return nil, err
-	}
+	// err = os.WriteFile(NetworkingConfigFile(), b, 0777)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// err = RebuildAndSwitchOS(ctx, logger)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return []string{address}, nil
 }

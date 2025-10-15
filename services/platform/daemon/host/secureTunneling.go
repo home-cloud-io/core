@@ -2,13 +2,13 @@ package host
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"os"
+	"net"
 	"slices"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	kvclient "github.com/home-cloud-io/core/services/platform/daemon/kv-client"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
@@ -60,41 +60,23 @@ func NewSecureTunnelingController(logger chassis.Logger) SecureTunnelingControll
 
 func (c secureTunnelingController) Load() {
 	ctx := context.Background()
-	settings, err := secureTunnelingSettings()
+	settings, err := kvclient.Settings(ctx)
 	if err != nil {
-		c.logger.WithError(err).Error("failed to read secure tunneling settings")
 		return
-	}
-	// get networking configuration from NixOS config file
-	config := NetworkingConfig{}
-	f, err := os.ReadFile(NetworkingConfigFile())
-	if err != nil {
-		c.logger.WithError(err).Error("failed to read networking config")
-		return
-	}
-	err = json.Unmarshal(f, &config)
-	if err != nil {
-		c.logger.WithError(err).Error("failed to unmarshal networking config")
 	}
 
 	// iterate through all Wireguard interfaces and do two things for each interface:
 	// 1. create a STUN binding (with port multiplexing) to configured server
 	// 2. connect to all configured Locator servers
-	for _, wgInterface := range settings.WireguardInterfaces {
+	for _, wgInterface := range settings.SecureTunnelingSettings.WireguardInterfaces {
 		log := c.logger.WithFields(chassis.Fields{
 			"interface_id":   wgInterface.Id,
 			"interface_name": wgInterface.Name,
 		})
 		log.Info("loading wireguard interface STUN and Locator servers")
 
-		infConfig, ok := config.Wireguard.Interfaces[wgInterface.Name]
-		if !ok {
-			log.Error("no configured wireguard interface with given name")
-			continue
-		}
-
 		// create STUN binding for interface
-		err := c.stunController.Bind(int(infConfig.ListenPort), wgInterface.StunServer)
+		err := c.stunController.Bind(int(wgInterface.Port), wgInterface.StunServer)
 		if err != nil {
 			log.WithError(err).Error("failed to get public address using STUN client")
 			continue
@@ -105,23 +87,24 @@ func (c secureTunnelingController) Load() {
 			c.locatorController.Connect(ctx, wgInterface, locatorAddress)
 		}
 	}
-
 }
 
 func (c secureTunnelingController) AddInterface(ctx context.Context, wgInterface *v1.WireguardInterface) (publicKey string, err error) {
-	settings, err := secureTunnelingSettings()
+	settings, err := kvclient.Settings(ctx)
 	if err != nil {
-		if err.Error() != SecureTunnelingNotEnabledError {
-			return "", err
-		}
-		settings = &sv1.SecureTunnelingSettings{}
+		return
 	}
 
-	// TODO: add a command to enable/disable secure tunneling without modifying any other config (will need to figure out wireguard nixos config)
-	settings.Enabled = true
+	// initializing secur tunneling so create empty settings
+	if settings.SecureTunnelingSettings == nil {
+		settings.SecureTunnelingSettings = &sv1.SecureTunnelingSettings{
+			Enabled:             true,
+			WireguardInterfaces: make([]*sv1.WireguardInterface, 0),
+		}
+	}
 
 	// make sure the interface doesn't already exist in settings
-	for _, existingInterface := range settings.WireguardInterfaces {
+	for _, existingInterface := range settings.SecureTunnelingSettings.WireguardInterfaces {
 		if existingInterface.Name == wgInterface.Name {
 			return "", errors.New("wireguard interface with same name already exists in settings")
 		}
@@ -133,29 +116,33 @@ func (c secureTunnelingController) AddInterface(ctx context.Context, wgInterface
 	}
 
 	// update settings config
-	settings.WireguardInterfaces = append(settings.WireguardInterfaces, &sv1.WireguardInterface{
+	settings.SecureTunnelingSettings.WireguardInterfaces = append(settings.SecureTunnelingSettings.WireguardInterfaces, &sv1.WireguardInterface{
 		Id:        wgInterface.Id,
 		Name:      wgInterface.Name,
 		Port:      int32(wgInterface.ListenPort),
 		PublicKey: publicKey,
 	})
-	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to update settings when adding wireguard interface")
+		return "", err
+	}
 
 	return publicKey, nil
 }
 
 func (c secureTunnelingController) RemoveInterface(ctx context.Context, wgInterfaceName string) error {
-	settings, err := secureTunnelingSettings()
+	settings, err := kvclient.Settings(ctx)
 	if err != nil {
 		return err
 	}
 
 	var wgInterface *sv1.WireguardInterface
-	for i, inf := range settings.WireguardInterfaces {
+	for i, inf := range settings.SecureTunnelingSettings.WireguardInterfaces {
 		if inf.Name == wgInterfaceName {
 			wgInterface = inf
 			// remove interface from settings
-			settings.WireguardInterfaces = slices.Delete(settings.WireguardInterfaces, i, i+1)
+			settings.SecureTunnelingSettings.WireguardInterfaces = slices.Delete(settings.SecureTunnelingSettings.WireguardInterfaces, i, i+1)
 			break
 		}
 	}
@@ -183,7 +170,11 @@ func (c secureTunnelingController) RemoveInterface(ctx context.Context, wgInterf
 	}
 
 	// update settings config
-	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to update settings when removing wireguard interface")
+		return err
+	}
 
 	c.logger.Info("finished removing wireguard interface")
 
@@ -191,13 +182,13 @@ func (c secureTunnelingController) RemoveInterface(ctx context.Context, wgInterf
 }
 
 func (c secureTunnelingController) AddPeer(ctx context.Context, wgInterfaceName string, peer *v1.WireguardPeer) (addresses []string, dnsServers []string, err error) {
-	settings, err := secureTunnelingSettings()
+	settings, err := kvclient.Settings(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var wgInterface *sv1.WireguardInterface
-	for _, inf := range settings.WireguardInterfaces {
+	for _, inf := range settings.SecureTunnelingSettings.WireguardInterfaces {
 		if inf.Name == wgInterfaceName {
 			wgInterface = inf
 			break
@@ -223,13 +214,13 @@ func (c secureTunnelingController) AddPeer(ctx context.Context, wgInterfaceName 
 }
 
 func (c secureTunnelingController) AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error {
-	settings, err := secureTunnelingSettings()
+	settings, err := kvclient.Settings(ctx)
 	if err != nil {
 		return err
 	}
 
 	var wgInterface *sv1.WireguardInterface
-	for _, inf := range settings.WireguardInterfaces {
+	for _, inf := range settings.SecureTunnelingSettings.WireguardInterfaces {
 		if inf.Name == wgInterfaceName {
 			wgInterface = inf
 			break
@@ -250,7 +241,11 @@ func (c secureTunnelingController) AddLocator(ctx context.Context, wgInterfaceNa
 	wgInterface.LocatorServers = append(wgInterface.LocatorServers, locatorAddress)
 
 	// update settings config
-	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to update settings when adding locator")
+		return err
+	}
 
 	// open connection to new locator
 	c.locatorController.Connect(ctx, wgInterface, locatorAddress)
@@ -259,13 +254,13 @@ func (c secureTunnelingController) AddLocator(ctx context.Context, wgInterfaceNa
 }
 
 func (c secureTunnelingController) RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) error {
-	settings, err := secureTunnelingSettings()
+	settings, err := kvclient.Settings(ctx)
 	if err != nil {
 		return err
 	}
 
 	var wgInterface *sv1.WireguardInterface
-	for _, inf := range settings.WireguardInterfaces {
+	for _, inf := range settings.SecureTunnelingSettings.WireguardInterfaces {
 		if inf.Name == wgInterfaceName {
 			wgInterface = inf
 			break
@@ -286,9 +281,12 @@ func (c secureTunnelingController) RemoveLocator(ctx context.Context, wgInterfac
 	}
 	c.logger.WithField("locators", wgInterface.LocatorServers).Info("locators")
 
-
 	// update settings config
-	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to update settings after removing locator")
+		return err
+	}
 
 	// close connection to locator
 	c.locatorController.Close(wgInterface, locatorAddress)
@@ -297,13 +295,13 @@ func (c secureTunnelingController) RemoveLocator(ctx context.Context, wgInterfac
 }
 
 func (c secureTunnelingController) BindSTUNServer(ctx context.Context, wgInterfaceName string, stunServerAddress string) error {
-	settings, err := secureTunnelingSettings()
+	settings, err := kvclient.Settings(ctx)
 	if err != nil {
 		return err
 	}
 
 	var wgInterface *sv1.WireguardInterface
-	for _, inf := range settings.WireguardInterfaces {
+	for _, inf := range settings.SecureTunnelingSettings.WireguardInterfaces {
 		if inf.Name == wgInterfaceName {
 			wgInterface = inf
 			break
@@ -329,27 +327,22 @@ func (c secureTunnelingController) BindSTUNServer(ctx context.Context, wgInterfa
 
 	// update settings config
 	wgInterface.StunServer = stunServerAddress
-	chassis.GetConfig().SetAndWrite(SecureTunnelingSettingsKey, settings)
+	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	if err != nil {
+		c.logger.WithError(err).Error("failed to update settings after after binding STUN server")
+		return err
+	}
 
 	return nil
 }
 
-func secureTunnelingSettings() (*sv1.SecureTunnelingSettings, error) {
-	var (
-		settings = &sv1.SecureTunnelingSettings{}
-		err      error
-	)
-
-	// check if locator already is configured for the given interface
-	err = chassis.GetConfig().UnmarshalKey(SecureTunnelingSettingsKey, settings)
+// Get preferred outbound ip of this machine
+func getOutboundIP() (string, error) {
+	conn, err := net.Dial("udp4", "home-cloud.io:80")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-
-	// make sure settings are enabled
-	if !settings.Enabled {
-		return nil, errors.New(SecureTunnelingNotEnabledError)
-	}
-
-	return settings, err
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String(), nil
 }
