@@ -10,6 +10,7 @@ type InstallSpec struct {
 	Istio      IstioSpec      `json:"istio,omitempty"`
 	Draft      DraftSpec      `json:"draft,omitempty"`
 	HomeCloud  HomeCloudSpec  `json:"homeCloud,omitempty"`
+	Talos      TalosSpec      `json:"talos,omitempty"`
 
 	VolumeMountHostPath string `json:"volumeMountHostPath,omitempty"`
 }
@@ -71,6 +72,10 @@ type ServerSpec struct {
 type DaemonSpec struct {
 	Image string `json:"image,omitempty"`
 	Tag   string `json:"tag,omitempty"`
+}
+
+type TalosSpec struct {
+	Enabled bool `json:"enabled,omitempty"`
 }
 
 // InstallStatus defines the observed state of Install

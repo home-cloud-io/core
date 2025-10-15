@@ -272,13 +272,6 @@ daemon:
 											ContainerPort: 8090,
 										},
 									},
-									VolumeMounts: []corev1.VolumeMount{
-										{
-											Name:      "config",
-											MountPath: "/etc/config.yaml",
-											SubPath:   "config.yaml",
-										},
-									},
 									LivenessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
@@ -295,6 +288,18 @@ daemon:
 											},
 										},
 									},
+									VolumeMounts: []corev1.VolumeMount{
+										{
+											Name:      "config",
+											MountPath: "/etc/config.yaml",
+											SubPath:   "config.yaml",
+										},
+										// TODO: only mount this if talos is enabled
+										{
+											Name:      "talos-secrets",
+											MountPath: "/var/run/secrets/talos.dev",
+										},
+									},
 								},
 							},
 							Volumes: []corev1.Volume{
@@ -302,8 +307,14 @@ daemon:
 									Name: "config",
 									VolumeSource: corev1.VolumeSource{ConfigMap: &corev1.ConfigMapVolumeSource{
 										LocalObjectReference: corev1.LocalObjectReference{Name: "daemon"},
-									},
-									},
+									}},
+								},
+								// TODO: only mount this if talos is enabled
+								{
+									Name: "talos-secrets",
+									VolumeSource: corev1.VolumeSource{Secret: &corev1.SecretVolumeSource{
+										SecretName: "talos-api-access",
+									}},
 								},
 							},
 						},

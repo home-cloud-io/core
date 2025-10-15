@@ -21,6 +21,7 @@ import (
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller"
+	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/talos"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -30,10 +31,14 @@ var (
 )
 
 func init() {
+	// initialize scheme
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-
+	// add home-cloud.io crds
 	utilruntime.Must(v1.AddToScheme(scheme))
+	// add gateway api crds
 	utilruntime.Must(gwv1.Install(scheme))
+	// add talos crds
+	utilruntime.Must(talos.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
