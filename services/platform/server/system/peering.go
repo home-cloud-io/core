@@ -3,11 +3,10 @@ package system
 import (
 	"context"
 	"errors"
-	"time"
 
+	"connectrpc.com/connect"
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	"github.com/home-cloud-io/core/services/platform/server/async"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
@@ -56,28 +55,20 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		LocatorServers:  wgInterface.LocatorServers,
 	}
 
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_AddWireguardPeer{
-			AddWireguardPeer: &dv1.AddWireguardPeer{
-				Peer: &dv1.WireguardPeer{
-					PublicKey:  peerConfig.PublicKey,
-					AllowedIps: []string{"0.0.0.0/0"},
-				},
-				WireguardInterface: wgInterface.Name,
+	resp, err := c.daemonClient.AddWireguardPeer(ctx, &connect.Request[dv1.AddWireguardPeerRequest]{
+		Msg: &dv1.AddWireguardPeerRequest{
+			Peer: &dv1.WireguardPeer{
+				PublicKey:  peerConfig.PublicKey,
+				AllowedIps: []string{"0.0.0.0/0"},
 			},
+			WireguardInterface: wgInterface.Name,
 		},
-	}, &async.ListenerOptions[*dv1.DaemonMessage]{
-		Timeout: 30 * time.Second,
 	})
 	if err != nil {
 		return nil, err
 	}
-	e := response.GetWireguardPeerAdded()
-	if e.Error != "" {
-		return nil, errors.New(e.Error)
-	}
-	peerConfig.Addresses = e.Addresses
-	peerConfig.DnsServers = e.DnsServers
+	peerConfig.Addresses = resp.Msg.Addresses
+	peerConfig.DnsServers = resp.Msg.DnsServers
 
 	return peerConfig, nil
 }

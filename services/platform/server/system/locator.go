@@ -2,10 +2,10 @@ package system
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"slices"
 
+	"connectrpc.com/connect"
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
@@ -19,20 +19,14 @@ type (
 )
 
 func (c *controller) AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) (err error) {
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_AddLocatorServerCommand{
-			AddLocatorServerCommand: &dv1.AddLocatorServerCommand{
-				LocatorAddress:     locatorAddress,
-				WireguardInterface: wgInterfaceName,
-			},
+	_, err = c.daemonClient.AddLocatorServer(ctx, &connect.Request[dv1.AddLocatorServerRequest]{
+		Msg: &dv1.AddLocatorServerRequest{
+			LocatorAddress:     locatorAddress,
+			WireguardInterface: wgInterfaceName,
 		},
-	}, nil)
+	})
 	if err != nil {
 		return err
-	}
-	e := response.GetLocatorServerAdded()
-	if e.Error != "" {
-		return errors.New(e.Error)
 	}
 
 	settings := &v1.DeviceSettings{}
@@ -50,20 +44,14 @@ func (c *controller) AddLocator(ctx context.Context, wgInterfaceName string, loc
 }
 
 func (c *controller) RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) (err error) {
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_RemoveLocatorServerCommand{
-			RemoveLocatorServerCommand: &dv1.RemoveLocatorServerCommand{
-				LocatorAddress:     locatorAddress,
-				WireguardInterface: wgInterfaceName,
-			},
+	_, err = c.daemonClient.RemoveLocatorServer(ctx, &connect.Request[dv1.RemoveLocatorServerRequest]{
+		Msg: &dv1.RemoveLocatorServerRequest{
+			LocatorAddress:     locatorAddress,
+			WireguardInterface: wgInterfaceName,
 		},
-	}, nil)
+	})
 	if err != nil {
 		return err
-	}
-	e := response.GetLocatorServerRemoved()
-	if e.Error != "" {
-		return errors.New(e.Error)
 	}
 
 	settings := &v1.DeviceSettings{}
