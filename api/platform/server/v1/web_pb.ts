@@ -441,21 +441,11 @@ export class CheckForSystemUpdatesRequest extends Message<CheckForSystemUpdatesR
 }
 
 /**
+ * TODO
+ *
  * @generated from message platform.server.v1.CheckForSystemUpdatesResponse
  */
 export class CheckForSystemUpdatesResponse extends Message<CheckForSystemUpdatesResponse> {
-  /**
-   * @generated from field: platform.server.v1.DaemonVersions daemon_versions = 1;
-   */
-  daemonVersions?: DaemonVersions;
-
-  /**
-   * os_diff is the result of the `nvd diff` command
-   *
-   * @generated from field: string os_diff = 2;
-   */
-  osDiff = "";
-
   constructor(data?: PartialMessage<CheckForSystemUpdatesResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -464,8 +454,6 @@ export class CheckForSystemUpdatesResponse extends Message<CheckForSystemUpdates
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.server.v1.CheckForSystemUpdatesResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "daemon_versions", kind: "message", T: DaemonVersions },
-    { no: 2, name: "os_diff", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckForSystemUpdatesResponse {
@@ -482,98 +470,6 @@ export class CheckForSystemUpdatesResponse extends Message<CheckForSystemUpdates
 
   static equals(a: CheckForSystemUpdatesResponse | PlainMessage<CheckForSystemUpdatesResponse> | undefined, b: CheckForSystemUpdatesResponse | PlainMessage<CheckForSystemUpdatesResponse> | undefined): boolean {
     return proto3.util.equals(CheckForSystemUpdatesResponse, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.DaemonVersions
- */
-export class DaemonVersions extends Message<DaemonVersions> {
-  /**
-   * @generated from field: platform.server.v1.DaemonVersion current = 1;
-   */
-  current?: DaemonVersion;
-
-  /**
-   * @generated from field: platform.server.v1.DaemonVersion latest = 2;
-   */
-  latest?: DaemonVersion;
-
-  constructor(data?: PartialMessage<DaemonVersions>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.DaemonVersions";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "current", kind: "message", T: DaemonVersion },
-    { no: 2, name: "latest", kind: "message", T: DaemonVersion },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonVersions {
-    return new DaemonVersions().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DaemonVersions {
-    return new DaemonVersions().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DaemonVersions {
-    return new DaemonVersions().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: DaemonVersions | PlainMessage<DaemonVersions> | undefined, b: DaemonVersions | PlainMessage<DaemonVersions> | undefined): boolean {
-    return proto3.util.equals(DaemonVersions, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.DaemonVersion
- */
-export class DaemonVersion extends Message<DaemonVersion> {
-  /**
-   * @generated from field: string version = 1;
-   */
-  version = "";
-
-  /**
-   * @generated from field: string vendor_hash = 2;
-   */
-  vendorHash = "";
-
-  /**
-   * @generated from field: string src_hash = 3;
-   */
-  srcHash = "";
-
-  constructor(data?: PartialMessage<DaemonVersion>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.DaemonVersion";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonVersion {
-    return new DaemonVersion().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DaemonVersion {
-    return new DaemonVersion().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DaemonVersion {
-    return new DaemonVersion().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: DaemonVersion | PlainMessage<DaemonVersion> | undefined, b: DaemonVersion | PlainMessage<DaemonVersion> | undefined): boolean {
-    return proto3.util.equals(DaemonVersion, a, b);
   }
 }
 
@@ -701,86 +597,6 @@ export class ImageVersion extends Message<ImageVersion> {
 }
 
 /**
- * @generated from message platform.server.v1.ChangeDaemonVersionRequest
- */
-export class ChangeDaemonVersionRequest extends Message<ChangeDaemonVersionRequest> {
-  /**
-   * @generated from field: string version = 1;
-   */
-  version = "";
-
-  /**
-   * @generated from field: string vendor_hash = 2;
-   */
-  vendorHash = "";
-
-  /**
-   * @generated from field: string src_hash = 3;
-   */
-  srcHash = "";
-
-  constructor(data?: PartialMessage<ChangeDaemonVersionRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.ChangeDaemonVersionRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ChangeDaemonVersionRequest {
-    return new ChangeDaemonVersionRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ChangeDaemonVersionRequest {
-    return new ChangeDaemonVersionRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ChangeDaemonVersionRequest {
-    return new ChangeDaemonVersionRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: ChangeDaemonVersionRequest | PlainMessage<ChangeDaemonVersionRequest> | undefined, b: ChangeDaemonVersionRequest | PlainMessage<ChangeDaemonVersionRequest> | undefined): boolean {
-    return proto3.util.equals(ChangeDaemonVersionRequest, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.ChangeDaemonVersionResponse
- */
-export class ChangeDaemonVersionResponse extends Message<ChangeDaemonVersionResponse> {
-  constructor(data?: PartialMessage<ChangeDaemonVersionResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.ChangeDaemonVersionResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ChangeDaemonVersionResponse {
-    return new ChangeDaemonVersionResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ChangeDaemonVersionResponse {
-    return new ChangeDaemonVersionResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ChangeDaemonVersionResponse {
-    return new ChangeDaemonVersionResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: ChangeDaemonVersionResponse | PlainMessage<ChangeDaemonVersionResponse> | undefined, b: ChangeDaemonVersionResponse | PlainMessage<ChangeDaemonVersionResponse> | undefined): boolean {
-    return proto3.util.equals(ChangeDaemonVersionResponse, a, b);
-  }
-}
-
-/**
  * @generated from message platform.server.v1.InstallOSUpdateRequest
  */
 export class InstallOSUpdateRequest extends Message<InstallOSUpdateRequest> {
@@ -839,80 +655,6 @@ export class InstallOSUpdateResponse extends Message<InstallOSUpdateResponse> {
 
   static equals(a: InstallOSUpdateResponse | PlainMessage<InstallOSUpdateResponse> | undefined, b: InstallOSUpdateResponse | PlainMessage<InstallOSUpdateResponse> | undefined): boolean {
     return proto3.util.equals(InstallOSUpdateResponse, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.SetSystemImageRequest
- */
-export class SetSystemImageRequest extends Message<SetSystemImageRequest> {
-  /**
-   * @generated from field: string current_image = 1;
-   */
-  currentImage = "";
-
-  /**
-   * @generated from field: string requested_image = 2;
-   */
-  requestedImage = "";
-
-  constructor(data?: PartialMessage<SetSystemImageRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.SetSystemImageRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "current_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "requested_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetSystemImageRequest {
-    return new SetSystemImageRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetSystemImageRequest {
-    return new SetSystemImageRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetSystemImageRequest {
-    return new SetSystemImageRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: SetSystemImageRequest | PlainMessage<SetSystemImageRequest> | undefined, b: SetSystemImageRequest | PlainMessage<SetSystemImageRequest> | undefined): boolean {
-    return proto3.util.equals(SetSystemImageRequest, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.SetSystemImageResponse
- */
-export class SetSystemImageResponse extends Message<SetSystemImageResponse> {
-  constructor(data?: PartialMessage<SetSystemImageResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.SetSystemImageResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetSystemImageResponse {
-    return new SetSystemImageResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetSystemImageResponse {
-    return new SetSystemImageResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetSystemImageResponse {
-    return new SetSystemImageResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: SetSystemImageResponse | PlainMessage<SetSystemImageResponse> | undefined, b: SetSystemImageResponse | PlainMessage<SetSystemImageResponse> | undefined): boolean {
-    return proto3.util.equals(SetSystemImageResponse, a, b);
   }
 }
 

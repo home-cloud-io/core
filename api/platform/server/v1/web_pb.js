@@ -121,37 +121,13 @@ export const CheckForSystemUpdatesRequest = /*@__PURE__*/ proto3.makeMessageType
 );
 
 /**
+ * TODO
+ *
  * @generated from message platform.server.v1.CheckForSystemUpdatesResponse
  */
 export const CheckForSystemUpdatesResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.CheckForSystemUpdatesResponse",
-  () => [
-    { no: 1, name: "daemon_versions", kind: "message", T: DaemonVersions },
-    { no: 2, name: "os_diff", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.DaemonVersions
- */
-export const DaemonVersions = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.DaemonVersions",
-  () => [
-    { no: 1, name: "current", kind: "message", T: DaemonVersion },
-    { no: 2, name: "latest", kind: "message", T: DaemonVersion },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.DaemonVersion
- */
-export const DaemonVersion = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.DaemonVersion",
-  () => [
-    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
+  [],
 );
 
 /**
@@ -186,26 +162,6 @@ export const ImageVersion = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.ChangeDaemonVersionRequest
- */
-export const ChangeDaemonVersionRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.ChangeDaemonVersionRequest",
-  () => [
-    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.ChangeDaemonVersionResponse
- */
-export const ChangeDaemonVersionResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.ChangeDaemonVersionResponse",
-  [],
-);
-
-/**
  * @generated from message platform.server.v1.InstallOSUpdateRequest
  */
 export const InstallOSUpdateRequest = /*@__PURE__*/ proto3.makeMessageType(
@@ -218,25 +174,6 @@ export const InstallOSUpdateRequest = /*@__PURE__*/ proto3.makeMessageType(
  */
 export const InstallOSUpdateResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.InstallOSUpdateResponse",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.SetSystemImageRequest
- */
-export const SetSystemImageRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.SetSystemImageRequest",
-  () => [
-    { no: 1, name: "current_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "requested_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.SetSystemImageResponse
- */
-export const SetSystemImageResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.SetSystemImageResponse",
   [],
 );
 

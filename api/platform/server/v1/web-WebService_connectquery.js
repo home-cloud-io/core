@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
  * Shutdown the host machine running Home Cloud
@@ -119,22 +119,6 @@ export const checkForContainerUpdates = {
 };
 
 /**
- * Change the currently installed Daemon version
- *
- * @generated from rpc platform.server.v1.WebService.ChangeDaemonVersion
- */
-export const changeDaemonVersion = {
-  localName: "changeDaemonVersion",
-  name: "ChangeDaemonVersion",
-  kind: MethodKind.Unary,
-  I: ChangeDaemonVersionRequest,
-  O: ChangeDaemonVersionResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-};
-
-/**
  * Install available NixOS updates (call after calling CheckForSystemUpdates)
  *
  * @generated from rpc platform.server.v1.WebService.InstallOSUpdate
@@ -145,22 +129,6 @@ export const installOSUpdate = {
   kind: MethodKind.Unary,
   I: InstallOSUpdateRequest,
   O: InstallOSUpdateResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-};
-
-/**
- * Set a system (draft and home cloud) container image (used for updating images)
- *
- * @generated from rpc platform.server.v1.WebService.SetSystemImage
- */
-export const setSystemImage = {
-  localName: "setSystemImage",
-  name: "SetSystemImage",
-  kind: MethodKind.Unary,
-  I: SetSystemImageRequest,
-  O: SetSystemImageResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

@@ -22,12 +22,8 @@ service WebService {
   rpc CheckForSystemUpdates(CheckForSystemUpdatesRequest) returns (CheckForSystemUpdatesResponse) {}
   // Check for available system (draft and home cloud) container updates
   rpc CheckForContainerUpdates(CheckForContainerUpdatesRequest) returns (CheckForContainerUpdatesResponse) {}
-  // Change the currently installed Daemon version
-  rpc ChangeDaemonVersion(ChangeDaemonVersionRequest) returns (ChangeDaemonVersionResponse) {}
   // Install available NixOS updates (call after calling CheckForSystemUpdates)
   rpc InstallOSUpdate(InstallOSUpdateRequest) returns (InstallOSUpdateResponse) {}
-  // Set a system (draft and home cloud) container image (used for updating images)
-  rpc SetSystemImage(SetSystemImageRequest) returns (SetSystemImageResponse) {}
   // Check the current health of all installed Home Cloud applications
   rpc AppsHealthCheck(AppsHealthCheckRequest) returns (AppsHealthCheckResponse) {}
   // Get the current host machine stats (cpu, memory, drives)
@@ -105,20 +101,7 @@ message UpdateAppResponse {}
 message CheckForSystemUpdatesRequest {}
 
 message CheckForSystemUpdatesResponse {
-  DaemonVersions daemon_versions = 1;
-  // os_diff is the result of the `nvd diff` command
-  string os_diff = 2;
-}
-
-message DaemonVersions {
-  DaemonVersion current = 1;
-  DaemonVersion latest = 2;
-}
-
-message DaemonVersion {
-  string version = 1;
-  string vendor_hash = 2;
-  string src_hash = 3;
+  // TODO
 }
 
 message CheckForContainerUpdatesRequest {}
@@ -134,24 +117,9 @@ message ImageVersion {
   string name = 4;
 }
 
-message ChangeDaemonVersionRequest {
-  string version = 1;
-  string vendor_hash = 2;
-  string src_hash = 3;
-}
-
-message ChangeDaemonVersionResponse {}
-
 message InstallOSUpdateRequest {}
 
 message InstallOSUpdateResponse {}
-
-message SetSystemImageRequest {
-  string current_image = 1;
-  string requested_image = 2;
-}
-
-message SetSystemImageResponse {}
 
 message AppsHealthCheckRequest {}
 
