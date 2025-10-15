@@ -23,7 +23,6 @@ const (
 	APP_STORE_ENTRIES_KEY       = "app_store_entries"
 	DEFAULT_DEVICE_SETTINGS_KEY = "device"
 	SEED_KEY                    = "secret_seed"
-	WIREGUARD_CONFIG_KEY        = "wireguard_config"
 )
 
 func Init() {

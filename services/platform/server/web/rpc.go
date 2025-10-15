@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
@@ -138,7 +137,7 @@ func (h *rpcHandler) GetAppsInStore(ctx context.Context, request *connect.Reques
 // SYSTEM
 
 func (h *rpcHandler) ShutdownHost(ctx context.Context, request *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error) {
-	err := h.sctl.ShutdownHost()
+	err := h.sctl.ShutdownHost(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +145,7 @@ func (h *rpcHandler) ShutdownHost(ctx context.Context, request *connect.Request[
 }
 
 func (h *rpcHandler) RestartHost(ctx context.Context, request *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error) {
-	err := h.sctl.RestartHost()
+	err := h.sctl.RestartHost(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -174,19 +173,6 @@ func (h *rpcHandler) CheckForContainerUpdates(ctx context.Context, request *conn
 	}), err
 }
 
-func (h *rpcHandler) ChangeDaemonVersion(ctx context.Context, request *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
-	err := h.sctl.ChangeDaemonVersion(&dv1.ChangeDaemonVersionCommand{
-		Version:    request.Msg.Version,
-		SrcHash:    request.Msg.SrcHash,
-		VendorHash: request.Msg.VendorHash,
-	})
-	if err != nil {
-		h.logger.WithError(err).Error("failed to change daemon version")
-		return nil, err
-	}
-	return connect.NewResponse(&v1.ChangeDaemonVersionResponse{}), nil
-}
-
 func (h *rpcHandler) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
 	err := h.sctl.InstallOSUpdate()
 	if err != nil {
@@ -194,18 +180,6 @@ func (h *rpcHandler) InstallOSUpdate(ctx context.Context, request *connect.Reque
 		return nil, err
 	}
 	return connect.NewResponse(&v1.InstallOSUpdateResponse{}), nil
-}
-
-func (h *rpcHandler) SetSystemImage(ctx context.Context, request *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
-	err := h.sctl.SetSystemImage(&dv1.SetSystemImageCommand{
-		CurrentImage:   request.Msg.CurrentImage,
-		RequestedImage: request.Msg.RequestedImage,
-	})
-	if err != nil {
-		h.logger.WithError(err).Error("failed to set system image")
-		return nil, err
-	}
-	return connect.NewResponse(&v1.SetSystemImageResponse{}), nil
 }
 
 func (h *rpcHandler) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
@@ -411,14 +385,6 @@ func (h *rpcHandler) GetSystemLogs(ctx context.Context, request *connect.Request
 		h.logger.WithError(err).Error(apps.ErrFailedToGetLogs)
 		return nil, errors.New(apps.ErrFailedToGetLogs)
 	}
-
-	deviceLogs, err := h.sctl.GetDeviceLogs(ctx, h.logger, int64(request.Msg.SinceSeconds))
-	if err != nil {
-		h.logger.WithError(err).Error(apps.ErrFailedToGetLogs)
-		return nil, errors.New(apps.ErrFailedToGetLogs)
-	}
-
-	logs = append(logs, deviceLogs...)
 
 	domainsMap := make(map[string]struct{})
 	namespacesMap := make(map[string]struct{})
