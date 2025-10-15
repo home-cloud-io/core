@@ -2,7 +2,6 @@ package host
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -246,16 +245,8 @@ func reject(logger chassis.Logger, requestId string, stream *connect.BidiStreamF
 // types (like wgtypes.Key instead of string) for encryption/decryption and peer validation
 func parseConfig(name, id string) (config WireGuardConfig, err error) {
 
-	// read config
+	// TODO: read from blueprint
 	netConfig := NetworkingConfig{}
-	f, err := os.ReadFile(NetworkingConfigFile())
-	if err != nil {
-		return config, err
-	}
-	err = json.Unmarshal(f, &netConfig)
-	if err != nil {
-		return config, err
-	}
 
 	data, err := os.ReadFile(netConfig.Wireguard.Interfaces[name].PrivateKeyFile)
 	if err != nil {

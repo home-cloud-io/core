@@ -5,29 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
-	"path/filepath"
-	"slices"
 )
-
-const (
-	nixCurrentSystemBin = "/run/current-system/sw/bin"
-)
-
-var (
-	cmdPrefix = []string{"--target", "1", "--mount", "--uts", "--ipc", "--net", "--pid"}
-)
-
-func NewCommand(name string, arg ...string) *exec.Cmd {
-	arg = append(arg, filepath.Join(nixCurrentSystemBin, name))
-	return exec.Command(name, arg...)
-}
-
-// TODO: test out running the daemon in k8s
-// TODO: still need to figure out writing host files
-func NewElevatedCommand(name string, arg ...string) *exec.Cmd {
-	arg = append(arg, filepath.Join(nixCurrentSystemBin, name))
-	return exec.Command("nsenter", slices.Concat(cmdPrefix, arg)...)
-}
 
 // ExecuteCommand executes a command and and prints the output to stdout.
 // It will not return until the command has completed or the context is cancelled.

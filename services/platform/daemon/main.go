@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/home-cloud-io/core/services/platform/daemon/communicate"
 	"github.com/home-cloud-io/core/services/platform/daemon/host"
+	kvclient "github.com/home-cloud-io/core/services/platform/daemon/kv-client"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
@@ -11,16 +12,20 @@ import (
 func main() {
 	var (
 		logger          = zerolog.New()
-		mdns            = host.NewDNSPublisher(logger)
 		secureTunneling = host.NewSecureTunnelingController(logger)
-		client          = communicate.NewClient(logger, mdns, secureTunneling)
+		server          = communicate.New(logger, secureTunneling)
 		migrator        = host.NewMigrator(logger)
 	)
 
+	runner := func() {
+		kvclient.Init()
+	}
+
 	// setup runtime
 	runtime := chassis.New(logger).
-		WithRunner(client.Listen).
-		WithRunner(mdns.Start).
+		WithRPCHandler(server).
+		// TODO: this doesn't gaurantee the kvclient will be ready for the other runners
+		WithRunner(runner).
 		WithRunner(migrator.Migrate).
 		WithRunner(secureTunneling.Load)
 
