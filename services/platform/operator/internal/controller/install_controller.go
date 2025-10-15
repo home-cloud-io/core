@@ -117,6 +117,16 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		}
 	}
 
+	if install.Spec.Talos.Enabled {
+		l.Info("reconciling talos components")
+		for _, o := range resources.TalosObjects(install) {
+			err = kubeCreateOrUpdate(ctx, r.Client, o)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	l.Info("reconciling draft components")
 	for _, o := range resources.DraftObjects(install) {
 		err = kubeCreateOrUpdate(ctx, r.Client, o)

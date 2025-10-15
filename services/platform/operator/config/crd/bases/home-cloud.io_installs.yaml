@@ -58,6 +58,13 @@ spec:
                 type: object
               homeCloud:
                 properties:
+                  daemon:
+                    properties:
+                      image:
+                        type: string
+                      tag:
+                        type: string
+                    type: object
                   hostname:
                     type: string
                   namespace:
@@ -100,6 +107,11 @@ spec:
                       values:
                         type: string
                     type: object
+                type: object
+              talos:
+                properties:
+                  enabled:
+                    type: boolean
                 type: object
               volumeMountHostPath:
                 type: string

@@ -27,3 +27,5 @@ spec:
   homeCloud:
     server:
       tag: sha-590cb46
+  talos:
+    enabled: true
