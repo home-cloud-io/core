@@ -32,3 +32,85 @@ Let's do a quick test of building the Home Cloud API protobufs:
 dctl api init
 dctl api build
 ```
+
+## Development
+
+### draft services
+
+You can start all required services locally in Docker with:
+
+```shell
+dctl infra init # only need to run this when updating docker images
+dctl infra start
+```
+
+### local k3s cluster
+
+You'll need a k3s cluster for development. You can create a local k3s cluster using [k3d (k3s in docker)](https://k3d.io/stable/). Follow the installation directions on their site to get the `k3d` CLI installed. Now you can start a basic k3d cluster with:
+
+```sh
+k3d cluster create --api-port 6550 -p '9080:80@loadbalancer' -p '9443:443@loadbalancer' --agents 1 --k3s-arg '--disable=traefik@server:*' home-cloud
+```
+
+### server
+
+Before running the server, we need to first build the web client that is hosted by the server. Navigate to `services/platform/server/web-client` and build the web client:
+
+```sh
+cd services/platform/server/web-client
+npm install
+npm run build
+```
+
+To run the server locally, first navigate up a directory (`cd ..`) and modify the `config.yaml`by updating the `server.k8s.config_path` to your local kubeconfig file.
+
+Then you can start the server:
+
+```sh
+go run main.go
+```
+
+The server will now connect to `blueprint` running in Docker (we ran it with `dctl infra start`) and connect to your local k3d cluster using your local kubeconfig.
+
+### daemon
+
+To run the daemon locally, first navigate to the `services/platform/daemon` directory (in a new terminal if you're running the server from before) and initialize the local filesystem:
+
+```sh
+go run init/main.go
+```
+
+Now you can start the daemon with:
+
+```sh
+go run main.go
+```
+
+### install k8s resources
+
+We need a few k8s CRDs to get everything working:
+
+```sh
+# k8s gateway api crds
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
+
+# home cloud operator crds
+kubectl apply -f services/platform/operator/config/crd/bases/home-cloud.io_apps.yaml
+```
+
+Now we need to install istio in ambient mode. You can do this using the [official documentation](https://istio.io/latest/docs/ambient/install/) for any platform, but if you're using the k3d cluster we created above, you can just run the below command for an automated install:
+
+```sh
+kubectl apply -f development/istio.yaml
+```
+
+### web client
+
+If you're developing the web client, you can run this in development mode:
+
+```sh
+cd services/platform/server/web-client
+npm start
+```
+
+This will open your browser to the web client running locally and proxying all requests to the home cloud server running on `localhost:8000`.
