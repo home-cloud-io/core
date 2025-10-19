@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sv1Connect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
@@ -11,13 +12,17 @@ import (
 	"connectrpc.com/connect"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-const (
-	// TODO: retrieve this from blueprint?
-	HomeCloudServerAddress = "http://server.home-cloud-system.svc.cluster.local:8090"
-	// HomeCloudServerAddress = "http://localhost:8090" // for local dev
+var (
+	HomeCloudServerAddress = func() string {
+		if os.Getenv("DRAFT_SERVICE_ENV") == "test" {
+			return "http://localhost:8000"
+		}
+		return "http://server.home-cloud-system.svc.cluster.local:8090"
+	}()
 
 	GatewayName = "ingress-gateway"
 )
@@ -39,7 +44,7 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 			CommonRouteSpec: gwv1.CommonRouteSpec{
 				ParentRefs: []gwv1.ParentReference{
 					{
-						Name:      GatewayName,
+						Name:      gwv1.ObjectName(GatewayName),
 						Namespace: &GatewayNamespace,
 					},
 				},
@@ -62,7 +67,7 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 			},
 		},
 	})
-	if err != nil {
+	if client.IgnoreAlreadyExists(err) != nil {
 		return err
 	}
 
