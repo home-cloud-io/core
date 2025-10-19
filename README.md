@@ -83,12 +83,10 @@ npm install
 npm run build
 ```
 
-To run the server locally, first navigate up a directory (`cd ..`) and modify the `config.yaml`by updating the `server.k8s.config_path` to your local kubeconfig file.
-
-Then you can start the server:
+To run the server locally, first navigate up a directory (`cd ..`), then you can start the server (you may need to change the KUBECONFIG path):
 
 ```sh
-go run main.go
+KUBECONFIG=~/.kube/config go run main.go
 ```
 
 The server will now connect to `blueprint` running in Docker (we ran it with `dctl infra start`) and connect to your local k3d cluster using your local kubeconfig.
