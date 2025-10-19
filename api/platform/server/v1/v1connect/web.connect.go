@@ -49,15 +49,9 @@ const (
 	// WebServiceCheckForContainerUpdatesProcedure is the fully-qualified name of the WebService's
 	// CheckForContainerUpdates RPC.
 	WebServiceCheckForContainerUpdatesProcedure = "/platform.server.v1.WebService/CheckForContainerUpdates"
-	// WebServiceChangeDaemonVersionProcedure is the fully-qualified name of the WebService's
-	// ChangeDaemonVersion RPC.
-	WebServiceChangeDaemonVersionProcedure = "/platform.server.v1.WebService/ChangeDaemonVersion"
 	// WebServiceInstallOSUpdateProcedure is the fully-qualified name of the WebService's
 	// InstallOSUpdate RPC.
 	WebServiceInstallOSUpdateProcedure = "/platform.server.v1.WebService/InstallOSUpdate"
-	// WebServiceSetSystemImageProcedure is the fully-qualified name of the WebService's SetSystemImage
-	// RPC.
-	WebServiceSetSystemImageProcedure = "/platform.server.v1.WebService/SetSystemImage"
 	// WebServiceAppsHealthCheckProcedure is the fully-qualified name of the WebService's
 	// AppsHealthCheck RPC.
 	WebServiceAppsHealthCheckProcedure = "/platform.server.v1.WebService/AppsHealthCheck"
@@ -118,9 +112,7 @@ var (
 	webServiceUpdateAppMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("UpdateApp")
 	webServiceCheckForSystemUpdatesMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("CheckForSystemUpdates")
 	webServiceCheckForContainerUpdatesMethodDescriptor = webServiceServiceDescriptor.Methods().ByName("CheckForContainerUpdates")
-	webServiceChangeDaemonVersionMethodDescriptor      = webServiceServiceDescriptor.Methods().ByName("ChangeDaemonVersion")
 	webServiceInstallOSUpdateMethodDescriptor          = webServiceServiceDescriptor.Methods().ByName("InstallOSUpdate")
-	webServiceSetSystemImageMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("SetSystemImage")
 	webServiceAppsHealthCheckMethodDescriptor          = webServiceServiceDescriptor.Methods().ByName("AppsHealthCheck")
 	webServiceGetSystemStatsMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("GetSystemStats")
 	webServiceIsDeviceSetupMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("IsDeviceSetup")
@@ -156,12 +148,8 @@ type WebServiceClient interface {
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
 	// Check for available system (draft and home cloud) container updates
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
-	// Change the currently installed Daemon version
-	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
 	// Install available NixOS updates (call after calling CheckForSystemUpdates)
 	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
-	// Set a system (draft and home cloud) container image (used for updating images)
-	SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error)
 	// Check the current health of all installed Home Cloud applications
 	AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error)
 	// Get the current host machine stats (cpu, memory, drives)
@@ -250,22 +238,10 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceCheckForContainerUpdatesMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		changeDaemonVersion: connect.NewClient[v1.ChangeDaemonVersionRequest, v1.ChangeDaemonVersionResponse](
-			httpClient,
-			baseURL+WebServiceChangeDaemonVersionProcedure,
-			connect.WithSchema(webServiceChangeDaemonVersionMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 		installOSUpdate: connect.NewClient[v1.InstallOSUpdateRequest, v1.InstallOSUpdateResponse](
 			httpClient,
 			baseURL+WebServiceInstallOSUpdateProcedure,
 			connect.WithSchema(webServiceInstallOSUpdateMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		setSystemImage: connect.NewClient[v1.SetSystemImageRequest, v1.SetSystemImageResponse](
-			httpClient,
-			baseURL+WebServiceSetSystemImageProcedure,
-			connect.WithSchema(webServiceSetSystemImageMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		appsHealthCheck: connect.NewClient[v1.AppsHealthCheckRequest, v1.AppsHealthCheckResponse](
@@ -382,9 +358,7 @@ type webServiceClient struct {
 	updateApp                *connect.Client[v1.UpdateAppRequest, v1.UpdateAppResponse]
 	checkForSystemUpdates    *connect.Client[v1.CheckForSystemUpdatesRequest, v1.CheckForSystemUpdatesResponse]
 	checkForContainerUpdates *connect.Client[v1.CheckForContainerUpdatesRequest, v1.CheckForContainerUpdatesResponse]
-	changeDaemonVersion      *connect.Client[v1.ChangeDaemonVersionRequest, v1.ChangeDaemonVersionResponse]
 	installOSUpdate          *connect.Client[v1.InstallOSUpdateRequest, v1.InstallOSUpdateResponse]
-	setSystemImage           *connect.Client[v1.SetSystemImageRequest, v1.SetSystemImageResponse]
 	appsHealthCheck          *connect.Client[v1.AppsHealthCheckRequest, v1.AppsHealthCheckResponse]
 	getSystemStats           *connect.Client[v1.GetSystemStatsRequest, v1.GetSystemStatsResponse]
 	isDeviceSetup            *connect.Client[v1.IsDeviceSetupRequest, v1.IsDeviceSetupResponse]
@@ -439,19 +413,9 @@ func (c *webServiceClient) CheckForContainerUpdates(ctx context.Context, req *co
 	return c.checkForContainerUpdates.CallUnary(ctx, req)
 }
 
-// ChangeDaemonVersion calls platform.server.v1.WebService.ChangeDaemonVersion.
-func (c *webServiceClient) ChangeDaemonVersion(ctx context.Context, req *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
-	return c.changeDaemonVersion.CallUnary(ctx, req)
-}
-
 // InstallOSUpdate calls platform.server.v1.WebService.InstallOSUpdate.
 func (c *webServiceClient) InstallOSUpdate(ctx context.Context, req *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
 	return c.installOSUpdate.CallUnary(ctx, req)
-}
-
-// SetSystemImage calls platform.server.v1.WebService.SetSystemImage.
-func (c *webServiceClient) SetSystemImage(ctx context.Context, req *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
-	return c.setSystemImage.CallUnary(ctx, req)
 }
 
 // AppsHealthCheck calls platform.server.v1.WebService.AppsHealthCheck.
@@ -555,12 +519,8 @@ type WebServiceHandler interface {
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
 	// Check for available system (draft and home cloud) container updates
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
-	// Change the currently installed Daemon version
-	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
 	// Install available NixOS updates (call after calling CheckForSystemUpdates)
 	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
-	// Set a system (draft and home cloud) container image (used for updating images)
-	SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error)
 	// Check the current health of all installed Home Cloud applications
 	AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error)
 	// Get the current host machine stats (cpu, memory, drives)
@@ -645,22 +605,10 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceCheckForContainerUpdatesMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	webServiceChangeDaemonVersionHandler := connect.NewUnaryHandler(
-		WebServiceChangeDaemonVersionProcedure,
-		svc.ChangeDaemonVersion,
-		connect.WithSchema(webServiceChangeDaemonVersionMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	webServiceInstallOSUpdateHandler := connect.NewUnaryHandler(
 		WebServiceInstallOSUpdateProcedure,
 		svc.InstallOSUpdate,
 		connect.WithSchema(webServiceInstallOSUpdateMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	webServiceSetSystemImageHandler := connect.NewUnaryHandler(
-		WebServiceSetSystemImageProcedure,
-		svc.SetSystemImage,
-		connect.WithSchema(webServiceSetSystemImageMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	webServiceAppsHealthCheckHandler := connect.NewUnaryHandler(
@@ -781,12 +729,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceCheckForSystemUpdatesHandler.ServeHTTP(w, r)
 		case WebServiceCheckForContainerUpdatesProcedure:
 			webServiceCheckForContainerUpdatesHandler.ServeHTTP(w, r)
-		case WebServiceChangeDaemonVersionProcedure:
-			webServiceChangeDaemonVersionHandler.ServeHTTP(w, r)
 		case WebServiceInstallOSUpdateProcedure:
 			webServiceInstallOSUpdateHandler.ServeHTTP(w, r)
-		case WebServiceSetSystemImageProcedure:
-			webServiceSetSystemImageHandler.ServeHTTP(w, r)
 		case WebServiceAppsHealthCheckProcedure:
 			webServiceAppsHealthCheckHandler.ServeHTTP(w, r)
 		case WebServiceGetSystemStatsProcedure:
@@ -858,16 +802,8 @@ func (UnimplementedWebServiceHandler) CheckForContainerUpdates(context.Context, 
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.CheckForContainerUpdates is not implemented"))
 }
 
-func (UnimplementedWebServiceHandler) ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.ChangeDaemonVersion is not implemented"))
-}
-
 func (UnimplementedWebServiceHandler) InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.InstallOSUpdate is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.SetSystemImage is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error) {

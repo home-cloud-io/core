@@ -19,8 +19,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	appsv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller"
+	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/talos"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -30,10 +31,14 @@ var (
 )
 
 func init() {
+	// initialize scheme
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-
-	utilruntime.Must(appsv1.AddToScheme(scheme))
+	// add home-cloud.io crds
+	utilruntime.Must(v1.AddToScheme(scheme))
+	// add gateway api crds
 	utilruntime.Must(gwv1.Install(scheme))
+	// add talos crds
+	utilruntime.Must(talos.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -113,6 +118,15 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "App")
+		os.Exit(1)
+	}
+
+	if err = (&controller.InstallReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Config: mgr.GetConfig(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Install")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

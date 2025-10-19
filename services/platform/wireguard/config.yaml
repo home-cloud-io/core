@@ -1,0 +1,11 @@
+service:
+  name: wireguard
+  domain: platform
+
+wireguard:
+  privateKey: gFqIIEs2yL0BY19utNy+6dZdcLAy7j/KRTfPYvCkxWQ=
+  publicKey: NivWwBWGGlzJ8Zs8bDw6vqsdD2UFv9H1OVaeXUp4VFQ=
+  peer:
+    privateKey: cATnEykzmlpQoU8GQQgtNQHKbXevqOARkgrVrUKXSFU=
+    publicKey: nrTE6/bnl4s1mppb0zTuoR9Z7Yepzzy9PQdpd53SXgA=
+

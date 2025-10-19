@@ -9,7 +9,7 @@ import (
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 
-	"github.com/imdario/mergo"
+	"dario.cat/mergo"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
@@ -223,6 +223,9 @@ func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, app
 	err = r.Client.Create(ctx, &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: appConfig.Namespace,
+			Labels: map[string]string{
+				"istio.io/dataplane-mode": "ambient",
+			},
 		},
 	})
 	if client.IgnoreAlreadyExists(err) != nil {
@@ -344,6 +347,20 @@ func getChartAndValues(opt action.ChartPathOptions, app *v1.App) (*chart.Chart, 
 	return chart, values, nil
 }
 
+func getChart(opt action.ChartPathOptions, chart string) (*chart.Chart, error) {
+	// download the chart to the file system
+	path, err := opt.LocateChart(chart, cli.New())
+	if err != nil {
+		return nil, err
+	}
+	// load chart from file
+	c, err := loader.Load(path)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
 // shouldUpgrade determines if the given app needs upgrading based on the version and values.
 func shouldUpgrade(app *v1.App) bool {
 	installedVersion := app.Status.Version
@@ -359,6 +376,25 @@ func shouldUpgrade(app *v1.App) bool {
 	// OR
 	// if the current values in the spec are different than those in the status
 	return semver.Compare(requestedVersion, installedVersion) != 0 || app.Spec.Values != app.Status.Values
+}
+
+// shouldUpgrade determines if the given app needs upgrading based on the version and values.
+func shouldUpgradeInstall(app *v1.Install) bool {
+	return false
+	// installedVersion := app.Status.Version
+	// if installedVersion != "" {
+	// 	installedVersion = "v" + installedVersion
+	// }
+	// requestedVersion := app.Spec.Version
+	// if requestedVersion != "" {
+	// 	requestedVersion = "v" + requestedVersion
+	// }
+	// UPGRADE
+	// if the requested version is greater than the installed version
+	// OR
+	// if the current values in the spec are different than those in the status
+	// TODO: check for spec changes
+	// return semver.Compare(requestedVersion, installedVersion) != 0
 }
 
 func repoURL(app *v1.App) string {

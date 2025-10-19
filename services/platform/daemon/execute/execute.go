@@ -13,7 +13,7 @@ import (
 // NOTE: If you want the command to continue even if the parent is killed (e.g. through a signal like SIGINT) you will
 // want to launch the command in a new process group so that signals are not sent to the child process.
 //
-// 	cmd.SysProcAttr = &syscall.SysProcAttr{
+//	cmd.SysProcAttr = &syscall.SysProcAttr{
 //		Setpgid: true,
 //	}
 func ExecuteCommand(ctx context.Context, cmd *exec.Cmd) error {
@@ -86,7 +86,7 @@ func ExecuteCommand(ctx context.Context, cmd *exec.Cmd) error {
 //
 // NOTE: You probably want to launch the command in a new process group to avoid signals (e.g. SIGINT) being sent to the child process.
 //
-// 	cmd.SysProcAttr = &syscall.SysProcAttr{
+//	cmd.SysProcAttr = &syscall.SysProcAttr{
 //		Setpgid: true,
 //	}
 func ExecuteCommandAndRelease(ctx context.Context, cmd *exec.Cmd) error {

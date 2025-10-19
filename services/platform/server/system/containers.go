@@ -4,20 +4,16 @@ import (
 	"context"
 	"fmt"
 	"sort"
-	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	"github.com/robfig/cron/v3"
 	"github.com/steady-bytes/draft/pkg/chassis"
-	"golang.org/x/mod/semver"
 )
 
 type (
 	Containers interface {
-		// SetSystemImage will update the image for a system container.
-		SetSystemImage(cmd *dv1.SetSystemImageCommand) error
 		// CheckForContainerUpdates will compare current system container images against the latest ones
 		// available and return the result.
 		CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error)
@@ -32,18 +28,6 @@ type (
 )
 
 // CONTAINERS
-
-func (c *controller) SetSystemImage(cmd *dv1.SetSystemImageCommand) error {
-	err := com.Send(&dv1.ServerMessage{
-		Message: &dv1.ServerMessage_SetSystemImageCommand{
-			SetSystemImageCommand: cmd,
-		},
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 func (c *controller) CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error) {
 	var (
@@ -116,32 +100,8 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 		return err
 	}
 
-	for _, image := range images {
-		log := logger.WithFields(chassis.Fields{
-			"image":           image.Image,
-			"current_version": image.Current,
-			"latest_version":  image.Latest,
-		})
-		if semver.Compare(image.Latest, image.Current) == 1 {
-			log.Info("updating image")
-			err := com.Send(&dv1.ServerMessage{
-				Message: &dv1.ServerMessage_SetSystemImageCommand{
-					SetSystemImageCommand: &dv1.SetSystemImageCommand{
-						CurrentImage:   fmt.Sprintf("%s:%s", image.Image, image.Current),
-						RequestedImage: fmt.Sprintf("%s:%s", image.Image, image.Latest),
-					},
-				},
-			})
-			if err != nil {
-				log.WithError(err).Error("failed to update system container image")
-				// don't return, try to update other containers
-			}
-			// TODO: this is a hack, should really be event-driven
-			time.Sleep(3 * time.Second)
-		} else {
-			log.Info("no update needed")
-		}
-	}
+	// TODO: Write to Install CRD and let Operator perform upgrade
+	fmt.Println(images)
 
 	return nil
 }

@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"connectrpc.com/connect"
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
@@ -35,8 +36,6 @@ type (
 		Login(ctx context.Context, username, password string) (string, error)
 		// GetComponentVersions returns all the versions of system components (server, daemon, etc.)
 		GetComponentVersions(ctx context.Context, logger chassis.Logger) (*v1.GetComponentVersionsResponse, error)
-		// GetDeviceLogs returns the logs from the daemon for the given seconds in the past
-		GetDeviceLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error)
 	}
 )
 
@@ -64,17 +63,6 @@ func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings,
 
 func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {
 
-	// set the device settings on the host (via the daemon)
-	err := c.saveSettings(ctx, logger, &dv1.SaveSettingsCommand{
-		AdminPassword:  settings.AdminUser.Password,
-		TimeZone:       settings.Timezone,
-		EnableSsh:      settings.EnableSsh,
-		TrustedSshKeys: settings.TrustedSshKeys,
-	})
-	if err != nil {
-		return err
-	}
-
 	// salt and hash given password if set
 	// otherwise, get existing value from cache
 	if settings.AdminUser.Password != "" {
@@ -96,7 +84,7 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 		settings.AdminUser.Password = existingSettings.AdminUser.Password
 	}
 
-	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	_, err := kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
 	if err != nil {
 		return errors.New(ErrFailedToCreateSettings)
 	}
@@ -128,13 +116,7 @@ func (c *controller) InitializeDevice(ctx context.Context, logger chassis.Logger
 		return errors.New(ErrDeviceAlreadySetup)
 	}
 
-	// set the device settings on the host (via the daemon)
-	err = c.saveSettings(ctx, logger, &dv1.SaveSettingsCommand{
-		AdminPassword:  settings.AdminUser.Password,
-		TimeZone:       settings.Timezone,
-		EnableSsh:      settings.EnableSsh,
-		TrustedSshKeys: settings.TrustedSshKeys,
-	})
+	_, err = c.daemonClient.InitializeHost(ctx, &connect.Request[dv1.InitializeHostRequest]{})
 	if err != nil {
 		return err
 	}
@@ -199,6 +181,7 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 		})
 	}
 
+	// TODO: does this get all the new images?
 	imageVersions, err := c.k8sclient.CurrentImages(ctx)
 	if err != nil {
 		versions = append(versions, &dv1.ComponentVersion{
@@ -216,51 +199,12 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 		}
 	}
 
-	logger.Info("requesting component versions from daemon")
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_RequestComponentVersionsCommand{
-			RequestComponentVersionsCommand: &dv1.RequestComponentVersionsCommand{},
-		},
-	}, nil)
-	if err != nil {
-		versions = append(versions, &dv1.ComponentVersion{
-			Name:    "daemon",
-			Domain:  "platform",
-			Version: err.Error(),
-		}, &dv1.ComponentVersion{
-			Name:    "nixos",
-			Domain:  "system",
-			Version: err.Error(),
-		})
-	}
-	e := response.GetComponentVersions()
-	versions = append(versions, e.Components...)
-
 	// sort versions
 	sort.Slice(versions, func(i, j int) bool {
 		return versions[i].Name < versions[j].Name
 	})
 
 	return buildComponentVersionsResponse(logger, versions), nil
-}
-
-func (c *controller) GetDeviceLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error) {
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_RequestLogsCommand{
-			RequestLogsCommand: &dv1.RequestLogsCommand{
-				SinceSeconds: uint32(sinceSeconds),
-			},
-		},
-	}, nil)
-	if err != nil {
-		return nil, err
-	}
-	e := response.GetLogs()
-	if e.Error != "" {
-		return nil, errors.New(e.Error)
-	}
-
-	return e.Logs, nil
 }
 
 // HELPERS

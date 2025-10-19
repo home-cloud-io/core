@@ -1,0 +1,31 @@
+apiVersion: home-cloud.io/v1
+kind: Install
+metadata:
+  finalizers:
+    - install.home-cloud.io/finalizer
+  labels:
+    app.kubernetes.io/name: install
+    app.kubernetes.io/instance: install-sample
+    app.kubernetes.io/part-of: home-cloud
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: home-cloud
+  name: install-sample
+spec:
+  istio:
+    istiod:
+      values: |
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+    ztunnel:
+      values: |
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+  homeCloud:
+    server:
+      tag: sha-590cb46
+  talos:
+    enabled: true

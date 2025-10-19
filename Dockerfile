@@ -57,7 +57,8 @@ RUN upx main
 FROM alpine:${ALPINE_VERSION} AS runner
 
 # Install dependencies
-RUN apk add -U --no-cache ca-certificates
+# TODO: only need iptables for wireguard service so should probably just layer the image
+RUN apk add -U --no-cache ca-certificates iptables
 
 # Copy the binary from go-builder
 COPY --from=go-builder /app/main /etc/main

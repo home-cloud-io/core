@@ -2,16 +2,14 @@ package system
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"time"
 
+	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	"github.com/robfig/cron/v3"
 
-	"github.com/home-cloud-io/core/services/platform/server/async"
 	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
@@ -34,6 +32,8 @@ type (
 	}
 )
 
+var CurrentStats *dv1.SystemStats
+
 // OS
 
 func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logger) (*v1.CheckForSystemUpdatesResponse, error) {
@@ -47,58 +47,13 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 		resp = &v1.CheckForSystemUpdatesResponse{}
 	)
 
-	// get the os update diff from the daemon
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_RequestOsUpdateDiff{},
-	}, &async.ListenerOptions[*dv1.DaemonMessage]{
-		// compiling the new OS can take a while
-		Timeout: 5 * time.Minute,
-	})
-	if err != nil {
-		return nil, err
-	}
-	e1 := response.GetOsUpdateDiff()
-	if e1.Error != "" {
-		return nil, errors.New(e1.Error)
-	}
-	resp.OsDiff = e1.Description
-
-	// get the current daemon version from the daemon
-	response, err = com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_RequestCurrentDaemonVersion{},
-	}, nil)
-	if err != nil {
-		return nil, err
-	}
-	e2 := response.GetCurrentDaemonVersion()
-	if e2.Error != "" {
-		return nil, errors.New(e2.Error)
-	}
-	resp.DaemonVersions = &v1.DaemonVersions{
-		Current: &v1.DaemonVersion{
-			Version:    e2.Version,
-			VendorHash: e2.VendorHash,
-			SrcHash:    e2.SrcHash,
-		},
-	}
-
-	// get latest available daemon version
-	latest, err := getLatestDaemonVersion()
-	if err != nil {
-		return nil, err
-	}
-	resp.DaemonVersions.Latest = latest
+	// TODO: check talos api through daemon
 
 	return resp, nil
 }
 
 func (c *controller) InstallOSUpdate() error {
-	err := com.Send(&dv1.ServerMessage{
-		Message: &dv1.ServerMessage_InstallOsUpdateCommand{},
-	})
-	if err != nil {
-		return err
-	}
+	// TODO: update using talos api?
 	return nil
 }
 
@@ -134,36 +89,13 @@ func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error 
 		return nil
 	}
 
-	updates, err := u.CheckForOSUpdates(ctx, logger)
+	_, err = u.CheckForOSUpdates(ctx, logger)
 	if err != nil {
 		logger.WithError(err).Error("failed to check for system updates")
 		return err
 	}
 
-	// if the daemon needs updating, install it along with the os updates
-	// otherwise just install the os update
-	if updates.DaemonVersions.Current.Version != updates.DaemonVersions.Latest.Version &&
-		updates.DaemonVersions.Current.SrcHash != updates.DaemonVersions.Latest.SrcHash &&
-		updates.DaemonVersions.Current.VendorHash != updates.DaemonVersions.Latest.VendorHash {
-		logger.Info("updating daemon along with os")
-		err = com.Send(&dv1.ServerMessage{
-			Message: &dv1.ServerMessage_ChangeDaemonVersionCommand{
-				ChangeDaemonVersionCommand: &dv1.ChangeDaemonVersionCommand{
-					Version:    updates.DaemonVersions.Latest.Version,
-					VendorHash: updates.DaemonVersions.Latest.VendorHash,
-					SrcHash:    updates.DaemonVersions.Latest.SrcHash,
-				},
-			},
-		})
-	} else {
-		err = com.Send(&dv1.ServerMessage{
-			Message: &dv1.ServerMessage_InstallOsUpdateCommand{},
-		})
-	}
-	if err != nil {
-		logger.WithError(err).Error("failed to install system update")
-		return err
-	}
+	// TODO: execute updates
 
 	return nil
 }
@@ -184,40 +116,26 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 		Peers:      []*dv1.WireguardPeer{},
 	}
 
-	// command daemon to initialize
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_AddWireguardInterface{
-			AddWireguardInterface: &dv1.AddWireguardInterface{
-				Interface: wgInterface,
-			},
+	// command daemon to add wireguard interface
+	resp, err := c.daemonClient.AddWireguardInterface(ctx, &connect.Request[dv1.AddWireguardInterfaceRequest]{
+		Msg: &dv1.AddWireguardInterfaceRequest{
+			Interface: wgInterface,
 		},
-	}, &async.ListenerOptions[*dv1.DaemonMessage]{
-		Timeout: 15 * time.Second,
 	})
 	if err != nil {
 		return err
 	}
-	e1 := response.GetWireguardInterfaceAdded()
-	if e1.Error != "" {
-		return errors.New(e1.Error)
-	}
-	publicKey := e1.PublicKey
+	publicKey := resp.Msg.PublicKey
 
 	// set STUN server on daemon
-	response, err = com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_SetStunServerCommand{
-			SetStunServerCommand: &dv1.SetSTUNServerCommand{
-				ServerAddress:      DefaultSTUNServerAddress,
-				WireguardInterface: DefaultWireguardInterface,
-			},
+	_, err = c.daemonClient.SetSTUNServer(ctx, &connect.Request[dv1.SetSTUNServerRequest]{
+		Msg: &dv1.SetSTUNServerRequest{
+			ServerAddress:      DefaultSTUNServerAddress,
+			WireguardInterface: DefaultWireguardInterface,
 		},
-	}, nil)
+	})
 	if err != nil {
 		return err
-	}
-	e2 := response.GetStunServerSet()
-	if e2.Error != "" {
-		return errors.New(e2.Error)
 	}
 
 	// enable feature in blueprint
@@ -252,21 +170,13 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 		err error
 	)
 
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_RemoveWireguardInterface{
-			RemoveWireguardInterface: &dv1.RemoveWireguardInterface{
-				Name: DefaultWireguardInterface,
-			},
+	_, err = c.daemonClient.RemoveWireguardInterface(ctx, &connect.Request[dv1.RemoveWireguardInterfaceRequest]{
+		Msg: &dv1.RemoveWireguardInterfaceRequest{
+			Name: DefaultWireguardInterface,
 		},
-	}, &async.ListenerOptions[*dv1.DaemonMessage]{
-		Timeout: 30 * time.Second,
 	})
 	if err != nil {
 		return err
-	}
-	e := response.GetWireguardInterfaceRemoved()
-	if e.Error != "" {
-		return errors.New(e.Error)
 	}
 
 	// disable feature in blueprint

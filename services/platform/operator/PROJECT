@@ -19,4 +19,20 @@ resources:
   kind: App
   path: github.com/home-cloud-io/operator/api/v1
   version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: home-cloud.io
+  kind: HomeCloudOperator
+  path: github.com/home-cloud-io/operator/api/v1
+  version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: home-cloud.io
+  kind: Install
+  path: github.com/home-cloud-io/operator/api/v1
+  version: v1
 version: "3"
