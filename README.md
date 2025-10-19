@@ -11,9 +11,11 @@ This repository contains the core components that make up the Home Cloud platfor
 
 To work on the Home Cloud core platform you'll need a couple of things installed:
 
-* [Go](https://golang.org/doc/install) v1.23+
+* [Go](https://golang.org/doc/install) - v1.23+
 * [Docker](https://docs.docker.com/get-docker/)
 * [Node via NVM](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating)
+* [k3d](https://k3d.io/stable/) - for running kubernetes locally
+* [kubectl](https://kubernetes.io/docs/tasks/tools/) - for managing kubernetes clusters
 
 This repository is built on top of the [Draft framework](https://github.com/steady-bytes/draft) for distributed systems. You don't need to be an expert with Draft to work with the Home Cloud core platform, but you'll need at least the `dctl` CLI tool. Let's install it now:
 
