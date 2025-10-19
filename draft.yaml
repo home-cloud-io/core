@@ -6,6 +6,3 @@ api:
 infra:
   blueprint:
     image_name: ghcr.io/steady-bytes/draft-core-blueprint:edge
-  fuse:
-    image_name: ghcr.io/steady-bytes/draft-core-fuse:edge
-  envoy:
