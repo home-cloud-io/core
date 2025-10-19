@@ -14,9 +14,6 @@ service:
       port: 8000
 
 server:
-  k8s:
-    config_path: YOUR_HOME_DIRECTORY/.kube/config
-    master_url: https://home-cloud.local:6443
   updates:
     os_auto_update_cron: "0 1 * * *"
     containers_auto_update_cron: "0 2 * * *"
