@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-base
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: base
+  targetNamespace: istio-system
+  version: 1.27.1
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-istiod
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: istiod
+  targetNamespace: istio-system
+  version: 1.27.1
+  valuesContent: |-
+    profile: ambient
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-cni
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: cni
+  targetNamespace: istio-system
+  version: 1.27.1
+  valuesContent: |-
+    profile: ambient
+    global:
+      platform: k3d
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-ztunnel
+  namespace: kube-system
+spec:
+  repo: https://istio-release.storage.googleapis.com/charts
+  chart: ztunnel
+  targetNamespace: istio-system
+  version: 1.27.1
+  valuesContent: |-
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+# ingress gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ingress-gateway
+  namespace: istio-system
+spec:
+  gatewayClassName: istio
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: All
+# default route to home-cloud server
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: home-cloud
+  namespace: home-cloud-system
+spec:
+  parentRefs:
+  - name: ingress-gateway
+    namespace: istio-system
+  hostnames: ["home-cloud.local"]
+  rules:
+  - backendRefs:
+    - name: server
+      port: 8090
