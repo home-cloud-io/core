@@ -341,6 +341,7 @@ func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, 
 		return err
 	}
 
+	// TODO: change from pods to deployments so that failed/succeeded pods don't show up as current versions
 	for _, p := range pods.Items {
 		for _, c := range p.Spec.Containers {
 			name := strings.Split(c.Image, ":")[0]
