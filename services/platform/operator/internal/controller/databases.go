@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/secrets"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
@@ -13,6 +12,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/secrets"
 )
 
 const (
@@ -90,8 +91,11 @@ func sysObjectExists(ctx context.Context, db *bun.DB, query string) (bool, error
 
 func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d AppDatabase, namespace string) error {
 	// create user within database
-	password := secrets.Generate(24, true)
-	_, err := db.ExecContext(ctx, fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", d.Name, password))
+	pass, err := secrets.Generate(24, true)
+	if err != nil {
+		return err
+	}
+	_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", d.Name, pass))
 	if err != nil {
 		return err
 	}
@@ -107,9 +111,9 @@ func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d Ap
 			"hostname": []byte("postgres.postgres"),
 			"database": []byte(d.Name),
 			"username": []byte(d.Name),
-			"password": []byte(password),
+			"password": []byte(pass),
 			"port":     []byte("5432"),
-			"uri":      []byte(fmt.Sprintf("postgres://%s:%s@postgres.postgres:5432/%s?sslmode=disable", d.Name, password, d.Name)),
+			"uri":      []byte(fmt.Sprintf("postgres://%s:%s@postgres.postgres:5432/%s?sslmode=disable", d.Name, pass, d.Name)),
 		},
 	})
 	if client.IgnoreAlreadyExists(err) != nil {
