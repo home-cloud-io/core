@@ -1,0 +1,3 @@
+service:
+  name: operator
+  domain: platform
