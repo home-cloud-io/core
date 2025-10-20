@@ -7,8 +7,6 @@ import (
 	"os"
 	"time"
 
-	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-
 	"dario.cat/mergo"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
@@ -21,11 +19,12 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 )
 
 const AppFinalizer = "apps.home-cloud.io/finalizer"
@@ -55,10 +54,6 @@ type HelmChartVersion struct {
 	Urls        []string  `yaml:"urls"`
 	Version     string    `yaml:"version"`
 }
-
-//+kubebuilder:rbac:groups=home-cloud.io,resources=apps,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=home-cloud.io,resources=apps/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=home-cloud.io,resources=apps/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -308,7 +303,13 @@ func createHelmAction(namespace string) (*action.Configuration, error) {
 	settings := cli.New()
 	settings.SetNamespace(namespace)
 	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), klog.Infof); err != nil {
+
+	// action.DebugLog wrapper around logr.Logger
+	l := func(format string, args ...any) {
+		log.Log.V(-1).Info(fmt.Sprintf(format, args...))
+	}
+
+	if err := actionConfig.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), l); err != nil {
 		return nil, err
 	}
 
@@ -376,25 +377,6 @@ func shouldUpgrade(app *v1.App) bool {
 	// OR
 	// if the current values in the spec are different than those in the status
 	return semver.Compare(requestedVersion, installedVersion) != 0 || app.Spec.Values != app.Status.Values
-}
-
-// shouldUpgrade determines if the given app needs upgrading based on the version and values.
-func shouldUpgradeInstall(app *v1.Install) bool {
-	return false
-	// installedVersion := app.Status.Version
-	// if installedVersion != "" {
-	// 	installedVersion = "v" + installedVersion
-	// }
-	// requestedVersion := app.Spec.Version
-	// if requestedVersion != "" {
-	// 	requestedVersion = "v" + requestedVersion
-	// }
-	// UPGRADE
-	// if the requested version is greater than the installed version
-	// OR
-	// if the current values in the spec are different than those in the status
-	// TODO: check for spec changes
-	// return semver.Compare(requestedVersion, installedVersion) != 0
 }
 
 func repoURL(app *v1.App) string {

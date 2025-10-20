@@ -11,6 +11,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// TODO: figure this out for talos and think about making this pluggable for different types of PV sources (ie. not just host path)
+
 func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence, app *v1.App, namespace string) error {
 	var (
 		objName          = fmt.Sprintf("%s-%s", app.Spec.Release, p.Name)

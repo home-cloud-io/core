@@ -45,10 +45,6 @@ const (
 	InstallFinalizer = "install.home-cloud.io/finalizer"
 )
 
-//+kubebuilder:rbac:groups=home-cloud.io,resources=installs,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=home-cloud.io,resources=installs/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=home-cloud.io,resources=installs/finalizers,verbs=update
-
 func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
 	l.Info("Reconciling Install")
@@ -297,12 +293,12 @@ func kubeCreateOrUpdate(ctx context.Context, kube client.Client, obj client.Obje
 	err := kube.Get(ctx, client.ObjectKeyFromObject(obj), obj)
 	if err != nil {
 		if kerrors.IsNotFound(err) {
-			l.Info("creating object")
+			l.V(1).Info("creating object")
 			return kube.Create(ctx, obj)
 		}
 		return err
 	}
-	l.Info("updating object")
+	l.V(1).Info("updating object")
 	return kube.Update(ctx, obj)
 }
 
@@ -368,7 +364,7 @@ func helmInstallOrUpgrade(ctx context.Context, cfg *action.Configuration, iAct *
 		v = nil
 	}
 	if release.Chart.Metadata.Version == uAct.Version && (reflect.DeepEqual(release.Config, v)) {
-		l.Info("ignoring unchanged helm release", "release", iAct.ReleaseName)
+		l.V(1).Info("ignoring unchanged helm release", "release", iAct.ReleaseName)
 		return nil
 	}
 
@@ -445,7 +441,7 @@ func (r *InstallReconciler) apply(ctx context.Context, reader io.Reader) error {
 			l.Error(err, "failed to apply object", "kind", obj.GetKind(), "name", obj.GetName())
 			return err
 		}
-		l.Info("applied YAML for object", "kind", obj.GetKind(), "name", obj.GetName())
+		l.V(1).Info("applied YAML for object", "kind", obj.GetKind(), "name", obj.GetName())
 	}
 	return nil
 }
