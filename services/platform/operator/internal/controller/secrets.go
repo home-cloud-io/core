@@ -17,7 +17,7 @@ func (r *AppReconciler) createSecret(ctx context.Context, s AppSecret, namespace
 			k.Length = 24
 		}
 		p, err := secrets.Generate(k.Length, k.NoSpecialCharacters)
-		if err !=  nil {
+		if err != nil {
 			return err
 		}
 		data[k.Name] = p
