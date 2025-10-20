@@ -4,6 +4,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// TODO: omitempty redudant?
+
 // InstallSpec defines the desired state of Install
 type InstallSpec struct {
 	GatewayAPI GatewayAPISpec `json:"gatewayApiSpec,omitempty"`

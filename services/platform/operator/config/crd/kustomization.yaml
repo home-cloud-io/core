@@ -5,6 +5,7 @@ resources:
 - bases/home-cloud.io_apps.yaml
 - bases/home-cloud.io_homecloudoperators.yaml
 - bases/home-cloud.io_installs.yaml
+- bases/home-cloud.io_wireguards.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patches:
