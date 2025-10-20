@@ -39,53 +39,56 @@ func init() {
 }
 
 func main() {
-	var (
-		log = zerolog.New()
-		ch = chassis.New(log).DisableMux()
-	)
+	// configure logger
+	log := zerolog.New()
+	_ = chassis.New(log).DisableMux()
 	log.SetLevel(chassis.GetConfig().LogLevel())
-	defer ch.Start()
-
 	ctrl.SetLogger(logger.NewLogger(log))
+
+	// configure manager
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme: scheme,
-		HealthProbeBindAddress: ":8090",
-		LeaderElection:         true,
-		LeaderElectionNamespace: "home-cloud-system",
-		LeaderElectionID:       "operator.home-cloud.io",
+		Scheme:                        scheme,
+		HealthProbeBindAddress:        ":" + chassis.GetConfig().GetString("service.network.bind_port"),
+		LeaderElection:                true,
+		LeaderElectionNamespace:       "home-cloud-system",
+		LeaderElectionID:              "operator.home-cloud.io",
 		LeaderElectionReleaseOnCancel: true,
 	})
 	if err != nil {
-		setupLog.Error(err, "unable to start manager")
+		setupLog.Error(err, "failed to create manager")
 		os.Exit(1)
 	}
 
+	// create app controller
 	if err = (&controller.AppReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "App")
+		setupLog.Error(err, "failed to create controller", "controller", "App")
 		os.Exit(1)
 	}
 
+	// create install controller
 	if err = (&controller.InstallReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 		Config: mgr.GetConfig(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Install")
+		setupLog.Error(err, "failed to create controller", "controller", "Install")
 		os.Exit(1)
 	}
 
+	// add health/ready checks
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up health check")
+		setupLog.Error(err, "failed to set up health check")
 		os.Exit(1)
 	}
 	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up ready check")
+		setupLog.Error(err, "failed to set up ready check")
 		os.Exit(1)
 	}
 
+	// start manager
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
