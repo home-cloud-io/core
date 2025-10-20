@@ -17,7 +17,11 @@ To work on the Home Cloud core platform you'll need a couple of things installed
 * [k3d](https://k3d.io/stable/) - for running kubernetes locally
 * [kubectl](https://kubernetes.io/docs/tasks/tools/) - for managing kubernetes clusters
 
-This repository is built on top of the [Draft framework](https://github.com/steady-bytes/draft) for distributed systems. You don't need to be an expert with Draft to work with the Home Cloud core platform, but you'll need at least the `dctl` CLI tool. Let's install it now:
+This repository is built on top of the [Draft framework](https://github.com/steady-bytes/draft) for distributed systems. You don't need to be an expert with Draft to work with the Home Cloud core platform, but you'll need at least the `dctl` CLI tool.
+
+>Note: The `dctl` tool is installed and run via Docker. >However, there is not currently a pre-built Docker >image for ARM architectures (like Apple Silicon). If you're on an ARM machine you'll need to install the [Draft framework](https://github.com/steady-bytes/draft) locally and build the image: `docker build -t ghcr.io/steady-bytes/draft-core-blueprint:latest --build-arg DOMAIN=core --build-arg SERVICE=blueprint .`. Then skip to step **local k3s cluster** below.
+
+Let's install it now:
 
 ```shell
 go install github.com/steady-bytes/draft/tools/dctl@latest
@@ -131,4 +135,4 @@ cd services/platform/server/web-client
 npm start
 ```
 
-This will open your browser to the web client running locally and proxying all requests to the home cloud server running on `localhost:8000`.
+This will open your browser to the web client running locally on `localhost:3000` and proxying all requests to the home cloud server running on `localhost:8000`.
