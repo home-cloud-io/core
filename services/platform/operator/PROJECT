@@ -9,7 +9,7 @@ plugins:
   manifests.sdk.operatorframework.io/v2: {}
   scorecard.sdk.operatorframework.io/v2: {}
 projectName: home-cloud
-repo: github.com/home-cloud-io/operator
+repo: github.com/home-cloud-io/core/services/platform/operator
 resources:
 - api:
     crdVersion: v1
@@ -17,7 +17,7 @@ resources:
   controller: true
   domain: home-cloud.io
   kind: App
-  path: github.com/home-cloud-io/operator/api/v1
+  path: github.com/home-cloud-io/core/services/platform/operator/api/v1
   version: v1
 - api:
     crdVersion: v1
@@ -25,7 +25,7 @@ resources:
   controller: true
   domain: home-cloud.io
   kind: HomeCloudOperator
-  path: github.com/home-cloud-io/operator/api/v1
+  path: github.com/home-cloud-io/core/services/platform/operator/api/v1
   version: v1
 - api:
     crdVersion: v1
@@ -33,13 +33,13 @@ resources:
   controller: true
   domain: home-cloud.io
   kind: Install
-  path: github.com/home-cloud-io/operator/api/v1
+  path: github.com/home-cloud-io/core/services/platform/operator/api/v1
   version: v1
 - api:
     crdVersion: v1
     namespaced: true
   domain: home-cloud.io
   kind: Wireguard
-  path: github.com/home-cloud-io/operator/api/v1
+  path: github.com/home-cloud-io/core/services/platform/operator/api/v1
   version: v1
 version: "3"
