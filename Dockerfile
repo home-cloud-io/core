@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.24
+ARG GO_VERSION=1.25.3
 ARG ALPINE_VERSION=3.18
 
 # Build web client (if needed)
