@@ -32,8 +32,6 @@ service WebService {
   rpc IsDeviceSetup(IsDeviceSetupRequest) returns (IsDeviceSetupResponse) {}
   // Initialize the device with the user's credentials and settings
   rpc InitializeDevice(InitializeDeviceRequest) returns (InitializeDeviceResponse) {}
-  // Login to the device
-  rpc Login(LoginRequest) returns (LoginResponse) {}
   // Get all apps available in the store
   rpc GetAppsInStore(GetAppsInStoreRequest) returns (GetAppsInStoreResponse) {}
   // Get the device settings
@@ -101,7 +99,7 @@ message UpdateAppResponse {}
 message CheckForSystemUpdatesRequest {}
 
 message CheckForSystemUpdatesResponse {
-  // TODO
+  // TODO: implement for talos and maybe eventually for other systems
 }
 
 message CheckForContainerUpdatesRequest {}
@@ -158,25 +156,12 @@ message IsDeviceSetupResponse {
 }
 
 message InitializeDeviceRequest {
-  string username = 1 [(validate.rules).string.min_len = 4];
-  string password = 2 [(validate.rules).string.min_len = 4];
-  // validate timezone is at least not empty
-  string timezone = 3 [(validate.rules).string.min_len = 7];
-  bool auto_update_apps = 4;
-  bool auto_update_os = 5;
+  bool auto_update_apps = 1;
+  bool auto_update_os = 2;
 }
 
 message InitializeDeviceResponse {
   bool setup = 1;
-}
-
-message LoginRequest {
-  string username = 1;
-  string password = 2;
-}
-
-message LoginResponse {
-  string token = 1;
 }
 
 message GetAppsInStoreRequest {}
@@ -308,13 +293,9 @@ message AppStoreEntries {
 
 // User settings for the device
 message DeviceSettings {
-  User admin_user = 1 [(validate.rules).message.required = true];
-  string timezone = 2 [(validate.rules).string.min_len = 7];
-  bool auto_update_apps = 3;
-  bool auto_update_os = 4;
-  bool enable_ssh = 5;
-  repeated string trusted_ssh_keys = 6;
-  SecureTunnelingSettings secure_tunneling_settings = 7;
+  bool auto_update_apps = 1;
+  bool auto_update_os = 2;
+  SecureTunnelingSettings secure_tunneling_settings = 3;
 }
 
 // NOTE: These settings are written to the daemon config on the host so that tunneling can be
@@ -335,11 +316,6 @@ message WireguardInterface {
   string public_key = 4;
   string stun_server = 5;
   repeated string locator_servers = 6;
-}
-
-message User {
-  string username = 1;
-  string password = 2;
 }
 
 // Subscription events

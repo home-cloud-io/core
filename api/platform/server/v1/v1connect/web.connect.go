@@ -64,8 +64,6 @@ const (
 	// WebServiceInitializeDeviceProcedure is the fully-qualified name of the WebService's
 	// InitializeDevice RPC.
 	WebServiceInitializeDeviceProcedure = "/platform.server.v1.WebService/InitializeDevice"
-	// WebServiceLoginProcedure is the fully-qualified name of the WebService's Login RPC.
-	WebServiceLoginProcedure = "/platform.server.v1.WebService/Login"
 	// WebServiceGetAppsInStoreProcedure is the fully-qualified name of the WebService's GetAppsInStore
 	// RPC.
 	WebServiceGetAppsInStoreProcedure = "/platform.server.v1.WebService/GetAppsInStore"
@@ -117,7 +115,6 @@ var (
 	webServiceGetSystemStatsMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("GetSystemStats")
 	webServiceIsDeviceSetupMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("IsDeviceSetup")
 	webServiceInitializeDeviceMethodDescriptor         = webServiceServiceDescriptor.Methods().ByName("InitializeDevice")
-	webServiceLoginMethodDescriptor                    = webServiceServiceDescriptor.Methods().ByName("Login")
 	webServiceGetAppsInStoreMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("GetAppsInStore")
 	webServiceGetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("GetDeviceSettings")
 	webServiceSetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("SetDeviceSettings")
@@ -158,8 +155,6 @@ type WebServiceClient interface {
 	IsDeviceSetup(context.Context, *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error)
 	// Initialize the device with the user's credentials and settings
 	InitializeDevice(context.Context, *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error)
-	// Login to the device
-	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
 	// Get all apps available in the store
 	GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error)
 	// Get the device settings
@@ -268,12 +263,6 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceInitializeDeviceMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		login: connect.NewClient[v1.LoginRequest, v1.LoginResponse](
-			httpClient,
-			baseURL+WebServiceLoginProcedure,
-			connect.WithSchema(webServiceLoginMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 		getAppsInStore: connect.NewClient[v1.GetAppsInStoreRequest, v1.GetAppsInStoreResponse](
 			httpClient,
 			baseURL+WebServiceGetAppsInStoreProcedure,
@@ -363,7 +352,6 @@ type webServiceClient struct {
 	getSystemStats           *connect.Client[v1.GetSystemStatsRequest, v1.GetSystemStatsResponse]
 	isDeviceSetup            *connect.Client[v1.IsDeviceSetupRequest, v1.IsDeviceSetupResponse]
 	initializeDevice         *connect.Client[v1.InitializeDeviceRequest, v1.InitializeDeviceResponse]
-	login                    *connect.Client[v1.LoginRequest, v1.LoginResponse]
 	getAppsInStore           *connect.Client[v1.GetAppsInStoreRequest, v1.GetAppsInStoreResponse]
 	getDeviceSettings        *connect.Client[v1.GetDeviceSettingsRequest, v1.GetDeviceSettingsResponse]
 	setDeviceSettings        *connect.Client[v1.SetDeviceSettingsRequest, v1.SetDeviceSettingsResponse]
@@ -436,11 +424,6 @@ func (c *webServiceClient) IsDeviceSetup(ctx context.Context, req *connect.Reque
 // InitializeDevice calls platform.server.v1.WebService.InitializeDevice.
 func (c *webServiceClient) InitializeDevice(ctx context.Context, req *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
 	return c.initializeDevice.CallUnary(ctx, req)
-}
-
-// Login calls platform.server.v1.WebService.Login.
-func (c *webServiceClient) Login(ctx context.Context, req *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
-	return c.login.CallUnary(ctx, req)
 }
 
 // GetAppsInStore calls platform.server.v1.WebService.GetAppsInStore.
@@ -529,8 +512,6 @@ type WebServiceHandler interface {
 	IsDeviceSetup(context.Context, *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error)
 	// Initialize the device with the user's credentials and settings
 	InitializeDevice(context.Context, *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error)
-	// Login to the device
-	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
 	// Get all apps available in the store
 	GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error)
 	// Get the device settings
@@ -635,12 +616,6 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceInitializeDeviceMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	webServiceLoginHandler := connect.NewUnaryHandler(
-		WebServiceLoginProcedure,
-		svc.Login,
-		connect.WithSchema(webServiceLoginMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	webServiceGetAppsInStoreHandler := connect.NewUnaryHandler(
 		WebServiceGetAppsInStoreProcedure,
 		svc.GetAppsInStore,
@@ -739,8 +714,6 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceIsDeviceSetupHandler.ServeHTTP(w, r)
 		case WebServiceInitializeDeviceProcedure:
 			webServiceInitializeDeviceHandler.ServeHTTP(w, r)
-		case WebServiceLoginProcedure:
-			webServiceLoginHandler.ServeHTTP(w, r)
 		case WebServiceGetAppsInStoreProcedure:
 			webServiceGetAppsInStoreHandler.ServeHTTP(w, r)
 		case WebServiceGetDeviceSettingsProcedure:
@@ -820,10 +793,6 @@ func (UnimplementedWebServiceHandler) IsDeviceSetup(context.Context, *connect.Re
 
 func (UnimplementedWebServiceHandler) InitializeDevice(context.Context, *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.InitializeDevice is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.Login is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error) {
