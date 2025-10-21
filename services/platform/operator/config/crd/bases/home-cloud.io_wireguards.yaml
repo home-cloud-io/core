@@ -49,6 +49,11 @@ spec:
               name:
                 description: Name specifies the name of the interface.
                 type: string
+              natInterface:
+                description: |-
+                  NATInterface specifies the interface to configure NAT masquerade on for forwarding
+                  external traffic through.
+                type: string
               peers:
                 description: Peers specifies a list of peer configurations to apply
                   to an interface.
@@ -146,6 +151,7 @@ spec:
             - address
             - listenPort
             - name
+            - natInterface
             - peers
             - privateKeySecret
             type: object

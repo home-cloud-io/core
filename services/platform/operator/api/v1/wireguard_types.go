@@ -8,17 +8,21 @@ import (
 
 // WireguardSpec defines the desired state of Wireguard
 type WireguardSpec struct {
+	// Name specifies the name of the interface.
+	Name string `json:"name"`
+
 	// PrivateKeySecret references a Secret which contains the private key for this interface.
 	PrivateKeySecret SecretReference `json:"privateKeySecret"`
+
+	// Address specifies the address of the interface in CIDR notation.
+	Address string `json:"address"`
 
 	// ListenPort specifies an interface's listening port.
 	ListenPort int `json:"listenPort"`
 
-	// Name specifies the name of the interface.
-	Name string `json:"name"`
-
-	// Address specifies the address of the interface in CIDR notation.
-	Address string `json:"address"`
+	// NATInterface specifies the interface to configure NAT masquerade on for forwarding
+	// external traffic through.
+	NATInterface string `json:"natInterface"`
 
 	// Peers specifies a list of peer configurations to apply to an interface.
 	Peers []PeerSpec `json:"peers"`
