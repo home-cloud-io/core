@@ -441,7 +441,7 @@ export class CheckForSystemUpdatesRequest extends Message<CheckForSystemUpdatesR
 }
 
 /**
- * TODO
+ * TODO: implement for talos and maybe eventually for other systems
  *
  * @generated from message platform.server.v1.CheckForSystemUpdatesResponse
  */
@@ -967,29 +967,12 @@ export class IsDeviceSetupResponse extends Message<IsDeviceSetupResponse> {
  */
 export class InitializeDeviceRequest extends Message<InitializeDeviceRequest> {
   /**
-   * @generated from field: string username = 1;
-   */
-  username = "";
-
-  /**
-   * @generated from field: string password = 2;
-   */
-  password = "";
-
-  /**
-   * validate timezone is at least not empty
-   *
-   * @generated from field: string timezone = 3;
-   */
-  timezone = "";
-
-  /**
-   * @generated from field: bool auto_update_apps = 4;
+   * @generated from field: bool auto_update_apps = 1;
    */
   autoUpdateApps = false;
 
   /**
-   * @generated from field: bool auto_update_os = 5;
+   * @generated from field: bool auto_update_os = 2;
    */
   autoUpdateOs = false;
 
@@ -1001,11 +984,8 @@ export class InitializeDeviceRequest extends Message<InitializeDeviceRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.server.v1.InitializeDeviceRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 5, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 1, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InitializeDeviceRequest {
@@ -1059,86 +1039,6 @@ export class InitializeDeviceResponse extends Message<InitializeDeviceResponse> 
 
   static equals(a: InitializeDeviceResponse | PlainMessage<InitializeDeviceResponse> | undefined, b: InitializeDeviceResponse | PlainMessage<InitializeDeviceResponse> | undefined): boolean {
     return proto3.util.equals(InitializeDeviceResponse, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.LoginRequest
- */
-export class LoginRequest extends Message<LoginRequest> {
-  /**
-   * @generated from field: string username = 1;
-   */
-  username = "";
-
-  /**
-   * @generated from field: string password = 2;
-   */
-  password = "";
-
-  constructor(data?: PartialMessage<LoginRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.LoginRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LoginRequest {
-    return new LoginRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LoginRequest {
-    return new LoginRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LoginRequest {
-    return new LoginRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: LoginRequest | PlainMessage<LoginRequest> | undefined, b: LoginRequest | PlainMessage<LoginRequest> | undefined): boolean {
-    return proto3.util.equals(LoginRequest, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.LoginResponse
- */
-export class LoginResponse extends Message<LoginResponse> {
-  /**
-   * @generated from field: string token = 1;
-   */
-  token = "";
-
-  constructor(data?: PartialMessage<LoginResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.LoginResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LoginResponse {
-    return new LoginResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LoginResponse {
-    return new LoginResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LoginResponse {
-    return new LoginResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: LoginResponse | PlainMessage<LoginResponse> | undefined, b: LoginResponse | PlainMessage<LoginResponse> | undefined): boolean {
-    return proto3.util.equals(LoginResponse, a, b);
   }
 }
 
@@ -2306,37 +2206,22 @@ export class AppStoreEntries extends Message<AppStoreEntries> {
  */
 export class DeviceSettings extends Message<DeviceSettings> {
   /**
-   * @generated from field: platform.server.v1.User admin_user = 1;
-   */
-  adminUser?: User;
-
-  /**
-   * @generated from field: string timezone = 2;
-   */
-  timezone = "";
-
-  /**
-   * @generated from field: bool auto_update_apps = 3;
+   * @generated from field: bool auto_update_apps = 1;
    */
   autoUpdateApps = false;
 
   /**
-   * @generated from field: bool auto_update_os = 4;
+   * @generated from field: bool auto_update_os = 2;
    */
   autoUpdateOs = false;
 
   /**
-   * @generated from field: bool enable_ssh = 5;
+   * @generated from field: bool enable_ssh = 3;
    */
   enableSsh = false;
 
   /**
-   * @generated from field: repeated string trusted_ssh_keys = 6;
-   */
-  trustedSshKeys: string[] = [];
-
-  /**
-   * @generated from field: platform.server.v1.SecureTunnelingSettings secure_tunneling_settings = 7;
+   * @generated from field: platform.server.v1.SecureTunnelingSettings secure_tunneling_settings = 4;
    */
   secureTunnelingSettings?: SecureTunnelingSettings;
 
@@ -2348,13 +2233,10 @@ export class DeviceSettings extends Message<DeviceSettings> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.server.v1.DeviceSettings";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "admin_user", kind: "message", T: User },
-    { no: 2, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 5, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 6, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 7, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
+    { no: 1, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeviceSettings {
@@ -2488,49 +2370,6 @@ export class WireguardInterface extends Message<WireguardInterface> {
 
   static equals(a: WireguardInterface | PlainMessage<WireguardInterface> | undefined, b: WireguardInterface | PlainMessage<WireguardInterface> | undefined): boolean {
     return proto3.util.equals(WireguardInterface, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.User
- */
-export class User extends Message<User> {
-  /**
-   * @generated from field: string username = 1;
-   */
-  username = "";
-
-  /**
-   * @generated from field: string password = 2;
-   */
-  password = "";
-
-  constructor(data?: PartialMessage<User>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.User";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): User {
-    return new User().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): User {
-    return new User().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): User {
-    return new User().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: User | PlainMessage<User> | undefined, b: User | PlainMessage<User> | undefined): boolean {
-    return proto3.util.equals(User, a, b);
   }
 }
 

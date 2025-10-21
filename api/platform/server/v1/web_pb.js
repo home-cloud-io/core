@@ -121,7 +121,7 @@ export const CheckForSystemUpdatesRequest = /*@__PURE__*/ proto3.makeMessageType
 );
 
 /**
- * TODO
+ * TODO: implement for talos and maybe eventually for other systems
  *
  * @generated from message platform.server.v1.CheckForSystemUpdatesResponse
  */
@@ -261,11 +261,8 @@ export const IsDeviceSetupResponse = /*@__PURE__*/ proto3.makeMessageType(
 export const InitializeDeviceRequest = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.InitializeDeviceRequest",
   () => [
-    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 5, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 1, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 
@@ -276,27 +273,6 @@ export const InitializeDeviceResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.InitializeDeviceResponse",
   () => [
     { no: 1, name: "setup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.LoginRequest
- */
-export const LoginRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.LoginRequest",
-  () => [
-    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.LoginResponse
- */
-export const LoginResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.LoginResponse",
-  () => [
-    { no: 1, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -604,13 +580,10 @@ export const AppStoreEntries = /*@__PURE__*/ proto3.makeMessageType(
 export const DeviceSettings = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.DeviceSettings",
   () => [
-    { no: 1, name: "admin_user", kind: "message", T: User },
-    { no: 2, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 5, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 6, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 7, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
+    { no: 1, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
   ],
 );
 
@@ -644,17 +617,6 @@ export const WireguardInterface = /*@__PURE__*/ proto3.makeMessageType(
     { no: 4, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "stun_server", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "locator_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.User
- */
-export const User = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.User",
-  () => [
-    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
