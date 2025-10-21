@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wg0-private-key
+  namespace: home-cloud-system
+type: Opaque
+stringData:
+  privateKey: gFqIIEs2yL0BY19utNy+6dZdcLAy7j/KRTfPYvCkxWQ=
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: peer1-keys
+  namespace: home-cloud-system
+type: Opaque
+stringData:
+  privateKey: cATnEykzmlpQoU8GQQgtNQHKbXevqOARkgrVrUKXSFU=
+---
+apiVersion: home-cloud.io/v1
+kind: Wireguard
+metadata:
+  name: wg0
+  namespace: home-cloud-system
+  finalizers:
+    - wireguard.home-cloud.io/finalizer
+spec:
+  name: wg0
+  privateKeySecret:
+    name: wg0-private-key
+    namespace: home-cloud-system
+    dataKey: privateKey
+  address: 10.100.0.1/24
+  natInterface: wlp59s0
+  listenPort: 51820
+  peers:
+    - publicKey: nrTE6/bnl4s1mppb0zTuoR9Z7Yepzzy9PQdpd53SXgA=
+      privateKeySecret:
+        name: peer1-keys
+        namespace: home-cloud-system
+        dataKey: privateKey
+      allowedIPs:
+        - 10.100.0.2/24
+
+
