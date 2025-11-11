@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	scheme = runtime.NewScheme()
+	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
 )
 
@@ -41,12 +41,10 @@ func main() {
 
 	// configure manager
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                        scheme,
-		HealthProbeBindAddress:        ":" + chassis.GetConfig().GetString("service.network.bind_port"),
-		LeaderElection:                true,
-		LeaderElectionNamespace:       "home-cloud-system",
-		LeaderElectionID:              "tunnel.home-cloud.io",
-		LeaderElectionReleaseOnCancel: true,
+		Scheme:                 scheme,
+		HealthProbeBindAddress: ":" + chassis.GetConfig().GetString("service.network.bind_port"),
+		// no need for election since tunnel needs to run as a single replica StatefulSet
+		LeaderElection: false,
 	})
 	if err != nil {
 		setupLog.Error(err, "failed to create manager")
@@ -55,8 +53,8 @@ func main() {
 
 	// create wireguard controller
 	if err = (&wireguard.WireguardReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:  mgr.GetClient(),
+		Scheme:  mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "failed to create controller", "controller", "Wireguard")
 		os.Exit(1)

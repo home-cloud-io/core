@@ -39,6 +39,12 @@ func (s *sink) Enabled(level int) bool {
 func (s *sink) Info(level int, msg string, keysAndValues ...any) {
 	// level will always be >=0
 	switch level {
+	case -3:
+		s.log.WithFields(s.handleFields(keysAndValues...)).Fatal(msg)
+	case -2:
+		s.log.WithFields(s.handleFields(keysAndValues...)).Panic(msg)
+	case -1:
+		s.log.WithFields(s.handleFields(keysAndValues...)).Warn(msg)
 	case 0:
 		s.log.WithFields(s.handleFields(keysAndValues...)).Info(msg)
 	case 1:

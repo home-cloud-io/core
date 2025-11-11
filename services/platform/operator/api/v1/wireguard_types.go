@@ -8,6 +8,19 @@ import (
 
 // WireguardSpec defines the desired state of Wireguard
 type WireguardSpec struct {
+	// ID specifies the universally unique (UUID v4) identity of this interface. This is a public
+	// value that is used to lookup this Wireguard interface (server) via the defined Locator servers. It can
+	// be rotated independently of the private key (e.g. if the ID gets leaked and someone tries to DDOS
+	// the server with connection requests through a public Locator).
+	ID string `json:"id"`
+
+	// Locators specifies the addresses of Locator servers to connect to this Wireguard interface.
+	Locators []string `json:"locators"`
+
+	// STUNServer specifies the address of the STUN server to bind the ListenPort to and perform
+	// multiplexing of traffic between STUN and Wireguard.
+	STUNServer string `json:"stunServer"`
+
 	// Name specifies the name of the interface.
 	Name string `json:"name"`
 
@@ -60,11 +73,13 @@ type PeerSpec struct {
 }
 
 type SecretReference struct {
-	// Name specifies name of the secret.
+	// Name specifies name of the Secret object.
 	Name string `json:"name"`
 
-	// Namespace specifies the namespace of the secret.
-	Namespace string `json:"namespace"`
+	// Namespace specifies the namespace of the Secret object.
+	// If not set, will search within the same namespace as the Wireguard object.
+	// +optional
+	Namespace *string `json:"namespace,omitempty"`
 
 	// DataKey specifies the data key to find the requested value in.
 	DataKey string `json:"dataKey"`
