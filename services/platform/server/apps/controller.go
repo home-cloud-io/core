@@ -51,7 +51,9 @@ type (
 )
 
 func NewController(logger chassis.Logger) Controller {
-	chassis.GetConfig().SetDefault(autoUpdateCronConfigKey, "0 3 * * *")
+	config := chassis.GetConfig()
+	config.SetDefault(autoUpdateCronConfigKey, "0 3 * * *")
+	config.SetDefault(rawChartBaseUrlConfigKey, "https://raw.githubusercontent.com/home-cloud-io/store")
 	return &controller{
 		k8sclient: k8sclient.NewClient(logger),
 	}
@@ -63,8 +65,8 @@ const (
 	ErrFailedToGetComponentVersions = "failed to get component versions"
 	ErrFailedToGetLogs              = "failed to get logs"
 
-	autoUpdateCronConfigKey = "server.updates.apps_auto_update_cron"
-	rawChartBaseUrl         = "https://raw.githubusercontent.com/home-cloud-io/store"
+	autoUpdateCronConfigKey  = "server.updates.apps_auto_update_cron"
+	rawChartBaseUrlConfigKey = "server.apps.raw_chart_base_url"
 )
 
 func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.App, error) {
@@ -97,7 +99,8 @@ func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.Ap
 
 	// add extra information not from the index (e.g. readme and installed flag)
 	for _, app := range apps {
-		resp, err := http.Get(fmt.Sprintf("%s/%s-%s/charts/%s/README.md", rawChartBaseUrl, app.Name, app.Version, app.Name))
+		url := chassis.GetConfig().GetString(rawChartBaseUrlConfigKey)
+		resp, err := http.Get(fmt.Sprintf("%s/%s-%s/charts/%s/README.md", url, app.Name, app.Version, app.Name))
 		if err != nil {
 			logger.WithFields(chassis.Fields{
 				"app":         app.Name,

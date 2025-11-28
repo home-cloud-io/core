@@ -27,9 +27,10 @@ type (
 )
 
 const (
-	APP_STORE_URL               = "https://apps.home-cloud.io/index.yaml"
 	ErrFailedToPopulateAppStore = "failed to populate app store"
+
 	storeCacheIntervalConfigKey = "server.apps.store_cache_update_interval_minutes"
+	storeUrlConfigKey           = "server.apps.store_url"
 )
 
 // AppStoreCache creates a new store cache that runs in the background
@@ -37,6 +38,7 @@ const (
 func AppStoreCache(logger chassis.Logger) {
 	config := chassis.GetConfig()
 	config.SetDefault(storeCacheIntervalConfigKey, 15)
+	config.SetDefault(storeUrlConfigKey, "https://apps.home-cloud.io/index.yaml")
 	interval := config.GetInt(storeCacheIntervalConfigKey)
 	logger.WithField("interval_minutes", interval).Info("setting app store cache update interval")
 	for {
@@ -51,7 +53,8 @@ func refresh(logger chassis.Logger) error {
 	logger.Info("refreshing app store cache")
 	ctx := context.Background()
 	httpClient := &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, APP_STORE_URL, nil)
+	url := chassis.GetConfig().GetString(storeUrlConfigKey)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		logger.Error("failed to create request for apps.yaml")
 		return errors.New(ErrFailedToPopulateAppStore)
