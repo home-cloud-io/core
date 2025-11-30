@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { ArrowLeftOutlined, SyncOutlined } from '@ant-design/icons';
 import { useQuery } from '@connectrpc/connect-query';
-import { getSystemLogs } from 'api/platform/server/v1/web-WebService_connectquery';
+import { getSystemLogs } from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
 import { useNavigate } from 'react-router-dom';
 
 export default function LogsPage() {

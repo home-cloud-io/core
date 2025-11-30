@@ -1,14 +1,13 @@
 {
-  "name": "api",
-  "version": "1.0.0",
-  "description": "To serve as the home for type definitions, rpc service's, model's, validation of messages, and gateway generation. All of the above are declared in [protocol buffer's]() and compiled using [buf]() inside of a docker container to reduce protoc compiler, and compiler plugin environment dependencies.",
-  "main": "index.js",
+  "name": "@home-cloud/api",
+  "version": "0.8.7",
+  "description": "Home Cloud API specification. Generated from proto3 using ConnectRPC.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "jgkawell",
+  "license": "Apache-2.0",
   "dependencies": {
     "@bufbuild/buf": "^1.47.2",
     "@bufbuild/protobuf": "^1.10.0",

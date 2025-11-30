@@ -18,7 +18,7 @@ import {
 import { useQuery } from '@connectrpc/connect-query';
 import {
   getComponentVersions,
-} from 'api/platform/server/v1/web-WebService_connectquery';
+} from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
 import logo from '../../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 

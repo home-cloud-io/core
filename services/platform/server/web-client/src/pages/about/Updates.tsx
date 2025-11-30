@@ -25,13 +25,13 @@ import {
   checkForSystemUpdates,
   installOSUpdate,
   setSystemImage,
-} from 'api/platform/server/v1/web-WebService_connectquery';
+} from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
 import {
   CheckForContainerUpdatesResponse,
   CheckForSystemUpdatesResponse,
   DaemonVersion,
   ImageVersion,
-} from 'api/platform/server/v1/web_pb';
+} from '@home-cloud/api/platform/server/v1/web_pb';
 import { useNavigate } from 'react-router-dom';
 
 export default function UpdatesPage() {

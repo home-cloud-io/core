@@ -20,8 +20,8 @@ import { useMutation, useQuery } from '@connectrpc/connect-query';
 import {
   initializeDevice,
   isDeviceSetup,
-} from 'api/platform/server/v1/web-WebService_connectquery';
-import { InitializeDeviceRequest } from 'api/platform/server/v1/web_pb';
+} from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
+import { InitializeDeviceRequest } from '@home-cloud/api/platform/server/v1/web_pb';
 import { useNavigate } from 'react-router-dom';
 
 const logo = require('../../assets/logo.png');
