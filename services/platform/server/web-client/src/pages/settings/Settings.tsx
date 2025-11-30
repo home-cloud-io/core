@@ -36,7 +36,7 @@ import {
   SetDeviceSettingsRequest,
   RegisterToLocatorRequest,
   DeregisterFromLocatorRequest,
-} from "api/platform/server/v1/web_pb";
+} from "@home-cloud/api/platform/server/v1/web_pb";
 import {
   deregisterFromLocator,
   disableSecureTunnelling,
@@ -44,7 +44,7 @@ import {
   getDeviceSettings,
   registerToLocator,
   setDeviceSettings,
-} from "api/platform/server/v1/web-WebService_connectquery";
+} from "@home-cloud/api/platform/server/v1/web-WebService_connectquery";
 import { HelpModal } from "../../components/HelpModal";
 import { Option } from "antd/es/mentions";
 
