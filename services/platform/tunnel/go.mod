@@ -131,6 +131,3 @@ require (
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.0 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )
-
-// use the changes in this PR which fixes Android incompatability
-replace github.com/pion/mdns/v2 => github.com/atomirex/mdns/v2 v2.0.8-0.20241223173114-39a9a802b6f4
