@@ -37,7 +37,7 @@ func (l *LocatorClient) Connect(ctx context.Context) {
 	l.cancel = cancel
 
 	log := log.FromContext(ctx)
-	log.V(1).Info("connecting to locator")
+	log.Info("connecting to locator", "address", l.Address)
 
 	client := sdConnect.NewLocatorServiceClient(http.DefaultClient, l.Address)
 	stream := client.Connect(ctx)
@@ -46,7 +46,7 @@ func (l *LocatorClient) Connect(ctx context.Context) {
 	wg := v1.Wireguard{}
 	err := l.KubeClient.Get(ctx, l.WireguardReference, &wg)
 	if err != nil {
-		log.Error(err, "failed to get Wireguard object from k8s")
+		log.Error(err, "failed to get Wireguard object from k8s", "reference", l.WireguardReference)
 		return
 	}
 
@@ -74,6 +74,7 @@ func (l *LocatorClient) Connect(ctx context.Context) {
 		if err != nil {
 			if !strings.Contains(err.Error(), "context canceled") {
 				log.Error(err, "failed to receive message from locator")
+				// TODO: need to retry connection
 			}
 			continue
 		}
@@ -108,7 +109,7 @@ func (l *LocatorClient) authorizeLocate(ctx context.Context, stream *connect.Bid
 	wg := v1.Wireguard{}
 	err = l.KubeClient.Get(ctx, l.WireguardReference, &wg)
 	if err != nil {
-		log.Error(err, "failed to get Wireguard object from k8s")
+		log.Error(err, "failed to get Wireguard object from k8s", "reference", l.WireguardReference)
 		reject(ctx, locate.RequestId, stream)
 		return
 	}

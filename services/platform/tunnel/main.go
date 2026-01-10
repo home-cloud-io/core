@@ -17,6 +17,7 @@ import (
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/logger"
+	"github.com/home-cloud-io/services/platform/tunnel/stun"
 	"github.com/home-cloud-io/services/platform/tunnel/wireguard"
 )
 
@@ -55,6 +56,7 @@ func main() {
 	if err = (&wireguard.WireguardReconciler{
 		Client:  mgr.GetClient(),
 		Scheme:  mgr.GetScheme(),
+		STUNCtl: stun.NewSTUNController(log),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "failed to create controller", "controller", "Wireguard")
 		os.Exit(1)

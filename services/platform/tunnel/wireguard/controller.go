@@ -96,6 +96,8 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 			return err
 		}
 		log.Info("link added")
+	} else {
+		log.Info("link unchanged")
 	}
 
 	if new.Spec.Name != current.Spec.Name || new.Spec.Address != current.Spec.Address {
@@ -109,6 +111,8 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 			return err
 		}
 		log.Info("address added")
+	} else {
+		log.Info("address unchanged")
 	}
 
 	// NOTE: we always parse peers because they contain keys which come from referenced Secret objects
@@ -191,6 +195,8 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 			return err
 		}
 		log.Info("link set up")
+	} else {
+		log.Info("link unchanged")
 	}
 
 	if new.Spec.Address != current.Spec.Address || new.Spec.NATInterface != current.Spec.NATInterface {
@@ -204,14 +210,15 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 		if err != nil {
 			return err
 		}
-		if exists {
-			return nil
+		if !exists {
+			err = ipt.Append("nat", "POSTROUTING", rule...)
+			if err != nil {
+				return err
+			}
+			log.Info("iptables configured")
 		}
-		err = ipt.Append("nat", "POSTROUTING", rule...)
-		if err != nil {
-			return err
-		}
-		log.Info("iptables configured")
+	} else {
+		log.Info("nat unchanged")
 	}
 
 	if new.Spec.ListenPort != current.Spec.ListenPort || new.Spec.STUNServer != current.Spec.STUNServer {
@@ -230,13 +237,15 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 		if err != nil {
 			return err
 		}
+	} else {
+		log.Info("stun unchanged")
 	}
 
 	// update locators if the configured locators has changed or if the ID has changed
 	if !slices.Equal(new.Spec.Locators, current.Spec.Locators) || new.Spec.ID != current.Spec.ID {
 		nn := types.NamespacedName{
-			Namespace: current.Namespace,
-			Name:      current.Name,
+			Namespace: new.Namespace,
+			Name:      new.Name,
 		}
 
 		// cancel previous clients
@@ -260,6 +269,8 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 
 		// save new state
 		r.locatorsState[nn] = clients
+	} else {
+		log.Info("locators unchanged")
 	}
 
 	return nil
