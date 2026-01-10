@@ -12,7 +12,7 @@ type sink struct {
 
 func NewLogger(logger chassis.Logger) logr.Logger {
 	return logr.New(&sink{
-		log: logger.WithCallDepth(4),
+		log: logger.WithCallDepth(5),
 	})
 }
 
