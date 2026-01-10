@@ -245,6 +245,7 @@ func (b *stunBinding) bind() error {
 	err := b.client.Do(stun.MustBuild(stun.TransactionID, stun.BindingRequest), func(res stun.Event) {
 		if res.Error != nil {
 			eventErr = res.Error
+			return
 		}
 
 		// parse the returned address from the response
@@ -252,6 +253,7 @@ func (b *stunBinding) bind() error {
 		err := foundAddress.GetFrom(res.Message)
 		if err != nil {
 			eventErr = err
+			return
 		}
 
 		// save the found address
