@@ -3,7 +3,7 @@ module github.com/home-cloud-io/services/platform/mdns
 go 1.23.6
 
 require (
-	github.com/pion/mdns/v2 v2.0.7
+	github.com/pion/mdns/v2 v2.1.0
 	github.com/steady-bytes/draft/pkg/chassis v0.4.5
 	github.com/steady-bytes/draft/pkg/loggers v0.2.3
 	golang.org/x/net v0.35.0
@@ -89,6 +89,3 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-// use the changes in this PR which fixes Android incompatability
-replace github.com/pion/mdns/v2 => github.com/atomirex/mdns/v2 v2.0.8-0.20241223173114-39a9a802b6f4
