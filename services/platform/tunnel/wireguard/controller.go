@@ -77,6 +77,8 @@ func (r *WireguardReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wireguard, new *v1.Wireguard) error {
 	log := log.FromContext(ctx)
 
+	log.Info("reconciling address", "address", new.Spec.Address)
+
 	// define interface
 	inf := &netlink.Wireguard{LinkAttrs: netlink.LinkAttrs{Name: new.Spec.Name}}
 
@@ -95,7 +97,7 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 		if errors.Is(err, fmt.Errorf("file exists")) {
 			return err
 		}
-		log.Info("link added")
+		log.Info("link configured")
 	} else {
 		log.Info("link unchanged")
 	}
@@ -110,7 +112,7 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 		if errors.Is(err, fmt.Errorf("file exists")) {
 			return err
 		}
-		log.Info("address added")
+		log.Info("address configured")
 	} else {
 		log.Info("address unchanged")
 	}
@@ -175,6 +177,7 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 	// configure device
 	wClient, err := wgctrl.New()
 	if err != nil {
+		log.Error(err, "failed to create wireguard client")
 		return err
 	}
 	err = wClient.ConfigureDevice(new.Spec.Name, wgtypes.Config{
@@ -184,6 +187,7 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 		Peers:        peers,
 	})
 	if err != nil {
+		log.Error(err, "failed to configure wireguard device")
 		return err
 	}
 	log.Info("device configured")
@@ -194,7 +198,7 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 		if err != nil {
 			return err
 		}
-		log.Info("link set up")
+		log.Info("link configured")
 	} else {
 		log.Info("link unchanged")
 	}
@@ -216,6 +220,8 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 				return err
 			}
 			log.Info("iptables configured")
+		} else {
+			log.Info("iptables unchanged")
 		}
 	} else {
 		log.Info("nat unchanged")
@@ -237,6 +243,7 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 		if err != nil {
 			return err
 		}
+		log.Info("stun configured")
 	} else {
 		log.Info("stun unchanged")
 	}
@@ -255,24 +262,34 @@ func (r *WireguardReconciler) reconcile(ctx context.Context, current *v1.Wiregua
 			}
 		}
 
+		// set new values
+		nn.Namespace = new.Namespace
+		nn.Name = new.Name
+
 		// connect to new clients
 		clients := make([]*LocatorClient, len(new.Spec.Locators))
 		for i, address := range new.Spec.Locators {
+			c, cancel := context.WithCancel(ctx)
 			run := &LocatorClient{
 				Address:            address,
 				WireguardReference: nn,
 				KubeClient:         r.Client,
+				STUNController:     r.STUNCtl,
+				cancel:             cancel,
 			}
 			clients[i] = run
-			go run.Connect(ctx)
+			go run.Connect(c)
 		}
 
 		// save new state
 		r.locatorsState[nn] = clients
+
+		log.Info("locators configured")
 	} else {
 		log.Info("locators unchanged")
 	}
 
+	log.Info("reconcile complete")
 	return nil
 }
 

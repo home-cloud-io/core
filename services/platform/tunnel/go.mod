@@ -2,9 +2,9 @@ module github.com/home-cloud-io/services/platform/tunnel
 
 go 1.25.3
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
-replace github.com/home-cloud-io/core/services/platform/operator => ../../../services/platform/operator
+// replace github.com/home-cloud-io/core/services/platform/operator => ../../../services/platform/operator
 
 require (
 	connectrpc.com/connect v1.18.1
@@ -12,11 +12,13 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/home-cloud-io/core/api v0.8.7
 	github.com/home-cloud-io/core/services/platform/daemon v0.0.38
-	github.com/home-cloud-io/core/services/platform/operator v0.0.2
+	// TODO: change to v0.0.4 when available
+	github.com/home-cloud-io/core/services/platform/operator v0.0.3-0.20260110225306-fbaff52d3d5c
 	github.com/netbirdio/netbird v0.59.7
 	github.com/pion/stun/v2 v2.0.0
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
-	github.com/steady-bytes/draft/pkg/loggers v0.2.5
+	// TODO: still have call depth issues with this version
+	github.com/steady-bytes/draft/pkg/loggers v0.2.6-0.20260110203148-38bbf815f75f
 	github.com/vishvananda/netlink v1.3.1
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10
 	k8s.io/api v0.34.1
@@ -103,15 +105,16 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/crypto v0.42.0 // indirect
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
-	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/net v0.44.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
-	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
-	golang.org/x/term v0.34.0 // indirect
-	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/term v0.35.0 // indirect
+	golang.org/x/text v0.29.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
+	golang.org/x/tools v0.37.0 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard v0.0.0-20231211153847-12269c276173 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
