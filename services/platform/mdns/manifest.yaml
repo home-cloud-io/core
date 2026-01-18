@@ -9,9 +9,9 @@ kind: ClusterRole
 metadata:
   name: home-cloud-mdns
 rules:
-  - apiGroups: ['']
-    resources: ['services']
-    verbs: ['list', 'watch']
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -55,6 +55,7 @@ spec:
         app: mdns
     spec:
       # need to be on host for creating the mDNS server on :5353
+      # TODO: could potentially get around this with UDPRoutes in GatewayAPI
       hostNetwork: true
       serviceAccountName: mdns
       containers:
@@ -70,15 +71,14 @@ spec:
             seccompProfile:
               type: RuntimeDefault
             capabilities:
-              drop: ["ALL"]
+              drop:
+                - ALL
           env:
-            # TODO: read these from blueprint
+            # TODO: read this from kubernetes
             - name: HOST_IP
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
-            - name: HOST_NAME
-              value: home-cloud
           volumeMounts:
             - name: config
               mountPath: /etc/config.yaml
