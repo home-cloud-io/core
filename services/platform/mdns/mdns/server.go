@@ -71,7 +71,10 @@ func (s *server) Serve(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	s.logger.WithField("address", hostIP).Info("registered host IP")
+	s.logger.WithFields(chassis.Fields{
+		"address": hostIP,
+		"hosts":   s.hosts,
+	}).Info("registered host IP")
 
 	// close old conn
 	if s.conn != nil {
