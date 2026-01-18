@@ -43,9 +43,22 @@ spec:
                 description: Address specifies the address of the interface in CIDR
                   notation.
                 type: string
+              id:
+                description: |-
+                  ID specifies the universally unique (UUID v4) identity of this interface. This is a public
+                  value that is used to lookup this Wireguard interface (server) via the defined Locator servers. It can
+                  be rotated independently of the private key (e.g. if the ID gets leaked and someone tries to DDOS
+                  the server with connection requests through a public Locator).
+                type: string
               listenPort:
                 description: ListenPort specifies an interface's listening port.
                 type: integer
+              locators:
+                description: Locators specifies the addresses of Locator servers to
+                  connect to this Wireguard interface.
+                items:
+                  type: string
+                type: array
               name:
                 description: Name specifies the name of the interface.
                 type: string
@@ -89,15 +102,16 @@ spec:
                             requested value in.
                           type: string
                         name:
-                          description: Name specifies name of the secret.
+                          description: Name specifies name of the Secret object.
                           type: string
                         namespace:
-                          description: Namespace specifies the namespace of the secret.
+                          description: |-
+                            Namespace specifies the namespace of the Secret object.
+                            If not set, will search within the same namespace as the Wireguard object.
                           type: string
                       required:
                       - dataKey
                       - name
-                      - namespace
                       type: object
                     privateKeySecret:
                       description: PrivateKeySecret references a Secret which contains
@@ -108,15 +122,16 @@ spec:
                             requested value in.
                           type: string
                         name:
-                          description: Name specifies name of the secret.
+                          description: Name specifies name of the Secret object.
                           type: string
                         namespace:
-                          description: Namespace specifies the namespace of the secret.
+                          description: |-
+                            Namespace specifies the namespace of the Secret object.
+                            If not set, will search within the same namespace as the Wireguard object.
                           type: string
                       required:
                       - dataKey
                       - name
-                      - namespace
                       type: object
                     publicKey:
                       description: |-
@@ -137,23 +152,32 @@ spec:
                       value in.
                     type: string
                   name:
-                    description: Name specifies name of the secret.
+                    description: Name specifies name of the Secret object.
                     type: string
                   namespace:
-                    description: Namespace specifies the namespace of the secret.
+                    description: |-
+                      Namespace specifies the namespace of the Secret object.
+                      If not set, will search within the same namespace as the Wireguard object.
                     type: string
                 required:
                 - dataKey
                 - name
-                - namespace
                 type: object
+              stunServer:
+                description: |-
+                  STUNServer specifies the address of the STUN server to bind the ListenPort to and perform
+                  multiplexing of traffic between STUN and Wireguard.
+                type: string
             required:
             - address
+            - id
             - listenPort
+            - locators
             - name
             - natInterface
             - peers
             - privateKeySecret
+            - stunServer
             type: object
           status:
             description: status defines the observed state of Wireguard
