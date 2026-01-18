@@ -6,4 +6,4 @@ service:
     level: debug
 
   network:
-    port: 8001
+    bind_port: 8001
