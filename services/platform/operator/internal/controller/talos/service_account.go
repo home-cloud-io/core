@@ -10,10 +10,10 @@ import (
 
 type ServiceAccount struct {
 	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata"`
 
-	Spec   ServiceAccountSpec   `json:"spec,omitempty"`
-	Status ServiceAccountStatus `json:"status,omitempty"`
+	Spec   ServiceAccountSpec   `json:"spec"`
+	Status ServiceAccountStatus `json:"status"`
 }
 
 type ServiceAccountSpec struct {
@@ -26,7 +26,7 @@ type ServiceAccountStatus struct {
 
 type ServiceAccountList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	metav1.ListMeta `json:"metadata"`
 	Items           []ServiceAccount `json:"items"`
 }
 
