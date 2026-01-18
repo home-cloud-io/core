@@ -201,12 +201,11 @@ func demultiplex(ctx context.Context, logger chassis.Logger, conn net.PacketConn
 			logger.Debug("stopping STUN demultiplexer")
 			return
 		default:
-			size, addr, err := conn.ReadFrom(buf)
+			size, _, err := conn.ReadFrom(buf)
 			if err != nil {
 				logger.Errorf("error while reading packet from the shared socket: %s", err)
 				continue
 			}
-			logger.WithField("packet_size", size).WithField("address", addr).Debug("read a STUN packet")
 			if _, err = stunConn.Write(buf[:size]); err != nil {
 				logger.WithError(err).Error("failed to write")
 				return

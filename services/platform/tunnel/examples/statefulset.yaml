@@ -1,0 +1,95 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tunnel
+  namespace: home-cloud-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: home-cloud-tunnel
+rules:
+  - apiGroups: ['home-cloud.io']
+    resources: ['wireguards']
+    verbs: ['*']
+  - apiGroups: ['home-cloud.io']
+    resources: ['wireguards/status']
+    verbs: ['get']
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list', 'watch']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tunnel-viewer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: home-cloud-tunnel
+subjects:
+  - kind: ServiceAccount
+    name: tunnel
+    namespace: home-cloud-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tunnel
+  namespace: home-cloud-system
+data:
+  config.yaml: |
+    service:
+      name: tunnel
+      domain: platform
+      env: prod
+      logging:
+        level: debug
+      network:
+        bind_port: 8091
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tunnel
+  namespace: home-cloud-system
+spec:
+  serviceName: tunnel
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tunnel
+  template:
+    metadata:
+      labels:
+        app: tunnel
+    spec:
+      # TODO: could potentially get around this with UDPRoutes in GatewayAPI
+      hostNetwork: true
+      serviceAccountName: tunnel
+      containers:
+        - name: tunnel
+          image: ghcr.io/home-cloud-io/core-platform-tunnel:latest
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+              - "NET_ADMIN"
+          # TODO
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          volumeMounts:
+          - name: config
+            mountPath: /etc/config.yaml
+            subPath: config.yaml
+      volumes:
+      - name: config
+        configMap:
+          name: tunnel
