@@ -35,8 +35,7 @@ func NewController(logger chassis.Logger) Controller {
 	config.SetDefault(osAutoUpdateCronConfigKey, "0 1 * * *")
 	config.SetDefault(containerAutoUpdateCronConfigKey, "0 2 * * *")
 	return &controller{
-		k8sclient: k8sclient.NewClient(logger),
-		// TODO: derive this address? get it from blueprint?
+		k8sclient:    k8sclient.NewClient(logger),
 		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, "daemon.home-cloud-system"),
 	}
 }
