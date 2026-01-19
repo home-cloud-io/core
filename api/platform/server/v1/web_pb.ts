@@ -1952,51 +1952,6 @@ export class Entries extends Message<Entries> {
 }
 
 /**
- * Aggregate model for the installed apps saved in blueprint
- *
- * @generated from message platform.server.v1.InstalledApp
- */
-export class InstalledApp extends Message<InstalledApp> {
-  /**
-   * @generated from field: platform.server.v1.App application = 1;
-   */
-  application?: App;
-
-  /**
-   * @generated from field: platform.server.v1.AppRunningStatus status = 2;
-   */
-  status?: AppRunningStatus;
-
-  constructor(data?: PartialMessage<InstalledApp>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.InstalledApp";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "application", kind: "message", T: App },
-    { no: 2, name: "status", kind: "message", T: AppRunningStatus },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InstalledApp {
-    return new InstalledApp().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InstalledApp {
-    return new InstalledApp().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InstalledApp {
-    return new InstalledApp().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: InstalledApp | PlainMessage<InstalledApp> | undefined, b: InstalledApp | PlainMessage<InstalledApp> | undefined): boolean {
-    return proto3.util.equals(InstalledApp, a, b);
-  }
-}
-
-/**
  * Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
  * A backround thread in the server will fetch the index and update the
  * cache at startup and then every 24 hours

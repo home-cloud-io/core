@@ -257,12 +257,6 @@ message Entries {
   repeated App apps = 1;
 }
 
-// Aggregate model for the installed apps saved in blueprint
-message InstalledApp {
-  App application = 1;
-  AppRunningStatus status = 2;
-}
-
 // Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
 // A backround thread in the server will fetch the index and update the
 // cache at startup and then every 24 hours
