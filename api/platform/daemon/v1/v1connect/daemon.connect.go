@@ -39,59 +39,19 @@ const (
 	// DaemonServiceRebootHostProcedure is the fully-qualified name of the DaemonService's RebootHost
 	// RPC.
 	DaemonServiceRebootHostProcedure = "/platform.daemon.v1.DaemonService/RebootHost"
-	// DaemonServiceInitializeHostProcedure is the fully-qualified name of the DaemonService's
-	// InitializeHost RPC.
-	DaemonServiceInitializeHostProcedure = "/platform.daemon.v1.DaemonService/InitializeHost"
-	// DaemonServiceAddWireguardInterfaceProcedure is the fully-qualified name of the DaemonService's
-	// AddWireguardInterface RPC.
-	DaemonServiceAddWireguardInterfaceProcedure = "/platform.daemon.v1.DaemonService/AddWireguardInterface"
-	// DaemonServiceRemoveWireguardInterfaceProcedure is the fully-qualified name of the DaemonService's
-	// RemoveWireguardInterface RPC.
-	DaemonServiceRemoveWireguardInterfaceProcedure = "/platform.daemon.v1.DaemonService/RemoveWireguardInterface"
-	// DaemonServiceAddWireguardPeerProcedure is the fully-qualified name of the DaemonService's
-	// AddWireguardPeer RPC.
-	DaemonServiceAddWireguardPeerProcedure = "/platform.daemon.v1.DaemonService/AddWireguardPeer"
-	// DaemonServiceRemoveWireguardPeerProcedure is the fully-qualified name of the DaemonService's
-	// RemoveWireguardPeer RPC.
-	DaemonServiceRemoveWireguardPeerProcedure = "/platform.daemon.v1.DaemonService/RemoveWireguardPeer"
-	// DaemonServiceSetSTUNServerProcedure is the fully-qualified name of the DaemonService's
-	// SetSTUNServer RPC.
-	DaemonServiceSetSTUNServerProcedure = "/platform.daemon.v1.DaemonService/SetSTUNServer"
-	// DaemonServiceAddLocatorServerProcedure is the fully-qualified name of the DaemonService's
-	// AddLocatorServer RPC.
-	DaemonServiceAddLocatorServerProcedure = "/platform.daemon.v1.DaemonService/AddLocatorServer"
-	// DaemonServiceRemoveLocatorServerProcedure is the fully-qualified name of the DaemonService's
-	// RemoveLocatorServer RPC.
-	DaemonServiceRemoveLocatorServerProcedure = "/platform.daemon.v1.DaemonService/RemoveLocatorServer"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	daemonServiceServiceDescriptor                        = v1.File_platform_daemon_v1_daemon_proto.Services().ByName("DaemonService")
-	daemonServiceShutdownHostMethodDescriptor             = daemonServiceServiceDescriptor.Methods().ByName("ShutdownHost")
-	daemonServiceRebootHostMethodDescriptor               = daemonServiceServiceDescriptor.Methods().ByName("RebootHost")
-	daemonServiceInitializeHostMethodDescriptor           = daemonServiceServiceDescriptor.Methods().ByName("InitializeHost")
-	daemonServiceAddWireguardInterfaceMethodDescriptor    = daemonServiceServiceDescriptor.Methods().ByName("AddWireguardInterface")
-	daemonServiceRemoveWireguardInterfaceMethodDescriptor = daemonServiceServiceDescriptor.Methods().ByName("RemoveWireguardInterface")
-	daemonServiceAddWireguardPeerMethodDescriptor         = daemonServiceServiceDescriptor.Methods().ByName("AddWireguardPeer")
-	daemonServiceRemoveWireguardPeerMethodDescriptor      = daemonServiceServiceDescriptor.Methods().ByName("RemoveWireguardPeer")
-	daemonServiceSetSTUNServerMethodDescriptor            = daemonServiceServiceDescriptor.Methods().ByName("SetSTUNServer")
-	daemonServiceAddLocatorServerMethodDescriptor         = daemonServiceServiceDescriptor.Methods().ByName("AddLocatorServer")
-	daemonServiceRemoveLocatorServerMethodDescriptor      = daemonServiceServiceDescriptor.Methods().ByName("RemoveLocatorServer")
+	daemonServiceServiceDescriptor            = v1.File_platform_daemon_v1_daemon_proto.Services().ByName("DaemonService")
+	daemonServiceShutdownHostMethodDescriptor = daemonServiceServiceDescriptor.Methods().ByName("ShutdownHost")
+	daemonServiceRebootHostMethodDescriptor   = daemonServiceServiceDescriptor.Methods().ByName("RebootHost")
 )
 
 // DaemonServiceClient is a client for the platform.daemon.v1.DaemonService service.
 type DaemonServiceClient interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
 	RebootHost(context.Context, *connect.Request[v1.RebootHostRequest]) (*connect.Response[v1.RebootHostResponse], error)
-	InitializeHost(context.Context, *connect.Request[v1.InitializeHostRequest]) (*connect.Response[v1.InitializeHostResponse], error)
-	AddWireguardInterface(context.Context, *connect.Request[v1.AddWireguardInterfaceRequest]) (*connect.Response[v1.AddWireguardInterfaceResponse], error)
-	RemoveWireguardInterface(context.Context, *connect.Request[v1.RemoveWireguardInterfaceRequest]) (*connect.Response[v1.RemoveWireguardInterfaceResponse], error)
-	AddWireguardPeer(context.Context, *connect.Request[v1.AddWireguardPeerRequest]) (*connect.Response[v1.AddWireguardPeerResponse], error)
-	RemoveWireguardPeer(context.Context, *connect.Request[v1.RemoveWireguardPeerRequest]) (*connect.Response[v1.RemoveWireguardPeerResponse], error)
-	SetSTUNServer(context.Context, *connect.Request[v1.SetSTUNServerRequest]) (*connect.Response[v1.SetSTUNServerResponse], error)
-	AddLocatorServer(context.Context, *connect.Request[v1.AddLocatorServerRequest]) (*connect.Response[v1.AddLocatorServerResponse], error)
-	RemoveLocatorServer(context.Context, *connect.Request[v1.RemoveLocatorServerRequest]) (*connect.Response[v1.RemoveLocatorServerResponse], error)
 }
 
 // NewDaemonServiceClient constructs a client for the platform.daemon.v1.DaemonService service. By
@@ -116,69 +76,13 @@ func NewDaemonServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(daemonServiceRebootHostMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		initializeHost: connect.NewClient[v1.InitializeHostRequest, v1.InitializeHostResponse](
-			httpClient,
-			baseURL+DaemonServiceInitializeHostProcedure,
-			connect.WithSchema(daemonServiceInitializeHostMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		addWireguardInterface: connect.NewClient[v1.AddWireguardInterfaceRequest, v1.AddWireguardInterfaceResponse](
-			httpClient,
-			baseURL+DaemonServiceAddWireguardInterfaceProcedure,
-			connect.WithSchema(daemonServiceAddWireguardInterfaceMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		removeWireguardInterface: connect.NewClient[v1.RemoveWireguardInterfaceRequest, v1.RemoveWireguardInterfaceResponse](
-			httpClient,
-			baseURL+DaemonServiceRemoveWireguardInterfaceProcedure,
-			connect.WithSchema(daemonServiceRemoveWireguardInterfaceMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		addWireguardPeer: connect.NewClient[v1.AddWireguardPeerRequest, v1.AddWireguardPeerResponse](
-			httpClient,
-			baseURL+DaemonServiceAddWireguardPeerProcedure,
-			connect.WithSchema(daemonServiceAddWireguardPeerMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		removeWireguardPeer: connect.NewClient[v1.RemoveWireguardPeerRequest, v1.RemoveWireguardPeerResponse](
-			httpClient,
-			baseURL+DaemonServiceRemoveWireguardPeerProcedure,
-			connect.WithSchema(daemonServiceRemoveWireguardPeerMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		setSTUNServer: connect.NewClient[v1.SetSTUNServerRequest, v1.SetSTUNServerResponse](
-			httpClient,
-			baseURL+DaemonServiceSetSTUNServerProcedure,
-			connect.WithSchema(daemonServiceSetSTUNServerMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		addLocatorServer: connect.NewClient[v1.AddLocatorServerRequest, v1.AddLocatorServerResponse](
-			httpClient,
-			baseURL+DaemonServiceAddLocatorServerProcedure,
-			connect.WithSchema(daemonServiceAddLocatorServerMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		removeLocatorServer: connect.NewClient[v1.RemoveLocatorServerRequest, v1.RemoveLocatorServerResponse](
-			httpClient,
-			baseURL+DaemonServiceRemoveLocatorServerProcedure,
-			connect.WithSchema(daemonServiceRemoveLocatorServerMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
 // daemonServiceClient implements DaemonServiceClient.
 type daemonServiceClient struct {
-	shutdownHost             *connect.Client[v1.ShutdownHostRequest, v1.ShutdownHostResponse]
-	rebootHost               *connect.Client[v1.RebootHostRequest, v1.RebootHostResponse]
-	initializeHost           *connect.Client[v1.InitializeHostRequest, v1.InitializeHostResponse]
-	addWireguardInterface    *connect.Client[v1.AddWireguardInterfaceRequest, v1.AddWireguardInterfaceResponse]
-	removeWireguardInterface *connect.Client[v1.RemoveWireguardInterfaceRequest, v1.RemoveWireguardInterfaceResponse]
-	addWireguardPeer         *connect.Client[v1.AddWireguardPeerRequest, v1.AddWireguardPeerResponse]
-	removeWireguardPeer      *connect.Client[v1.RemoveWireguardPeerRequest, v1.RemoveWireguardPeerResponse]
-	setSTUNServer            *connect.Client[v1.SetSTUNServerRequest, v1.SetSTUNServerResponse]
-	addLocatorServer         *connect.Client[v1.AddLocatorServerRequest, v1.AddLocatorServerResponse]
-	removeLocatorServer      *connect.Client[v1.RemoveLocatorServerRequest, v1.RemoveLocatorServerResponse]
+	shutdownHost *connect.Client[v1.ShutdownHostRequest, v1.ShutdownHostResponse]
+	rebootHost   *connect.Client[v1.RebootHostRequest, v1.RebootHostResponse]
 }
 
 // ShutdownHost calls platform.daemon.v1.DaemonService.ShutdownHost.
@@ -191,58 +95,10 @@ func (c *daemonServiceClient) RebootHost(ctx context.Context, req *connect.Reque
 	return c.rebootHost.CallUnary(ctx, req)
 }
 
-// InitializeHost calls platform.daemon.v1.DaemonService.InitializeHost.
-func (c *daemonServiceClient) InitializeHost(ctx context.Context, req *connect.Request[v1.InitializeHostRequest]) (*connect.Response[v1.InitializeHostResponse], error) {
-	return c.initializeHost.CallUnary(ctx, req)
-}
-
-// AddWireguardInterface calls platform.daemon.v1.DaemonService.AddWireguardInterface.
-func (c *daemonServiceClient) AddWireguardInterface(ctx context.Context, req *connect.Request[v1.AddWireguardInterfaceRequest]) (*connect.Response[v1.AddWireguardInterfaceResponse], error) {
-	return c.addWireguardInterface.CallUnary(ctx, req)
-}
-
-// RemoveWireguardInterface calls platform.daemon.v1.DaemonService.RemoveWireguardInterface.
-func (c *daemonServiceClient) RemoveWireguardInterface(ctx context.Context, req *connect.Request[v1.RemoveWireguardInterfaceRequest]) (*connect.Response[v1.RemoveWireguardInterfaceResponse], error) {
-	return c.removeWireguardInterface.CallUnary(ctx, req)
-}
-
-// AddWireguardPeer calls platform.daemon.v1.DaemonService.AddWireguardPeer.
-func (c *daemonServiceClient) AddWireguardPeer(ctx context.Context, req *connect.Request[v1.AddWireguardPeerRequest]) (*connect.Response[v1.AddWireguardPeerResponse], error) {
-	return c.addWireguardPeer.CallUnary(ctx, req)
-}
-
-// RemoveWireguardPeer calls platform.daemon.v1.DaemonService.RemoveWireguardPeer.
-func (c *daemonServiceClient) RemoveWireguardPeer(ctx context.Context, req *connect.Request[v1.RemoveWireguardPeerRequest]) (*connect.Response[v1.RemoveWireguardPeerResponse], error) {
-	return c.removeWireguardPeer.CallUnary(ctx, req)
-}
-
-// SetSTUNServer calls platform.daemon.v1.DaemonService.SetSTUNServer.
-func (c *daemonServiceClient) SetSTUNServer(ctx context.Context, req *connect.Request[v1.SetSTUNServerRequest]) (*connect.Response[v1.SetSTUNServerResponse], error) {
-	return c.setSTUNServer.CallUnary(ctx, req)
-}
-
-// AddLocatorServer calls platform.daemon.v1.DaemonService.AddLocatorServer.
-func (c *daemonServiceClient) AddLocatorServer(ctx context.Context, req *connect.Request[v1.AddLocatorServerRequest]) (*connect.Response[v1.AddLocatorServerResponse], error) {
-	return c.addLocatorServer.CallUnary(ctx, req)
-}
-
-// RemoveLocatorServer calls platform.daemon.v1.DaemonService.RemoveLocatorServer.
-func (c *daemonServiceClient) RemoveLocatorServer(ctx context.Context, req *connect.Request[v1.RemoveLocatorServerRequest]) (*connect.Response[v1.RemoveLocatorServerResponse], error) {
-	return c.removeLocatorServer.CallUnary(ctx, req)
-}
-
 // DaemonServiceHandler is an implementation of the platform.daemon.v1.DaemonService service.
 type DaemonServiceHandler interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
 	RebootHost(context.Context, *connect.Request[v1.RebootHostRequest]) (*connect.Response[v1.RebootHostResponse], error)
-	InitializeHost(context.Context, *connect.Request[v1.InitializeHostRequest]) (*connect.Response[v1.InitializeHostResponse], error)
-	AddWireguardInterface(context.Context, *connect.Request[v1.AddWireguardInterfaceRequest]) (*connect.Response[v1.AddWireguardInterfaceResponse], error)
-	RemoveWireguardInterface(context.Context, *connect.Request[v1.RemoveWireguardInterfaceRequest]) (*connect.Response[v1.RemoveWireguardInterfaceResponse], error)
-	AddWireguardPeer(context.Context, *connect.Request[v1.AddWireguardPeerRequest]) (*connect.Response[v1.AddWireguardPeerResponse], error)
-	RemoveWireguardPeer(context.Context, *connect.Request[v1.RemoveWireguardPeerRequest]) (*connect.Response[v1.RemoveWireguardPeerResponse], error)
-	SetSTUNServer(context.Context, *connect.Request[v1.SetSTUNServerRequest]) (*connect.Response[v1.SetSTUNServerResponse], error)
-	AddLocatorServer(context.Context, *connect.Request[v1.AddLocatorServerRequest]) (*connect.Response[v1.AddLocatorServerResponse], error)
-	RemoveLocatorServer(context.Context, *connect.Request[v1.RemoveLocatorServerRequest]) (*connect.Response[v1.RemoveLocatorServerResponse], error)
 }
 
 // NewDaemonServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -263,76 +119,12 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(daemonServiceRebootHostMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	daemonServiceInitializeHostHandler := connect.NewUnaryHandler(
-		DaemonServiceInitializeHostProcedure,
-		svc.InitializeHost,
-		connect.WithSchema(daemonServiceInitializeHostMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	daemonServiceAddWireguardInterfaceHandler := connect.NewUnaryHandler(
-		DaemonServiceAddWireguardInterfaceProcedure,
-		svc.AddWireguardInterface,
-		connect.WithSchema(daemonServiceAddWireguardInterfaceMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	daemonServiceRemoveWireguardInterfaceHandler := connect.NewUnaryHandler(
-		DaemonServiceRemoveWireguardInterfaceProcedure,
-		svc.RemoveWireguardInterface,
-		connect.WithSchema(daemonServiceRemoveWireguardInterfaceMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	daemonServiceAddWireguardPeerHandler := connect.NewUnaryHandler(
-		DaemonServiceAddWireguardPeerProcedure,
-		svc.AddWireguardPeer,
-		connect.WithSchema(daemonServiceAddWireguardPeerMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	daemonServiceRemoveWireguardPeerHandler := connect.NewUnaryHandler(
-		DaemonServiceRemoveWireguardPeerProcedure,
-		svc.RemoveWireguardPeer,
-		connect.WithSchema(daemonServiceRemoveWireguardPeerMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	daemonServiceSetSTUNServerHandler := connect.NewUnaryHandler(
-		DaemonServiceSetSTUNServerProcedure,
-		svc.SetSTUNServer,
-		connect.WithSchema(daemonServiceSetSTUNServerMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	daemonServiceAddLocatorServerHandler := connect.NewUnaryHandler(
-		DaemonServiceAddLocatorServerProcedure,
-		svc.AddLocatorServer,
-		connect.WithSchema(daemonServiceAddLocatorServerMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	daemonServiceRemoveLocatorServerHandler := connect.NewUnaryHandler(
-		DaemonServiceRemoveLocatorServerProcedure,
-		svc.RemoveLocatorServer,
-		connect.WithSchema(daemonServiceRemoveLocatorServerMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/platform.daemon.v1.DaemonService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DaemonServiceShutdownHostProcedure:
 			daemonServiceShutdownHostHandler.ServeHTTP(w, r)
 		case DaemonServiceRebootHostProcedure:
 			daemonServiceRebootHostHandler.ServeHTTP(w, r)
-		case DaemonServiceInitializeHostProcedure:
-			daemonServiceInitializeHostHandler.ServeHTTP(w, r)
-		case DaemonServiceAddWireguardInterfaceProcedure:
-			daemonServiceAddWireguardInterfaceHandler.ServeHTTP(w, r)
-		case DaemonServiceRemoveWireguardInterfaceProcedure:
-			daemonServiceRemoveWireguardInterfaceHandler.ServeHTTP(w, r)
-		case DaemonServiceAddWireguardPeerProcedure:
-			daemonServiceAddWireguardPeerHandler.ServeHTTP(w, r)
-		case DaemonServiceRemoveWireguardPeerProcedure:
-			daemonServiceRemoveWireguardPeerHandler.ServeHTTP(w, r)
-		case DaemonServiceSetSTUNServerProcedure:
-			daemonServiceSetSTUNServerHandler.ServeHTTP(w, r)
-		case DaemonServiceAddLocatorServerProcedure:
-			daemonServiceAddLocatorServerHandler.ServeHTTP(w, r)
-		case DaemonServiceRemoveLocatorServerProcedure:
-			daemonServiceRemoveLocatorServerHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -348,36 +140,4 @@ func (UnimplementedDaemonServiceHandler) ShutdownHost(context.Context, *connect.
 
 func (UnimplementedDaemonServiceHandler) RebootHost(context.Context, *connect.Request[v1.RebootHostRequest]) (*connect.Response[v1.RebootHostResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.RebootHost is not implemented"))
-}
-
-func (UnimplementedDaemonServiceHandler) InitializeHost(context.Context, *connect.Request[v1.InitializeHostRequest]) (*connect.Response[v1.InitializeHostResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.InitializeHost is not implemented"))
-}
-
-func (UnimplementedDaemonServiceHandler) AddWireguardInterface(context.Context, *connect.Request[v1.AddWireguardInterfaceRequest]) (*connect.Response[v1.AddWireguardInterfaceResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.AddWireguardInterface is not implemented"))
-}
-
-func (UnimplementedDaemonServiceHandler) RemoveWireguardInterface(context.Context, *connect.Request[v1.RemoveWireguardInterfaceRequest]) (*connect.Response[v1.RemoveWireguardInterfaceResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.RemoveWireguardInterface is not implemented"))
-}
-
-func (UnimplementedDaemonServiceHandler) AddWireguardPeer(context.Context, *connect.Request[v1.AddWireguardPeerRequest]) (*connect.Response[v1.AddWireguardPeerResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.AddWireguardPeer is not implemented"))
-}
-
-func (UnimplementedDaemonServiceHandler) RemoveWireguardPeer(context.Context, *connect.Request[v1.RemoveWireguardPeerRequest]) (*connect.Response[v1.RemoveWireguardPeerResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.RemoveWireguardPeer is not implemented"))
-}
-
-func (UnimplementedDaemonServiceHandler) SetSTUNServer(context.Context, *connect.Request[v1.SetSTUNServerRequest]) (*connect.Response[v1.SetSTUNServerResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.SetSTUNServer is not implemented"))
-}
-
-func (UnimplementedDaemonServiceHandler) AddLocatorServer(context.Context, *connect.Request[v1.AddLocatorServerRequest]) (*connect.Response[v1.AddLocatorServerResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.AddLocatorServer is not implemented"))
-}
-
-func (UnimplementedDaemonServiceHandler) RemoveLocatorServer(context.Context, *connect.Request[v1.RemoveLocatorServerRequest]) (*connect.Response[v1.RemoveLocatorServerResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.RemoveLocatorServer is not implemented"))
 }

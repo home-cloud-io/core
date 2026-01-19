@@ -28,10 +28,6 @@ service WebService {
   rpc AppsHealthCheck(AppsHealthCheckRequest) returns (AppsHealthCheckResponse) {}
   // Get the current host machine stats (cpu, memory, drives)
   rpc GetSystemStats(GetSystemStatsRequest) returns (GetSystemStatsResponse) {}
-  // Check to validate if the device has gone through the onboarding process
-  rpc IsDeviceSetup(IsDeviceSetupRequest) returns (IsDeviceSetupResponse) {}
-  // Initialize the device with the user's credentials and settings
-  rpc InitializeDevice(InitializeDeviceRequest) returns (InitializeDeviceResponse) {}
   // Get all apps available in the store
   rpc GetAppsInStore(GetAppsInStoreRequest) returns (GetAppsInStoreResponse) {}
   // Get the device settings
@@ -147,21 +143,6 @@ message GetSystemStatsRequest {}
 
 message GetSystemStatsResponse {
   platform.daemon.v1.SystemStats stats = 1;
-}
-
-message IsDeviceSetupRequest {}
-message IsDeviceSetupResponse {
-  // If false the device is not setup, and the user should be redirected into the onboarding flow
-  bool setup = 1;
-}
-
-message InitializeDeviceRequest {
-  bool auto_update_apps = 1;
-  bool auto_update_os = 2;
-}
-
-message InitializeDeviceResponse {
-  bool setup = 1;
 }
 
 message GetAppsInStoreRequest {}

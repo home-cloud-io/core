@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, ServerEvent, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, SubscribeRequest, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, ServerEvent, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, SubscribeRequest, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -120,28 +120,6 @@ export const WebService = {
       name: "GetSystemStats",
       I: GetSystemStatsRequest,
       O: GetSystemStatsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Check to validate if the device has gone through the onboarding process
-     *
-     * @generated from rpc platform.server.v1.WebService.IsDeviceSetup
-     */
-    isDeviceSetup: {
-      name: "IsDeviceSetup",
-      I: IsDeviceSetupRequest,
-      O: IsDeviceSetupResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Initialize the device with the user's credentials and settings
-     *
-     * @generated from rpc platform.server.v1.WebService.InitializeDevice
-     */
-    initializeDevice: {
-      name: "InitializeDevice",
-      I: InitializeDeviceRequest,
-      O: InitializeDeviceResponse,
       kind: MethodKind.Unary,
     },
     /**
