@@ -87,7 +87,7 @@ export const updateApp = {
 } as const;
 
 /**
- * Check for available NixOS and Daemon updates
+ * Check for available OS updates
  *
  * @generated from rpc platform.server.v1.WebService.CheckForSystemUpdates
  */
@@ -103,7 +103,7 @@ export const checkForSystemUpdates = {
 } as const;
 
 /**
- * Check for available system (draft and home cloud) container updates
+ * Check for available system container updates
  *
  * @generated from rpc platform.server.v1.WebService.CheckForContainerUpdates
  */
@@ -119,7 +119,7 @@ export const checkForContainerUpdates = {
 } as const;
 
 /**
- * Install available NixOS updates (call after calling CheckForSystemUpdates)
+ * Install available OS update
  *
  * @generated from rpc platform.server.v1.WebService.InstallOSUpdate
  */

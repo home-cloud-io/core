@@ -133,11 +133,11 @@ type WebServiceClient interface {
 	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
 	// Update a Home Cloud application
 	UpdateApp(context.Context, *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error)
-	// Check for available NixOS and Daemon updates
+	// Check for available OS updates
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
-	// Check for available system (draft and home cloud) container updates
+	// Check for available system container updates
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
-	// Install available NixOS updates (call after calling CheckForSystemUpdates)
+	// Install available OS update
 	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
 	// Check the current health of all installed Home Cloud applications
 	AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error)
@@ -462,11 +462,11 @@ type WebServiceHandler interface {
 	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
 	// Update a Home Cloud application
 	UpdateApp(context.Context, *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error)
-	// Check for available NixOS and Daemon updates
+	// Check for available OS updates
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
-	// Check for available system (draft and home cloud) container updates
+	// Check for available system container updates
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
-	// Install available NixOS updates (call after calling CheckForSystemUpdates)
+	// Install available OS update
 	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
 	// Check the current health of all installed Home Cloud applications
 	AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error)
