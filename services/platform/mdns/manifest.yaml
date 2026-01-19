@@ -74,7 +74,6 @@ spec:
               drop:
                 - ALL
           env:
-            # TODO: read this from kubernetes
             - name: HOST_IP
               valueFrom:
                 fieldRef:

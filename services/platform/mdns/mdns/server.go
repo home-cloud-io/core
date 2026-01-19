@@ -62,7 +62,6 @@ func (s *server) Serve(ctx context.Context) error {
 	}
 
 	// server hosts
-	// TODO: get config from blueprint
 	hostIP := net.ParseIP(os.Getenv("HOST_IP"))
 	conn, err := mdns.Server(ipv4.NewPacketConn(l4), ipv6.NewPacketConn(l6), &mdns.Config{
 		LocalNames:   s.hosts,
@@ -108,7 +107,7 @@ func (s *server) AddHost(ctx context.Context, host string) error {
 
 func (s *server) RemoveHost(ctx context.Context, host string) error {
 	s.logger.WithField("host", host).Info("removing host")
-	// TODO: should change this to a thread-safe map using a mutex
+	// TODO: should change this to a thread-safe map using a mutex?
 	hosts := []string{}
 	for _, h := range s.hosts {
 		if h != host {
