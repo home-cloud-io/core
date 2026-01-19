@@ -505,19 +505,6 @@ export const Entries = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * Aggregate model for the installed apps saved in blueprint
- *
- * @generated from message platform.server.v1.InstalledApp
- */
-export const InstalledApp = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InstalledApp",
-  () => [
-    { no: 1, name: "application", kind: "message", T: App },
-    { no: 2, name: "status", kind: "message", T: AppRunningStatus },
-  ],
-);
-
-/**
  * Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
  * A backround thread in the server will fetch the index and update the
  * cache at startup and then every 24 hours
