@@ -2,7 +2,6 @@ package execute
 
 import (
 	"context"
-	"os/exec"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
@@ -16,8 +15,9 @@ func Reboot(ctx context.Context, logger chassis.Logger) error {
 		logger.Info("mocking reboot")
 		return nil
 	}
+	// TODO: implement with talos
 	// TODO: option to use "powercycle" mode?
-	return ExecuteCommandAndRelease(ctx, exec.Command("talosctl", "reboot"))
+	return nil
 }
 
 func Shutdown(ctx context.Context, logger chassis.Logger) error {
@@ -26,6 +26,7 @@ func Shutdown(ctx context.Context, logger chassis.Logger) error {
 		logger.Info("mocking shutdown")
 		return nil
 	}
+	// TODO: implement with talos
 	// TODO: option to force after timeout?
-	return ExecuteCommandAndRelease(ctx, exec.Command("talosctl", "shutdown"))
+	return nil
 }
