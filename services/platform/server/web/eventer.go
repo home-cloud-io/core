@@ -4,11 +4,11 @@ import (
 	"strings"
 	"sync"
 
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
+
+	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 )
 
 type (
@@ -25,7 +25,7 @@ type (
 
 var (
 	events = &eventer{
-		mutex: sync.Mutex{},
+		mutex:   sync.Mutex{},
 		streams: map[string]*connect.ServerStream[v1.ServerEvent]{},
 	}
 )

@@ -7,15 +7,15 @@ import (
 	"strings"
 	"time"
 
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
-	"github.com/home-cloud-io/core/services/platform/server/apps"
-	"github.com/home-cloud-io/core/services/platform/server/system"
-
 	"connectrpc.com/connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
+	"github.com/home-cloud-io/core/services/platform/server/apps"
+	"github.com/home-cloud-io/core/services/platform/server/system"
 )
 
 type (
@@ -174,9 +174,9 @@ func (h *rpcHandler) CheckForContainerUpdates(ctx context.Context, request *conn
 }
 
 func (h *rpcHandler) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
-	err := h.sctl.InstallOSUpdate()
+	err := h.sctl.UpdateOS(ctx, h.logger)
 	if err != nil {
-		h.logger.WithError(err).Error("failed to change install os update")
+		h.logger.WithError(err).Error("failed to install os update")
 		return nil, err
 	}
 	return connect.NewResponse(&v1.InstallOSUpdateResponse{}), nil
@@ -192,71 +192,6 @@ func (h *rpcHandler) GetSystemStats(ctx context.Context, request *connect.Reques
 	return connect.NewResponse(&v1.GetSystemStatsResponse{
 		Stats: stats,
 	}), nil
-}
-
-// IsDeviceSetup checks if the device is setup. It's also the first request made by the FE when loading. If the device is not setup, the FE will redirect to the setup page.
-// A device is considered setup (or will return true) if the device has a username, password, and the `Settings` object is not empty in `blueprint`.
-func (h *rpcHandler) IsDeviceSetup(ctx context.Context, request *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error) {
-	h.logger.Info("checking if device is setup")
-	isSetup, err := h.sctl.IsDeviceSetup(ctx)
-	if err != nil {
-		return nil, fmt.Errorf(system.ErrFailedToGetSettings)
-	}
-
-	return connect.NewResponse(&v1.IsDeviceSetupResponse{Setup: isSetup}), nil
-}
-
-func (h *rpcHandler) InitializeDevice(ctx context.Context, request *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
-	h.logger.Info("requested to set up device for the first time")
-
-	var msg = request.Msg
-	if err := msg.ValidateAll(); err != nil {
-		return nil, err
-	}
-
-	// convert the request to the `DeviceSettings` object
-	deviceSettings := &v1.DeviceSettings{
-		AdminUser: &v1.User{
-			Username: msg.GetUsername(),
-			Password: msg.GetPassword(),
-		},
-		Timezone:       msg.GetTimezone(),
-		AutoUpdateApps: msg.GetAutoUpdateApps(),
-		AutoUpdateOs:   msg.GetAutoUpdateOs(),
-		SecureTunnelingSettings: &v1.SecureTunnelingSettings{
-			Enabled: false,
-		},
-	}
-
-	err := h.sctl.InitializeDevice(ctx, h.logger, deviceSettings)
-	if err != nil {
-		if err.Error() == system.ErrDeviceAlreadySetup {
-			return connect.NewResponse(&v1.InitializeDeviceResponse{Setup: true}), nil
-		}
-
-		h.logger.Error(err.Error())
-		return nil, err
-	}
-
-	return connect.NewResponse(&v1.InitializeDeviceResponse{Setup: true}), nil
-}
-
-func (h *rpcHandler) Login(ctx context.Context, request *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
-	h.logger.Info("login request")
-
-	msg := request.Msg
-	if err := msg.Validate(); err != nil {
-		h.logger.WithError(err).Error(ErrInvalidInputValues)
-		return nil, fmt.Errorf(ErrInvalidInputValues)
-	}
-
-	res, err := h.sctl.Login(ctx, msg.GetUsername(), msg.GetPassword())
-	if err != nil {
-		h.logger.WithError(err).Error(ErrFailedToLogin)
-		return nil, fmt.Errorf(ErrFailedToLogin)
-	}
-
-	return connect.NewResponse(&v1.LoginResponse{Token: res}), nil
 }
 
 func (h *rpcHandler) GetDeviceSettings(ctx context.Context, request *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error) {

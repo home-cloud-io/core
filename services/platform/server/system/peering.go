@@ -3,13 +3,18 @@ package system
 import (
 	"context"
 	"errors"
+	"fmt"
+	"slices"
 
-	"connectrpc.com/connect"
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
+	"github.com/google/uuid"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+
+	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 )
 
 type (
@@ -26,49 +31,100 @@ const (
 
 func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*v1.RegisterPeerResponse, error) {
 
-	settings := &v1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+	// get wireguard server config
+	wireguardServer := &opv1.Wireguard{}
+	err := c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      DefaultWireguardInterface,
+		Namespace: "home-cloud-system",
+	}, wireguardServer)
 	if err != nil {
-		logger.WithError(err).Warn("failed to get device settings when loading locators")
+		// TODO: check NotFound specifically
+		logger.WithError(err).Error("failed to get wireguard server config")
 		return nil, err
 	}
 
-	if !settings.SecureTunnelingSettings.Enabled {
-		return nil, errors.New("secure tunneling not enabled")
+	// get wireguard server private key
+	wireguardServerSecret := &corev1.Secret{}
+	err = c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      wireguardServer.Spec.PrivateKeySecret.Name,
+		Namespace: *wireguardServer.Spec.PrivateKeySecret.Namespace,
+	}, wireguardServerSecret)
+	if err != nil {
+		logger.WithError(err).Error("failed to get wireguard server secret")
+		return nil, err
+	}
+	wireguardServerPrivateKey, err := wgtypes.ParseKey(string(wireguardServerSecret.Data["privateKey"]))
+	if err != nil {
+		logger.WithError(err).Error("failed to parse wireguard server private key")
+		return nil, err
 	}
 
-	// TODO: handle multiple interfaces
-	wgInterface := settings.SecureTunnelingSettings.WireguardInterfaces[0]
-
-	// create pub/priv key
-	privKey, err := wgtypes.GeneratePrivateKey()
+	// create private key for peer
+	peerPrivateKey, err := wgtypes.GeneratePrivateKey()
 	if err != nil {
 		logger.WithError(err).Error(ErrFailedToGenPrivKey)
 		return nil, errors.New(ErrFailedToGenPrivKey)
 	}
 
-	peerConfig := &v1.RegisterPeerResponse{
-		PrivateKey:      privKey.String(),
-		PublicKey:       privKey.PublicKey().String(),
-		ServerPublicKey: wgInterface.PublicKey,
-		ServerId:        wgInterface.Id,
-		LocatorServers:  wgInterface.LocatorServers,
+	// find the first unused ip in the address space
+	existingAddresses := []string{}
+	for _, existingPeer := range wireguardServer.Spec.Peers {
+		if existingPeer.PublicKey == peerPrivateKey.PublicKey().String() {
+			return nil, errors.New("peer with requested public key already registered with given interface")
+		}
+		existingAddresses = append(existingAddresses, existingPeer.AllowedIPs...)
+	}
+	var peerAddress string
+	for i := 2; i < 255; i++ {
+		peerAddress = fmt.Sprintf("10.100.0.%d/32", i)
+		if !slices.Contains(existingAddresses, peerAddress) {
+			break
+		}
+	}
+	if peerAddress == "" {
+		return nil, errors.New("no available ip address for peer found")
 	}
 
-	resp, err := c.daemonClient.AddWireguardPeer(ctx, &connect.Request[dv1.AddWireguardPeerRequest]{
-		Msg: &dv1.AddWireguardPeerRequest{
-			Peer: &dv1.WireguardPeer{
-				PublicKey:  peerConfig.PublicKey,
-				AllowedIps: []string{"0.0.0.0/0"},
-			},
-			WireguardInterface: wgInterface.Name,
+	// create peer secret
+	peerSecret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("%s-private-key", uuid.NewString()),
+			Namespace: "home-cloud-system",
 		},
-	})
+		StringData: map[string]string{
+			"privateKey": peerPrivateKey.String(),
+		},
+	}
+	err = c.k8sclient.Create(ctx, peerSecret)
 	if err != nil {
+		logger.WithError(err).Error("failed to create wireguard peer private key secret")
 		return nil, err
 	}
-	peerConfig.Addresses = resp.Msg.Addresses
-	peerConfig.DnsServers = resp.Msg.DnsServers
 
-	return peerConfig, nil
+	// add peer to server
+	wireguardServer.Spec.Peers = append(wireguardServer.Spec.Peers, opv1.PeerSpec{
+		PublicKey: peerPrivateKey.PublicKey().String(),
+		PrivateKeySecret: &opv1.SecretReference{
+			Name:      peerSecret.Name,
+			Namespace: &peerSecret.Namespace,
+			DataKey:   "privateKey",
+		},
+		AllowedIPs: []string{peerAddress},
+	})
+	err = c.k8sclient.Update(ctx, wireguardServer)
+	if err != nil {
+		logger.WithError(err).Error("failed to update wireguard server config")
+		return nil, err
+	}
+
+	return &v1.RegisterPeerResponse{
+		PrivateKey:      peerPrivateKey.String(),
+		PublicKey:       peerPrivateKey.PublicKey().String(),
+		ServerPublicKey: wireguardServerPrivateKey.PublicKey().String(),
+		ServerId:        wireguardServer.Spec.ID,
+		Addresses:       []string{peerAddress},
+		LocatorServers:  wireguardServer.Spec.Locators,
+		// TODO
+		// DnsServers: []string{},
+	}, nil
 }

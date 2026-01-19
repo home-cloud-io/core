@@ -3,9 +3,9 @@ package system
 import (
 	"context"
 
-	"connectrpc.com/connect"
-
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+
+	"connectrpc.com/connect"
 )
 
 type (
