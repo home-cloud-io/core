@@ -14,7 +14,7 @@ var (
 			&talos.ServiceAccount{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "talos-api-access",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 				},
 				Spec: talos.ServiceAccountSpec{
 					Roles: []string{

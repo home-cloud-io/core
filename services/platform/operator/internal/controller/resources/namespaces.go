@@ -21,17 +21,10 @@ var (
 			},
 			&corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: install.Spec.HomeCloud.Namespace,
+					Name: install.Namespace,
 					Labels: map[string]string{
 						"pod-security.kubernetes.io/enforce": "privileged",
-						"istio.io/dataplane-mode":            "ambient",
-					},
-				},
-			},
-			&corev1.Namespace{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: install.Spec.Draft.Namespace,
-					Labels: map[string]string{
+						// TODO: does this work with the tunnel?
 						"istio.io/dataplane-mode": "ambient",
 					},
 				},

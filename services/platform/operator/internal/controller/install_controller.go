@@ -113,23 +113,16 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		}
 	}
 
-	if install.Spec.Talos.Enabled {
-		l.Info("reconciling talos components")
-		for _, o := range resources.TalosObjects(install) {
-			err = kubeCreateOrUpdate(ctx, r.Client, o)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	l.Info("reconciling draft components")
-	for _, o := range resources.DraftObjects(install) {
-		err = kubeCreateOrUpdate(ctx, r.Client, o)
-		if err != nil {
-			return err
-		}
-	}
+	// TODO
+	// if install.Spec.Talos.Enabled {
+	// 	l.Info("reconciling talos components")
+	// 	for _, o := range resources.TalosObjects(install) {
+	// 		err = kubeCreateOrUpdate(ctx, r.Client, o)
+	// 		if err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
 
 	l.Info("reconciling home cloud server components")
 	for _, o := range resources.HomeCloudObjects(install) {
@@ -221,13 +214,6 @@ func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) 
 	// NOTE: we do not delete any CRDs (gateway API/istio) as they could be in use by other applications
 
 	for _, o := range slices.Backward(resources.HomeCloudObjects(install)) {
-		err := r.Client.Delete(ctx, o)
-		if client.IgnoreNotFound(err) != nil {
-			return err
-		}
-	}
-
-	for _, o := range slices.Backward(resources.DraftObjects(install)) {
 		err := r.Client.Delete(ctx, o)
 		if client.IgnoreNotFound(err) != nil {
 			return err
@@ -326,9 +312,7 @@ func helmGet(cfg *action.Configuration, releaseName string) (*release.Release, e
 }
 
 func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Install) error {
-	install.Status.Installed = true
-	// TODO: save current spec?
-	// install.Status.Values = install.Spec.Values
+	// TODO: write the installed versions to the status
 	return r.Status().Update(ctx, install)
 }
 
