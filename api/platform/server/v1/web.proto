@@ -18,11 +18,11 @@ service WebService {
   rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
   // Update a Home Cloud application
   rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
-  // Check for available NixOS and Daemon updates
+  // Check for available OS updates
   rpc CheckForSystemUpdates(CheckForSystemUpdatesRequest) returns (CheckForSystemUpdatesResponse) {}
-  // Check for available system (draft and home cloud) container updates
+  // Check for available system container updates
   rpc CheckForContainerUpdates(CheckForContainerUpdatesRequest) returns (CheckForContainerUpdatesResponse) {}
-  // Install available NixOS updates (call after calling CheckForSystemUpdates)
+  // Install available OS update
   rpc InstallOSUpdate(InstallOSUpdateRequest) returns (InstallOSUpdateResponse) {}
   // Check the current health of all installed Home Cloud applications
   rpc AppsHealthCheck(AppsHealthCheckRequest) returns (AppsHealthCheckResponse) {}
@@ -210,7 +210,6 @@ message GetSystemLogsResponse {
 
 //////////////////////////////////////////////////////////////////////////
 // MODELS
-// All the structs used in the service and that are stored in the database
 //////////////////////////////////////////////////////////////////////////
 
 message Apps {
@@ -273,12 +272,6 @@ message DeviceSettings {
   SecureTunnelingSettings secure_tunneling_settings = 3;
 }
 
-// NOTE: These settings are written to the daemon config on the host so that tunneling can be
-// configured on device boot even if the server and/or blueprint are down.
-//
-// This means that these settings are written in two places (blueprint and host filesystem) and
-// must be kept in sync. In the future we probably want to move to a sync pattern where the daemon
-// can connect directly to blueprint and syncs settings periodically.
 message SecureTunnelingSettings {
   bool enabled = 1;
   repeated WireguardInterface wireguard_interfaces = 2;

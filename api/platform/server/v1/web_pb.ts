@@ -2056,13 +2056,6 @@ export class DeviceSettings extends Message<DeviceSettings> {
 }
 
 /**
- * NOTE: These settings are written to the daemon config on the host so that tunneling can be
- * configured on device boot even if the server and/or blueprint are down.
- *
- * This means that these settings are written in two places (blueprint and host filesystem) and
- * must be kept in sync. In the future we probably want to move to a sync pattern where the daemon
- * can connect directly to blueprint and syncs settings periodically.
- *
  * @generated from message platform.server.v1.SecureTunnelingSettings
  */
 export class SecureTunnelingSettings extends Message<SecureTunnelingSettings> {
