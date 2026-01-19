@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AddLocatorServerRequest, AddLocatorServerResponse, AddWireguardInterfaceRequest, AddWireguardInterfaceResponse, AddWireguardPeerRequest, AddWireguardPeerResponse, InitializeHostRequest, InitializeHostResponse, RebootHostRequest, RebootHostResponse, RemoveLocatorServerRequest, RemoveLocatorServerResponse, RemoveWireguardInterfaceRequest, RemoveWireguardInterfaceResponse, RemoveWireguardPeerRequest, RemoveWireguardPeerResponse, SetSTUNServerRequest, SetSTUNServerResponse, ShutdownHostRequest, ShutdownHostResponse } from "./daemon_pb.js";
+import { RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse } from "./daemon_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -28,78 +28,6 @@ export const DaemonService = {
       name: "RebootHost",
       I: RebootHostRequest,
       O: RebootHostResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc platform.daemon.v1.DaemonService.InitializeHost
-     */
-    initializeHost: {
-      name: "InitializeHost",
-      I: InitializeHostRequest,
-      O: InitializeHostResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc platform.daemon.v1.DaemonService.AddWireguardInterface
-     */
-    addWireguardInterface: {
-      name: "AddWireguardInterface",
-      I: AddWireguardInterfaceRequest,
-      O: AddWireguardInterfaceResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc platform.daemon.v1.DaemonService.RemoveWireguardInterface
-     */
-    removeWireguardInterface: {
-      name: "RemoveWireguardInterface",
-      I: RemoveWireguardInterfaceRequest,
-      O: RemoveWireguardInterfaceResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc platform.daemon.v1.DaemonService.AddWireguardPeer
-     */
-    addWireguardPeer: {
-      name: "AddWireguardPeer",
-      I: AddWireguardPeerRequest,
-      O: AddWireguardPeerResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc platform.daemon.v1.DaemonService.RemoveWireguardPeer
-     */
-    removeWireguardPeer: {
-      name: "RemoveWireguardPeer",
-      I: RemoveWireguardPeerRequest,
-      O: RemoveWireguardPeerResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc platform.daemon.v1.DaemonService.SetSTUNServer
-     */
-    setSTUNServer: {
-      name: "SetSTUNServer",
-      I: SetSTUNServerRequest,
-      O: SetSTUNServerResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc platform.daemon.v1.DaemonService.AddLocatorServer
-     */
-    addLocatorServer: {
-      name: "AddLocatorServer",
-      I: AddLocatorServerRequest,
-      O: AddLocatorServerResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc platform.daemon.v1.DaemonService.RemoveLocatorServer
-     */
-    removeLocatorServer: {
-      name: "RemoveLocatorServer",
-      I: RemoveLocatorServerRequest,
-      O: RemoveLocatorServerResponse,
       kind: MethodKind.Unary,
     },
   }

@@ -238,45 +238,6 @@ export const GetSystemStatsResponse = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.IsDeviceSetupRequest
- */
-export const IsDeviceSetupRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.IsDeviceSetupRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.IsDeviceSetupResponse
- */
-export const IsDeviceSetupResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.IsDeviceSetupResponse",
-  () => [
-    { no: 1, name: "setup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.InitializeDeviceRequest
- */
-export const InitializeDeviceRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InitializeDeviceRequest",
-  () => [
-    { no: 1, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 2, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.InitializeDeviceResponse
- */
-export const InitializeDeviceResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InitializeDeviceResponse",
-  () => [
-    { no: 1, name: "setup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ],
-);
-
-/**
  * @generated from message platform.server.v1.GetAppsInStoreRequest
  */
 export const GetAppsInStoreRequest = /*@__PURE__*/ proto3.makeMessageType(
@@ -582,8 +543,7 @@ export const DeviceSettings = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 3, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 4, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
+    { no: 3, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
   ],
 );
 

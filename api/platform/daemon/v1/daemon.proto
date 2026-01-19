@@ -5,24 +5,13 @@ package platform.daemon.v1;
 option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
 
 import "platform/daemon/v1/system.proto";
-import "platform/daemon/v1/wireguard.proto";
 import "validate/validate.proto";
 
 service DaemonService {
   rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
   rpc RebootHost(RebootHostRequest) returns (RebootHostResponse) {}
-  rpc InitializeHost(InitializeHostRequest) returns (InitializeHostResponse) {}
   
-  rpc AddWireguardInterface(AddWireguardInterfaceRequest) returns (AddWireguardInterfaceResponse) {}
-  rpc RemoveWireguardInterface(RemoveWireguardInterfaceRequest) returns (RemoveWireguardInterfaceResponse) {}
-  rpc AddWireguardPeer(AddWireguardPeerRequest) returns (AddWireguardPeerResponse) {}
-  rpc RemoveWireguardPeer(RemoveWireguardPeerRequest) returns (RemoveWireguardPeerResponse) {}
-
-  rpc SetSTUNServer(SetSTUNServerRequest) returns (SetSTUNServerResponse) {}
-  rpc AddLocatorServer(AddLocatorServerRequest) returns (AddLocatorServerResponse) {}
-  rpc RemoveLocatorServer(RemoveLocatorServerRequest) returns (RemoveLocatorServerResponse) {}
-  
-  // TODO: talos updates
+  // TODO: system updates
 }
 
 message ShutdownHostRequest {}
@@ -30,53 +19,3 @@ message ShutdownHostResponse {}
 
 message RebootHostRequest {}
 message RebootHostResponse {}
-
-message InitializeHostRequest {}
-message InitializeHostResponse {
-  // TODO: return/save new talos secrets/config
-}
-
-message AddWireguardInterfaceRequest {
-  platform.daemon.v1.WireguardInterface interface = 1;
-}
-message AddWireguardInterfaceResponse {
-  string public_key = 1;
-}
-
-message RemoveWireguardInterfaceRequest {
-  string name = 1;
-}
-message RemoveWireguardInterfaceResponse {}
-
-message AddWireguardPeerRequest {
-  platform.daemon.v1.WireguardPeer peer = 1;
-  string wireguard_interface = 2;
-}
-message AddWireguardPeerResponse {
-  repeated string addresses = 1;
-  repeated string dns_servers = 2;
-}
-
-message RemoveWireguardPeerRequest {
-  // TODO
-}
-message RemoveWireguardPeerResponse {}
-
-message SetSTUNServerRequest {
-  string server_address = 1;
-  string wireguard_interface = 2;
-}
-message SetSTUNServerResponse {}
-
-message AddLocatorServerRequest {
-  string locator_address = 1;
-  string wireguard_interface = 2;
-  // TODO: eventually this is where the access key will be included that the user receives after purchasing the locator subscription
-}
-message AddLocatorServerResponse {}
-
-message RemoveLocatorServerRequest {
-  string locator_address = 1;
-  string wireguard_interface = 2;
-}
-message RemoveLocatorServerResponse {}
