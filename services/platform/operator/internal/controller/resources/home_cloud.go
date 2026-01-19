@@ -22,7 +22,7 @@ var (
 			&rbacv1.Role{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "manage-home-cloud-apps",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 				},
 				Rules: []rbacv1.PolicyRule{
 					{
@@ -53,13 +53,13 @@ var (
 			&rbacv1.RoleBinding{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "manage-home-cloud-apps",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 				},
 				Subjects: []rbacv1.Subject{
 					{
 						Kind:      "ServiceAccount",
 						Name:      "default",
-						Namespace: install.Spec.HomeCloud.Namespace,
+						Namespace: install.Namespace,
 					},
 				},
 				RoleRef: rbacv1.RoleRef{
@@ -76,7 +76,7 @@ var (
 					{
 						Kind:      "ServiceAccount",
 						Name:      "default",
-						Namespace: install.Spec.HomeCloud.Namespace,
+						Namespace: install.Namespace,
 					},
 				},
 				RoleRef: rbacv1.RoleRef{
@@ -88,21 +88,20 @@ var (
 			&corev1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "server",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 				},
 				Data: map[string]string{
-					"config.yaml": fmt.Sprintf(`
+					"config.yaml": `
 service:
   name: server
   domain: home-cloud
   env: prod
-  entrypoint: http://blueprint.%s:8090
-`, install.Spec.Draft.Namespace)},
+`},
 			},
 			&appsv1.Deployment{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "server",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 				},
 				Spec: appsv1.DeploymentSpec{
 					Replicas: ptr.To[int32](1),
@@ -121,7 +120,7 @@ service:
 							Containers: []corev1.Container{
 								{
 									Name:  "server",
-									Image: fmt.Sprintf("%s:%s", install.Spec.HomeCloud.Server.Image, install.Spec.HomeCloud.Server.Tag),
+									Image: fmt.Sprintf("%s:%s", install.Spec.Server.Image, install.Spec.Server.Tag),
 									Ports: []corev1.ContainerPort{
 										{
 											Name:          "http",
@@ -170,7 +169,7 @@ service:
 			&corev1.Service{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "server",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 					Labels: map[string]string{
 						"app": "server",
 					},
@@ -194,7 +193,7 @@ service:
 			&gwv1.HTTPRoute{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "server",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 				},
 				Spec: gwv1.HTTPRouteSpec{
 					CommonRouteSpec: gwv1.CommonRouteSpec{
@@ -206,7 +205,7 @@ service:
 						},
 					},
 					Hostnames: []gwv1.Hostname{
-						gwv1.Hostname(install.Spec.HomeCloud.Hostname),
+						gwv1.Hostname(install.Spec.Settings.Hostname),
 					},
 					Rules: []gwv1.HTTPRouteRule{
 						{
@@ -224,28 +223,25 @@ service:
 					},
 				},
 			},
+			// TODO: check if enabled and switch to talos daemon
 			// daemon
 			&corev1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "daemon",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 				},
 				Data: map[string]string{
-					"config.yaml": fmt.Sprintf(`
+					"config.yaml": `
 service:
   name: daemon
   domain: home-cloud
   env: prod
-  entrypoint: http://blueprint.%s:8090
-
-daemon:
-  domain: local
-`, install.Spec.Draft.Namespace)},
+`},
 			},
 			&appsv1.Deployment{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "daemon",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 				},
 				Spec: appsv1.DeploymentSpec{
 					Replicas: ptr.To[int32](1),
@@ -264,7 +260,7 @@ daemon:
 							Containers: []corev1.Container{
 								{
 									Name:  "daemon",
-									Image: fmt.Sprintf("%s:%s", install.Spec.HomeCloud.Daemon.Image, install.Spec.HomeCloud.Daemon.Tag),
+									Image: fmt.Sprintf("%s:%s", install.Spec.Daemon.Image, install.Spec.Daemon.Tag),
 									Ports: []corev1.ContainerPort{
 										{
 											Name:          "http",
@@ -324,7 +320,7 @@ daemon:
 			&corev1.Service{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "daemon",
-					Namespace: install.Spec.HomeCloud.Namespace,
+					Namespace: install.Namespace,
 					Labels: map[string]string{
 						"app": "daemon",
 					},

@@ -34,7 +34,7 @@ type WireguardSpec struct {
 	ListenPort int `json:"listenPort"`
 
 	// NATInterface specifies the interface to configure NAT masquerade on for forwarding
-	// external traffic through.
+	// external traffic through (eth0, ens18, etc.).
 	NATInterface string `json:"natInterface"`
 
 	// Peers specifies a list of peer configurations to apply to an interface.

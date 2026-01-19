@@ -65,7 +65,7 @@ spec:
               natInterface:
                 description: |-
                   NATInterface specifies the interface to configure NAT masquerade on for forwarding
-                  external traffic through.
+                  external traffic through (eth0, ens18, etc.).
                 type: string
               peers:
                 description: Peers specifies a list of peer configurations to apply

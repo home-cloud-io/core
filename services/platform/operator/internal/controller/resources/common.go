@@ -10,6 +10,10 @@ import (
 
 var (
 	DefaultInstall = &v1.Install{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "install",
+			Namespace: "home-cloud-system",
+		},
 		Spec: v1.InstallSpec{
 			GatewayAPI: v1.GatewayAPISpec{
 				Version: "v1.3.0",
@@ -20,20 +24,14 @@ var (
 				Repo:               "https://istio-release.storage.googleapis.com/charts",
 				IngressGatewayName: "ingress-gateway",
 			},
-			Draft: v1.DraftSpec{
-				Namespace: "draft-system",
-				Blueprint: v1.BlueprintSpec{
-					Image: "ghcr.io/steady-bytes/draft-core-blueprint",
-					Tag:   "v0.0.6",
-				},
+			Server: v1.ServerSpec{
+				Image: "ghcr.io/home-cloud-io/core-platform-server",
+				Tag:   "v0.0.52",
 			},
-			HomeCloud: v1.HomeCloudSpec{
-				Namespace: "home-cloud-system",
-				Hostname:  "home-cloud.local",
-				Server: v1.ServerSpec{
-					Image: "ghcr.io/home-cloud-io/core-platform-server",
-					Tag:   "v0.0.52",
-				},
+			Settings: v1.SettingsSpec{
+				Hostname:         "home-cloud.local",
+				AutoUpdateApps:   true,
+				AutoUpdateSystem: true,
 			},
 			VolumeMountHostPath: "/mnt/k8s-pvs/",
 		},

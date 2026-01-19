@@ -10,9 +10,13 @@ import (
 type InstallSpec struct {
 	GatewayAPI GatewayAPISpec `json:"gatewayApiSpec,omitempty"`
 	Istio      IstioSpec      `json:"istio,omitempty"`
-	Draft      DraftSpec      `json:"draft,omitempty"`
-	HomeCloud  HomeCloudSpec  `json:"homeCloud,omitempty"`
-	Talos      TalosSpec      `json:"talos,omitempty"`
+	Server     ServerSpec     `json:"homeCloud,omitempty"`
+	// optional value to run a system daemon service for managing the host
+	// we'll only officially support Talos (for now?) but the community could
+	// build others (e.g. NixOS)
+	// TODO: document API
+	Daemon   DaemonSpec   `json:"talos,omitempty"`
+	Settings SettingsSpec `json:"settings,omitempty"`
 
 	VolumeMountHostPath string `json:"volumeMountHostPath,omitempty"`
 }
@@ -49,40 +53,51 @@ type ZtunnelSpec struct {
 	Values string `json:"values,omitempty"`
 }
 
-type DraftSpec struct {
-	Namespace string        `json:"namespace,omitempty"`
-	Blueprint BlueprintSpec `json:"blueprint,omitempty"`
-}
-
-type BlueprintSpec struct {
-	Image string `json:"image,omitempty"`
-	Tag   string `json:"tag,omitempty"`
-}
-
-type HomeCloudSpec struct {
-	Namespace string     `json:"namespace,omitempty"`
-	Hostname  string     `json:"hostname,omitempty"`
-	Server    ServerSpec `json:"server,omitempty"`
-	Daemon    DaemonSpec `json:"daemon,omitempty"`
-}
-
 type ServerSpec struct {
 	Image string `json:"image,omitempty"`
 	Tag   string `json:"tag,omitempty"`
 }
 
 type DaemonSpec struct {
-	Image string `json:"image,omitempty"`
-	Tag   string `json:"tag,omitempty"`
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+	Tag     string `json:"tag,omitempty"`
+
+	// TODO: will need options for customizing this install outside of Talos
 }
 
-type TalosSpec struct {
-	Enabled bool `json:"enabled,omitempty"`
+type SettingsSpec struct {
+	AutoUpdateApps   bool   `json:"autoUpdateApps"`
+	AutoUpdateSystem bool   `json:"autoUpdateSystem"`
+	Hostname         string `json:"hostname"`
+}
+
+type ImageVersion struct {
+	Image string
+	Tag   string
 }
 
 // InstallStatus defines the observed state of Install
 type InstallStatus struct {
-	Installed bool `json:"installed"`
+	Istio  IstioStatus  `json:"istio,omitempty"`
+	Server ServerStatus `json:"server,omitempty"`
+	Daemon DaemonStatus `json:"daemon,omitempty"`
+}
+
+type IstioStatus struct {
+	Version string `json:"version,omitempty"`
+	Repo    string `json:"repo,omitempty"`
+}
+
+type ServerStatus struct {
+	Image string `json:"image,omitempty"`
+	Tag   string `json:"tag,omitempty"`
+}
+
+type DaemonStatus struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+	Tag     string `json:"tag,omitempty"`
 }
 
 //+kubebuilder:object:root=true
