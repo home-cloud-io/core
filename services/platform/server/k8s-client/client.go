@@ -7,10 +7,6 @@ import (
 	"strings"
 	"time"
 
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
@@ -20,6 +16,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	crclient "sigs.k8s.io/controller-runtime/pkg/client"
+
+	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 )
 
 type (
@@ -28,15 +28,15 @@ type (
 		System
 	}
 	Apps interface {
-		// Install will install the given app
-		Install(ctx context.Context, spec opv1.AppSpec) error
-		// Delete will delete the given app
-		Delete(ctx context.Context, spec opv1.AppSpec) error
-		// Update will update the given app
+		// InstallApp will install the given app
+		InstallApp(ctx context.Context, spec opv1.AppSpec) error
+		// DeleteApp will delete the given app
+		DeleteApp(ctx context.Context, spec opv1.AppSpec) error
+		// UpdateApp will update the given app
 		//
 		// NOTE: An empty value on the spec will be applied as empty and will NOT
 		// default to the existing value.
-		Update(ctx context.Context, spec opv1.AppSpec) error
+		UpdateApp(ctx context.Context, spec opv1.AppSpec) error
 		// Installed returns whether or not the app with the given name is currently installed
 		Installed(ctx context.Context, name string) (installed bool, err error)
 		// Healthcheck will retrieve the health of all installed apps
@@ -47,14 +47,21 @@ type (
 		AppStorage(ctx context.Context, apps []opv1.App) ([]*webv1.AppStorage, error)
 	}
 	System interface {
+		// TODO: should this be here?
+		Create(ctx context.Context, obj crclient.Object) error
+		Get(ctx context.Context, key crclient.ObjectKey, obj crclient.Object) error
+		Update(ctx context.Context, obj crclient.Object) error
+		Delete(ctx context.Context, obj crclient.Object) error
+
 		// CurrentImages will retrieve the current images of all system containers. System
-		// containers are considered to be those in the `home-cloud-system` and `draft-system`
-		// namespaces.
+		// containers are considered to be those in the `home-cloud-system` namespace.
 		CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error)
 		// GetServerVersion will retrieve the current k8s server version
 		GetServerVersion(ctx context.Context) (version string, err error)
 		// GetLogs will retrieve the logs for all pods across the entire cluster
 		GetLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error)
+		// Settings returns the installation settings
+		Settings(ctx context.Context) (*opv1.SettingsSpec, error)
 	}
 
 	client struct {
@@ -105,7 +112,23 @@ func NewClient(logger chassis.Logger) Client {
 	}
 }
 
-func (c *client) Install(ctx context.Context, spec opv1.AppSpec) error {
+func (c *client) Create(ctx context.Context, obj crclient.Object) error {
+	return c.client.Create(ctx, obj)
+}
+
+func (c *client) Get(ctx context.Context, key crclient.ObjectKey, obj crclient.Object) error {
+	return c.client.Get(ctx, key, obj)
+}
+
+func (c *client) Update(ctx context.Context, obj crclient.Object) error {
+	return c.client.Update(ctx, obj)
+}
+
+func (c *client) Delete(ctx context.Context, obj crclient.Object) error {
+	return c.client.Delete(ctx, obj)
+}
+
+func (c *client) InstallApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       spec.Release,
@@ -117,7 +140,7 @@ func (c *client) Install(ctx context.Context, spec opv1.AppSpec) error {
 	return c.client.Create(ctx, app)
 }
 
-func (c *client) Delete(ctx context.Context, spec opv1.AppSpec) error {
+func (c *client) DeleteApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      spec.Release,
@@ -127,7 +150,7 @@ func (c *client) Delete(ctx context.Context, spec opv1.AppSpec) error {
 	return c.client.Delete(ctx, app)
 }
 
-func (c *client) Update(ctx context.Context, spec opv1.AppSpec) error {
+func (c *client) UpdateApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{}
 	err := c.client.Get(ctx, types.NamespacedName{
 		Name:      spec.Release,
@@ -432,4 +455,16 @@ func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSec
 	}
 
 	return logs
+}
+
+func (c *client) Settings(ctx context.Context) (*opv1.SettingsSpec, error) {
+	install := &opv1.Install{}
+	err := c.client.Get(ctx, types.NamespacedName{
+		Namespace: homeCloudNamespace,
+		Name:      "install",
+	}, install)
+	if err != nil {
+		return nil, err
+	}
+	return &install.Spec.Settings, nil
 }

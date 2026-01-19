@@ -7,9 +7,11 @@ import (
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+
 	"github.com/robfig/cron/v3"
 	"github.com/steady-bytes/draft/pkg/chassis"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type (
@@ -27,6 +29,12 @@ type (
 	}
 )
 
+// TODO: istio version management
+
+// TODO: completely rethink updates
+// 		 what if we had an rss feed on the website with updates published there so
+// 		 we could control releases better?
+
 // CONTAINERS
 
 func (c *controller) CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error) {
@@ -34,12 +42,24 @@ func (c *controller) CheckForContainerUpdates(ctx context.Context, logger chassi
 		images []*v1.ImageVersion
 	)
 
-	// populate current versions (from k8s)
-	images, err := c.k8sclient.CurrentImages(ctx)
+	install := &opv1.Install{}
+	err := c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      "install",
+		Namespace: "home-cloud-system",
+	}, install)
 	if err != nil {
-		logger.WithError(err).Error("failed to get current container versions")
+		logger.WithError(err).Error("failed to get installation opject")
 		return nil, err
 	}
+
+	images = append(images, &v1.ImageVersion{
+		Image:   install.Status.Server.Image,
+		Current: install.Status.Server.Tag,
+	})
+	images = append(images, &v1.ImageVersion{
+		Image:   install.Status.Daemon.Image,
+		Current: install.Status.Daemon.Tag,
+	})
 
 	// populate latest versions (from registry)
 	images, err = getLatestImageTags(ctx, images)
@@ -81,18 +101,6 @@ func (c *controller) AutoUpdateContainers(logger chassis.Logger) {
 
 func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger) error {
 	logger.Info("updating containers")
-	settings := &v1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		logger.WithError(err).Error("failed to get device settings")
-		return err
-	}
-
-	// TODO: should this be a different setting?
-	if !settings.AutoUpdateOs {
-		logger.Info("auto update sytem not enabled")
-		return nil
-	}
 
 	images, err := c.CheckForContainerUpdates(ctx, logger)
 	if err != nil {

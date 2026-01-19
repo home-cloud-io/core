@@ -1,17 +1,15 @@
 package apps
 
 import (
-	"context"
 	"errors"
 	"io"
 	"net/http"
 	"time"
 
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
-
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"gopkg.in/yaml.v3"
+
+	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 )
 
 type (
@@ -32,24 +30,21 @@ const (
 	storeCacheIntervalConfigKey = "server.apps.store_cache_update_interval_minutes"
 )
 
-// AppStoreCache creates a new store cache that runs in the background
-// keeping the app store up to date with the latest available apps
-func AppStoreCache(logger chassis.Logger) {
+func (c *controller) AppStoreCache(logger chassis.Logger) {
 	config := chassis.GetConfig()
 	config.SetDefault(storeCacheIntervalConfigKey, 15)
 	interval := config.GetInt(storeCacheIntervalConfigKey)
 	logger.WithField("interval_minutes", interval).Info("setting app store cache update interval")
 	for {
-		err := refresh(logger)
+		err := c.refresh(logger)
 		if err != nil {
 			logger.WithError(err).Error("failed to refresh app store cache")
 		}
 		time.Sleep(time.Duration(interval) * time.Minute)
 	}
 }
-func refresh(logger chassis.Logger) error {
+func (c *controller) refresh(logger chassis.Logger) error {
 	logger.Info("refreshing app store cache")
-	ctx := context.Background()
 	httpClient := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, APP_STORE_URL, nil)
 	if err != nil {
@@ -88,12 +83,8 @@ func refresh(logger chassis.Logger) error {
 		}
 	}
 
-	// store in blueprint
-	_, err = kvclient.Set(ctx, kvclient.APP_STORE_ENTRIES_KEY, entries)
-	if err != nil {
-		logger.Error("failed to save app store entries")
-		return errors.New(ErrFailedToPopulateAppStore)
-	}
+	// cache in memory
+	c.storeCache = entries
 
 	logger.Info("app store cache has been refreshed")
 	return nil

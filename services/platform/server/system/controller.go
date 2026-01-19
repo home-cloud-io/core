@@ -2,21 +2,14 @@ package system
 
 import (
 	"context"
-	"crypto/sha512"
-	"encoding/hex"
-	"errors"
 	"fmt"
 	"net/http"
-	"sync"
 
 	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	"github.com/home-cloud-io/core/services/platform/server/async"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
-	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
 
 	"github.com/containers/image/v5/docker"
-	kvv1 "github.com/steady-bytes/draft/api/core/registry/key_value/v1"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
 )
@@ -32,23 +25,19 @@ type (
 	}
 
 	controller struct {
-		k8sclient        k8sclient.System
-		daemonClient     dv1connect.DaemonServiceClient
-		systemUpdateLock sync.Mutex
-		broadcaster      async.Broadcaster
+		k8sclient    k8sclient.System
+		daemonClient dv1connect.DaemonServiceClient
 	}
 )
 
-func NewController(logger chassis.Logger, broadcaster async.Broadcaster) Controller {
+func NewController(logger chassis.Logger) Controller {
 	config := chassis.GetConfig()
 	config.SetDefault(osAutoUpdateCronConfigKey, "0 1 * * *")
 	config.SetDefault(containerAutoUpdateCronConfigKey, "0 2 * * *")
 	return &controller{
 		k8sclient: k8sclient.NewClient(logger),
 		// TODO: derive this address? get it from blueprint?
-		daemonClient:     dv1connect.NewDaemonServiceClient(http.DefaultClient, "daemon.home-cloud-system"),
-		systemUpdateLock: sync.Mutex{},
-		broadcaster:      broadcaster,
+		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, "daemon.home-cloud-system"),
 	}
 }
 
@@ -66,30 +55,6 @@ const (
 )
 
 // helper functions
-
-func getSaltValue(ctx context.Context) (string, error) {
-	seedVal := &kvv1.Value{}
-	err := kvclient.Get(ctx, kvclient.SEED_KEY, seedVal)
-	if err != nil {
-		return "", errors.New(ErrFailedToBuildSeedGetRequest)
-	}
-
-	return seedVal.GetData(), nil
-}
-
-func hashPassword(password string, salt []byte) string {
-	// a little salt & hash before saving the password
-	var (
-		pwBytes        = []byte(password)
-		sha512Hasher   = sha512.New()
-		hashedPassword = sha512Hasher.Sum(nil)
-	)
-
-	pwBytes = append(pwBytes, []byte(salt)...)
-	sha512Hasher.Write(pwBytes)
-
-	return hex.EncodeToString(hashedPassword)
-}
 
 func getLatestImageTags(ctx context.Context, images []*v1.ImageVersion) ([]*v1.ImageVersion, error) {
 	for _, image := range images {
