@@ -73,7 +73,6 @@ type (
 
 const (
 	homeCloudNamespace = "home-cloud-system"
-	draftNamespace     = "draft-system"
 )
 
 func NewClient(logger chassis.Logger) Client {
@@ -169,12 +168,6 @@ func (c *client) CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, erro
 		images = map[string]*webv1.ImageVersion{}
 		err    error
 	)
-
-	// draft containers
-	err = c.getCurrentImageVersions(ctx, draftNamespace, images)
-	if err != nil {
-		return nil, err
-	}
 
 	// home-cloud containers
 	err = c.getCurrentImageVersions(ctx, homeCloudNamespace, images)
