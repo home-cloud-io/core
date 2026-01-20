@@ -39,16 +39,24 @@ spec:
           spec:
             description: InstallSpec defines the desired state of Install
             properties:
-              gatewayApiSpec:
+              daemon:
+                description: |-
+                  optional value to run a system daemon service for managing the host
+                  we'll only officially support Talos (for now?) but the community could
+                  build others (e.g. NixOS)
                 properties:
-                  version:
-                    type: string
-                type: object
-              homeCloud:
-                properties:
+                  enabled:
+                    type: boolean
                   image:
                     type: string
                   tag:
+                    type: string
+                type: object
+              gatewayApi:
+                properties:
+                  url:
+                    type: string
+                  version:
                     type: string
                 type: object
               istio:
@@ -82,6 +90,13 @@ spec:
                         type: string
                     type: object
                 type: object
+              server:
+                properties:
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               settings:
                 properties:
                   autoUpdateApps:
@@ -90,26 +105,13 @@ spec:
                     type: boolean
                   hostname:
                     type: string
-                required:
-                - autoUpdateApps
-                - autoUpdateSystem
-                - hostname
-                type: object
-              talos:
-                description: |-
-                  optional value to run a system daemon service for managing the host
-                  we'll only officially support Talos (for now?) but the community could
-                  build others (e.g. NixOS)
-                properties:
-                  enabled:
-                    type: boolean
-                  image:
-                    type: string
-                  tag:
+                  volumeMountHostPath:
                     type: string
                 type: object
-              volumeMountHostPath:
+              version:
                 type: string
+            required:
+            - version
             type: object
           status:
             description: InstallStatus defines the observed state of Install

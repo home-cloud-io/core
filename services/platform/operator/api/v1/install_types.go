@@ -8,20 +8,20 @@ import (
 
 // InstallSpec defines the desired state of Install
 type InstallSpec struct {
-	GatewayAPI GatewayAPISpec `json:"gatewayApiSpec,omitempty"`
+	Version    string         `json:"version"`
+	GatewayAPI GatewayAPISpec `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
 	Istio      IstioSpec      `json:"istio,omitempty"`
-	Server     ServerSpec     `json:"homeCloud,omitempty"`
+	Server     ServerSpec     `json:"server,omitempty"`
 	// optional value to run a system daemon service for managing the host
 	// we'll only officially support Talos (for now?) but the community could
 	// build others (e.g. NixOS)
 	// TODO: document API
-	Daemon   DaemonSpec   `json:"talos,omitempty"`
+	Daemon   DaemonSpec   `json:"daemon,omitempty"`
 	Settings SettingsSpec `json:"settings,omitempty"`
-
-	VolumeMountHostPath string `json:"volumeMountHostPath,omitempty"`
 }
 
 type GatewayAPISpec struct {
+	URL     string `json:"url,omitempty"`
 	Version string `json:"version,omitempty"`
 }
 
@@ -67,9 +67,11 @@ type DaemonSpec struct {
 }
 
 type SettingsSpec struct {
-	AutoUpdateApps   bool   `json:"autoUpdateApps"`
-	AutoUpdateSystem bool   `json:"autoUpdateSystem"`
-	Hostname         string `json:"hostname"`
+	AutoUpdateApps   bool   `json:"autoUpdateApps,omitempty"`
+	AutoUpdateSystem bool   `json:"autoUpdateSystem,omitempty"`
+	Hostname         string `json:"hostname,omitempty"`
+	// TODO: is this needed for talos?
+	VolumeMountHostPath string `json:"volumeMountHostPath,omitempty"`
 }
 
 type ImageVersion struct {

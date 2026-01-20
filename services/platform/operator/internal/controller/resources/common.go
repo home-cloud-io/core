@@ -15,25 +15,17 @@ var (
 			Namespace: "home-cloud-system",
 		},
 		Spec: v1.InstallSpec{
-			GatewayAPI: v1.GatewayAPISpec{
-				Version: "v1.3.0",
-			},
 			Istio: v1.IstioSpec{
-				Version:            "1.27.1",
 				Namespace:          "istio-system",
-				Repo:               "https://istio-release.storage.googleapis.com/charts",
 				IngressGatewayName: "ingress-gateway",
-			},
-			Server: v1.ServerSpec{
-				Image: "ghcr.io/home-cloud-io/core-platform-server",
-				Tag:   "v0.0.52",
 			},
 			Settings: v1.SettingsSpec{
 				Hostname:         "home-cloud.local",
 				AutoUpdateApps:   true,
 				AutoUpdateSystem: true,
+				// TODO: is this needed for talos?
+				VolumeMountHostPath: "/mnt/k8s-pvs/",
 			},
-			VolumeMountHostPath: "/mnt/k8s-pvs/",
 		},
 	}
 )

@@ -43,6 +43,7 @@ type InstallReconciler struct {
 
 const (
 	InstallFinalizer = "install.home-cloud.io/finalizer"
+	ReleasesURL      = "https://github.com/home-cloud-io/core/releases/download/"
 )
 
 func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -61,16 +62,29 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	// set defaults
-	err = mergo.Merge(install, resources.DefaultInstall)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
 	// if marked for deletion, try to delete/uninstall
 	if install.GetDeletionTimestamp() != nil {
 		l.Info("Uninstalling Install")
 		return ctrl.Result{}, r.tryDeletions(ctx, install)
+	}
+
+	// get version manifest from repo
+	resp, err := http.Get(fmt.Sprintf("%s/%s/manifest.yaml", ReleasesURL, install.Spec.Version))
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// populate versions into default install spec
+	dec := yaml.NewDecoder(resp.Body)
+	err = dec.Decode(&resources.DefaultInstall.Spec)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// set defaults: any values set on the resource will override the defaults, including versions
+	err = mergo.Merge(install, resources.DefaultInstall)
+	if err != nil {
+		return ctrl.Result{}, err
 	}
 
 	l.Info("Reconciling Install")
@@ -82,7 +96,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	var err error
 
 	l.Info("reconciling gateway api crds")
-	resp, err := http.Get(fmt.Sprintf("https://github.com/kubernetes-sigs/gateway-api/releases/download/%s/standard-install.yaml", install.Spec.GatewayAPI.Version))
+	resp, err := http.Get(fmt.Sprintf("%s/%s/standard-install.yaml", install.Spec.GatewayAPI.URL, install.Spec.GatewayAPI.Version))
 	if err != nil {
 		return err
 	}

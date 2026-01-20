@@ -49,10 +49,6 @@ func main() {
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                        scheme,
 		HealthProbeBindAddress:        ":" + chassis.GetConfig().GetString("service.network.bind_port"),
-		LeaderElection:                true,
-		LeaderElectionNamespace:       "home-cloud-system",
-		LeaderElectionID:              "operator.home-cloud.io",
-		LeaderElectionReleaseOnCancel: true,
 	})
 	if err != nil {
 		setupLog.Error(err, "failed to create manager")
