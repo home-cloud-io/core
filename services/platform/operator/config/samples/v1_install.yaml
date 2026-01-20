@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/created-by: home-cloud
   name: install-sample
 spec:
+  version: v0.0.1-beta
   istio:
     istiod:
       values: |
@@ -24,8 +25,3 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
-  homeCloud:
-    server:
-      tag: sha-590cb46
-  talos:
-    enabled: true
