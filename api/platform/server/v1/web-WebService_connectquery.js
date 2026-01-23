@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DeregisterPeerRequest, DeregisterPeerResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse, UpdateSystemRequest, UpdateSystemResponse } from "./web_pb.js";
 
 /**
  * Shutdown the host machine running Home Cloud
@@ -55,22 +55,6 @@ export const installApp = {
 };
 
 /**
- * Delete a Home Cloud application
- *
- * @generated from rpc platform.server.v1.WebService.DeleteApp
- */
-export const deleteApp = {
-  localName: "deleteApp",
-  name: "DeleteApp",
-  kind: MethodKind.Unary,
-  I: DeleteAppRequest,
-  O: DeleteAppResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-};
-
-/**
  * Update a Home Cloud application
  *
  * @generated from rpc platform.server.v1.WebService.UpdateApp
@@ -87,7 +71,23 @@ export const updateApp = {
 };
 
 /**
- * Check for available OS updates
+ * Delete a Home Cloud application
+ *
+ * @generated from rpc platform.server.v1.WebService.DeleteApp
+ */
+export const deleteApp = {
+  localName: "deleteApp",
+  name: "DeleteApp",
+  kind: MethodKind.Unary,
+  I: DeleteAppRequest,
+  O: DeleteAppResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * Check for available system updates
  *
  * @generated from rpc platform.server.v1.WebService.CheckForSystemUpdates
  */
@@ -121,14 +121,14 @@ export const checkForContainerUpdates = {
 /**
  * Install available OS update
  *
- * @generated from rpc platform.server.v1.WebService.InstallOSUpdate
+ * @generated from rpc platform.server.v1.WebService.UpdateSystem
  */
-export const installOSUpdate = {
-  localName: "installOSUpdate",
-  name: "InstallOSUpdate",
+export const updateSystem = {
+  localName: "updateSystem",
+  name: "UpdateSystem",
   kind: MethodKind.Unary,
-  I: InstallOSUpdateRequest,
-  O: InstallOSUpdateResponse,
+  I: UpdateSystemRequest,
+  O: UpdateSystemResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }
@@ -327,7 +327,7 @@ export const deregisterFromLocator = {
 };
 
 /**
- * RegisterPeer is used to connect a client to the home-cloud overlay network
+ * RegisterPeer adds a peer to remote access
  *
  * @generated from rpc platform.server.v1.WebService.RegisterPeer
  */
@@ -337,6 +337,22 @@ export const registerPeer = {
   kind: MethodKind.Unary,
   I: RegisterPeerRequest,
   O: RegisterPeerResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+};
+
+/**
+ * DeregisterPeer removes a peer from remote access
+ *
+ * @generated from rpc platform.server.v1.WebService.DeregisterPeer
+ */
+export const deregisterPeer = {
+  localName: "deregisterPeer",
+  name: "DeregisterPeer",
+  kind: MethodKind.Unary,
+  I: DeregisterPeerRequest,
+  O: DeregisterPeerResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }
