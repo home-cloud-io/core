@@ -14,16 +14,16 @@ service WebService {
   rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
   // Install a Home Cloud application
   rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {}
-  // Delete a Home Cloud application
-  rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
   // Update a Home Cloud application
   rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
-  // Check for available OS updates
+  // Delete a Home Cloud application
+  rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
+  // Check for available system updates
   rpc CheckForSystemUpdates(CheckForSystemUpdatesRequest) returns (CheckForSystemUpdatesResponse) {}
   // Check for available system container updates
   rpc CheckForContainerUpdates(CheckForContainerUpdatesRequest) returns (CheckForContainerUpdatesResponse) {}
   // Install available OS update
-  rpc InstallOSUpdate(InstallOSUpdateRequest) returns (InstallOSUpdateResponse) {}
+  rpc UpdateSystem(UpdateSystemRequest) returns (UpdateSystemResponse) {}
   // Check the current health of all installed Home Cloud applications
   rpc AppsHealthCheck(AppsHealthCheckRequest) returns (AppsHealthCheckResponse) {}
   // Get the current host machine stats (cpu, memory, drives)
@@ -51,19 +51,19 @@ service WebService {
   rpc RegisterToLocator(RegisterToLocatorRequest) returns (RegisterToLocatorResponse) {}
   // Deregister the server from the given Locator service
   rpc DeregisterFromLocator(DeregisterFromLocatorRequest) returns (DeregisterFromLocatorResponse) {}
-  // RegisterPeer is used to connect a client to the home-cloud overlay network
+  // RegisterPeer adds a peer to remote access
   rpc RegisterPeer(RegisterPeerRequest) returns (RegisterPeerResponse) {}
+  // DeregisterPeer removes a peer from remote access
+  rpc DeregisterPeer(DeregisterPeerRequest) returns (DeregisterPeerResponse) {}
 
   // Subscribe to the server for events
   rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
 }
 
 message ShutdownHostRequest {}
-
 message ShutdownHostResponse {}
 
 message RestartHostRequest {}
-
 message RestartHostResponse {}
 
 message InstallAppRequest {
@@ -73,14 +73,7 @@ message InstallAppRequest {
   string values = 4;
   string version = 5;
 }
-
 message InstallAppResponse {}
-
-message DeleteAppRequest {
-  string release = 1;
-}
-
-message DeleteAppResponse {}
 
 message UpdateAppRequest {
   string chart = 1;
@@ -89,17 +82,21 @@ message UpdateAppRequest {
   string values = 4;
   string version = 5;
 }
-
 message UpdateAppResponse {}
 
-message CheckForSystemUpdatesRequest {}
+message DeleteAppRequest {
+  string release = 1;
+}
+message DeleteAppResponse {}
 
+message CheckForSystemUpdatesRequest {}
 message CheckForSystemUpdatesResponse {
+  bool update_available = 1;
+
   // TODO: implement for talos and maybe eventually for other systems
 }
 
 message CheckForContainerUpdatesRequest {}
-
 message CheckForContainerUpdatesResponse {
   repeated ImageVersion image_versions = 1;
 }
@@ -111,12 +108,10 @@ message ImageVersion {
   string name = 4;
 }
 
-message InstallOSUpdateRequest {}
-
-message InstallOSUpdateResponse {}
+message UpdateSystemRequest {}
+message UpdateSystemResponse {}
 
 message AppsHealthCheckRequest {}
-
 message AppsHealthCheckResponse {
   repeated AppHealth checks = 1;
 }
@@ -256,6 +251,34 @@ message Entries {
   repeated App apps = 1;
 }
 
+message SystemVersion {
+  string version = 1;
+  IstioVersion istio = 2;
+  GatewayAPIVersion gateway_api = 3;
+  ServerVersion server = 4;
+  DaemonVersion daemon = 5;
+}
+
+message IstioVersion {
+  string repo = 1;
+  string version = 2;
+}
+
+message GatewayAPIVersion {
+  string url = 1;
+  string version = 2;
+}
+
+message ServerVersion {
+  string image = 1;
+  string tag = 2;
+}
+
+message DaemonVersion {
+  string image = 1;
+  string tag = 2;
+}
+
 // Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
 // A backround thread in the server will fetch the index and update the
 // cache at startup and then every 24 hours
@@ -321,3 +344,8 @@ message RegisterPeerResponse{
   string server_id = 6;
   repeated string locator_servers = 7;
 }
+
+message DeregisterPeerRequest {
+  // TODO
+}
+message DeregisterPeerResponse{}

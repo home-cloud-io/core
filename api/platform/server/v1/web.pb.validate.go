@@ -657,210 +657,6 @@ var _ interface {
 	ErrorName() string
 } = InstallAppResponseValidationError{}
 
-// Validate checks the field values on DeleteAppRequest with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *DeleteAppRequest) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on DeleteAppRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// DeleteAppRequestMultiError, or nil if none found.
-func (m *DeleteAppRequest) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *DeleteAppRequest) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Release
-
-	if len(errors) > 0 {
-		return DeleteAppRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-// DeleteAppRequestMultiError is an error wrapping multiple validation errors
-// returned by DeleteAppRequest.ValidateAll() if the designated constraints
-// aren't met.
-type DeleteAppRequestMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m DeleteAppRequestMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m DeleteAppRequestMultiError) AllErrors() []error { return m }
-
-// DeleteAppRequestValidationError is the validation error returned by
-// DeleteAppRequest.Validate if the designated constraints aren't met.
-type DeleteAppRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e DeleteAppRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e DeleteAppRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e DeleteAppRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e DeleteAppRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e DeleteAppRequestValidationError) ErrorName() string { return "DeleteAppRequestValidationError" }
-
-// Error satisfies the builtin error interface
-func (e DeleteAppRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sDeleteAppRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = DeleteAppRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = DeleteAppRequestValidationError{}
-
-// Validate checks the field values on DeleteAppResponse with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *DeleteAppResponse) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on DeleteAppResponse with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// DeleteAppResponseMultiError, or nil if none found.
-func (m *DeleteAppResponse) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *DeleteAppResponse) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if len(errors) > 0 {
-		return DeleteAppResponseMultiError(errors)
-	}
-
-	return nil
-}
-
-// DeleteAppResponseMultiError is an error wrapping multiple validation errors
-// returned by DeleteAppResponse.ValidateAll() if the designated constraints
-// aren't met.
-type DeleteAppResponseMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m DeleteAppResponseMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m DeleteAppResponseMultiError) AllErrors() []error { return m }
-
-// DeleteAppResponseValidationError is the validation error returned by
-// DeleteAppResponse.Validate if the designated constraints aren't met.
-type DeleteAppResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e DeleteAppResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e DeleteAppResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e DeleteAppResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e DeleteAppResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e DeleteAppResponseValidationError) ErrorName() string {
-	return "DeleteAppResponseValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e DeleteAppResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sDeleteAppResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = DeleteAppResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = DeleteAppResponseValidationError{}
-
 // Validate checks the field values on UpdateAppRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -1073,6 +869,210 @@ var _ interface {
 	ErrorName() string
 } = UpdateAppResponseValidationError{}
 
+// Validate checks the field values on DeleteAppRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DeleteAppRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteAppRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteAppRequestMultiError, or nil if none found.
+func (m *DeleteAppRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteAppRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Release
+
+	if len(errors) > 0 {
+		return DeleteAppRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteAppRequestMultiError is an error wrapping multiple validation errors
+// returned by DeleteAppRequest.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteAppRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteAppRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteAppRequestMultiError) AllErrors() []error { return m }
+
+// DeleteAppRequestValidationError is the validation error returned by
+// DeleteAppRequest.Validate if the designated constraints aren't met.
+type DeleteAppRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteAppRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteAppRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteAppRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteAppRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteAppRequestValidationError) ErrorName() string { return "DeleteAppRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DeleteAppRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteAppRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteAppRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteAppRequestValidationError{}
+
+// Validate checks the field values on DeleteAppResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *DeleteAppResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteAppResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteAppResponseMultiError, or nil if none found.
+func (m *DeleteAppResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteAppResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeleteAppResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteAppResponseMultiError is an error wrapping multiple validation errors
+// returned by DeleteAppResponse.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteAppResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteAppResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteAppResponseMultiError) AllErrors() []error { return m }
+
+// DeleteAppResponseValidationError is the validation error returned by
+// DeleteAppResponse.Validate if the designated constraints aren't met.
+type DeleteAppResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteAppResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteAppResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteAppResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteAppResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteAppResponseValidationError) ErrorName() string {
+	return "DeleteAppResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteAppResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteAppResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteAppResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteAppResponseValidationError{}
+
 // Validate checks the field values on CheckForSystemUpdatesRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -1197,6 +1197,8 @@ func (m *CheckForSystemUpdatesResponse) validate(all bool) error {
 	}
 
 	var errors []error
+
+	// no validation rules for UpdateAvailable
 
 	if len(errors) > 0 {
 		return CheckForSystemUpdatesResponseMultiError(errors)
@@ -1628,22 +1630,22 @@ var _ interface {
 	ErrorName() string
 } = ImageVersionValidationError{}
 
-// Validate checks the field values on InstallOSUpdateRequest with the rules
+// Validate checks the field values on UpdateSystemRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *InstallOSUpdateRequest) Validate() error {
+func (m *UpdateSystemRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on InstallOSUpdateRequest with the rules
+// ValidateAll checks the field values on UpdateSystemRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// InstallOSUpdateRequestMultiError, or nil if none found.
-func (m *InstallOSUpdateRequest) ValidateAll() error {
+// UpdateSystemRequestMultiError, or nil if none found.
+func (m *UpdateSystemRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *InstallOSUpdateRequest) validate(all bool) error {
+func (m *UpdateSystemRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1651,19 +1653,19 @@ func (m *InstallOSUpdateRequest) validate(all bool) error {
 	var errors []error
 
 	if len(errors) > 0 {
-		return InstallOSUpdateRequestMultiError(errors)
+		return UpdateSystemRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// InstallOSUpdateRequestMultiError is an error wrapping multiple validation
-// errors returned by InstallOSUpdateRequest.ValidateAll() if the designated
+// UpdateSystemRequestMultiError is an error wrapping multiple validation
+// errors returned by UpdateSystemRequest.ValidateAll() if the designated
 // constraints aren't met.
-type InstallOSUpdateRequestMultiError []error
+type UpdateSystemRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m InstallOSUpdateRequestMultiError) Error() string {
+func (m UpdateSystemRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1672,11 +1674,11 @@ func (m InstallOSUpdateRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m InstallOSUpdateRequestMultiError) AllErrors() []error { return m }
+func (m UpdateSystemRequestMultiError) AllErrors() []error { return m }
 
-// InstallOSUpdateRequestValidationError is the validation error returned by
-// InstallOSUpdateRequest.Validate if the designated constraints aren't met.
-type InstallOSUpdateRequestValidationError struct {
+// UpdateSystemRequestValidationError is the validation error returned by
+// UpdateSystemRequest.Validate if the designated constraints aren't met.
+type UpdateSystemRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1684,24 +1686,24 @@ type InstallOSUpdateRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e InstallOSUpdateRequestValidationError) Field() string { return e.field }
+func (e UpdateSystemRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e InstallOSUpdateRequestValidationError) Reason() string { return e.reason }
+func (e UpdateSystemRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e InstallOSUpdateRequestValidationError) Cause() error { return e.cause }
+func (e UpdateSystemRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e InstallOSUpdateRequestValidationError) Key() bool { return e.key }
+func (e UpdateSystemRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e InstallOSUpdateRequestValidationError) ErrorName() string {
-	return "InstallOSUpdateRequestValidationError"
+func (e UpdateSystemRequestValidationError) ErrorName() string {
+	return "UpdateSystemRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e InstallOSUpdateRequestValidationError) Error() string {
+func (e UpdateSystemRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1713,14 +1715,14 @@ func (e InstallOSUpdateRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sInstallOSUpdateRequest.%s: %s%s",
+		"invalid %sUpdateSystemRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = InstallOSUpdateRequestValidationError{}
+var _ error = UpdateSystemRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -1728,24 +1730,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = InstallOSUpdateRequestValidationError{}
+} = UpdateSystemRequestValidationError{}
 
-// Validate checks the field values on InstallOSUpdateResponse with the rules
+// Validate checks the field values on UpdateSystemResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *InstallOSUpdateResponse) Validate() error {
+func (m *UpdateSystemResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on InstallOSUpdateResponse with the
-// rules defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on UpdateSystemResponse with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// InstallOSUpdateResponseMultiError, or nil if none found.
-func (m *InstallOSUpdateResponse) ValidateAll() error {
+// UpdateSystemResponseMultiError, or nil if none found.
+func (m *UpdateSystemResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *InstallOSUpdateResponse) validate(all bool) error {
+func (m *UpdateSystemResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1753,19 +1755,19 @@ func (m *InstallOSUpdateResponse) validate(all bool) error {
 	var errors []error
 
 	if len(errors) > 0 {
-		return InstallOSUpdateResponseMultiError(errors)
+		return UpdateSystemResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// InstallOSUpdateResponseMultiError is an error wrapping multiple validation
-// errors returned by InstallOSUpdateResponse.ValidateAll() if the designated
+// UpdateSystemResponseMultiError is an error wrapping multiple validation
+// errors returned by UpdateSystemResponse.ValidateAll() if the designated
 // constraints aren't met.
-type InstallOSUpdateResponseMultiError []error
+type UpdateSystemResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m InstallOSUpdateResponseMultiError) Error() string {
+func (m UpdateSystemResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1774,11 +1776,11 @@ func (m InstallOSUpdateResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m InstallOSUpdateResponseMultiError) AllErrors() []error { return m }
+func (m UpdateSystemResponseMultiError) AllErrors() []error { return m }
 
-// InstallOSUpdateResponseValidationError is the validation error returned by
-// InstallOSUpdateResponse.Validate if the designated constraints aren't met.
-type InstallOSUpdateResponseValidationError struct {
+// UpdateSystemResponseValidationError is the validation error returned by
+// UpdateSystemResponse.Validate if the designated constraints aren't met.
+type UpdateSystemResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1786,24 +1788,24 @@ type InstallOSUpdateResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e InstallOSUpdateResponseValidationError) Field() string { return e.field }
+func (e UpdateSystemResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e InstallOSUpdateResponseValidationError) Reason() string { return e.reason }
+func (e UpdateSystemResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e InstallOSUpdateResponseValidationError) Cause() error { return e.cause }
+func (e UpdateSystemResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e InstallOSUpdateResponseValidationError) Key() bool { return e.key }
+func (e UpdateSystemResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e InstallOSUpdateResponseValidationError) ErrorName() string {
-	return "InstallOSUpdateResponseValidationError"
+func (e UpdateSystemResponseValidationError) ErrorName() string {
+	return "UpdateSystemResponseValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e InstallOSUpdateResponseValidationError) Error() string {
+func (e UpdateSystemResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1815,14 +1817,14 @@ func (e InstallOSUpdateResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sInstallOSUpdateResponse.%s: %s%s",
+		"invalid %sUpdateSystemResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = InstallOSUpdateResponseValidationError{}
+var _ error = UpdateSystemResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -1830,7 +1832,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = InstallOSUpdateResponseValidationError{}
+} = UpdateSystemResponseValidationError{}
 
 // Validate checks the field values on AppsHealthCheckRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -5559,6 +5561,641 @@ var _ interface {
 	ErrorName() string
 } = EntriesValidationError{}
 
+// Validate checks the field values on SystemVersion with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SystemVersion) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SystemVersion with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SystemVersionMultiError, or
+// nil if none found.
+func (m *SystemVersion) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SystemVersion) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Version
+
+	if all {
+		switch v := interface{}(m.GetIstio()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SystemVersionValidationError{
+					field:  "Istio",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SystemVersionValidationError{
+					field:  "Istio",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIstio()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SystemVersionValidationError{
+				field:  "Istio",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetGatewayApi()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SystemVersionValidationError{
+					field:  "GatewayApi",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SystemVersionValidationError{
+					field:  "GatewayApi",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGatewayApi()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SystemVersionValidationError{
+				field:  "GatewayApi",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetServer()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SystemVersionValidationError{
+					field:  "Server",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SystemVersionValidationError{
+					field:  "Server",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetServer()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SystemVersionValidationError{
+				field:  "Server",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDaemon()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SystemVersionValidationError{
+					field:  "Daemon",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SystemVersionValidationError{
+					field:  "Daemon",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDaemon()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SystemVersionValidationError{
+				field:  "Daemon",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SystemVersionMultiError(errors)
+	}
+
+	return nil
+}
+
+// SystemVersionMultiError is an error wrapping multiple validation errors
+// returned by SystemVersion.ValidateAll() if the designated constraints
+// aren't met.
+type SystemVersionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SystemVersionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SystemVersionMultiError) AllErrors() []error { return m }
+
+// SystemVersionValidationError is the validation error returned by
+// SystemVersion.Validate if the designated constraints aren't met.
+type SystemVersionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SystemVersionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SystemVersionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SystemVersionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SystemVersionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SystemVersionValidationError) ErrorName() string { return "SystemVersionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SystemVersionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSystemVersion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SystemVersionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SystemVersionValidationError{}
+
+// Validate checks the field values on IstioVersion with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *IstioVersion) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on IstioVersion with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in IstioVersionMultiError, or
+// nil if none found.
+func (m *IstioVersion) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *IstioVersion) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Repo
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return IstioVersionMultiError(errors)
+	}
+
+	return nil
+}
+
+// IstioVersionMultiError is an error wrapping multiple validation errors
+// returned by IstioVersion.ValidateAll() if the designated constraints aren't met.
+type IstioVersionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m IstioVersionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m IstioVersionMultiError) AllErrors() []error { return m }
+
+// IstioVersionValidationError is the validation error returned by
+// IstioVersion.Validate if the designated constraints aren't met.
+type IstioVersionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IstioVersionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IstioVersionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IstioVersionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IstioVersionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IstioVersionValidationError) ErrorName() string { return "IstioVersionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IstioVersionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIstioVersion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IstioVersionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IstioVersionValidationError{}
+
+// Validate checks the field values on GatewayAPIVersion with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GatewayAPIVersion) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GatewayAPIVersion with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GatewayAPIVersionMultiError, or nil if none found.
+func (m *GatewayAPIVersion) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GatewayAPIVersion) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Url
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return GatewayAPIVersionMultiError(errors)
+	}
+
+	return nil
+}
+
+// GatewayAPIVersionMultiError is an error wrapping multiple validation errors
+// returned by GatewayAPIVersion.ValidateAll() if the designated constraints
+// aren't met.
+type GatewayAPIVersionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GatewayAPIVersionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GatewayAPIVersionMultiError) AllErrors() []error { return m }
+
+// GatewayAPIVersionValidationError is the validation error returned by
+// GatewayAPIVersion.Validate if the designated constraints aren't met.
+type GatewayAPIVersionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GatewayAPIVersionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GatewayAPIVersionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GatewayAPIVersionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GatewayAPIVersionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GatewayAPIVersionValidationError) ErrorName() string {
+	return "GatewayAPIVersionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GatewayAPIVersionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGatewayAPIVersion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GatewayAPIVersionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GatewayAPIVersionValidationError{}
+
+// Validate checks the field values on ServerVersion with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ServerVersion) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ServerVersion with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ServerVersionMultiError, or
+// nil if none found.
+func (m *ServerVersion) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ServerVersion) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Image
+
+	// no validation rules for Tag
+
+	if len(errors) > 0 {
+		return ServerVersionMultiError(errors)
+	}
+
+	return nil
+}
+
+// ServerVersionMultiError is an error wrapping multiple validation errors
+// returned by ServerVersion.ValidateAll() if the designated constraints
+// aren't met.
+type ServerVersionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ServerVersionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ServerVersionMultiError) AllErrors() []error { return m }
+
+// ServerVersionValidationError is the validation error returned by
+// ServerVersion.Validate if the designated constraints aren't met.
+type ServerVersionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ServerVersionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ServerVersionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ServerVersionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ServerVersionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ServerVersionValidationError) ErrorName() string { return "ServerVersionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ServerVersionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sServerVersion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ServerVersionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ServerVersionValidationError{}
+
+// Validate checks the field values on DaemonVersion with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *DaemonVersion) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DaemonVersion with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DaemonVersionMultiError, or
+// nil if none found.
+func (m *DaemonVersion) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DaemonVersion) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Image
+
+	// no validation rules for Tag
+
+	if len(errors) > 0 {
+		return DaemonVersionMultiError(errors)
+	}
+
+	return nil
+}
+
+// DaemonVersionMultiError is an error wrapping multiple validation errors
+// returned by DaemonVersion.ValidateAll() if the designated constraints
+// aren't met.
+type DaemonVersionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DaemonVersionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DaemonVersionMultiError) AllErrors() []error { return m }
+
+// DaemonVersionValidationError is the validation error returned by
+// DaemonVersion.Validate if the designated constraints aren't met.
+type DaemonVersionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DaemonVersionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DaemonVersionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DaemonVersionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DaemonVersionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DaemonVersionValidationError) ErrorName() string { return "DaemonVersionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DaemonVersionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDaemonVersion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DaemonVersionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DaemonVersionValidationError{}
+
 // Validate checks the field values on AppStoreEntries with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -6935,3 +7572,207 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RegisterPeerResponseValidationError{}
+
+// Validate checks the field values on DeregisterPeerRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeregisterPeerRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeregisterPeerRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeregisterPeerRequestMultiError, or nil if none found.
+func (m *DeregisterPeerRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeregisterPeerRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeregisterPeerRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeregisterPeerRequestMultiError is an error wrapping multiple validation
+// errors returned by DeregisterPeerRequest.ValidateAll() if the designated
+// constraints aren't met.
+type DeregisterPeerRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeregisterPeerRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeregisterPeerRequestMultiError) AllErrors() []error { return m }
+
+// DeregisterPeerRequestValidationError is the validation error returned by
+// DeregisterPeerRequest.Validate if the designated constraints aren't met.
+type DeregisterPeerRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeregisterPeerRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeregisterPeerRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeregisterPeerRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeregisterPeerRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeregisterPeerRequestValidationError) ErrorName() string {
+	return "DeregisterPeerRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeregisterPeerRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeregisterPeerRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeregisterPeerRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeregisterPeerRequestValidationError{}
+
+// Validate checks the field values on DeregisterPeerResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeregisterPeerResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeregisterPeerResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeregisterPeerResponseMultiError, or nil if none found.
+func (m *DeregisterPeerResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeregisterPeerResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeregisterPeerResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeregisterPeerResponseMultiError is an error wrapping multiple validation
+// errors returned by DeregisterPeerResponse.ValidateAll() if the designated
+// constraints aren't met.
+type DeregisterPeerResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeregisterPeerResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeregisterPeerResponseMultiError) AllErrors() []error { return m }
+
+// DeregisterPeerResponseValidationError is the validation error returned by
+// DeregisterPeerResponse.Validate if the designated constraints aren't met.
+type DeregisterPeerResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeregisterPeerResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeregisterPeerResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeregisterPeerResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeregisterPeerResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeregisterPeerResponseValidationError) ErrorName() string {
+	return "DeregisterPeerResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeregisterPeerResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeregisterPeerResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeregisterPeerResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeregisterPeerResponseValidationError{}

@@ -250,74 +250,6 @@ export class InstallAppResponse extends Message<InstallAppResponse> {
 }
 
 /**
- * @generated from message platform.server.v1.DeleteAppRequest
- */
-export class DeleteAppRequest extends Message<DeleteAppRequest> {
-  /**
-   * @generated from field: string release = 1;
-   */
-  release = "";
-
-  constructor(data?: PartialMessage<DeleteAppRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.DeleteAppRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAppRequest {
-    return new DeleteAppRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAppRequest {
-    return new DeleteAppRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAppRequest {
-    return new DeleteAppRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: DeleteAppRequest | PlainMessage<DeleteAppRequest> | undefined, b: DeleteAppRequest | PlainMessage<DeleteAppRequest> | undefined): boolean {
-    return proto3.util.equals(DeleteAppRequest, a, b);
-  }
-}
-
-/**
- * @generated from message platform.server.v1.DeleteAppResponse
- */
-export class DeleteAppResponse extends Message<DeleteAppResponse> {
-  constructor(data?: PartialMessage<DeleteAppResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.DeleteAppResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAppResponse {
-    return new DeleteAppResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAppResponse {
-    return new DeleteAppResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAppResponse {
-    return new DeleteAppResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: DeleteAppResponse | PlainMessage<DeleteAppResponse> | undefined, b: DeleteAppResponse | PlainMessage<DeleteAppResponse> | undefined): boolean {
-    return proto3.util.equals(DeleteAppResponse, a, b);
-  }
-}
-
-/**
  * @generated from message platform.server.v1.UpdateAppRequest
  */
 export class UpdateAppRequest extends Message<UpdateAppRequest> {
@@ -410,6 +342,74 @@ export class UpdateAppResponse extends Message<UpdateAppResponse> {
 }
 
 /**
+ * @generated from message platform.server.v1.DeleteAppRequest
+ */
+export class DeleteAppRequest extends Message<DeleteAppRequest> {
+  /**
+   * @generated from field: string release = 1;
+   */
+  release = "";
+
+  constructor(data?: PartialMessage<DeleteAppRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DeleteAppRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAppRequest {
+    return new DeleteAppRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAppRequest {
+    return new DeleteAppRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAppRequest {
+    return new DeleteAppRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteAppRequest | PlainMessage<DeleteAppRequest> | undefined, b: DeleteAppRequest | PlainMessage<DeleteAppRequest> | undefined): boolean {
+    return proto3.util.equals(DeleteAppRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DeleteAppResponse
+ */
+export class DeleteAppResponse extends Message<DeleteAppResponse> {
+  constructor(data?: PartialMessage<DeleteAppResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DeleteAppResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAppResponse {
+    return new DeleteAppResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAppResponse {
+    return new DeleteAppResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAppResponse {
+    return new DeleteAppResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteAppResponse | PlainMessage<DeleteAppResponse> | undefined, b: DeleteAppResponse | PlainMessage<DeleteAppResponse> | undefined): boolean {
+    return proto3.util.equals(DeleteAppResponse, a, b);
+  }
+}
+
+/**
  * @generated from message platform.server.v1.CheckForSystemUpdatesRequest
  */
 export class CheckForSystemUpdatesRequest extends Message<CheckForSystemUpdatesRequest> {
@@ -441,11 +441,14 @@ export class CheckForSystemUpdatesRequest extends Message<CheckForSystemUpdatesR
 }
 
 /**
- * TODO: implement for talos and maybe eventually for other systems
- *
  * @generated from message platform.server.v1.CheckForSystemUpdatesResponse
  */
 export class CheckForSystemUpdatesResponse extends Message<CheckForSystemUpdatesResponse> {
+  /**
+   * @generated from field: bool update_available = 1;
+   */
+  updateAvailable = false;
+
   constructor(data?: PartialMessage<CheckForSystemUpdatesResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -454,6 +457,7 @@ export class CheckForSystemUpdatesResponse extends Message<CheckForSystemUpdates
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.server.v1.CheckForSystemUpdatesResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "update_available", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CheckForSystemUpdatesResponse {
@@ -597,64 +601,64 @@ export class ImageVersion extends Message<ImageVersion> {
 }
 
 /**
- * @generated from message platform.server.v1.InstallOSUpdateRequest
+ * @generated from message platform.server.v1.UpdateSystemRequest
  */
-export class InstallOSUpdateRequest extends Message<InstallOSUpdateRequest> {
-  constructor(data?: PartialMessage<InstallOSUpdateRequest>) {
+export class UpdateSystemRequest extends Message<UpdateSystemRequest> {
+  constructor(data?: PartialMessage<UpdateSystemRequest>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.InstallOSUpdateRequest";
+  static readonly typeName = "platform.server.v1.UpdateSystemRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InstallOSUpdateRequest {
-    return new InstallOSUpdateRequest().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSystemRequest {
+    return new UpdateSystemRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InstallOSUpdateRequest {
-    return new InstallOSUpdateRequest().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSystemRequest {
+    return new UpdateSystemRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InstallOSUpdateRequest {
-    return new InstallOSUpdateRequest().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSystemRequest {
+    return new UpdateSystemRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(a: InstallOSUpdateRequest | PlainMessage<InstallOSUpdateRequest> | undefined, b: InstallOSUpdateRequest | PlainMessage<InstallOSUpdateRequest> | undefined): boolean {
-    return proto3.util.equals(InstallOSUpdateRequest, a, b);
+  static equals(a: UpdateSystemRequest | PlainMessage<UpdateSystemRequest> | undefined, b: UpdateSystemRequest | PlainMessage<UpdateSystemRequest> | undefined): boolean {
+    return proto3.util.equals(UpdateSystemRequest, a, b);
   }
 }
 
 /**
- * @generated from message platform.server.v1.InstallOSUpdateResponse
+ * @generated from message platform.server.v1.UpdateSystemResponse
  */
-export class InstallOSUpdateResponse extends Message<InstallOSUpdateResponse> {
-  constructor(data?: PartialMessage<InstallOSUpdateResponse>) {
+export class UpdateSystemResponse extends Message<UpdateSystemResponse> {
+  constructor(data?: PartialMessage<UpdateSystemResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "platform.server.v1.InstallOSUpdateResponse";
+  static readonly typeName = "platform.server.v1.UpdateSystemResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InstallOSUpdateResponse {
-    return new InstallOSUpdateResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateSystemResponse {
+    return new UpdateSystemResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InstallOSUpdateResponse {
-    return new InstallOSUpdateResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateSystemResponse {
+    return new UpdateSystemResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InstallOSUpdateResponse {
-    return new InstallOSUpdateResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateSystemResponse {
+    return new UpdateSystemResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: InstallOSUpdateResponse | PlainMessage<InstallOSUpdateResponse> | undefined, b: InstallOSUpdateResponse | PlainMessage<InstallOSUpdateResponse> | undefined): boolean {
-    return proto3.util.equals(InstallOSUpdateResponse, a, b);
+  static equals(a: UpdateSystemResponse | PlainMessage<UpdateSystemResponse> | undefined, b: UpdateSystemResponse | PlainMessage<UpdateSystemResponse> | undefined): boolean {
+    return proto3.util.equals(UpdateSystemResponse, a, b);
   }
 }
 
@@ -1952,6 +1956,239 @@ export class Entries extends Message<Entries> {
 }
 
 /**
+ * @generated from message platform.server.v1.SystemVersion
+ */
+export class SystemVersion extends Message<SystemVersion> {
+  /**
+   * @generated from field: string version = 1;
+   */
+  version = "";
+
+  /**
+   * @generated from field: platform.server.v1.IstioVersion istio = 2;
+   */
+  istio?: IstioVersion;
+
+  /**
+   * @generated from field: platform.server.v1.GatewayAPIVersion gateway_api = 3;
+   */
+  gatewayApi?: GatewayAPIVersion;
+
+  /**
+   * @generated from field: platform.server.v1.ServerVersion server = 4;
+   */
+  server?: ServerVersion;
+
+  /**
+   * @generated from field: platform.server.v1.DaemonVersion daemon = 5;
+   */
+  daemon?: DaemonVersion;
+
+  constructor(data?: PartialMessage<SystemVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.SystemVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "istio", kind: "message", T: IstioVersion },
+    { no: 3, name: "gateway_api", kind: "message", T: GatewayAPIVersion },
+    { no: 4, name: "server", kind: "message", T: ServerVersion },
+    { no: 5, name: "daemon", kind: "message", T: DaemonVersion },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SystemVersion {
+    return new SystemVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SystemVersion {
+    return new SystemVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SystemVersion {
+    return new SystemVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SystemVersion | PlainMessage<SystemVersion> | undefined, b: SystemVersion | PlainMessage<SystemVersion> | undefined): boolean {
+    return proto3.util.equals(SystemVersion, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.IstioVersion
+ */
+export class IstioVersion extends Message<IstioVersion> {
+  /**
+   * @generated from field: string repo = 1;
+   */
+  repo = "";
+
+  /**
+   * @generated from field: string version = 2;
+   */
+  version = "";
+
+  constructor(data?: PartialMessage<IstioVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.IstioVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IstioVersion {
+    return new IstioVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): IstioVersion {
+    return new IstioVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): IstioVersion {
+    return new IstioVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: IstioVersion | PlainMessage<IstioVersion> | undefined, b: IstioVersion | PlainMessage<IstioVersion> | undefined): boolean {
+    return proto3.util.equals(IstioVersion, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.GatewayAPIVersion
+ */
+export class GatewayAPIVersion extends Message<GatewayAPIVersion> {
+  /**
+   * @generated from field: string url = 1;
+   */
+  url = "";
+
+  /**
+   * @generated from field: string version = 2;
+   */
+  version = "";
+
+  constructor(data?: PartialMessage<GatewayAPIVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.GatewayAPIVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GatewayAPIVersion {
+    return new GatewayAPIVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GatewayAPIVersion {
+    return new GatewayAPIVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GatewayAPIVersion {
+    return new GatewayAPIVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GatewayAPIVersion | PlainMessage<GatewayAPIVersion> | undefined, b: GatewayAPIVersion | PlainMessage<GatewayAPIVersion> | undefined): boolean {
+    return proto3.util.equals(GatewayAPIVersion, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.ServerVersion
+ */
+export class ServerVersion extends Message<ServerVersion> {
+  /**
+   * @generated from field: string image = 1;
+   */
+  image = "";
+
+  /**
+   * @generated from field: string tag = 2;
+   */
+  tag = "";
+
+  constructor(data?: PartialMessage<ServerVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.ServerVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "tag", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerVersion {
+    return new ServerVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ServerVersion {
+    return new ServerVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ServerVersion {
+    return new ServerVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ServerVersion | PlainMessage<ServerVersion> | undefined, b: ServerVersion | PlainMessage<ServerVersion> | undefined): boolean {
+    return proto3.util.equals(ServerVersion, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DaemonVersion
+ */
+export class DaemonVersion extends Message<DaemonVersion> {
+  /**
+   * @generated from field: string image = 1;
+   */
+  image = "";
+
+  /**
+   * @generated from field: string tag = 2;
+   */
+  tag = "";
+
+  constructor(data?: PartialMessage<DaemonVersion>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DaemonVersion";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "tag", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DaemonVersion {
+    return new DaemonVersion().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DaemonVersion {
+    return new DaemonVersion().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DaemonVersion {
+    return new DaemonVersion().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DaemonVersion | PlainMessage<DaemonVersion> | undefined, b: DaemonVersion | PlainMessage<DaemonVersion> | undefined): boolean {
+    return proto3.util.equals(DaemonVersion, a, b);
+  }
+}
+
+/**
  * Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
  * A backround thread in the server will fetch the index and update the
  * cache at startup and then every 24 hours
@@ -2463,6 +2700,70 @@ export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
 
   static equals(a: RegisterPeerResponse | PlainMessage<RegisterPeerResponse> | undefined, b: RegisterPeerResponse | PlainMessage<RegisterPeerResponse> | undefined): boolean {
     return proto3.util.equals(RegisterPeerResponse, a, b);
+  }
+}
+
+/**
+ * TODO
+ *
+ * @generated from message platform.server.v1.DeregisterPeerRequest
+ */
+export class DeregisterPeerRequest extends Message<DeregisterPeerRequest> {
+  constructor(data?: PartialMessage<DeregisterPeerRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DeregisterPeerRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeregisterPeerRequest {
+    return new DeregisterPeerRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeregisterPeerRequest {
+    return new DeregisterPeerRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeregisterPeerRequest {
+    return new DeregisterPeerRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeregisterPeerRequest | PlainMessage<DeregisterPeerRequest> | undefined, b: DeregisterPeerRequest | PlainMessage<DeregisterPeerRequest> | undefined): boolean {
+    return proto3.util.equals(DeregisterPeerRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.DeregisterPeerResponse
+ */
+export class DeregisterPeerResponse extends Message<DeregisterPeerResponse> {
+  constructor(data?: PartialMessage<DeregisterPeerResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.DeregisterPeerResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeregisterPeerResponse {
+    return new DeregisterPeerResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeregisterPeerResponse {
+    return new DeregisterPeerResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeregisterPeerResponse {
+    return new DeregisterPeerResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeregisterPeerResponse | PlainMessage<DeregisterPeerResponse> | undefined, b: DeregisterPeerResponse | PlainMessage<DeregisterPeerResponse> | undefined): boolean {
+    return proto3.util.equals(DeregisterPeerResponse, a, b);
   }
 }
 

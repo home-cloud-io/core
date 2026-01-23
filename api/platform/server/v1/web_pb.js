@@ -73,24 +73,6 @@ export const InstallAppResponse = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.DeleteAppRequest
- */
-export const DeleteAppRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.DeleteAppRequest",
-  () => [
-    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.DeleteAppResponse
- */
-export const DeleteAppResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.DeleteAppResponse",
-  [],
-);
-
-/**
  * @generated from message platform.server.v1.UpdateAppRequest
  */
 export const UpdateAppRequest = /*@__PURE__*/ proto3.makeMessageType(
@@ -113,6 +95,24 @@ export const UpdateAppResponse = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
+ * @generated from message platform.server.v1.DeleteAppRequest
+ */
+export const DeleteAppRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DeleteAppRequest",
+  () => [
+    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DeleteAppResponse
+ */
+export const DeleteAppResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DeleteAppResponse",
+  [],
+);
+
+/**
  * @generated from message platform.server.v1.CheckForSystemUpdatesRequest
  */
 export const CheckForSystemUpdatesRequest = /*@__PURE__*/ proto3.makeMessageType(
@@ -121,13 +121,13 @@ export const CheckForSystemUpdatesRequest = /*@__PURE__*/ proto3.makeMessageType
 );
 
 /**
- * TODO: implement for talos and maybe eventually for other systems
- *
  * @generated from message platform.server.v1.CheckForSystemUpdatesResponse
  */
 export const CheckForSystemUpdatesResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.CheckForSystemUpdatesResponse",
-  [],
+  () => [
+    { no: 1, name: "update_available", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ],
 );
 
 /**
@@ -162,18 +162,18 @@ export const ImageVersion = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.InstallOSUpdateRequest
+ * @generated from message platform.server.v1.UpdateSystemRequest
  */
-export const InstallOSUpdateRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InstallOSUpdateRequest",
+export const UpdateSystemRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.UpdateSystemRequest",
   [],
 );
 
 /**
- * @generated from message platform.server.v1.InstallOSUpdateResponse
+ * @generated from message platform.server.v1.UpdateSystemResponse
  */
-export const InstallOSUpdateResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InstallOSUpdateResponse",
+export const UpdateSystemResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.UpdateSystemResponse",
   [],
 );
 
@@ -505,6 +505,64 @@ export const Entries = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
+ * @generated from message platform.server.v1.SystemVersion
+ */
+export const SystemVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.SystemVersion",
+  () => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "istio", kind: "message", T: IstioVersion },
+    { no: 3, name: "gateway_api", kind: "message", T: GatewayAPIVersion },
+    { no: 4, name: "server", kind: "message", T: ServerVersion },
+    { no: 5, name: "daemon", kind: "message", T: DaemonVersion },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.IstioVersion
+ */
+export const IstioVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.IstioVersion",
+  () => [
+    { no: 1, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GatewayAPIVersion
+ */
+export const GatewayAPIVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.GatewayAPIVersion",
+  () => [
+    { no: 1, name: "url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.ServerVersion
+ */
+export const ServerVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.ServerVersion",
+  () => [
+    { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "tag", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DaemonVersion
+ */
+export const DaemonVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DaemonVersion",
+  () => [
+    { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "tag", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
  * Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
  * A backround thread in the server will fetch the index and update the
  * cache at startup and then every 24 hours
@@ -630,5 +688,23 @@ export const RegisterPeerResponse = /*@__PURE__*/ proto3.makeMessageType(
     { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "locator_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ],
+);
+
+/**
+ * TODO
+ *
+ * @generated from message platform.server.v1.DeregisterPeerRequest
+ */
+export const DeregisterPeerRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DeregisterPeerRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.DeregisterPeerResponse
+ */
+export const DeregisterPeerResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DeregisterPeerResponse",
+  [],
 );
 
