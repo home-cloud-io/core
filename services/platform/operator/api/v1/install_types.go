@@ -13,6 +13,7 @@ type InstallSpec struct {
 	Istio      IstioSpec      `json:"istio,omitempty"`
 	Server     ServerSpec     `json:"server,omitempty"`
 	MDNS       MDNSSpec       `json:"mdns,omitempty"`
+	Tunnel     TunnelSpec     `json:"tunnel,omitempty"`
 	// optional value to run a system daemon service for managing the host
 	// we'll only officially support Talos (for now?) but the community could
 	// build others (e.g. NixOS)
@@ -61,6 +62,12 @@ type ServerSpec struct {
 }
 
 type MDNSSpec struct {
+	Disable bool   `json:"disable,omitempty"`
+	Image   string `json:"image,omitempty"`
+	Tag     string `json:"tag,omitempty"`
+}
+
+type TunnelSpec struct {
 	Disable bool   `json:"disable,omitempty"`
 	Image   string `json:"image,omitempty"`
 	Tag     string `json:"tag,omitempty"`

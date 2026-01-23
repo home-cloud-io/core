@@ -119,6 +119,15 @@ spec:
                   volumeMountHostPath:
                     type: string
                 type: object
+              tunnel:
+                properties:
+                  disable:
+                    type: boolean
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               version:
                 type: string
             required:
