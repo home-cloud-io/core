@@ -12,6 +12,7 @@ type InstallSpec struct {
 	GatewayAPI GatewayAPISpec `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
 	Istio      IstioSpec      `json:"istio,omitempty"`
 	Server     ServerSpec     `json:"server,omitempty"`
+	MDNS       MDNSSpec       `json:"mdns,omitempty"`
 	// optional value to run a system daemon service for managing the host
 	// we'll only officially support Talos (for now?) but the community could
 	// build others (e.g. NixOS)
@@ -54,12 +55,19 @@ type ZtunnelSpec struct {
 }
 
 type ServerSpec struct {
-	Image string `json:"image,omitempty"`
-	Tag   string `json:"tag,omitempty"`
+	Disable bool   `json:"disable,omitempty"`
+	Image   string `json:"image,omitempty"`
+	Tag     string `json:"tag,omitempty"`
+}
+
+type MDNSSpec struct {
+	Disable bool   `json:"disable,omitempty"`
+	Image   string `json:"image,omitempty"`
+	Tag     string `json:"tag,omitempty"`
 }
 
 type DaemonSpec struct {
-	Enabled bool   `json:"enabled,omitempty"`
+	Disable bool   `json:"disable,omitempty"`
 	Image   string `json:"image,omitempty"`
 	Tag     string `json:"tag,omitempty"`
 

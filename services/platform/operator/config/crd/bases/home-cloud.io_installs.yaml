@@ -45,7 +45,7 @@ spec:
                   we'll only officially support Talos (for now?) but the community could
                   build others (e.g. NixOS)
                 properties:
-                  enabled:
+                  disable:
                     type: boolean
                   image:
                     type: string
@@ -90,8 +90,19 @@ spec:
                         type: string
                     type: object
                 type: object
+              mdns:
+                properties:
+                  disable:
+                    type: boolean
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               server:
                 properties:
+                  disable:
+                    type: boolean
                   image:
                     type: string
                   tag:
