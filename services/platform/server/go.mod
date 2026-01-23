@@ -2,9 +2,9 @@ module github.com/home-cloud-io/core/services/platform/server
 
 go 1.25.3
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
-replace github.com/home-cloud-io/core/services/platform/operator => ../../../services/platform/operator
+// replace github.com/home-cloud-io/core/services/platform/operator => ../../../services/platform/operator
 
 // replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 
@@ -14,9 +14,9 @@ require (
 	connectrpc.com/connect v1.16.2
 	github.com/containers/image/v5 v5.32.2
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.8.7
+	github.com/home-cloud-io/core/api v0.8.8-0.20260123043547-11ce4a88a957
 	// TODO: change to v0.0.4 when available
-	github.com/home-cloud-io/core/services/platform/operator v0.0.3-0.20260110225306-fbaff52d3d5c
+	github.com/home-cloud-io/core/services/platform/operator v0.0.3-0.20260123043547-11ce4a88a957
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/steady-bytes/draft/api v1.0.0 // indirect
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
@@ -78,7 +78,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/moby/sys/mountinfo v0.7.2 // indirect
-	github.com/moby/sys/user v0.2.0 // indirect
+	github.com/moby/sys/user v0.3.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect

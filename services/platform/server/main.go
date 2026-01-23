@@ -30,7 +30,7 @@ func main() {
 	}
 
 	defer chassis.New(logger).
-		WithClientApplication(files, "web-client").
+		WithClientApplication(files, "web-client/dist").
 		WithRPCHandler(webRPC).
 		WithRunner(runner).
 		Start()

@@ -136,6 +136,10 @@ github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245 h1:Nyeelmxya
 github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245/go.mod h1:nTakvJ4XYq45UXtn0DbwR4aU9ZdjlnIenpbs6Cd+FM0=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0 h1:fPpQR1iGEVYjZ2OELvUHX600VAK5qmdnDEv3eXOwZUA=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0/go.mod h1:YHukhB04ChJsLHLJEUD6vjFyLX2L3dsX3wPBZcX4tmc=
+github.com/home-cloud-io/core/api v0.8.8-0.20260123043547-11ce4a88a957 h1:IFyVsyA69/IEd7JI+9G6cWh8OLrYkPhw5KR4h8Dt0Lg=
+github.com/home-cloud-io/core/api v0.8.8-0.20260123043547-11ce4a88a957/go.mod h1:4G9DoubvZUuMFZOM63P6AOHyQ5Ulm9X2ilJ1EshIvjc=
+github.com/home-cloud-io/core/services/platform/operator v0.0.3-0.20260123043547-11ce4a88a957 h1:pkQiOVoC632vl4fmSP5q3o7uTiU9KKYi+P/MPba5baA=
+github.com/home-cloud-io/core/services/platform/operator v0.0.3-0.20260123043547-11ce4a88a957/go.mod h1:nUyuwZx+/9UgaOHFGLytb6HiRDJvZIbvLoa8bYANWOE=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
@@ -178,8 +182,8 @@ github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyua
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/moby/sys/mountinfo v0.7.2 h1:1shs6aH5s4o5H2zQLn796ADW1wMrIwHsyJ2v9KouLrg=
 github.com/moby/sys/mountinfo v0.7.2/go.mod h1:1YOa8w8Ih7uW0wALDUgT1dTTSBrZ+HiBLGws92L2RU4=
-github.com/moby/sys/user v0.2.0 h1:OnpapJsRp25vkhw8TFG6OLJODNh/3rEwRWtJ3kakwRM=
-github.com/moby/sys/user v0.2.0/go.mod h1:RYstrcWOJpVh+6qzUqp2bU3eaRpdiQeKGlKitaH0PM8=
+github.com/moby/sys/user v0.3.0 h1:9ni5DlcW5an3SvRSx4MouotOygvzaXbaSrc/wGDFWPo=
+github.com/moby/sys/user v0.3.0/go.mod h1:bG+tYYYJgaMtRKgEmuueC0hJEAZWwtIbZTB+85uoHjs=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w8PVh93nsPXa1VrQ6jlwL5oN8l14QlcNfg=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=

@@ -40,6 +40,7 @@ func (c *controller) CheckForOSUpdates(ctx context.Context, logger chassis.Logge
 	logger.Info("checking for os updates")
 
 	// TODO: check by calling system service (talos)
+	// c.daemonClient.
 
 	return nil, nil
 }
