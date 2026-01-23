@@ -1,7 +1,10 @@
 package resources
 
 import (
+	"fmt"
+
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -52,6 +55,26 @@ var (
 							},
 						},
 					},
+					Infrastructure: &gwv1.GatewayInfrastructure{
+						ParametersRef: &gwv1.LocalParametersReference{
+							Kind: gwv1.Kind("ConfigMap"),
+							Name: fmt.Sprintf("%s-options", install.Spec.Istio.IngressGatewayName),
+						},
+					},
+				},
+			},
+			&corev1.ConfigMap{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("%s-options", install.Spec.Istio.IngressGatewayName),
+					Namespace: install.Spec.Istio.Namespace,
+				},
+				Data: map[string]string{
+					"service": `spec:
+  type: NodePort
+  ports:
+  - port: 80
+    nodePort: 80
+`,
 				},
 			},
 		}
