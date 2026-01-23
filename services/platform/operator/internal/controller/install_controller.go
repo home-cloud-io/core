@@ -119,7 +119,6 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 
 	l.Info("reconciling common components")
 	for _, o := range resources.CommonObjects(install) {
-		// TODO: this creates but doesn't update? (at least for ConfigMaps?)
 		err = kubeCreateOrUpdate(ctx, r.Client, o)
 		if err != nil {
 			return err
@@ -262,20 +261,20 @@ func (r *InstallReconciler) tryDeletions(ctx context.Context, install *v1.Instal
 }
 
 func kubeCreateOrUpdate(ctx context.Context, kube client.Client, obj client.Object) error {
-	l := log.FromContext(ctx).WithValues(
-		"object", fmt.Sprintf("%s/%s", obj.GetNamespace(), obj.GetName()),
-		"kind", obj.GetObjectKind().GroupVersionKind().Kind,
-	)
-	err := kube.Get(ctx, client.ObjectKeyFromObject(obj), obj)
-	if err != nil {
-		if kerrors.IsNotFound(err) {
-			l.V(1).Info("creating object")
-			return kube.Create(ctx, obj)
+	err := kube.Create(ctx, obj)
+	if kerrors.IsAlreadyExists(err) {
+		// this is a bit of a mess and might not be totally necessary but it creates a new instance
+		// of the same underlying type in obj (which must be a pointer) so that we don't overwrite all
+		// fields when we really only want the ResourceVersion
+		c := reflect.New(reflect.TypeOf(obj).Elem()).Interface().(client.Object)
+		err := kube.Get(ctx, client.ObjectKeyFromObject(obj), c)
+		if err != nil {
+			return err
 		}
-		return err
+		obj.SetResourceVersion(c.GetResourceVersion())
+		return kube.Update(ctx, obj)
 	}
-	l.V(1).Info("updating object")
-	return kube.Update(ctx, obj)
+	return err
 }
 
 func helmExists(cfg *action.Configuration, releaseName string) (bool, error) {
