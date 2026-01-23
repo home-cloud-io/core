@@ -14,12 +14,10 @@ import (
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
-	corev1 "k8s.io/api/core/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -62,12 +60,6 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	// if marked for deletion, try to delete/uninstall
-	if install.GetDeletionTimestamp() != nil {
-		l.Info("Uninstalling Install")
-		return ctrl.Result{}, r.tryDeletions(ctx, install)
-	}
-
 	// get version manifest from repo
 	resp, err := http.Get(fmt.Sprintf("%s/%s/manifest.yaml", ReleasesURL, install.Spec.Version))
 	if err != nil {
@@ -85,6 +77,12 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	err = mergo.Merge(install, resources.DefaultInstall)
 	if err != nil {
 		return ctrl.Result{}, err
+	}
+
+	// if marked for deletion, try to delete/uninstall
+	if install.GetDeletionTimestamp() != nil {
+		l.Info("Uninstalling Install")
+		return ctrl.Result{}, r.tryDeletions(ctx, install)
 	}
 
 	l.Info("Reconciling Install")
@@ -121,6 +119,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 
 	l.Info("reconciling common components")
 	for _, o := range resources.CommonObjects(install) {
+		// TODO: this creates but doesn't update? (at least for ConfigMaps?)
 		err = kubeCreateOrUpdate(ctx, r.Client, o)
 		if err != nil {
 			return err
@@ -144,29 +143,6 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		if err != nil {
 			return err
 		}
-	}
-
-	l.Info("setting ingress service node port")
-	service := &corev1.Service{}
-	err = r.Client.Get(ctx, types.NamespacedName{
-		Namespace: install.Spec.Istio.Namespace,
-		Name:      fmt.Sprintf("%s-istio", install.Spec.Istio.IngressGatewayName),
-	}, service)
-	if err != nil {
-		// TODO: loop until service exists
-		return err
-	}
-	for i, p := range service.Spec.Ports {
-		if p.Port != 80 {
-			continue
-		}
-		p.NodePort = 80
-		service.Spec.Ports[i] = p
-		break
-	}
-	err = r.Client.Update(ctx, service)
-	if err != nil {
-		return err
 	}
 
 	return r.updateStatus(ctx, install)

@@ -21,6 +21,7 @@ var (
 			},
 			&corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
+					// namespace for Home Cloud installation (recommended home-cloud-system)
 					Name: install.Namespace,
 					Labels: map[string]string{
 						"pod-security.kubernetes.io/enforce": "privileged",
