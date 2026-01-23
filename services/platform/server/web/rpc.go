@@ -173,13 +173,13 @@ func (h *rpcHandler) CheckForContainerUpdates(ctx context.Context, request *conn
 	}), err
 }
 
-func (h *rpcHandler) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
+func (h *rpcHandler) UpdateSystem(ctx context.Context, request *connect.Request[v1.UpdateSystemRequest]) (*connect.Response[v1.UpdateSystemResponse], error) {
 	err := h.sctl.UpdateOS(ctx, h.logger)
 	if err != nil {
-		h.logger.WithError(err).Error("failed to install os update")
+		h.logger.WithError(err).Error("failed to update system")
 		return nil, err
 	}
-	return connect.NewResponse(&v1.InstallOSUpdateResponse{}), nil
+	return connect.NewResponse(&v1.UpdateSystemResponse{}), nil
 }
 
 func (h *rpcHandler) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
@@ -269,6 +269,14 @@ func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[
 	}
 
 	return connect.NewResponse(resp), nil
+}
+
+func (h *rpcHandler) DeregisterPeer(ctx context.Context, request *connect.Request[v1.DeregisterPeerRequest]) (*connect.Response[v1.DeregisterPeerResponse], error) {
+	h.logger.Info("deregister a peer")
+
+	// TODO
+
+	return nil, errors.ErrUnsupported
 }
 
 func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
