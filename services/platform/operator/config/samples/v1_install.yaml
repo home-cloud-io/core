@@ -1,17 +1,14 @@
 apiVersion: home-cloud.io/v1
 kind: Install
 metadata:
+  name: install-sample
+  namespace: home-cloud-system
   finalizers:
     - install.home-cloud.io/finalizer
-  labels:
-    app.kubernetes.io/name: install
-    app.kubernetes.io/instance: install-sample
-    app.kubernetes.io/part-of: home-cloud
-    app.kubernetes.io/managed-by: kustomize
-    app.kubernetes.io/created-by: home-cloud
-  name: install-sample
 spec:
   version: v0.0.1-beta
+  daemon:
+    disable: true
   istio:
     istiod:
       values: |
