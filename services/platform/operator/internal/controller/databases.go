@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
@@ -16,9 +17,13 @@ import (
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/secrets"
 )
 
-const (
-	PostgresHostname = "postgres.postgres"
-	// PostgresHostname = "localhost" // for local dev
+var (
+	PostgresHostname = func() string {
+		if os.Getenv("DRAFT_SERVICE_ENV") == "test" {
+			return "localhost"
+		}
+		return "postgres.postgres.svc.cluster.local"
+	}()
 )
 
 func (r *AppReconciler) createDatabase(ctx context.Context, d AppDatabase, namespace string) error {

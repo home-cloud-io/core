@@ -20,9 +20,9 @@ import {
   Flex,
   Button,
 } from 'antd';
-import { AppStorage } from 'api/platform/server/v1/web_pb';
+import { AppStorage } from '@home-cloud/api/platform/server/v1/web_pb';
 import { HelpModal } from '../../components/HelpModal';
-import { getAppStorage } from 'api/platform/server/v1/web-WebService_connectquery';
+import { getAppStorage } from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
 
 const helpInfo = [
   {

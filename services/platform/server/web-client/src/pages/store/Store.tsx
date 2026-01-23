@@ -4,12 +4,12 @@ import {
   deleteApp,
   getAppsInStore,
   installApp,
-} from 'api/platform/server/v1/web-WebService_connectquery';
+} from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
 import {
   App,
   DeleteAppRequest,
   InstallAppRequest,
-} from 'api/platform/server/v1/web_pb';
+} from '@home-cloud/api/platform/server/v1/web_pb';
 import {
   Alert,
   Spin,

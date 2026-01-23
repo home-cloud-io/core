@@ -30,7 +30,7 @@ import {
   isDeviceSetup,
   restartHost,
   shutdownHost,
-} from 'api/platform/server/v1/web-WebService_connectquery';
+} from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
 import DeviceOnboardPage from './pages/device/Onboard';
 import AboutPage from './pages/about/About';
 

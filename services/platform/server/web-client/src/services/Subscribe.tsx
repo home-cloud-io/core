@@ -7,8 +7,8 @@ import React, {
 } from 'react';
 import { createConnectTransport } from '@connectrpc/connect-web';
 import { createClient } from '@connectrpc/connect';
-import { WebService } from 'api/platform/server/v1/web_connect';
-import { ServerEvent } from 'api/platform/server/v1/web_pb';
+import { WebService } from '@home-cloud/api/platform/server/v1/web_connect';
+import { ServerEvent } from '@home-cloud/api/platform/server/v1/web_pb';
 import * as Config from '../utils/config';
 
 export const SubscribeContext = React.createContext({ client: WebService });

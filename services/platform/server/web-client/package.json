@@ -1,6 +1,6 @@
 {
-  "name": "home-cloud-server-web-client",
-  "version": "1.0.0",
+  "name": "@home-cloud/web-client",
+  "version": "0.0.1",
   "description": "Home Cloud Server",
   "scripts": {
     "start": "react-scripts start",
@@ -17,6 +17,7 @@
     "@connectrpc/connect": "^1.6.1",
     "@connectrpc/connect-query": "^1.4.2",
     "@connectrpc/connect-web": "^1.2.0",
+    "@home-cloud/api": "^0.8.7",
     "@reduxjs/toolkit": "^2.3.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -26,7 +27,6 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "antd": "^5.22.1",
-    "api": "https://gitpkg.vercel.app/home-cloud-io/core/api?api/v0.8.7",
     "install": "^0.13.0",
     "marked": "^15.0.0",
     "react": "^18.3.1",

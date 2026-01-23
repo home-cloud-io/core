@@ -20,13 +20,13 @@ import {
   CloseCircleOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
-import { AppHealth, AppStatus } from "api/platform/server/v1/web_pb";
+import { AppHealth, AppStatus } from "@home-cloud/api/platform/server/v1/web_pb";
 import { useQuery } from "@connectrpc/connect-query";
 import {
   appsHealthCheck,
   getSystemStats,
-} from "api/platform/server/v1/web-WebService_connectquery";
-import { SystemStats } from "api/platform/daemon/v1/system_pb";
+} from "@home-cloud/api/platform/server/v1/web-WebService_connectquery";
+import { SystemStats } from "@home-cloud/api/platform/daemon/v1/system_pb";
 import { ProviderValue, useEvents } from "../../services/Subscribe";
 import { useNavigate } from "react-router-dom";
 
