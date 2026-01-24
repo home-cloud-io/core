@@ -137,16 +137,20 @@ func (h *rpcHandler) GetAppsInStore(ctx context.Context, request *connect.Reques
 // SYSTEM
 
 func (h *rpcHandler) ShutdownHost(ctx context.Context, request *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error) {
+	h.logger.Info("shutdown host request")
 	err := h.sctl.ShutdownHost(ctx)
 	if err != nil {
+		h.logger.WithError(err).Error("failed to shutdown host")
 		return nil, err
 	}
 	return connect.NewResponse(&v1.ShutdownHostResponse{}), nil
 }
 
 func (h *rpcHandler) RestartHost(ctx context.Context, request *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error) {
+	h.logger.Info("restart host request")
 	err := h.sctl.RestartHost(ctx)
 	if err != nil {
+		h.logger.WithError(err).Error("failed to restart host")
 		return nil, err
 	}
 	return connect.NewResponse(&v1.RestartHostResponse{}), nil

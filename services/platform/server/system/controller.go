@@ -36,7 +36,7 @@ func NewController(logger chassis.Logger) Controller {
 	config.SetDefault(containerAutoUpdateCronConfigKey, "0 2 * * *")
 	return &controller{
 		k8sclient:    k8sclient.NewClient(logger),
-		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, "daemon.home-cloud-system"),
+		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, "http://daemon.home-cloud-system"),
 	}
 }
 

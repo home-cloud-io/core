@@ -2,8 +2,8 @@ package mdns
 
 import (
 	"context"
+	"fmt"
 	"net"
-	"os"
 	"slices"
 
 	"github.com/pion/mdns/v2"
@@ -24,6 +24,10 @@ type (
 		conn   *mdns.Conn
 		hosts  []string
 	}
+)
+
+const (
+	HostIPConfigKey     = "mdns.host_ip"
 )
 
 func New(logger chassis.Logger) Server {
@@ -62,7 +66,11 @@ func (s *server) Serve(ctx context.Context) error {
 	}
 
 	// server hosts
-	hostIP := net.ParseIP(os.Getenv("HOST_IP"))
+	hostIPString := chassis.GetConfig().GetString(HostIPConfigKey)
+	hostIP := net.ParseIP(hostIPString)
+	if hostIP == nil {
+		return fmt.Errorf("invalid host IP: %s", hostIPString)
+	}
 	conn, err := mdns.Server(ipv4.NewPacketConn(l4), ipv6.NewPacketConn(l6), &mdns.Config{
 		LocalNames:   s.hosts,
 		LocalAddress: hostIP,

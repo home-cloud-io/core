@@ -10,11 +10,9 @@ import (
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-const (
-	GatewayName = "ingress-gateway"
-)
-
 var (
+	// TODO: get this value from the install
+	GatewayName      = "ingress-gateway"
 	GatewayNamespace = gwv1.Namespace("istio-system")
 )
 
@@ -38,6 +36,8 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 				},
 			},
 			// TODO: change this to subdomain? (*.home-cloud.local)
+			// subdomains don't work on Windows with mDNS so this would require running our
+			// own DNS server (which we want to do anyway)
 			Hostnames: []gwv1.Hostname{gwv1.Hostname(fmt.Sprintf("%s.local", route.Name))},
 			Rules: []gwv1.HTTPRouteRule{
 				{

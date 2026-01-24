@@ -1,11 +1,11 @@
 module github.com/home-cloud-io/services/platform/mdns
 
-go 1.23.6
+go 1.25.3
 
 require (
 	github.com/pion/mdns/v2 v2.1.0
-	github.com/steady-bytes/draft/pkg/chassis v0.4.5
-	github.com/steady-bytes/draft/pkg/loggers v0.2.3
+	github.com/steady-bytes/draft/pkg/chassis v0.6.1
+	github.com/steady-bytes/draft/pkg/loggers v0.2.5
 	golang.org/x/net v0.35.0
 	k8s.io/api v0.30.1
 	k8s.io/apimachinery v0.30.1
@@ -20,7 +20,6 @@ require (
 	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.15.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
-	github.com/envoyproxy/go-control-plane v0.12.0 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
