@@ -13,7 +13,6 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/healthz"
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/logger"
@@ -43,7 +42,7 @@ func main() {
 	// configure manager
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
-		HealthProbeBindAddress: ":" + chassis.GetConfig().GetString("service.network.bind_port"),
+		HealthProbeBindAddress: "",
 		// no need for election since tunnel needs to run as a single replica StatefulSet
 		LeaderElection: false,
 	})
@@ -59,16 +58,6 @@ func main() {
 		STUNCtl: stun.NewSTUNController(log),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "failed to create controller", "controller", "Wireguard")
-		os.Exit(1)
-	}
-
-	// add health/ready checks
-	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
-		setupLog.Error(err, "failed to set up health check")
-		os.Exit(1)
-	}
-	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
-		setupLog.Error(err, "failed to set up ready check")
 		os.Exit(1)
 	}
 

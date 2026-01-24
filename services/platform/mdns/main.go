@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	k8sclient "github.com/home-cloud-io/services/platform/mdns/k8s-client"
 	"github.com/home-cloud-io/services/platform/mdns/mdns"
@@ -30,13 +31,18 @@ func main() {
 	)
 
 	defer chassis.New(logger).
+		DisableMux().
 		WithRunner(runner.run).
 		Start()
 }
 
 func (r *Runner) run() {
-	k8sClient := k8sclient.NewClient(r.logger)
+	if chassis.GetConfig().GetString(mdns.HostIPConfigKey) == "" {
+		r.logger.Fatal(fmt.Sprintf("%s config value required but not set", mdns.HostIPConfigKey))
+	}
+
 	ctx := context.Background()
+	k8sClient := k8sclient.NewClient(r.logger)
 
 	// channels
 	notifyMdns := make(chan services.Resource)
@@ -65,12 +71,12 @@ func (r *Runner) run() {
 			case services.Added:
 				err := mdnsServer.AddHost(ctx, resource.Hostname)
 				if err != nil {
-					panic(err)
+					r.logger.WithError(err).Error("failed to add host")
 				}
 			case services.Deleted:
 				err := mdnsServer.RemoveHost(ctx, resource.Hostname)
 				if err != nil {
-					panic(err)
+					r.logger.WithError(err).Error("failed to remove host")
 				}
 			}
 		case <-stopper:

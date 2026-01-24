@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -12,17 +11,8 @@ import (
 )
 
 var (
-	HomeCloudServerAddress = func() string {
-		if os.Getenv("DRAFT_SERVICE_ENV") == "test" {
-			return "http://localhost:8000"
-		}
-		return "http://server.home-cloud-system.svc.cluster.local:8090"
-	}()
-
+	// TODO: get this value from the install
 	GatewayName = "ingress-gateway"
-)
-
-var (
 	GatewayNamespace = gwv1.Namespace("istio-system")
 )
 
@@ -45,6 +35,8 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 				},
 			},
 			// TODO: change this to subdomain? (*.home-cloud.local)
+			// subdomains don't work on Windows with mDNS so this would require running our
+			// own DNS server (which we want to do anyway)
 			Hostnames: []gwv1.Hostname{gwv1.Hostname(fmt.Sprintf("%s.local", route.Name))},
 			Rules: []gwv1.HTTPRouteRule{
 				{

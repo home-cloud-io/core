@@ -68,11 +68,3 @@ WORKDIR /etc
 
 # Run
 ENTRYPOINT ["/etc/main"]
-
-# Runtime arguments
-ARG HTTP_PORT=8080
-ARG GRPC_PORT=8090
-
-# Expose needed ports
-EXPOSE ${HTTP_PORT}
-EXPOSE ${GRPC_PORT}

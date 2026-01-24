@@ -9,12 +9,11 @@ import { createConnectTransport } from '@connectrpc/connect-web';
 import { createClient } from '@connectrpc/connect';
 import { WebService } from '@home-cloud/api/platform/server/v1/web_connect';
 import { ServerEvent } from '@home-cloud/api/platform/server/v1/web_pb';
-import * as Config from '../utils/config';
 
 export const SubscribeContext = React.createContext({ client: WebService });
 
 export const transport = createConnectTransport({
-  baseUrl: Config.BASE_URL,
+  baseUrl: window.location.origin,
 });
 
 export const client = createClient(WebService, transport);
