@@ -1,0 +1,5 @@
+service:
+  name: tunnel
+  domain: platform
+  logging:
+    level: debug

@@ -1,0 +1,9 @@
+apiVersion: home-cloud.io/v1
+kind: Wireguard
+metadata:
+  labels:
+    app.kubernetes.io/name: home-cloud
+    app.kubernetes.io/managed-by: kustomize
+  name: wireguard-sample
+spec:
+  # TODO(user): Add fields here

@@ -3,21 +3,16 @@ package system
 import (
 	"context"
 	"fmt"
-	"sort"
-	"time"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
+
 	"github.com/robfig/cron/v3"
 	"github.com/steady-bytes/draft/pkg/chassis"
-	"golang.org/x/mod/semver"
 )
 
 type (
 	Containers interface {
-		// SetSystemImage will update the image for a system container.
-		SetSystemImage(cmd *dv1.SetSystemImageCommand) error
 		// CheckForContainerUpdates will compare current system container images against the latest ones
 		// available and return the result.
 		CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error)
@@ -31,50 +26,15 @@ type (
 	}
 )
 
+// TODO: change updates to use the operator by setting the Version field on the Install
+
 // CONTAINERS
 
-func (c *controller) SetSystemImage(cmd *dv1.SetSystemImageCommand) error {
-	err := com.Send(&dv1.ServerMessage{
-		Message: &dv1.ServerMessage_SetSystemImageCommand{
-			SetSystemImageCommand: cmd,
-		},
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (c *controller) CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error) {
-	var (
-		images []*v1.ImageVersion
-	)
 
-	// populate current versions (from k8s)
-	images, err := c.k8sclient.CurrentImages(ctx)
-	if err != nil {
-		logger.WithError(err).Error("failed to get current container versions")
-		return nil, err
-	}
+	// TODO: remove this?
 
-	// populate latest versions (from registry)
-	images, err = getLatestImageTags(ctx, images)
-	if err != nil {
-		logger.WithError(err).Error("failed to get latest image versions")
-		return nil, err
-	}
-
-	// add shorthand name to image structs
-	for _, image := range images {
-		image.Name = componentFromImage(image.Image)
-	}
-
-	// sort images
-	sort.Slice(images, func(i, j int) bool {
-		return images[i].Name < images[j].Name
-	})
-
-	return images, err
+	return nil, nil
 }
 
 func (c *controller) AutoUpdateContainers(logger chassis.Logger) {
@@ -97,18 +57,6 @@ func (c *controller) AutoUpdateContainers(logger chassis.Logger) {
 
 func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger) error {
 	logger.Info("updating containers")
-	settings := &v1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		logger.WithError(err).Error("failed to get device settings")
-		return err
-	}
-
-	// TODO: should this be a different setting?
-	if !settings.AutoUpdateOs {
-		logger.Info("auto update sytem not enabled")
-		return nil
-	}
 
 	images, err := c.CheckForContainerUpdates(ctx, logger)
 	if err != nil {
@@ -116,32 +64,8 @@ func (c *controller) UpdateContainers(ctx context.Context, logger chassis.Logger
 		return err
 	}
 
-	for _, image := range images {
-		log := logger.WithFields(chassis.Fields{
-			"image":           image.Image,
-			"current_version": image.Current,
-			"latest_version":  image.Latest,
-		})
-		if semver.Compare(image.Latest, image.Current) == 1 {
-			log.Info("updating image")
-			err := com.Send(&dv1.ServerMessage{
-				Message: &dv1.ServerMessage_SetSystemImageCommand{
-					SetSystemImageCommand: &dv1.SetSystemImageCommand{
-						CurrentImage:   fmt.Sprintf("%s:%s", image.Image, image.Current),
-						RequestedImage: fmt.Sprintf("%s:%s", image.Image, image.Latest),
-					},
-				},
-			})
-			if err != nil {
-				log.WithError(err).Error("failed to update system container image")
-				// don't return, try to update other containers
-			}
-			// TODO: this is a hack, should really be event-driven
-			time.Sleep(3 * time.Second)
-		} else {
-			log.Info("no update needed")
-		}
-	}
+	// TODO: Write to Install CRD and let Operator perform upgrade
+	fmt.Println(images)
 
 	return nil
 }

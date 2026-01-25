@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wg0-private-key
+  namespace: home-cloud-system
+type: Opaque
+stringData:
+  privateKey: <PRIVATE_KEY_OF_SERVER>
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: peer1-keys
+  namespace: home-cloud-system
+type: Opaque
+stringData:
+  privateKey: <PRIVATE_KEY_OF_PEER>
+---
+apiVersion: home-cloud.io/v1
+kind: Wireguard
+metadata:
+  name: wg0
+  namespace: home-cloud-system
+  finalizers:
+    - wireguard.home-cloud.io/finalizer
+spec:
+  id: 01446168-49fa-495d-ab9f-db084073728f
+  name: wg0
+  privateKeySecret:
+    name: wg0-private-key
+    namespace: home-cloud-system
+    dataKey: privateKey
+  address: 10.100.0.1/32
+  # TODO: determine this automatically (I think it will change based on the host)
+  natInterface: ens18
+  listenPort: 51820
+  stunServer: locator1.home-cloud.io:3478
+  locators:
+  - https://locator1.home-cloud.io
+  peers:
+    - publicKey: <PUBLIC_KEY_OF_PEER>
+      privateKeySecret:
+        name: peer1-keys
+        namespace: home-cloud-system
+        dataKey: privateKey
+      allowedIPs:
+        - 10.100.0.2/32
+
+

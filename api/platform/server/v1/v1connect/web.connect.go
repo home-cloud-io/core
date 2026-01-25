@@ -39,39 +39,24 @@ const (
 	WebServiceRestartHostProcedure = "/platform.server.v1.WebService/RestartHost"
 	// WebServiceInstallAppProcedure is the fully-qualified name of the WebService's InstallApp RPC.
 	WebServiceInstallAppProcedure = "/platform.server.v1.WebService/InstallApp"
-	// WebServiceDeleteAppProcedure is the fully-qualified name of the WebService's DeleteApp RPC.
-	WebServiceDeleteAppProcedure = "/platform.server.v1.WebService/DeleteApp"
 	// WebServiceUpdateAppProcedure is the fully-qualified name of the WebService's UpdateApp RPC.
 	WebServiceUpdateAppProcedure = "/platform.server.v1.WebService/UpdateApp"
+	// WebServiceDeleteAppProcedure is the fully-qualified name of the WebService's DeleteApp RPC.
+	WebServiceDeleteAppProcedure = "/platform.server.v1.WebService/DeleteApp"
 	// WebServiceCheckForSystemUpdatesProcedure is the fully-qualified name of the WebService's
 	// CheckForSystemUpdates RPC.
 	WebServiceCheckForSystemUpdatesProcedure = "/platform.server.v1.WebService/CheckForSystemUpdates"
 	// WebServiceCheckForContainerUpdatesProcedure is the fully-qualified name of the WebService's
 	// CheckForContainerUpdates RPC.
 	WebServiceCheckForContainerUpdatesProcedure = "/platform.server.v1.WebService/CheckForContainerUpdates"
-	// WebServiceChangeDaemonVersionProcedure is the fully-qualified name of the WebService's
-	// ChangeDaemonVersion RPC.
-	WebServiceChangeDaemonVersionProcedure = "/platform.server.v1.WebService/ChangeDaemonVersion"
-	// WebServiceInstallOSUpdateProcedure is the fully-qualified name of the WebService's
-	// InstallOSUpdate RPC.
-	WebServiceInstallOSUpdateProcedure = "/platform.server.v1.WebService/InstallOSUpdate"
-	// WebServiceSetSystemImageProcedure is the fully-qualified name of the WebService's SetSystemImage
-	// RPC.
-	WebServiceSetSystemImageProcedure = "/platform.server.v1.WebService/SetSystemImage"
+	// WebServiceUpdateSystemProcedure is the fully-qualified name of the WebService's UpdateSystem RPC.
+	WebServiceUpdateSystemProcedure = "/platform.server.v1.WebService/UpdateSystem"
 	// WebServiceAppsHealthCheckProcedure is the fully-qualified name of the WebService's
 	// AppsHealthCheck RPC.
 	WebServiceAppsHealthCheckProcedure = "/platform.server.v1.WebService/AppsHealthCheck"
 	// WebServiceGetSystemStatsProcedure is the fully-qualified name of the WebService's GetSystemStats
 	// RPC.
 	WebServiceGetSystemStatsProcedure = "/platform.server.v1.WebService/GetSystemStats"
-	// WebServiceIsDeviceSetupProcedure is the fully-qualified name of the WebService's IsDeviceSetup
-	// RPC.
-	WebServiceIsDeviceSetupProcedure = "/platform.server.v1.WebService/IsDeviceSetup"
-	// WebServiceInitializeDeviceProcedure is the fully-qualified name of the WebService's
-	// InitializeDevice RPC.
-	WebServiceInitializeDeviceProcedure = "/platform.server.v1.WebService/InitializeDevice"
-	// WebServiceLoginProcedure is the fully-qualified name of the WebService's Login RPC.
-	WebServiceLoginProcedure = "/platform.server.v1.WebService/Login"
 	// WebServiceGetAppsInStoreProcedure is the fully-qualified name of the WebService's GetAppsInStore
 	// RPC.
 	WebServiceGetAppsInStoreProcedure = "/platform.server.v1.WebService/GetAppsInStore"
@@ -104,6 +89,9 @@ const (
 	WebServiceDeregisterFromLocatorProcedure = "/platform.server.v1.WebService/DeregisterFromLocator"
 	// WebServiceRegisterPeerProcedure is the fully-qualified name of the WebService's RegisterPeer RPC.
 	WebServiceRegisterPeerProcedure = "/platform.server.v1.WebService/RegisterPeer"
+	// WebServiceDeregisterPeerProcedure is the fully-qualified name of the WebService's DeregisterPeer
+	// RPC.
+	WebServiceDeregisterPeerProcedure = "/platform.server.v1.WebService/DeregisterPeer"
 	// WebServiceSubscribeProcedure is the fully-qualified name of the WebService's Subscribe RPC.
 	WebServiceSubscribeProcedure = "/platform.server.v1.WebService/Subscribe"
 )
@@ -114,18 +102,13 @@ var (
 	webServiceShutdownHostMethodDescriptor             = webServiceServiceDescriptor.Methods().ByName("ShutdownHost")
 	webServiceRestartHostMethodDescriptor              = webServiceServiceDescriptor.Methods().ByName("RestartHost")
 	webServiceInstallAppMethodDescriptor               = webServiceServiceDescriptor.Methods().ByName("InstallApp")
-	webServiceDeleteAppMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("DeleteApp")
 	webServiceUpdateAppMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("UpdateApp")
+	webServiceDeleteAppMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("DeleteApp")
 	webServiceCheckForSystemUpdatesMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("CheckForSystemUpdates")
 	webServiceCheckForContainerUpdatesMethodDescriptor = webServiceServiceDescriptor.Methods().ByName("CheckForContainerUpdates")
-	webServiceChangeDaemonVersionMethodDescriptor      = webServiceServiceDescriptor.Methods().ByName("ChangeDaemonVersion")
-	webServiceInstallOSUpdateMethodDescriptor          = webServiceServiceDescriptor.Methods().ByName("InstallOSUpdate")
-	webServiceSetSystemImageMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("SetSystemImage")
+	webServiceUpdateSystemMethodDescriptor             = webServiceServiceDescriptor.Methods().ByName("UpdateSystem")
 	webServiceAppsHealthCheckMethodDescriptor          = webServiceServiceDescriptor.Methods().ByName("AppsHealthCheck")
 	webServiceGetSystemStatsMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("GetSystemStats")
-	webServiceIsDeviceSetupMethodDescriptor            = webServiceServiceDescriptor.Methods().ByName("IsDeviceSetup")
-	webServiceInitializeDeviceMethodDescriptor         = webServiceServiceDescriptor.Methods().ByName("InitializeDevice")
-	webServiceLoginMethodDescriptor                    = webServiceServiceDescriptor.Methods().ByName("Login")
 	webServiceGetAppsInStoreMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("GetAppsInStore")
 	webServiceGetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("GetDeviceSettings")
 	webServiceSetDeviceSettingsMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("SetDeviceSettings")
@@ -137,6 +120,7 @@ var (
 	webServiceRegisterToLocatorMethodDescriptor        = webServiceServiceDescriptor.Methods().ByName("RegisterToLocator")
 	webServiceDeregisterFromLocatorMethodDescriptor    = webServiceServiceDescriptor.Methods().ByName("DeregisterFromLocator")
 	webServiceRegisterPeerMethodDescriptor             = webServiceServiceDescriptor.Methods().ByName("RegisterPeer")
+	webServiceDeregisterPeerMethodDescriptor           = webServiceServiceDescriptor.Methods().ByName("DeregisterPeer")
 	webServiceSubscribeMethodDescriptor                = webServiceServiceDescriptor.Methods().ByName("Subscribe")
 )
 
@@ -148,30 +132,20 @@ type WebServiceClient interface {
 	RestartHost(context.Context, *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error)
 	// Install a Home Cloud application
 	InstallApp(context.Context, *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error)
-	// Delete a Home Cloud application
-	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
 	// Update a Home Cloud application
 	UpdateApp(context.Context, *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error)
-	// Check for available NixOS and Daemon updates
+	// Delete a Home Cloud application
+	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
+	// Check for available system updates
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
-	// Check for available system (draft and home cloud) container updates
+	// Check for available system container updates
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
-	// Change the currently installed Daemon version
-	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
-	// Install available NixOS updates (call after calling CheckForSystemUpdates)
-	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
-	// Set a system (draft and home cloud) container image (used for updating images)
-	SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error)
+	// Install available OS update
+	UpdateSystem(context.Context, *connect.Request[v1.UpdateSystemRequest]) (*connect.Response[v1.UpdateSystemResponse], error)
 	// Check the current health of all installed Home Cloud applications
 	AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error)
 	// Get the current host machine stats (cpu, memory, drives)
 	GetSystemStats(context.Context, *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error)
-	// Check to validate if the device has gone through the onboarding process
-	IsDeviceSetup(context.Context, *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error)
-	// Initialize the device with the user's credentials and settings
-	InitializeDevice(context.Context, *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error)
-	// Login to the device
-	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
 	// Get all apps available in the store
 	GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error)
 	// Get the device settings
@@ -192,8 +166,10 @@ type WebServiceClient interface {
 	RegisterToLocator(context.Context, *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error)
 	// Deregister the server from the given Locator service
 	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
-	// RegisterPeer is used to connect a client to the home-cloud overlay network
+	// RegisterPeer adds a peer to remote access
 	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
+	// DeregisterPeer removes a peer from remote access
+	DeregisterPeer(context.Context, *connect.Request[v1.DeregisterPeerRequest]) (*connect.Response[v1.DeregisterPeerResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error)
 }
@@ -226,16 +202,16 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceInstallAppMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		deleteApp: connect.NewClient[v1.DeleteAppRequest, v1.DeleteAppResponse](
-			httpClient,
-			baseURL+WebServiceDeleteAppProcedure,
-			connect.WithSchema(webServiceDeleteAppMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 		updateApp: connect.NewClient[v1.UpdateAppRequest, v1.UpdateAppResponse](
 			httpClient,
 			baseURL+WebServiceUpdateAppProcedure,
 			connect.WithSchema(webServiceUpdateAppMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		deleteApp: connect.NewClient[v1.DeleteAppRequest, v1.DeleteAppResponse](
+			httpClient,
+			baseURL+WebServiceDeleteAppProcedure,
+			connect.WithSchema(webServiceDeleteAppMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		checkForSystemUpdates: connect.NewClient[v1.CheckForSystemUpdatesRequest, v1.CheckForSystemUpdatesResponse](
@@ -250,22 +226,10 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceCheckForContainerUpdatesMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		changeDaemonVersion: connect.NewClient[v1.ChangeDaemonVersionRequest, v1.ChangeDaemonVersionResponse](
+		updateSystem: connect.NewClient[v1.UpdateSystemRequest, v1.UpdateSystemResponse](
 			httpClient,
-			baseURL+WebServiceChangeDaemonVersionProcedure,
-			connect.WithSchema(webServiceChangeDaemonVersionMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		installOSUpdate: connect.NewClient[v1.InstallOSUpdateRequest, v1.InstallOSUpdateResponse](
-			httpClient,
-			baseURL+WebServiceInstallOSUpdateProcedure,
-			connect.WithSchema(webServiceInstallOSUpdateMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		setSystemImage: connect.NewClient[v1.SetSystemImageRequest, v1.SetSystemImageResponse](
-			httpClient,
-			baseURL+WebServiceSetSystemImageProcedure,
-			connect.WithSchema(webServiceSetSystemImageMethodDescriptor),
+			baseURL+WebServiceUpdateSystemProcedure,
+			connect.WithSchema(webServiceUpdateSystemMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		appsHealthCheck: connect.NewClient[v1.AppsHealthCheckRequest, v1.AppsHealthCheckResponse](
@@ -278,24 +242,6 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			httpClient,
 			baseURL+WebServiceGetSystemStatsProcedure,
 			connect.WithSchema(webServiceGetSystemStatsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		isDeviceSetup: connect.NewClient[v1.IsDeviceSetupRequest, v1.IsDeviceSetupResponse](
-			httpClient,
-			baseURL+WebServiceIsDeviceSetupProcedure,
-			connect.WithSchema(webServiceIsDeviceSetupMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		initializeDevice: connect.NewClient[v1.InitializeDeviceRequest, v1.InitializeDeviceResponse](
-			httpClient,
-			baseURL+WebServiceInitializeDeviceProcedure,
-			connect.WithSchema(webServiceInitializeDeviceMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		login: connect.NewClient[v1.LoginRequest, v1.LoginResponse](
-			httpClient,
-			baseURL+WebServiceLoginProcedure,
-			connect.WithSchema(webServiceLoginMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		getAppsInStore: connect.NewClient[v1.GetAppsInStoreRequest, v1.GetAppsInStoreResponse](
@@ -364,6 +310,12 @@ func NewWebServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			connect.WithSchema(webServiceRegisterPeerMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		deregisterPeer: connect.NewClient[v1.DeregisterPeerRequest, v1.DeregisterPeerResponse](
+			httpClient,
+			baseURL+WebServiceDeregisterPeerProcedure,
+			connect.WithSchema(webServiceDeregisterPeerMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		subscribe: connect.NewClient[v1.SubscribeRequest, v1.ServerEvent](
 			httpClient,
 			baseURL+WebServiceSubscribeProcedure,
@@ -378,18 +330,13 @@ type webServiceClient struct {
 	shutdownHost             *connect.Client[v1.ShutdownHostRequest, v1.ShutdownHostResponse]
 	restartHost              *connect.Client[v1.RestartHostRequest, v1.RestartHostResponse]
 	installApp               *connect.Client[v1.InstallAppRequest, v1.InstallAppResponse]
-	deleteApp                *connect.Client[v1.DeleteAppRequest, v1.DeleteAppResponse]
 	updateApp                *connect.Client[v1.UpdateAppRequest, v1.UpdateAppResponse]
+	deleteApp                *connect.Client[v1.DeleteAppRequest, v1.DeleteAppResponse]
 	checkForSystemUpdates    *connect.Client[v1.CheckForSystemUpdatesRequest, v1.CheckForSystemUpdatesResponse]
 	checkForContainerUpdates *connect.Client[v1.CheckForContainerUpdatesRequest, v1.CheckForContainerUpdatesResponse]
-	changeDaemonVersion      *connect.Client[v1.ChangeDaemonVersionRequest, v1.ChangeDaemonVersionResponse]
-	installOSUpdate          *connect.Client[v1.InstallOSUpdateRequest, v1.InstallOSUpdateResponse]
-	setSystemImage           *connect.Client[v1.SetSystemImageRequest, v1.SetSystemImageResponse]
+	updateSystem             *connect.Client[v1.UpdateSystemRequest, v1.UpdateSystemResponse]
 	appsHealthCheck          *connect.Client[v1.AppsHealthCheckRequest, v1.AppsHealthCheckResponse]
 	getSystemStats           *connect.Client[v1.GetSystemStatsRequest, v1.GetSystemStatsResponse]
-	isDeviceSetup            *connect.Client[v1.IsDeviceSetupRequest, v1.IsDeviceSetupResponse]
-	initializeDevice         *connect.Client[v1.InitializeDeviceRequest, v1.InitializeDeviceResponse]
-	login                    *connect.Client[v1.LoginRequest, v1.LoginResponse]
 	getAppsInStore           *connect.Client[v1.GetAppsInStoreRequest, v1.GetAppsInStoreResponse]
 	getDeviceSettings        *connect.Client[v1.GetDeviceSettingsRequest, v1.GetDeviceSettingsResponse]
 	setDeviceSettings        *connect.Client[v1.SetDeviceSettingsRequest, v1.SetDeviceSettingsResponse]
@@ -401,6 +348,7 @@ type webServiceClient struct {
 	registerToLocator        *connect.Client[v1.RegisterToLocatorRequest, v1.RegisterToLocatorResponse]
 	deregisterFromLocator    *connect.Client[v1.DeregisterFromLocatorRequest, v1.DeregisterFromLocatorResponse]
 	registerPeer             *connect.Client[v1.RegisterPeerRequest, v1.RegisterPeerResponse]
+	deregisterPeer           *connect.Client[v1.DeregisterPeerRequest, v1.DeregisterPeerResponse]
 	subscribe                *connect.Client[v1.SubscribeRequest, v1.ServerEvent]
 }
 
@@ -419,14 +367,14 @@ func (c *webServiceClient) InstallApp(ctx context.Context, req *connect.Request[
 	return c.installApp.CallUnary(ctx, req)
 }
 
-// DeleteApp calls platform.server.v1.WebService.DeleteApp.
-func (c *webServiceClient) DeleteApp(ctx context.Context, req *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error) {
-	return c.deleteApp.CallUnary(ctx, req)
-}
-
 // UpdateApp calls platform.server.v1.WebService.UpdateApp.
 func (c *webServiceClient) UpdateApp(ctx context.Context, req *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error) {
 	return c.updateApp.CallUnary(ctx, req)
+}
+
+// DeleteApp calls platform.server.v1.WebService.DeleteApp.
+func (c *webServiceClient) DeleteApp(ctx context.Context, req *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error) {
+	return c.deleteApp.CallUnary(ctx, req)
 }
 
 // CheckForSystemUpdates calls platform.server.v1.WebService.CheckForSystemUpdates.
@@ -439,19 +387,9 @@ func (c *webServiceClient) CheckForContainerUpdates(ctx context.Context, req *co
 	return c.checkForContainerUpdates.CallUnary(ctx, req)
 }
 
-// ChangeDaemonVersion calls platform.server.v1.WebService.ChangeDaemonVersion.
-func (c *webServiceClient) ChangeDaemonVersion(ctx context.Context, req *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
-	return c.changeDaemonVersion.CallUnary(ctx, req)
-}
-
-// InstallOSUpdate calls platform.server.v1.WebService.InstallOSUpdate.
-func (c *webServiceClient) InstallOSUpdate(ctx context.Context, req *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
-	return c.installOSUpdate.CallUnary(ctx, req)
-}
-
-// SetSystemImage calls platform.server.v1.WebService.SetSystemImage.
-func (c *webServiceClient) SetSystemImage(ctx context.Context, req *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
-	return c.setSystemImage.CallUnary(ctx, req)
+// UpdateSystem calls platform.server.v1.WebService.UpdateSystem.
+func (c *webServiceClient) UpdateSystem(ctx context.Context, req *connect.Request[v1.UpdateSystemRequest]) (*connect.Response[v1.UpdateSystemResponse], error) {
+	return c.updateSystem.CallUnary(ctx, req)
 }
 
 // AppsHealthCheck calls platform.server.v1.WebService.AppsHealthCheck.
@@ -462,21 +400,6 @@ func (c *webServiceClient) AppsHealthCheck(ctx context.Context, req *connect.Req
 // GetSystemStats calls platform.server.v1.WebService.GetSystemStats.
 func (c *webServiceClient) GetSystemStats(ctx context.Context, req *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
 	return c.getSystemStats.CallUnary(ctx, req)
-}
-
-// IsDeviceSetup calls platform.server.v1.WebService.IsDeviceSetup.
-func (c *webServiceClient) IsDeviceSetup(ctx context.Context, req *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error) {
-	return c.isDeviceSetup.CallUnary(ctx, req)
-}
-
-// InitializeDevice calls platform.server.v1.WebService.InitializeDevice.
-func (c *webServiceClient) InitializeDevice(ctx context.Context, req *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
-	return c.initializeDevice.CallUnary(ctx, req)
-}
-
-// Login calls platform.server.v1.WebService.Login.
-func (c *webServiceClient) Login(ctx context.Context, req *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
-	return c.login.CallUnary(ctx, req)
 }
 
 // GetAppsInStore calls platform.server.v1.WebService.GetAppsInStore.
@@ -534,6 +457,11 @@ func (c *webServiceClient) RegisterPeer(ctx context.Context, req *connect.Reques
 	return c.registerPeer.CallUnary(ctx, req)
 }
 
+// DeregisterPeer calls platform.server.v1.WebService.DeregisterPeer.
+func (c *webServiceClient) DeregisterPeer(ctx context.Context, req *connect.Request[v1.DeregisterPeerRequest]) (*connect.Response[v1.DeregisterPeerResponse], error) {
+	return c.deregisterPeer.CallUnary(ctx, req)
+}
+
 // Subscribe calls platform.server.v1.WebService.Subscribe.
 func (c *webServiceClient) Subscribe(ctx context.Context, req *connect.Request[v1.SubscribeRequest]) (*connect.ServerStreamForClient[v1.ServerEvent], error) {
 	return c.subscribe.CallServerStream(ctx, req)
@@ -547,30 +475,20 @@ type WebServiceHandler interface {
 	RestartHost(context.Context, *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error)
 	// Install a Home Cloud application
 	InstallApp(context.Context, *connect.Request[v1.InstallAppRequest]) (*connect.Response[v1.InstallAppResponse], error)
-	// Delete a Home Cloud application
-	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
 	// Update a Home Cloud application
 	UpdateApp(context.Context, *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error)
-	// Check for available NixOS and Daemon updates
+	// Delete a Home Cloud application
+	DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error)
+	// Check for available system updates
 	CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error)
-	// Check for available system (draft and home cloud) container updates
+	// Check for available system container updates
 	CheckForContainerUpdates(context.Context, *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error)
-	// Change the currently installed Daemon version
-	ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error)
-	// Install available NixOS updates (call after calling CheckForSystemUpdates)
-	InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error)
-	// Set a system (draft and home cloud) container image (used for updating images)
-	SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error)
+	// Install available OS update
+	UpdateSystem(context.Context, *connect.Request[v1.UpdateSystemRequest]) (*connect.Response[v1.UpdateSystemResponse], error)
 	// Check the current health of all installed Home Cloud applications
 	AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error)
 	// Get the current host machine stats (cpu, memory, drives)
 	GetSystemStats(context.Context, *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error)
-	// Check to validate if the device has gone through the onboarding process
-	IsDeviceSetup(context.Context, *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error)
-	// Initialize the device with the user's credentials and settings
-	InitializeDevice(context.Context, *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error)
-	// Login to the device
-	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
 	// Get all apps available in the store
 	GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error)
 	// Get the device settings
@@ -591,8 +509,10 @@ type WebServiceHandler interface {
 	RegisterToLocator(context.Context, *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error)
 	// Deregister the server from the given Locator service
 	DeregisterFromLocator(context.Context, *connect.Request[v1.DeregisterFromLocatorRequest]) (*connect.Response[v1.DeregisterFromLocatorResponse], error)
-	// RegisterPeer is used to connect a client to the home-cloud overlay network
+	// RegisterPeer adds a peer to remote access
 	RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error)
+	// DeregisterPeer removes a peer from remote access
+	DeregisterPeer(context.Context, *connect.Request[v1.DeregisterPeerRequest]) (*connect.Response[v1.DeregisterPeerResponse], error)
 	// Subscribe to the server for events
 	Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error
 }
@@ -621,16 +541,16 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceInstallAppMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	webServiceDeleteAppHandler := connect.NewUnaryHandler(
-		WebServiceDeleteAppProcedure,
-		svc.DeleteApp,
-		connect.WithSchema(webServiceDeleteAppMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	webServiceUpdateAppHandler := connect.NewUnaryHandler(
 		WebServiceUpdateAppProcedure,
 		svc.UpdateApp,
 		connect.WithSchema(webServiceUpdateAppMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	webServiceDeleteAppHandler := connect.NewUnaryHandler(
+		WebServiceDeleteAppProcedure,
+		svc.DeleteApp,
+		connect.WithSchema(webServiceDeleteAppMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	webServiceCheckForSystemUpdatesHandler := connect.NewUnaryHandler(
@@ -645,22 +565,10 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceCheckForContainerUpdatesMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	webServiceChangeDaemonVersionHandler := connect.NewUnaryHandler(
-		WebServiceChangeDaemonVersionProcedure,
-		svc.ChangeDaemonVersion,
-		connect.WithSchema(webServiceChangeDaemonVersionMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	webServiceInstallOSUpdateHandler := connect.NewUnaryHandler(
-		WebServiceInstallOSUpdateProcedure,
-		svc.InstallOSUpdate,
-		connect.WithSchema(webServiceInstallOSUpdateMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	webServiceSetSystemImageHandler := connect.NewUnaryHandler(
-		WebServiceSetSystemImageProcedure,
-		svc.SetSystemImage,
-		connect.WithSchema(webServiceSetSystemImageMethodDescriptor),
+	webServiceUpdateSystemHandler := connect.NewUnaryHandler(
+		WebServiceUpdateSystemProcedure,
+		svc.UpdateSystem,
+		connect.WithSchema(webServiceUpdateSystemMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	webServiceAppsHealthCheckHandler := connect.NewUnaryHandler(
@@ -673,24 +581,6 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		WebServiceGetSystemStatsProcedure,
 		svc.GetSystemStats,
 		connect.WithSchema(webServiceGetSystemStatsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	webServiceIsDeviceSetupHandler := connect.NewUnaryHandler(
-		WebServiceIsDeviceSetupProcedure,
-		svc.IsDeviceSetup,
-		connect.WithSchema(webServiceIsDeviceSetupMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	webServiceInitializeDeviceHandler := connect.NewUnaryHandler(
-		WebServiceInitializeDeviceProcedure,
-		svc.InitializeDevice,
-		connect.WithSchema(webServiceInitializeDeviceMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	webServiceLoginHandler := connect.NewUnaryHandler(
-		WebServiceLoginProcedure,
-		svc.Login,
-		connect.WithSchema(webServiceLoginMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	webServiceGetAppsInStoreHandler := connect.NewUnaryHandler(
@@ -759,6 +649,12 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 		connect.WithSchema(webServiceRegisterPeerMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	webServiceDeregisterPeerHandler := connect.NewUnaryHandler(
+		WebServiceDeregisterPeerProcedure,
+		svc.DeregisterPeer,
+		connect.WithSchema(webServiceDeregisterPeerMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	webServiceSubscribeHandler := connect.NewServerStreamHandler(
 		WebServiceSubscribeProcedure,
 		svc.Subscribe,
@@ -773,30 +669,20 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceRestartHostHandler.ServeHTTP(w, r)
 		case WebServiceInstallAppProcedure:
 			webServiceInstallAppHandler.ServeHTTP(w, r)
-		case WebServiceDeleteAppProcedure:
-			webServiceDeleteAppHandler.ServeHTTP(w, r)
 		case WebServiceUpdateAppProcedure:
 			webServiceUpdateAppHandler.ServeHTTP(w, r)
+		case WebServiceDeleteAppProcedure:
+			webServiceDeleteAppHandler.ServeHTTP(w, r)
 		case WebServiceCheckForSystemUpdatesProcedure:
 			webServiceCheckForSystemUpdatesHandler.ServeHTTP(w, r)
 		case WebServiceCheckForContainerUpdatesProcedure:
 			webServiceCheckForContainerUpdatesHandler.ServeHTTP(w, r)
-		case WebServiceChangeDaemonVersionProcedure:
-			webServiceChangeDaemonVersionHandler.ServeHTTP(w, r)
-		case WebServiceInstallOSUpdateProcedure:
-			webServiceInstallOSUpdateHandler.ServeHTTP(w, r)
-		case WebServiceSetSystemImageProcedure:
-			webServiceSetSystemImageHandler.ServeHTTP(w, r)
+		case WebServiceUpdateSystemProcedure:
+			webServiceUpdateSystemHandler.ServeHTTP(w, r)
 		case WebServiceAppsHealthCheckProcedure:
 			webServiceAppsHealthCheckHandler.ServeHTTP(w, r)
 		case WebServiceGetSystemStatsProcedure:
 			webServiceGetSystemStatsHandler.ServeHTTP(w, r)
-		case WebServiceIsDeviceSetupProcedure:
-			webServiceIsDeviceSetupHandler.ServeHTTP(w, r)
-		case WebServiceInitializeDeviceProcedure:
-			webServiceInitializeDeviceHandler.ServeHTTP(w, r)
-		case WebServiceLoginProcedure:
-			webServiceLoginHandler.ServeHTTP(w, r)
 		case WebServiceGetAppsInStoreProcedure:
 			webServiceGetAppsInStoreHandler.ServeHTTP(w, r)
 		case WebServiceGetDeviceSettingsProcedure:
@@ -819,6 +705,8 @@ func NewWebServiceHandler(svc WebServiceHandler, opts ...connect.HandlerOption) 
 			webServiceDeregisterFromLocatorHandler.ServeHTTP(w, r)
 		case WebServiceRegisterPeerProcedure:
 			webServiceRegisterPeerHandler.ServeHTTP(w, r)
+		case WebServiceDeregisterPeerProcedure:
+			webServiceDeregisterPeerHandler.ServeHTTP(w, r)
 		case WebServiceSubscribeProcedure:
 			webServiceSubscribeHandler.ServeHTTP(w, r)
 		default:
@@ -842,12 +730,12 @@ func (UnimplementedWebServiceHandler) InstallApp(context.Context, *connect.Reque
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.InstallApp is not implemented"))
 }
 
-func (UnimplementedWebServiceHandler) DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.DeleteApp is not implemented"))
-}
-
 func (UnimplementedWebServiceHandler) UpdateApp(context.Context, *connect.Request[v1.UpdateAppRequest]) (*connect.Response[v1.UpdateAppResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.UpdateApp is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) DeleteApp(context.Context, *connect.Request[v1.DeleteAppRequest]) (*connect.Response[v1.DeleteAppResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.DeleteApp is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) CheckForSystemUpdates(context.Context, *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error) {
@@ -858,16 +746,8 @@ func (UnimplementedWebServiceHandler) CheckForContainerUpdates(context.Context, 
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.CheckForContainerUpdates is not implemented"))
 }
 
-func (UnimplementedWebServiceHandler) ChangeDaemonVersion(context.Context, *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.ChangeDaemonVersion is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) InstallOSUpdate(context.Context, *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.InstallOSUpdate is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) SetSystemImage(context.Context, *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.SetSystemImage is not implemented"))
+func (UnimplementedWebServiceHandler) UpdateSystem(context.Context, *connect.Request[v1.UpdateSystemRequest]) (*connect.Response[v1.UpdateSystemResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.UpdateSystem is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) AppsHealthCheck(context.Context, *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error) {
@@ -876,18 +756,6 @@ func (UnimplementedWebServiceHandler) AppsHealthCheck(context.Context, *connect.
 
 func (UnimplementedWebServiceHandler) GetSystemStats(context.Context, *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.GetSystemStats is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) IsDeviceSetup(context.Context, *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.IsDeviceSetup is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) InitializeDevice(context.Context, *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.InitializeDevice is not implemented"))
-}
-
-func (UnimplementedWebServiceHandler) Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.Login is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) GetAppsInStore(context.Context, *connect.Request[v1.GetAppsInStoreRequest]) (*connect.Response[v1.GetAppsInStoreResponse], error) {
@@ -932,6 +800,10 @@ func (UnimplementedWebServiceHandler) DeregisterFromLocator(context.Context, *co
 
 func (UnimplementedWebServiceHandler) RegisterPeer(context.Context, *connect.Request[v1.RegisterPeerRequest]) (*connect.Response[v1.RegisterPeerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.RegisterPeer is not implemented"))
+}
+
+func (UnimplementedWebServiceHandler) DeregisterPeer(context.Context, *connect.Request[v1.DeregisterPeerRequest]) (*connect.Response[v1.DeregisterPeerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.server.v1.WebService.DeregisterPeer is not implemented"))
 }
 
 func (UnimplementedWebServiceHandler) Subscribe(context.Context, *connect.Request[v1.SubscribeRequest], *connect.ServerStream[v1.ServerEvent]) error {

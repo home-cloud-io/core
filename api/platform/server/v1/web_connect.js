@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, ServerEvent, SetDeviceSettingsRequest, SetDeviceSettingsResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, SubscribeRequest, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DeregisterPeerRequest, DeregisterPeerResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, ServerEvent, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, SubscribeRequest, UpdateAppRequest, UpdateAppResponse, UpdateSystemRequest, UpdateSystemResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -46,17 +46,6 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Delete a Home Cloud application
-     *
-     * @generated from rpc platform.server.v1.WebService.DeleteApp
-     */
-    deleteApp: {
-      name: "DeleteApp",
-      I: DeleteAppRequest,
-      O: DeleteAppResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
      * Update a Home Cloud application
      *
      * @generated from rpc platform.server.v1.WebService.UpdateApp
@@ -68,7 +57,18 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Check for available NixOS and Daemon updates
+     * Delete a Home Cloud application
+     *
+     * @generated from rpc platform.server.v1.WebService.DeleteApp
+     */
+    deleteApp: {
+      name: "DeleteApp",
+      I: DeleteAppRequest,
+      O: DeleteAppResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Check for available system updates
      *
      * @generated from rpc platform.server.v1.WebService.CheckForSystemUpdates
      */
@@ -79,7 +79,7 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Check for available system (draft and home cloud) container updates
+     * Check for available system container updates
      *
      * @generated from rpc platform.server.v1.WebService.CheckForContainerUpdates
      */
@@ -90,36 +90,14 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Change the currently installed Daemon version
+     * Install available OS update
      *
-     * @generated from rpc platform.server.v1.WebService.ChangeDaemonVersion
+     * @generated from rpc platform.server.v1.WebService.UpdateSystem
      */
-    changeDaemonVersion: {
-      name: "ChangeDaemonVersion",
-      I: ChangeDaemonVersionRequest,
-      O: ChangeDaemonVersionResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Install available NixOS updates (call after calling CheckForSystemUpdates)
-     *
-     * @generated from rpc platform.server.v1.WebService.InstallOSUpdate
-     */
-    installOSUpdate: {
-      name: "InstallOSUpdate",
-      I: InstallOSUpdateRequest,
-      O: InstallOSUpdateResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Set a system (draft and home cloud) container image (used for updating images)
-     *
-     * @generated from rpc platform.server.v1.WebService.SetSystemImage
-     */
-    setSystemImage: {
-      name: "SetSystemImage",
-      I: SetSystemImageRequest,
-      O: SetSystemImageResponse,
+    updateSystem: {
+      name: "UpdateSystem",
+      I: UpdateSystemRequest,
+      O: UpdateSystemResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -142,39 +120,6 @@ export const WebService = {
       name: "GetSystemStats",
       I: GetSystemStatsRequest,
       O: GetSystemStatsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Check to validate if the device has gone through the onboarding process
-     *
-     * @generated from rpc platform.server.v1.WebService.IsDeviceSetup
-     */
-    isDeviceSetup: {
-      name: "IsDeviceSetup",
-      I: IsDeviceSetupRequest,
-      O: IsDeviceSetupResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Initialize the device with the user's credentials and settings
-     *
-     * @generated from rpc platform.server.v1.WebService.InitializeDevice
-     */
-    initializeDevice: {
-      name: "InitializeDevice",
-      I: InitializeDeviceRequest,
-      O: InitializeDeviceResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Login to the device
-     *
-     * @generated from rpc platform.server.v1.WebService.Login
-     */
-    login: {
-      name: "Login",
-      I: LoginRequest,
-      O: LoginResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -288,7 +233,7 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * RegisterPeer is used to connect a client to the home-cloud overlay network
+     * RegisterPeer adds a peer to remote access
      *
      * @generated from rpc platform.server.v1.WebService.RegisterPeer
      */
@@ -296,6 +241,17 @@ export const WebService = {
       name: "RegisterPeer",
       I: RegisterPeerRequest,
       O: RegisterPeerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * DeregisterPeer removes a peer from remote access
+     *
+     * @generated from rpc platform.server.v1.WebService.DeregisterPeer
+     */
+    deregisterPeer: {
+      name: "DeregisterPeer",
+      I: DeregisterPeerRequest,
+      O: DeregisterPeerResponse,
       kind: MethodKind.Unary,
     },
     /**

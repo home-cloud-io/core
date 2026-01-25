@@ -1,0 +1,24 @@
+apiVersion: home-cloud.io/v1
+kind: Install
+metadata:
+  name: install
+  namespace: home-cloud-system
+  finalizers:
+    - install.home-cloud.io/finalizer
+spec:
+  version: v0.0.1-beta
+  settings:
+    hostname: dev.local
+  istio:
+    istiod:
+      values: |
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+    ztunnel:
+      values: |
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi

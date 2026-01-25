@@ -73,24 +73,6 @@ export const InstallAppResponse = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.DeleteAppRequest
- */
-export const DeleteAppRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.DeleteAppRequest",
-  () => [
-    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.DeleteAppResponse
- */
-export const DeleteAppResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.DeleteAppResponse",
-  [],
-);
-
-/**
  * @generated from message platform.server.v1.UpdateAppRequest
  */
 export const UpdateAppRequest = /*@__PURE__*/ proto3.makeMessageType(
@@ -113,6 +95,24 @@ export const UpdateAppResponse = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
+ * @generated from message platform.server.v1.DeleteAppRequest
+ */
+export const DeleteAppRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DeleteAppRequest",
+  () => [
+    { no: 1, name: "release", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DeleteAppResponse
+ */
+export const DeleteAppResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DeleteAppResponse",
+  [],
+);
+
+/**
  * @generated from message platform.server.v1.CheckForSystemUpdatesRequest
  */
 export const CheckForSystemUpdatesRequest = /*@__PURE__*/ proto3.makeMessageType(
@@ -126,31 +126,7 @@ export const CheckForSystemUpdatesRequest = /*@__PURE__*/ proto3.makeMessageType
 export const CheckForSystemUpdatesResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.CheckForSystemUpdatesResponse",
   () => [
-    { no: 1, name: "daemon_versions", kind: "message", T: DaemonVersions },
-    { no: 2, name: "os_diff", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.DaemonVersions
- */
-export const DaemonVersions = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.DaemonVersions",
-  () => [
-    { no: 1, name: "current", kind: "message", T: DaemonVersion },
-    { no: 2, name: "latest", kind: "message", T: DaemonVersion },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.DaemonVersion
- */
-export const DaemonVersion = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.DaemonVersion",
-  () => [
-    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "update_available", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 
@@ -186,57 +162,18 @@ export const ImageVersion = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.ChangeDaemonVersionRequest
+ * @generated from message platform.server.v1.UpdateSystemRequest
  */
-export const ChangeDaemonVersionRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.ChangeDaemonVersionRequest",
-  () => [
-    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "vendor_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "src_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.ChangeDaemonVersionResponse
- */
-export const ChangeDaemonVersionResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.ChangeDaemonVersionResponse",
+export const UpdateSystemRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.UpdateSystemRequest",
   [],
 );
 
 /**
- * @generated from message platform.server.v1.InstallOSUpdateRequest
+ * @generated from message platform.server.v1.UpdateSystemResponse
  */
-export const InstallOSUpdateRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InstallOSUpdateRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.InstallOSUpdateResponse
- */
-export const InstallOSUpdateResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InstallOSUpdateResponse",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.SetSystemImageRequest
- */
-export const SetSystemImageRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.SetSystemImageRequest",
-  () => [
-    { no: 1, name: "current_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "requested_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.SetSystemImageResponse
- */
-export const SetSystemImageResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.SetSystemImageResponse",
+export const UpdateSystemResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.UpdateSystemResponse",
   [],
 );
 
@@ -297,69 +234,6 @@ export const GetSystemStatsResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.GetSystemStatsResponse",
   () => [
     { no: 1, name: "stats", kind: "message", T: SystemStats },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.IsDeviceSetupRequest
- */
-export const IsDeviceSetupRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.IsDeviceSetupRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.IsDeviceSetupResponse
- */
-export const IsDeviceSetupResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.IsDeviceSetupResponse",
-  () => [
-    { no: 1, name: "setup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.InitializeDeviceRequest
- */
-export const InitializeDeviceRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InitializeDeviceRequest",
-  () => [
-    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 5, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.InitializeDeviceResponse
- */
-export const InitializeDeviceResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InitializeDeviceResponse",
-  () => [
-    { no: 1, name: "setup", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.LoginRequest
- */
-export const LoginRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.LoginRequest",
-  () => [
-    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.LoginResponse
- */
-export const LoginResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.LoginResponse",
-  () => [
-    { no: 1, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -631,15 +505,60 @@ export const Entries = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * Aggregate model for the installed apps saved in blueprint
- *
- * @generated from message platform.server.v1.InstalledApp
+ * @generated from message platform.server.v1.SystemVersion
  */
-export const InstalledApp = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.InstalledApp",
+export const SystemVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.SystemVersion",
   () => [
-    { no: 1, name: "application", kind: "message", T: App },
-    { no: 2, name: "status", kind: "message", T: AppRunningStatus },
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "istio", kind: "message", T: IstioVersion },
+    { no: 3, name: "gateway_api", kind: "message", T: GatewayAPIVersion },
+    { no: 4, name: "server", kind: "message", T: ServerVersion },
+    { no: 5, name: "daemon", kind: "message", T: DaemonVersion },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.IstioVersion
+ */
+export const IstioVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.IstioVersion",
+  () => [
+    { no: 1, name: "repo", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.GatewayAPIVersion
+ */
+export const GatewayAPIVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.GatewayAPIVersion",
+  () => [
+    { no: 1, name: "url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.ServerVersion
+ */
+export const ServerVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.ServerVersion",
+  () => [
+    { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "tag", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.DaemonVersion
+ */
+export const DaemonVersion = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DaemonVersion",
+  () => [
+    { no: 1, name: "image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "tag", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -667,24 +586,13 @@ export const AppStoreEntries = /*@__PURE__*/ proto3.makeMessageType(
 export const DeviceSettings = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.DeviceSettings",
   () => [
-    { no: 1, name: "admin_user", kind: "message", T: User },
-    { no: 2, name: "timezone", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 4, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 5, name: "enable_ssh", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 6, name: "trusted_ssh_keys", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 7, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
+    { no: 1, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
   ],
 );
 
 /**
- * NOTE: These settings are written to the daemon config on the host so that tunneling can be
- * configured on device boot even if the server and/or blueprint are down.
- *
- * This means that these settings are written in two places (blueprint and host filesystem) and
- * must be kept in sync. In the future we probably want to move to a sync pattern where the daemon
- * can connect directly to blueprint and syncs settings periodically.
- *
  * @generated from message platform.server.v1.SecureTunnelingSettings
  */
 export const SecureTunnelingSettings = /*@__PURE__*/ proto3.makeMessageType(
@@ -707,17 +615,6 @@ export const WireguardInterface = /*@__PURE__*/ proto3.makeMessageType(
     { no: 4, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "stun_server", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "locator_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.User
- */
-export const User = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.User",
-  () => [
-    { no: 1, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "password", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -791,5 +688,23 @@ export const RegisterPeerResponse = /*@__PURE__*/ proto3.makeMessageType(
     { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "locator_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ],
+);
+
+/**
+ * TODO
+ *
+ * @generated from message platform.server.v1.DeregisterPeerRequest
+ */
+export const DeregisterPeerRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DeregisterPeerRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.server.v1.DeregisterPeerResponse
+ */
+export const DeregisterPeerResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.DeregisterPeerResponse",
+  [],
 );
 

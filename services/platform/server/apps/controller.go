@@ -3,7 +3,6 @@ package apps
 import (
 	"cmp"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,14 +10,13 @@ import (
 	"strings"
 	"time"
 
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
-	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
-
 	"github.com/robfig/cron/v3"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/mod/semver"
+
+	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 )
 
 type (
@@ -43,10 +41,14 @@ type (
 		AutoUpdate(logger chassis.Logger)
 		// GetAppStorage will retrieve the app storage volumes for all installed apps.
 		GetAppStorage(ctx context.Context, logger chassis.Logger) ([]*v1.AppStorage, error)
+		// AppStoreCache creates a new store cache that runs in the background
+		// keeping the app store up to date with the latest available apps
+		AppStoreCache(logger chassis.Logger)
 	}
 
 	controller struct {
-		k8sclient k8sclient.Apps
+		k8sclient  k8sclient.Apps
+		storeCache *v1.AppStoreEntries
 	}
 )
 
@@ -71,19 +73,12 @@ const (
 
 func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.App, error) {
 	var (
-		err      error
-		apps     []*v1.App
-		appStore = &v1.AppStoreEntries{}
+		err  error
+		apps []*v1.App
 	)
 
 	logger.Info("getting apps in store (from cache)")
-	err = kvclient.Get(ctx, kvclient.APP_STORE_ENTRIES_KEY, appStore)
-	if err != nil {
-		logger.WithError(err).Error("failed to get app store entries from cache")
-		return nil, errors.New(ErrFailedToGetApps)
-	}
-
-	for _, v := range appStore.Entries {
+	for _, v := range c.storeCache.Entries {
 		// TODO: get the latest, right now this assumes the `app` slice is already sorted by version
 		// append the first app of the app store entry to to the `apps` slice
 		if len(v.Apps) > 0 {
@@ -159,7 +154,7 @@ func (c *controller) Install(ctx context.Context, logger chassis.Logger, request
 					}
 
 					log.Info("dependency is needed: installing")
-					err := c.k8sclient.Install(ctx, opv1.AppSpec{
+					err := c.k8sclient.InstallApp(ctx, opv1.AppSpec{
 						Chart:   dep.Name,
 						Repo:    strings.TrimPrefix(dep.Repository, "https://"),
 						Release: dep.Name,
@@ -185,7 +180,7 @@ func (c *controller) Install(ctx context.Context, logger chassis.Logger, request
 
 	// install requested app
 	logger.Info("installing requested app")
-	err = c.k8sclient.Install(ctx, opv1.AppSpec{
+	err = c.k8sclient.InstallApp(ctx, opv1.AppSpec{
 		Chart:   request.Chart,
 		Repo:    request.Repo,
 		Release: request.Release,
@@ -210,7 +205,7 @@ func (c *controller) Install(ctx context.Context, logger chassis.Logger, request
 }
 
 func (c *controller) Delete(ctx context.Context, logger chassis.Logger, request *v1.DeleteAppRequest) error {
-	err := c.k8sclient.Delete(ctx, opv1.AppSpec{
+	err := c.k8sclient.DeleteApp(ctx, opv1.AppSpec{
 		Release: request.Release,
 	})
 	if err != nil {
@@ -220,7 +215,7 @@ func (c *controller) Delete(ctx context.Context, logger chassis.Logger, request 
 }
 
 func (c *controller) Update(ctx context.Context, logger chassis.Logger, request *v1.UpdateAppRequest) error {
-	err := c.k8sclient.Update(ctx, opv1.AppSpec{
+	err := c.k8sclient.UpdateApp(ctx, opv1.AppSpec{
 		Chart:   request.Chart,
 		Repo:    request.Repo,
 		Release: request.Release,
@@ -235,17 +230,6 @@ func (c *controller) Update(ctx context.Context, logger chassis.Logger, request 
 
 func (c *controller) UpdateAll(ctx context.Context, logger chassis.Logger) error {
 	logger.Info("updating all apps")
-	settings := &v1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		logger.WithError(err).Error("failed to get device settings")
-		return err
-	}
-
-	if !settings.AutoUpdateApps {
-		logger.Info("auto update apps not enabled")
-		return nil
-	}
 
 	storeApps, err := c.Store(ctx, logger)
 	if err != nil {

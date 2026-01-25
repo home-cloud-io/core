@@ -7,10 +7,9 @@ import { createConnectTransport } from '@connectrpc/connect-web';
 import { TransportProvider } from '@connectrpc/connect-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { EventListener, EventsProvider } from './services/Subscribe';
-import * as Config from './utils/config';
 
 export const transport = createConnectTransport({
-  baseUrl: Config.BASE_URL,
+  baseUrl: window.location.origin,
 });
 
 const queryClient = new QueryClient();
