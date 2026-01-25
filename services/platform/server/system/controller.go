@@ -49,8 +49,8 @@ const (
 	// Currently only a single interface is supported and defaults to this value. In the future we
 	// will probably want to support multiple interfaces (e.g. one for trusted mobile clients and another for federated servers)
 	DefaultWireguardInterface = "wg0"
-	// TODO: make this configurable
-	DefaultSTUNServerAddress = "locator1.home-cloud.io:3478"
+	DefaultSTUNServerAddress  = "locator1.home-cloud.io:3478"
+	DefaultLocatorAddress     = "https://locator1.home-cloud.io"
 )
 
 // helper functions
