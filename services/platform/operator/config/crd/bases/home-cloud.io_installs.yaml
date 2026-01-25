@@ -51,6 +51,9 @@ spec:
               gatewayApi:
                 properties:
                   disable:
+                    description: |-
+                      Disabling will not uninstall a previous installation. Since these CRDs are cluster-scoped, this is to avoid
+                      breaking an existing installation from another source. You must uninstall manually after disabling.
                     type: boolean
                   url:
                     type: string

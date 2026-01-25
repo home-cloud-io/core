@@ -18,6 +18,8 @@ type InstallSpec struct {
 }
 
 type GatewayAPISpec struct {
+	// Disabling will not uninstall a previous installation. Since these CRDs are cluster-scoped, this is to avoid
+	// breaking an existing installation from another source. You must uninstall manually after disabling.
 	Disable bool   `json:"disable,omitempty"`
 	URL     string `json:"url,omitempty"`
 	Version string `json:"version,omitempty"`
