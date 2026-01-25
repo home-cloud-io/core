@@ -1,7 +1,7 @@
 apiVersion: home-cloud.io/v1
 kind: Install
 metadata:
-  name: install-sample
+  name: install
   namespace: home-cloud-system
   finalizers:
     - install.home-cloud.io/finalizer
