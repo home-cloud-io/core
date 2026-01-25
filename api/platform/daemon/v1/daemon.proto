@@ -11,8 +11,8 @@ service DaemonService {
   rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
   rpc RebootHost(RebootHostRequest) returns (RebootHostResponse) {}
   rpc SystemStats(SystemStatsRequest) returns (SystemStatsResponse) {}
-
-  // TODO: system updates
+  rpc Version(VersionRequest) returns (VersionResponse) {}
+  // rpc Update(UpdateRequest) returns (UpdateResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -24,4 +24,10 @@ message RebootHostResponse {}
 message SystemStatsRequest {}
 message SystemStatsResponse {
   platform.daemon.v1.SystemStats stats = 1;
+}
+
+message VersionRequest {}
+message VersionResponse {
+  string name = 1;
+  string version = 2;
 }

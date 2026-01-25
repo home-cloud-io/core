@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse, SystemStatsRequest, SystemStatsResponse } from "./daemon_pb.js";
+import { RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse, SystemStatsRequest, SystemStatsResponse, VersionRequest, VersionResponse } from "./daemon_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -37,6 +37,15 @@ export const DaemonService = {
       name: "SystemStats",
       I: SystemStatsRequest,
       O: SystemStatsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc platform.daemon.v1.DaemonService.Version
+     */
+    version: {
+      name: "Version",
+      I: VersionRequest,
+      O: VersionResponse,
       kind: MethodKind.Unary,
     },
   }
