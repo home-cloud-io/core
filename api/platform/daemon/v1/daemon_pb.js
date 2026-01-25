@@ -56,3 +56,22 @@ export const SystemStatsResponse = /*@__PURE__*/ proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.daemon.v1.VersionRequest
+ */
+export const VersionRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.VersionRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.daemon.v1.VersionResponse
+ */
+export const VersionResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.VersionResponse",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+

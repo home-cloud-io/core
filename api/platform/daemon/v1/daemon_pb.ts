@@ -199,3 +199,77 @@ export class SystemStatsResponse extends Message<SystemStatsResponse> {
   }
 }
 
+/**
+ * @generated from message platform.daemon.v1.VersionRequest
+ */
+export class VersionRequest extends Message<VersionRequest> {
+  constructor(data?: PartialMessage<VersionRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.VersionRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): VersionRequest {
+    return new VersionRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): VersionRequest {
+    return new VersionRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): VersionRequest {
+    return new VersionRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: VersionRequest | PlainMessage<VersionRequest> | undefined, b: VersionRequest | PlainMessage<VersionRequest> | undefined): boolean {
+    return proto3.util.equals(VersionRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.VersionResponse
+ */
+export class VersionResponse extends Message<VersionResponse> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string version = 2;
+   */
+  version = "";
+
+  constructor(data?: PartialMessage<VersionResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.VersionResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): VersionResponse {
+    return new VersionResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): VersionResponse {
+    return new VersionResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): VersionResponse {
+    return new VersionResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: VersionResponse | PlainMessage<VersionResponse> | undefined, b: VersionResponse | PlainMessage<VersionResponse> | undefined): boolean {
+    return proto3.util.equals(VersionResponse, a, b);
+  }
+}
+
