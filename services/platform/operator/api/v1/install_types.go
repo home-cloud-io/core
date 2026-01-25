@@ -92,6 +92,7 @@ type ImageVersion struct {
 
 // InstallStatus defines the observed state of Install
 type InstallStatus struct {
+	Version    string           `json:"version,omitempty"`
 	GatewayAPI GatewayAPIStatus `json:"gatewayApi,omitempty"`
 	Istio      IstioStatus      `json:"istio,omitempty"`
 	Server     ServerStatus     `json:"server,omitempty"`
