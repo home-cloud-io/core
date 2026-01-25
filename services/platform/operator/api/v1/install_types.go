@@ -4,8 +4,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// TODO: omitempty redudant?
-
 // InstallSpec defines the desired state of Install
 type InstallSpec struct {
 	Version    string         `json:"version"`
@@ -14,20 +12,19 @@ type InstallSpec struct {
 	Server     ServerSpec     `json:"server,omitempty"`
 	MDNS       MDNSSpec       `json:"mdns,omitempty"`
 	Tunnel     TunnelSpec     `json:"tunnel,omitempty"`
-	// optional value to run a system daemon service for managing the host
-	// we'll only officially support Talos (for now?) but the community could
-	// build others (e.g. NixOS)
 	// TODO: document API
 	Daemon   DaemonSpec   `json:"daemon,omitempty"`
 	Settings SettingsSpec `json:"settings,omitempty"`
 }
 
 type GatewayAPISpec struct {
+	Disable bool   `json:"disable,omitempty"`
 	URL     string `json:"url,omitempty"`
 	Version string `json:"version,omitempty"`
 }
 
 type IstioSpec struct {
+	Disable            bool   `json:"disable,omitempty"`
 	Namespace          string `json:"istio,omitempty"`
 	Version            string `json:"version,omitempty"`
 	Repo               string `json:"repo,omitempty"`
@@ -77,16 +74,15 @@ type DaemonSpec struct {
 	Disable bool   `json:"disable,omitempty"`
 	Image   string `json:"image,omitempty"`
 	Tag     string `json:"tag,omitempty"`
-
-	// TODO: will need options for customizing this install outside of Talos
 }
 
 type SettingsSpec struct {
-	AutoUpdateApps   bool   `json:"autoUpdateApps,omitempty"`
-	AutoUpdateSystem bool   `json:"autoUpdateSystem,omitempty"`
-	Hostname         string `json:"hostname,omitempty"`
-	// TODO: is this needed for talos?
-	VolumeMountHostPath string `json:"volumeMountHostPath,omitempty"`
+	// AutoUpdateApps (default: true)
+	AutoUpdateApps bool `json:"autoUpdateApps,omitempty"`
+	// AutoUpdateSystem (default: true)
+	AutoUpdateSystem bool `json:"autoUpdateSystem,omitempty"`
+	// Hostname defines the base hostname for the install (default: home-cloud.local)
+	Hostname string `json:"hostname,omitempty"`
 }
 
 type ImageVersion struct {
@@ -96,9 +92,17 @@ type ImageVersion struct {
 
 // InstallStatus defines the observed state of Install
 type InstallStatus struct {
-	Istio  IstioStatus  `json:"istio,omitempty"`
-	Server ServerStatus `json:"server,omitempty"`
-	Daemon DaemonStatus `json:"daemon,omitempty"`
+	GatewayAPI GatewayAPIStatus `json:"gatewayApi,omitempty"`
+	Istio      IstioStatus      `json:"istio,omitempty"`
+	Server     ServerStatus     `json:"server,omitempty"`
+	Tunnel     TunnelStatus     `json:"tunnel,omitempty"`
+	MDNS       MDNSStatus       `json:"mdns,omitempty"`
+	Daemon     DaemonStatus     `json:"daemon,omitempty"`
+}
+
+type GatewayAPIStatus struct {
+	URL     string `json:"url,omitempty"`
+	Version string `json:"version,omitempty"`
 }
 
 type IstioStatus struct {
@@ -111,10 +115,19 @@ type ServerStatus struct {
 	Tag   string `json:"tag,omitempty"`
 }
 
+type MDNSStatus struct {
+	Image string `json:"image,omitempty"`
+	Tag   string `json:"tag,omitempty"`
+}
+
+type TunnelStatus struct {
+	Image string `json:"image,omitempty"`
+	Tag   string `json:"tag,omitempty"`
+}
+
 type DaemonStatus struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
-	Tag     string `json:"tag,omitempty"`
+	Image string `json:"image,omitempty"`
+	Tag   string `json:"tag,omitempty"`
 }
 
 //+kubebuilder:object:root=true

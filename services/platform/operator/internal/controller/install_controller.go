@@ -125,17 +125,6 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		}
 	}
 
-	// TODO
-	// if install.Spec.Talos.Enabled {
-	// 	l.Info("reconciling talos components")
-	// 	for _, o := range resources.TalosObjects(install) {
-	// 		err = kubeCreateOrUpdate(ctx, r.Client, o)
-	// 		if err != nil {
-	// 			return err
-	// 		}
-	// 	}
-	// }
-
 	l.Info("reconciling home cloud server components")
 	for _, o := range resources.HomeCloudObjects(install) {
 		err = kubeCreateOrUpdate(ctx, r.Client, o)
@@ -301,6 +290,49 @@ func helmGet(cfg *action.Configuration, releaseName string) (*release.Release, e
 }
 
 func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Install) error {
+
+	if !install.Spec.GatewayAPI.Disable {
+		install.Status.GatewayAPI = v1.GatewayAPIStatus{
+			URL:     install.Spec.GatewayAPI.URL,
+			Version: install.Spec.GatewayAPI.Version,
+		}
+	}
+
+	if !install.Spec.Istio.Disable {
+		install.Status.Istio = v1.IstioStatus{
+			Repo:    install.Spec.Istio.Repo,
+			Version: install.Spec.Istio.Version,
+		}
+	}
+
+	if !install.Spec.Server.Disable {
+		install.Status.Server = v1.ServerStatus{
+			Image:    install.Spec.Server.Image,
+			Tag: install.Spec.Server.Tag,
+		}
+	}
+
+	if !install.Spec.MDNS.Disable {
+		install.Status.MDNS = v1.MDNSStatus{
+			Image:    install.Spec.MDNS.Image,
+			Tag: install.Spec.MDNS.Tag,
+		}
+	}
+
+	if !install.Spec.Tunnel.Disable {
+		install.Status.Tunnel = v1.TunnelStatus{
+			Image:    install.Spec.Tunnel.Image,
+			Tag: install.Spec.Tunnel.Tag,
+		}
+	}
+
+	if !install.Spec.Daemon.Disable {
+		install.Status.Daemon = v1.DaemonStatus{
+			Image:    install.Spec.Daemon.Image,
+			Tag: install.Spec.Daemon.Tag,
+		}
+	}
+
 	// TODO: write the installed versions to the status
 	return r.Status().Update(ctx, install)
 }
