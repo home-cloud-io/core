@@ -32,10 +32,6 @@ import (
 // TODO: cancel install on crd update so that failed installs don't get stuck until timeout
 // might also need a lock on reconcile?
 
-// TODO: handle disabling previously installed components
-// 		pretty sure this can just check the status to see if the component is currently installed...
-// 		if it is, perform deletion steps and then remove the status
-
 // InstallReconciler reconciles a Install object
 type InstallReconciler struct {
 	client.Client
@@ -115,26 +111,56 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		}
 	}
 
-	l.Info("reconciling istio install")
-	err = reconcileIstio(ctx, install)
+	if !install.Spec.Istio.Disable {
+		l.Info("reconciling ingress gateway")
+		err = r.installResources(ctx, resources.GatewayObjects(install))
+		if err != nil {
+			return err
+		}
+
+		l.Info("reconciling istio install")
+		err = reconcileIstio(ctx, install)
+		if err != nil {
+			return err
+		}
+	} else {
+		if install.Status.Istio.Version != "" {
+			l.Info("istio is disabled: removing ingress gateway")
+			err = r.uninstallResources(ctx, resources.GatewayObjects(install))
+			if err != nil {
+				return err
+			}
+
+			l.Info("istio is disabled: removing previous installation")
+			err = uninstallIstio(ctx, install)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	installed := install.Status.Server.Tag != ""
+	err = r.reconcileObjects(ctx, "server", install.Spec.Server.Disable, installed, resources.ServerObjects(install))
 	if err != nil {
 		return err
 	}
 
-	l.Info("reconciling common components")
-	for _, o := range resources.CommonObjects(install) {
-		err = kubeCreateOrUpdate(ctx, r.Client, o)
-		if err != nil {
-			return err
-		}
+	installed = install.Status.MDNS.Tag != ""
+	err = r.reconcileObjects(ctx, "mdns", install.Spec.MDNS.Disable, installed, resources.MDNSObjects(install))
+	if err != nil {
+		return err
 	}
 
-	l.Info("reconciling home cloud server components")
-	for _, o := range resources.HomeCloudObjects(install) {
-		err = kubeCreateOrUpdate(ctx, r.Client, o)
-		if err != nil {
-			return err
-		}
+	installed = install.Status.Tunnel.Tag != ""
+	err = r.reconcileObjects(ctx, "tunnel", install.Spec.Tunnel.Disable, installed, resources.TunnelObjects(install))
+	if err != nil {
+		return err
+	}
+
+	installed = install.Status.Daemon.Tag != ""
+	err = r.reconcileObjects(ctx, "daemon", install.Spec.Daemon.Disable, installed, resources.DaemonObjects(install))
+	if err != nil {
+		return err
 	}
 
 	return r.updateStatus(ctx, install)
@@ -191,24 +217,7 @@ func reconcileIstio(ctx context.Context, install *v1.Install) error {
 	return nil
 }
 
-func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) error {
-
-	// NOTE: we do not delete any CRDs (gateway API/istio) as they could be in use by other applications
-
-	for _, o := range slices.Backward(resources.HomeCloudObjects(install)) {
-		err := r.Client.Delete(ctx, o)
-		if client.IgnoreNotFound(err) != nil {
-			return err
-		}
-	}
-
-	for _, o := range slices.Backward(resources.CommonObjects(install)) {
-		err := r.Client.Delete(ctx, o)
-		if client.IgnoreNotFound(err) != nil {
-			return err
-		}
-	}
-
+func uninstallIstio(ctx context.Context, install *v1.Install) error {
 	actionConfiguration, err := createHelmAction(install.Spec.Istio.Namespace)
 	if err != nil {
 		return err
@@ -227,13 +236,73 @@ func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) 
 		}
 	}
 
-	for _, o := range slices.Backward(resources.NamespaceObjects(install)) {
+	return nil
+}
+
+func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) error {
+
+	// NOTE: we do not delete any CRDs (gateway API/istio) as they could be in use by other applications
+
+	err := r.uninstallResources(ctx, slices.Concat(
+		resources.GatewayObjects(install),
+		resources.ServerObjects(install),
+		resources.MDNSObjects(install),
+		resources.TunnelObjects(install),
+		resources.DaemonObjects(install),
+		resources.TalosObjects(install),
+	))
+	if err != nil {
+		return err
+	}
+
+	err = uninstallIstio(ctx, install)
+	if err != nil {
+		return err
+	}
+
+	// delete namespaces last
+	err = r.uninstallResources(ctx, resources.NamespaceObjects(install))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *InstallReconciler) reconcileObjects(ctx context.Context, name string, disable bool, installed bool, objects []client.Object) error {
+	l := log.FromContext(ctx)
+
+	// uninstall if disabled and currently installed
+	if disable && installed {
+		if installed {
+			l.Info(fmt.Sprintf("%s is disabled: removing previous installation", name))
+			return r.uninstallResources(ctx, objects)
+		}
+	}
+
+	// otherwise create/update
+	l.Info(fmt.Sprintf("reconciling %s install", name))
+	return r.installResources(ctx, objects)
+}
+
+func (r *InstallReconciler) installResources(ctx context.Context, objects []client.Object) error {
+	for _, o := range objects {
+		err := kubeCreateOrUpdate(ctx, r.Client, o)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// TODO: move this to resources package and accept the kube client as a parameter?
+func (r *InstallReconciler) uninstallResources(ctx context.Context, objects []client.Object) error {
+	for _, o := range slices.Backward(objects) {
 		err := r.Client.Delete(ctx, o)
 		if client.IgnoreNotFound(err) != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -302,6 +371,8 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 			URL:     install.Spec.GatewayAPI.URL,
 			Version: install.Spec.GatewayAPI.Version,
 		}
+	} else {
+		install.Status.GatewayAPI = v1.GatewayAPIStatus{}
 	}
 
 	if !install.Spec.Istio.Disable {
@@ -309,6 +380,8 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 			Repo:    install.Spec.Istio.Repo,
 			Version: install.Spec.Istio.Version,
 		}
+	} else {
+		install.Status.Istio = v1.IstioStatus{}
 	}
 
 	if !install.Spec.Server.Disable {
@@ -316,6 +389,8 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 			Image: install.Spec.Server.Image,
 			Tag:   install.Spec.Server.Tag,
 		}
+	} else {
+		install.Status.Server = v1.ServerStatus{}
 	}
 
 	if !install.Spec.MDNS.Disable {
@@ -323,6 +398,8 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 			Image: install.Spec.MDNS.Image,
 			Tag:   install.Spec.MDNS.Tag,
 		}
+	} else {
+		install.Status.MDNS = v1.MDNSStatus{}
 	}
 
 	if !install.Spec.Tunnel.Disable {
@@ -330,6 +407,8 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 			Image: install.Spec.Tunnel.Image,
 			Tag:   install.Spec.Tunnel.Tag,
 		}
+	} else {
+		install.Status.Tunnel = v1.TunnelStatus{}
 	}
 
 	if !install.Spec.Daemon.Disable {
@@ -337,9 +416,10 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 			Image: install.Spec.Daemon.Image,
 			Tag:   install.Spec.Daemon.Tag,
 		}
+	} else {
+		install.Status.Daemon = v1.DaemonStatus{}
 	}
 
-	// TODO: write the installed versions to the status
 	return r.Status().Update(ctx, install)
 }
 
