@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
+import { SystemStats } from "./system_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.ShutdownHostRequest
@@ -127,6 +128,74 @@ export class RebootHostResponse extends Message<RebootHostResponse> {
 
   static equals(a: RebootHostResponse | PlainMessage<RebootHostResponse> | undefined, b: RebootHostResponse | PlainMessage<RebootHostResponse> | undefined): boolean {
     return proto3.util.equals(RebootHostResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.SystemStatsRequest
+ */
+export class SystemStatsRequest extends Message<SystemStatsRequest> {
+  constructor(data?: PartialMessage<SystemStatsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.SystemStatsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SystemStatsRequest {
+    return new SystemStatsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SystemStatsRequest {
+    return new SystemStatsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SystemStatsRequest {
+    return new SystemStatsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SystemStatsRequest | PlainMessage<SystemStatsRequest> | undefined, b: SystemStatsRequest | PlainMessage<SystemStatsRequest> | undefined): boolean {
+    return proto3.util.equals(SystemStatsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.SystemStatsResponse
+ */
+export class SystemStatsResponse extends Message<SystemStatsResponse> {
+  /**
+   * @generated from field: platform.daemon.v1.SystemStats stats = 1;
+   */
+  stats?: SystemStats;
+
+  constructor(data?: PartialMessage<SystemStatsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.SystemStatsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "stats", kind: "message", T: SystemStats },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SystemStatsResponse {
+    return new SystemStatsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SystemStatsResponse {
+    return new SystemStatsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SystemStatsResponse {
+    return new SystemStatsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SystemStatsResponse | PlainMessage<SystemStatsResponse> | undefined, b: SystemStatsResponse | PlainMessage<SystemStatsResponse> | undefined): boolean {
+    return proto3.util.equals(SystemStatsResponse, a, b);
   }
 }
 

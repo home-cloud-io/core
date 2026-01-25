@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse } from "./daemon_pb.js";
+import { RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse, SystemStatsRequest, SystemStatsResponse } from "./daemon_pb.js";
 
 /**
  * @generated from rpc platform.daemon.v1.DaemonService.ShutdownHost
@@ -29,6 +29,20 @@ export const rebootHost = {
   kind: MethodKind.Unary,
   I: RebootHostRequest,
   O: RebootHostResponse,
+  service: {
+    typeName: "platform.daemon.v1.DaemonService"
+  }
+};
+
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.SystemStats
+ */
+export const systemStats = {
+  localName: "systemStats",
+  name: "SystemStats",
+  kind: MethodKind.Unary,
+  I: SystemStatsRequest,
+  O: SystemStatsResponse,
   service: {
     typeName: "platform.daemon.v1.DaemonService"
   }

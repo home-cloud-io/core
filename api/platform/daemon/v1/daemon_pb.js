@@ -4,6 +4,7 @@
 // @ts-nocheck
 
 import { proto3 } from "@bufbuild/protobuf";
+import { SystemStats } from "./system_pb.js";
 
 /**
  * @generated from message platform.daemon.v1.ShutdownHostRequest
@@ -35,5 +36,23 @@ export const RebootHostRequest = /*@__PURE__*/ proto3.makeMessageType(
 export const RebootHostResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.RebootHostResponse",
   [],
+);
+
+/**
+ * @generated from message platform.daemon.v1.SystemStatsRequest
+ */
+export const SystemStatsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.SystemStatsRequest",
+  [],
+);
+
+/**
+ * @generated from message platform.daemon.v1.SystemStatsResponse
+ */
+export const SystemStatsResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.SystemStatsResponse",
+  () => [
+    { no: 1, name: "stats", kind: "message", T: SystemStats },
+  ],
 );
 
