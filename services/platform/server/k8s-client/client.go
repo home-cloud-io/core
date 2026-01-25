@@ -72,7 +72,8 @@ type (
 )
 
 const (
-	homeCloudNamespace = "home-cloud-system"
+	// TODO: this needs to be dynamic
+	HomeCloudNamespace = "home-cloud-system"
 )
 
 func NewClient(logger chassis.Logger) Client {
@@ -131,7 +132,7 @@ func (c *client) InstallApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       spec.Release,
-			Namespace:  homeCloudNamespace,
+			Namespace:  HomeCloudNamespace,
 			Finalizers: []string{"apps.home-cloud.io/finalizer"},
 		},
 		Spec: spec,
@@ -143,7 +144,7 @@ func (c *client) DeleteApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      spec.Release,
-			Namespace: homeCloudNamespace,
+			Namespace: HomeCloudNamespace,
 		},
 	}
 	return c.client.Delete(ctx, app)
@@ -153,7 +154,7 @@ func (c *client) UpdateApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{}
 	err := c.client.Get(ctx, types.NamespacedName{
 		Name:      spec.Release,
-		Namespace: homeCloudNamespace,
+		Namespace: HomeCloudNamespace,
 	}, app)
 	if err != nil {
 		return err
@@ -170,7 +171,7 @@ func (c *client) CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, erro
 	)
 
 	// home-cloud containers
-	err = c.getCurrentImageVersions(ctx, homeCloudNamespace, images)
+	err = c.getCurrentImageVersions(ctx, HomeCloudNamespace, images)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +192,7 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 	// get all installed apps
 	apps := &opv1.AppList{}
 	err := c.client.List(ctx, apps, &crclient.ListOptions{
-		Namespace: homeCloudNamespace,
+		Namespace: HomeCloudNamespace,
 	})
 	if err != nil {
 		return nil, err
@@ -251,7 +252,7 @@ func (c *client) GetAppPodLists(ctx context.Context) ([]*corev1.PodList, error) 
 	// get all installed apps
 	apps := &opv1.AppList{}
 	err := c.client.List(ctx, apps, &crclient.ListOptions{
-		Namespace: homeCloudNamespace,
+		Namespace: HomeCloudNamespace,
 	})
 	if err != nil {
 		return nil, err
@@ -283,7 +284,7 @@ func (c *client) GetAppPodLists(ctx context.Context) ([]*corev1.PodList, error) 
 func (c *client) Installed(ctx context.Context, name string) (installed bool, err error) {
 	apps := &opv1.App{}
 	err = c.client.Get(ctx, types.NamespacedName{
-		Namespace: homeCloudNamespace,
+		Namespace: HomeCloudNamespace,
 		Name:      name,
 	}, apps)
 	if err != nil {
@@ -301,7 +302,7 @@ func (c *client) Installed(ctx context.Context, name string) (installed bool, er
 func (c *client) InstalledApps(ctx context.Context) ([]opv1.App, error) {
 	apps := &opv1.AppList{}
 	err := c.client.List(ctx, apps, &crclient.ListOptions{
-		Namespace: homeCloudNamespace,
+		Namespace: HomeCloudNamespace,
 	})
 	if err != nil {
 		return nil, err
@@ -453,7 +454,7 @@ func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSec
 func (c *client) Settings(ctx context.Context) (*opv1.SettingsSpec, error) {
 	install := &opv1.Install{}
 	err := c.client.Get(ctx, types.NamespacedName{
-		Namespace: homeCloudNamespace,
+		Namespace: HomeCloudNamespace,
 		Name:      "install",
 	}, install)
 	if err != nil {

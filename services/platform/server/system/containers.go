@@ -3,15 +3,12 @@ package system
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 
 	"github.com/robfig/cron/v3"
 	"github.com/steady-bytes/draft/pkg/chassis"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 type (
@@ -29,56 +26,15 @@ type (
 	}
 )
 
-// TODO: istio version management
-
-// TODO: completely rethink updates
-// 		 what if we had an rss feed on the website with updates published there so
-// 		 we could control releases better?
+// TODO: change updates to use the operator by setting the Version field on the Install
 
 // CONTAINERS
 
 func (c *controller) CheckForContainerUpdates(ctx context.Context, logger chassis.Logger) ([]*v1.ImageVersion, error) {
-	var (
-		images []*v1.ImageVersion
-	)
 
-	install := &opv1.Install{}
-	err := c.k8sclient.Get(ctx, types.NamespacedName{
-		Name:      "install",
-		Namespace: "home-cloud-system",
-	}, install)
-	if err != nil {
-		logger.WithError(err).Error("failed to get installation opject")
-		return nil, err
-	}
+	// TODO: remove this?
 
-	images = append(images, &v1.ImageVersion{
-		Image:   install.Status.Server.Image,
-		Current: install.Status.Server.Tag,
-	})
-	images = append(images, &v1.ImageVersion{
-		Image:   install.Status.Daemon.Image,
-		Current: install.Status.Daemon.Tag,
-	})
-
-	// populate latest versions (from registry)
-	images, err = getLatestImageTags(ctx, images)
-	if err != nil {
-		logger.WithError(err).Error("failed to get latest image versions")
-		return nil, err
-	}
-
-	// add shorthand name to image structs
-	for _, image := range images {
-		image.Name = componentFromImage(image.Image)
-	}
-
-	// sort images
-	sort.Slice(images, func(i, j int) bool {
-		return images[i].Name < images[j].Name
-	})
-
-	return images, err
+	return nil, nil
 }
 
 func (c *controller) AutoUpdateContainers(logger chassis.Logger) {
