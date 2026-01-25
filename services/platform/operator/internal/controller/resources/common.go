@@ -26,8 +26,6 @@ var (
 				Hostname:         "home-cloud.local",
 				AutoUpdateApps:   true,
 				AutoUpdateSystem: true,
-				// TODO: is this needed for talos?
-				VolumeMountHostPath: "/mnt/k8s-pvs/",
 			},
 		},
 	}

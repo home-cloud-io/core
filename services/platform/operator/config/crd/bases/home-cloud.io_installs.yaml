@@ -138,8 +138,6 @@ spec:
             properties:
               daemon:
                 properties:
-                  enabled:
-                    type: boolean
                   image:
                     type: string
                   tag:
@@ -152,7 +150,21 @@ spec:
                   version:
                     type: string
                 type: object
+              mdns:
+                properties:
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               server:
+                properties:
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              tunnel:
                 properties:
                   image:
                     type: string
