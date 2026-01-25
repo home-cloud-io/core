@@ -38,7 +38,16 @@ var (
 								"*",
 							},
 							APIGroups: []string{"home-cloud.io"},
-							Resources: []string{"apps", "installs"},
+							Resources: []string{"apps", "installs", "wireguards"},
+						},
+						{
+							Verbs: []string{
+								"get",
+								"create",
+								"delete",
+							},
+							APIGroups: []string{""},
+							Resources: []string{"secrets"},
 						},
 					},
 				},

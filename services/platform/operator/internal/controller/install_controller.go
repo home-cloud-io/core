@@ -32,6 +32,10 @@ import (
 // TODO: cancel install on crd update so that failed installs don't get stuck until timeout
 // might also need a lock on reconcile?
 
+// TODO: handle disabling previously installed components
+// 		pretty sure this can just check the status to see if the component is currently installed...
+// 		if it is, perform deletion steps and then remove the status
+
 // InstallReconciler reconciles a Install object
 type InstallReconciler struct {
 	client.Client
@@ -291,6 +295,8 @@ func helmGet(cfg *action.Configuration, releaseName string) (*release.Release, e
 
 func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Install) error {
 
+	install.Status.Version = install.Spec.Version
+
 	if !install.Spec.GatewayAPI.Disable {
 		install.Status.GatewayAPI = v1.GatewayAPIStatus{
 			URL:     install.Spec.GatewayAPI.URL,
@@ -307,29 +313,29 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 
 	if !install.Spec.Server.Disable {
 		install.Status.Server = v1.ServerStatus{
-			Image:    install.Spec.Server.Image,
-			Tag: install.Spec.Server.Tag,
+			Image: install.Spec.Server.Image,
+			Tag:   install.Spec.Server.Tag,
 		}
 	}
 
 	if !install.Spec.MDNS.Disable {
 		install.Status.MDNS = v1.MDNSStatus{
-			Image:    install.Spec.MDNS.Image,
-			Tag: install.Spec.MDNS.Tag,
+			Image: install.Spec.MDNS.Image,
+			Tag:   install.Spec.MDNS.Tag,
 		}
 	}
 
 	if !install.Spec.Tunnel.Disable {
 		install.Status.Tunnel = v1.TunnelStatus{
-			Image:    install.Spec.Tunnel.Image,
-			Tag: install.Spec.Tunnel.Tag,
+			Image: install.Spec.Tunnel.Image,
+			Tag:   install.Spec.Tunnel.Tag,
 		}
 	}
 
 	if !install.Spec.Daemon.Disable {
 		install.Status.Daemon = v1.DaemonStatus{
-			Image:    install.Spec.Daemon.Image,
-			Tag: install.Spec.Daemon.Tag,
+			Image: install.Spec.Daemon.Image,
+			Tag:   install.Spec.Daemon.Tag,
 		}
 	}
 

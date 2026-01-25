@@ -3,13 +3,14 @@ package system
 import (
 	"context"
 
+	"connectrpc.com/connect"
+	"github.com/steady-bytes/draft/pkg/chassis"
+	"k8s.io/apimachinery/pkg/types"
+
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
-
-	"github.com/steady-bytes/draft/pkg/chassis"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 type (
@@ -87,9 +88,19 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 		},
 		System: []*dv1.ComponentVersion{
 			{
+				Name:    "home-cloud",
+				Domain:  "system",
+				Version: install.Status.Version,
+			},
+			{
 				Name:    "istio",
 				Domain:  "system",
 				Version: install.Status.Istio.Version,
+			},
+			{
+				Name:    "gateway-api",
+				Domain:  "system",
+				Version: install.Status.GatewayAPI.Version,
 			},
 		},
 	}
@@ -109,7 +120,20 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 		})
 	}
 
-	// TODO: get OS version from daemon
+	osVersion, err := c.daemonClient.Version(ctx, connect.NewRequest(&dv1.VersionRequest{}))
+	if err != nil {
+		resp.System = append(resp.System, &dv1.ComponentVersion{
+			Name:    "unknown",
+			Domain:  "system",
+			Version: err.Error(),
+		})
+	} else {
+		resp.System = append(resp.System, &dv1.ComponentVersion{
+			Name:    osVersion.Msg.Name,
+			Domain:  "system",
+			Version: osVersion.Msg.Version,
+		})
+	}
 
 	return resp, nil
 }
