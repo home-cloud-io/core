@@ -39,6 +39,9 @@ const (
 	// DaemonServiceRebootHostProcedure is the fully-qualified name of the DaemonService's RebootHost
 	// RPC.
 	DaemonServiceRebootHostProcedure = "/platform.daemon.v1.DaemonService/RebootHost"
+	// DaemonServiceSystemStatsProcedure is the fully-qualified name of the DaemonService's SystemStats
+	// RPC.
+	DaemonServiceSystemStatsProcedure = "/platform.daemon.v1.DaemonService/SystemStats"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -46,12 +49,14 @@ var (
 	daemonServiceServiceDescriptor            = v1.File_platform_daemon_v1_daemon_proto.Services().ByName("DaemonService")
 	daemonServiceShutdownHostMethodDescriptor = daemonServiceServiceDescriptor.Methods().ByName("ShutdownHost")
 	daemonServiceRebootHostMethodDescriptor   = daemonServiceServiceDescriptor.Methods().ByName("RebootHost")
+	daemonServiceSystemStatsMethodDescriptor  = daemonServiceServiceDescriptor.Methods().ByName("SystemStats")
 )
 
 // DaemonServiceClient is a client for the platform.daemon.v1.DaemonService service.
 type DaemonServiceClient interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
 	RebootHost(context.Context, *connect.Request[v1.RebootHostRequest]) (*connect.Response[v1.RebootHostResponse], error)
+	SystemStats(context.Context, *connect.Request[v1.SystemStatsRequest]) (*connect.Response[v1.SystemStatsResponse], error)
 }
 
 // NewDaemonServiceClient constructs a client for the platform.daemon.v1.DaemonService service. By
@@ -76,6 +81,12 @@ func NewDaemonServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(daemonServiceRebootHostMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		systemStats: connect.NewClient[v1.SystemStatsRequest, v1.SystemStatsResponse](
+			httpClient,
+			baseURL+DaemonServiceSystemStatsProcedure,
+			connect.WithSchema(daemonServiceSystemStatsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -83,6 +94,7 @@ func NewDaemonServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 type daemonServiceClient struct {
 	shutdownHost *connect.Client[v1.ShutdownHostRequest, v1.ShutdownHostResponse]
 	rebootHost   *connect.Client[v1.RebootHostRequest, v1.RebootHostResponse]
+	systemStats  *connect.Client[v1.SystemStatsRequest, v1.SystemStatsResponse]
 }
 
 // ShutdownHost calls platform.daemon.v1.DaemonService.ShutdownHost.
@@ -95,10 +107,16 @@ func (c *daemonServiceClient) RebootHost(ctx context.Context, req *connect.Reque
 	return c.rebootHost.CallUnary(ctx, req)
 }
 
+// SystemStats calls platform.daemon.v1.DaemonService.SystemStats.
+func (c *daemonServiceClient) SystemStats(ctx context.Context, req *connect.Request[v1.SystemStatsRequest]) (*connect.Response[v1.SystemStatsResponse], error) {
+	return c.systemStats.CallUnary(ctx, req)
+}
+
 // DaemonServiceHandler is an implementation of the platform.daemon.v1.DaemonService service.
 type DaemonServiceHandler interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
 	RebootHost(context.Context, *connect.Request[v1.RebootHostRequest]) (*connect.Response[v1.RebootHostResponse], error)
+	SystemStats(context.Context, *connect.Request[v1.SystemStatsRequest]) (*connect.Response[v1.SystemStatsResponse], error)
 }
 
 // NewDaemonServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -119,12 +137,20 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(daemonServiceRebootHostMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	daemonServiceSystemStatsHandler := connect.NewUnaryHandler(
+		DaemonServiceSystemStatsProcedure,
+		svc.SystemStats,
+		connect.WithSchema(daemonServiceSystemStatsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.daemon.v1.DaemonService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DaemonServiceShutdownHostProcedure:
 			daemonServiceShutdownHostHandler.ServeHTTP(w, r)
 		case DaemonServiceRebootHostProcedure:
 			daemonServiceRebootHostHandler.ServeHTTP(w, r)
+		case DaemonServiceSystemStatsProcedure:
+			daemonServiceSystemStatsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -140,4 +166,8 @@ func (UnimplementedDaemonServiceHandler) ShutdownHost(context.Context, *connect.
 
 func (UnimplementedDaemonServiceHandler) RebootHost(context.Context, *connect.Request[v1.RebootHostRequest]) (*connect.Response[v1.RebootHostResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.RebootHost is not implemented"))
+}
+
+func (UnimplementedDaemonServiceHandler) SystemStats(context.Context, *connect.Request[v1.SystemStatsRequest]) (*connect.Response[v1.SystemStatsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.SystemStats is not implemented"))
 }

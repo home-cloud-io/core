@@ -442,3 +442,236 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RebootHostResponseValidationError{}
+
+// Validate checks the field values on SystemStatsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SystemStatsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SystemStatsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SystemStatsRequestMultiError, or nil if none found.
+func (m *SystemStatsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SystemStatsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SystemStatsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SystemStatsRequestMultiError is an error wrapping multiple validation errors
+// returned by SystemStatsRequest.ValidateAll() if the designated constraints
+// aren't met.
+type SystemStatsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SystemStatsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SystemStatsRequestMultiError) AllErrors() []error { return m }
+
+// SystemStatsRequestValidationError is the validation error returned by
+// SystemStatsRequest.Validate if the designated constraints aren't met.
+type SystemStatsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SystemStatsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SystemStatsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SystemStatsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SystemStatsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SystemStatsRequestValidationError) ErrorName() string {
+	return "SystemStatsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SystemStatsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSystemStatsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SystemStatsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SystemStatsRequestValidationError{}
+
+// Validate checks the field values on SystemStatsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SystemStatsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SystemStatsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SystemStatsResponseMultiError, or nil if none found.
+func (m *SystemStatsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SystemStatsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetStats()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SystemStatsResponseValidationError{
+					field:  "Stats",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SystemStatsResponseValidationError{
+					field:  "Stats",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStats()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SystemStatsResponseValidationError{
+				field:  "Stats",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SystemStatsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// SystemStatsResponseMultiError is an error wrapping multiple validation
+// errors returned by SystemStatsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type SystemStatsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SystemStatsResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SystemStatsResponseMultiError) AllErrors() []error { return m }
+
+// SystemStatsResponseValidationError is the validation error returned by
+// SystemStatsResponse.Validate if the designated constraints aren't met.
+type SystemStatsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SystemStatsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SystemStatsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SystemStatsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SystemStatsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SystemStatsResponseValidationError) ErrorName() string {
+	return "SystemStatsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SystemStatsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSystemStatsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SystemStatsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SystemStatsResponseValidationError{}
