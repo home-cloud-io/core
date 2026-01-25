@@ -8,7 +8,7 @@ go 1.25.3
 
 require (
 	connectrpc.com/connect v1.18.1
-	github.com/home-cloud-io/core/api v0.8.8-0.20260125000246-99b962ae5bd6
+	github.com/home-cloud-io/core/api v0.8.8-0.20260125022338-adb9d30fe247
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/siderolabs/talos/pkg/machinery v1.12.2
 	github.com/steady-bytes/draft/pkg/chassis v0.4.5

@@ -119,3 +119,17 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 		Stats: stats,
 	}), nil
 }
+
+func (h *rpcHandler) Version(ctx context.Context, request *connect.Request[v1.VersionRequest]) (*connect.Response[v1.VersionResponse], error) {
+
+	resp, err := h.client.MachineClient.Version(ctx, &emptypb.Empty{})
+	if err != nil {
+		h.logger.WithError(err).Error("failed to get version")
+		return nil, err
+	}
+
+	return connect.NewResponse(&v1.VersionResponse{
+		Name:    "talos",
+		Version: resp.Messages[0].Version.Tag,
+	}), nil
+}
