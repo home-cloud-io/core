@@ -34,8 +34,8 @@ func KubeClient() *kubernetes.Clientset {
 func SetSystemImage(ctx context.Context, logger chassis.Logger, def *v1.SetSystemImageCommand) error {
 	var (
 		replacers = []Replacer{
-			func(line string) string {
-				return strings.ReplaceAll(line, def.CurrentImage, def.RequestedImage)
+			func(line ReplacerLine) string {
+				return strings.ReplaceAll(line.Current, def.CurrentImage, def.RequestedImage)
 			},
 		}
 		systemKubernetesManifests = []string{

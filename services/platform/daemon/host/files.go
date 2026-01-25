@@ -15,7 +15,16 @@ import (
 
 type (
 	// Replacer take in a line in a file and outputs the replacement line (which could be the same if no change is needed)
-	Replacer func(line string) string
+	Replacer func(line ReplacerLine) string
+
+	// ReplacerLine is struct to hold scanner.Text() of requested file to allow user to look at previous and next lines
+	ReplacerLine struct {
+		Previous string
+		Current  string
+		Next     string
+		First    bool
+		Last     bool
+	}
 )
 
 var (
@@ -153,16 +162,51 @@ func LineByLineReplace(filename string, replacers []Replacer) error {
 
 	// execute replacers (writing into the temp file)
 	scanner := bufio.NewScanner(reader)
+
+	// check if file empty
+	if !scanner.Scan() {
+		return nil
+	}
+
+	// create and populate first line in file
+	line := ReplacerLine{}
+	line.First = true
+	line.Previous = ""
+	line.Current = scanner.Text()
+	line.Last = !scanner.Scan()
+	line.Next = scanner.Text()
+
+	// update first line in all replacers
+	line, err = updateLine(line, replacers, writer)
+	if err != nil {
+		return err
+	}
+
+	// create and populate subsequent lines in file
 	for scanner.Scan() {
-		line := scanner.Text()
-		for _, r := range replacers {
-			line = r(line)
-		}
-		_, err := io.WriteString(writer, line+"\n")
+		line.First = false
+		line.Previous = line.Current
+		line.Current = line.Next
+		line.Next = scanner.Text()
+		line, err = updateLine(line, replacers, writer)
 		if err != nil {
 			return err
 		}
 	}
+
+	// create and populate last line in file
+	if !line.First {
+		line.Last = true
+		line.First = false
+		line.Previous = line.Current
+		line.Current = line.Next
+		line.Next = scanner.Text()
+		line, err = updateLine(line, replacers, writer)
+		if err != nil {
+			return err
+		}
+	}
+
 	err = scanner.Err()
 	if err != nil {
 		return err
@@ -187,6 +231,14 @@ func LineByLineReplace(filename string, replacers []Replacer) error {
 	}
 
 	return nil
+}
+
+func updateLine(line ReplacerLine, replacers []Replacer, writer io.Writer) (ReplacerLine, error) {
+	for _, r := range replacers {
+		line.Current = r(line)
+	}
+	_, err := io.WriteString(writer, line.Current+"\n")
+	return line, err
 }
 
 // FilePath cleans the given path and makes it a local path by prefixing a "./tmp/" if
