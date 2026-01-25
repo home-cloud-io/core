@@ -15,6 +15,7 @@ import (
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 )
 
 type (
@@ -87,6 +88,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 		err error
 	)
 
+	// TODO: check for existing secret and use that if it exists
 	key, err := wgtypes.GeneratePrivateKey()
 	if err != nil {
 		logger.WithError(err).Error("failed to generate wireguard private key")
@@ -96,7 +98,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-private-key", DefaultWireguardInterface),
-			Namespace: "home-cloud-system",
+			Namespace: k8sclient.HomeCloudNamespace,
 		},
 		StringData: map[string]string{
 			"privateKey": key.String(),
@@ -111,7 +113,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	wgInterface := &opv1.Wireguard{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      DefaultWireguardInterface,
-			Namespace: "home-cloud-system",
+			Namespace: k8sclient.HomeCloudNamespace,
 		},
 		Spec: opv1.WireguardSpec{
 			ID:   uuid.New().String(),
@@ -121,8 +123,15 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 				Namespace: &secret.Namespace,
 				DataKey:   "privateKey",
 			},
-			Address:    "10.100.0.1/24",
-			ListenPort: 51820,
+			// TODO: determine this using daemon
+			NATInterface: "ens18",
+			STUNServer:   DefaultSTUNServerAddress,
+			Address:      "10.100.0.1/24",
+			ListenPort:   51820,
+			Locators: []string{
+				DefaultLocatorAddress,
+			},
+			Peers: []opv1.PeerSpec{},
 		},
 	}
 	err = c.k8sclient.Create(ctx, wgInterface)
