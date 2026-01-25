@@ -126,8 +126,8 @@ github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245 h1:Nyeelmxya
 github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245/go.mod h1:nTakvJ4XYq45UXtn0DbwR4aU9ZdjlnIenpbs6Cd+FM0=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0 h1:fPpQR1iGEVYjZ2OELvUHX600VAK5qmdnDEv3eXOwZUA=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0/go.mod h1:YHukhB04ChJsLHLJEUD6vjFyLX2L3dsX3wPBZcX4tmc=
-github.com/home-cloud-io/core/api v0.8.8-0.20260123043547-11ce4a88a957 h1:IFyVsyA69/IEd7JI+9G6cWh8OLrYkPhw5KR4h8Dt0Lg=
-github.com/home-cloud-io/core/api v0.8.8-0.20260123043547-11ce4a88a957/go.mod h1:4G9DoubvZUuMFZOM63P6AOHyQ5Ulm9X2ilJ1EshIvjc=
+github.com/home-cloud-io/core/api v0.8.8-0.20260125000246-99b962ae5bd6 h1:jOzNXX+GcAoKKRaUKex2U/xyFJAbxzlm2a3w7iJY7Ak=
+github.com/home-cloud-io/core/api v0.8.8-0.20260125000246-99b962ae5bd6/go.mod h1:4G9DoubvZUuMFZOM63P6AOHyQ5Ulm9X2ilJ1EshIvjc=
 github.com/josharian/native v1.1.0 h1:uuaP0hAbW7Y4l0ZRQ6C9zfb7Mg1mbFKry/xzDAfmtLA=
 github.com/josharian/native v1.1.0/go.mod h1:7X/raswPFr05uY3HiLlYeyQntB6OO7E/d2Cu7qoaN2w=
 github.com/jsimonetti/rtnetlink/v2 v2.1.0 h1:3sSPD0k+Qvia3wbv6kZXCN0Dlz6Swv7RHjvvonuOcKE=

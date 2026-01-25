@@ -7,8 +7,8 @@ metadata:
     - install.home-cloud.io/finalizer
 spec:
   version: v0.0.1-beta
-  daemon:
-    disable: true
+  settings:
+    hostname: dev.local
   istio:
     istiod:
       values: |

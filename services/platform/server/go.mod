@@ -14,7 +14,7 @@ require (
 	connectrpc.com/connect v1.16.2
 	github.com/containers/image/v5 v5.32.2
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.8.8-0.20260123043547-11ce4a88a957
+	github.com/home-cloud-io/core/api v0.8.8-0.20260125000246-99b962ae5bd6
 	// TODO: change to v0.0.4 when available
 	github.com/home-cloud-io/core/services/platform/operator v0.0.3-0.20260123043547-11ce4a88a957
 	github.com/robfig/cron/v3 v3.0.0

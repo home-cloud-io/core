@@ -187,10 +187,9 @@ func (h *rpcHandler) UpdateSystem(ctx context.Context, request *connect.Request[
 }
 
 func (h *rpcHandler) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
-	// grab the in-memory cache of current system stats
-	stats := system.CurrentStats
-	if stats == nil {
-		h.logger.Error("failed to get system stats")
+	stats, err := h.sctl.SystemStats(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to get system stats")
 		return nil, errors.New("failed to get system stats")
 	}
 	return connect.NewResponse(&v1.GetSystemStatsResponse{

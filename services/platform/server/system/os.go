@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -25,6 +26,8 @@ type (
 		AutoUpdateOS(logger chassis.Logger)
 		// UpdateOS will check for and install any OS (including Daemon) updates one time.
 		UpdateOS(ctx context.Context, logger chassis.Logger) error
+		// SystemStats...
+		SystemStats(ctx context.Context, loger chassis.Logger) (*dv1.SystemStats, error)
 		// EnableWireguard will initialize the Wireguard server
 		EnableWireguard(ctx context.Context, logger chassis.Logger) error
 		// DisableWireguard will disable the Wireguard server
@@ -69,6 +72,14 @@ func (u *controller) UpdateOS(ctx context.Context, logger chassis.Logger) error 
 	// TODO: update by calling system service (talos)
 
 	return nil
+}
+
+func (c *controller) SystemStats(ctx context.Context, loger chassis.Logger) (*dv1.SystemStats, error) {
+	resp, err := c.daemonClient.SystemStats(ctx, &connect.Request[dv1.SystemStatsRequest]{})
+	if err != nil {
+		return nil, err
+	}
+	return resp.Msg.Stats, nil
 }
 
 func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger) error {
