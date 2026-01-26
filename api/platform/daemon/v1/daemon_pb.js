@@ -75,3 +75,40 @@ export const VersionResponse = /*@__PURE__*/ proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message platform.daemon.v1.UpgradeRequest
+ */
+export const UpgradeRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.UpgradeRequest",
+  () => [
+    { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.UpgradeResponse
+ */
+export const UpgradeResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.UpgradeResponse",
+  [],
+);
+
+/**
+ * @generated from message platform.daemon.v1.UpgradeKubernetesRequest
+ */
+export const UpgradeKubernetesRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.UpgradeKubernetesRequest",
+  () => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.UpgradeKubernetesResponse
+ */
+export const UpgradeKubernetesResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.UpgradeKubernetesResponse",
+  [],
+);
+

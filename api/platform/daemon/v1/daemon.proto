@@ -12,7 +12,8 @@ service DaemonService {
   rpc RebootHost(RebootHostRequest) returns (RebootHostResponse) {}
   rpc SystemStats(SystemStatsRequest) returns (SystemStatsResponse) {}
   rpc Version(VersionRequest) returns (VersionResponse) {}
-  // rpc Update(UpdateRequest) returns (UpdateResponse) {}
+  rpc Upgrade(UpgradeRequest) returns (UpgradeResponse) {}
+  rpc UpgradeKubernetes(UpgradeKubernetesRequest) returns (UpgradeKubernetesResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -31,3 +32,14 @@ message VersionResponse {
   string name = 1;
   string version = 2;
 }
+
+message UpgradeRequest {
+  string source = 1;
+  string version = 2;
+}
+message UpgradeResponse {}
+
+message UpgradeKubernetesRequest {
+  string version = 1;
+}
+message UpgradeKubernetesResponse {}
