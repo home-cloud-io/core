@@ -879,3 +879,413 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = VersionResponseValidationError{}
+
+// Validate checks the field values on UpgradeRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *UpgradeRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpgradeRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in UpgradeRequestMultiError,
+// or nil if none found.
+func (m *UpgradeRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpgradeRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Source
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return UpgradeRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpgradeRequestMultiError is an error wrapping multiple validation errors
+// returned by UpgradeRequest.ValidateAll() if the designated constraints
+// aren't met.
+type UpgradeRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpgradeRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpgradeRequestMultiError) AllErrors() []error { return m }
+
+// UpgradeRequestValidationError is the validation error returned by
+// UpgradeRequest.Validate if the designated constraints aren't met.
+type UpgradeRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpgradeRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpgradeRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpgradeRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpgradeRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpgradeRequestValidationError) ErrorName() string { return "UpgradeRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpgradeRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpgradeRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpgradeRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpgradeRequestValidationError{}
+
+// Validate checks the field values on UpgradeResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpgradeResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpgradeResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpgradeResponseMultiError, or nil if none found.
+func (m *UpgradeResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpgradeResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpgradeResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpgradeResponseMultiError is an error wrapping multiple validation errors
+// returned by UpgradeResponse.ValidateAll() if the designated constraints
+// aren't met.
+type UpgradeResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpgradeResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpgradeResponseMultiError) AllErrors() []error { return m }
+
+// UpgradeResponseValidationError is the validation error returned by
+// UpgradeResponse.Validate if the designated constraints aren't met.
+type UpgradeResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpgradeResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpgradeResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpgradeResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpgradeResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpgradeResponseValidationError) ErrorName() string { return "UpgradeResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpgradeResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpgradeResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpgradeResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpgradeResponseValidationError{}
+
+// Validate checks the field values on UpgradeKubernetesRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpgradeKubernetesRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpgradeKubernetesRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpgradeKubernetesRequestMultiError, or nil if none found.
+func (m *UpgradeKubernetesRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpgradeKubernetesRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return UpgradeKubernetesRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpgradeKubernetesRequestMultiError is an error wrapping multiple validation
+// errors returned by UpgradeKubernetesRequest.ValidateAll() if the designated
+// constraints aren't met.
+type UpgradeKubernetesRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpgradeKubernetesRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpgradeKubernetesRequestMultiError) AllErrors() []error { return m }
+
+// UpgradeKubernetesRequestValidationError is the validation error returned by
+// UpgradeKubernetesRequest.Validate if the designated constraints aren't met.
+type UpgradeKubernetesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpgradeKubernetesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpgradeKubernetesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpgradeKubernetesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpgradeKubernetesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpgradeKubernetesRequestValidationError) ErrorName() string {
+	return "UpgradeKubernetesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpgradeKubernetesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpgradeKubernetesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpgradeKubernetesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpgradeKubernetesRequestValidationError{}
+
+// Validate checks the field values on UpgradeKubernetesResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpgradeKubernetesResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpgradeKubernetesResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpgradeKubernetesResponseMultiError, or nil if none found.
+func (m *UpgradeKubernetesResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpgradeKubernetesResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return UpgradeKubernetesResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpgradeKubernetesResponseMultiError is an error wrapping multiple validation
+// errors returned by UpgradeKubernetesResponse.ValidateAll() if the
+// designated constraints aren't met.
+type UpgradeKubernetesResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpgradeKubernetesResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpgradeKubernetesResponseMultiError) AllErrors() []error { return m }
+
+// UpgradeKubernetesResponseValidationError is the validation error returned by
+// UpgradeKubernetesResponse.Validate if the designated constraints aren't met.
+type UpgradeKubernetesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpgradeKubernetesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpgradeKubernetesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpgradeKubernetesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpgradeKubernetesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpgradeKubernetesResponseValidationError) ErrorName() string {
+	return "UpgradeKubernetesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpgradeKubernetesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpgradeKubernetesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpgradeKubernetesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpgradeKubernetesResponseValidationError{}

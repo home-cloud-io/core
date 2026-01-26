@@ -273,3 +273,145 @@ export class VersionResponse extends Message<VersionResponse> {
   }
 }
 
+/**
+ * @generated from message platform.daemon.v1.UpgradeRequest
+ */
+export class UpgradeRequest extends Message<UpgradeRequest> {
+  /**
+   * @generated from field: string source = 1;
+   */
+  source = "";
+
+  /**
+   * @generated from field: string version = 2;
+   */
+  version = "";
+
+  constructor(data?: PartialMessage<UpgradeRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.UpgradeRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpgradeRequest {
+    return new UpgradeRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpgradeRequest {
+    return new UpgradeRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpgradeRequest {
+    return new UpgradeRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpgradeRequest | PlainMessage<UpgradeRequest> | undefined, b: UpgradeRequest | PlainMessage<UpgradeRequest> | undefined): boolean {
+    return proto3.util.equals(UpgradeRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.UpgradeResponse
+ */
+export class UpgradeResponse extends Message<UpgradeResponse> {
+  constructor(data?: PartialMessage<UpgradeResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.UpgradeResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpgradeResponse {
+    return new UpgradeResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpgradeResponse {
+    return new UpgradeResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpgradeResponse {
+    return new UpgradeResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpgradeResponse | PlainMessage<UpgradeResponse> | undefined, b: UpgradeResponse | PlainMessage<UpgradeResponse> | undefined): boolean {
+    return proto3.util.equals(UpgradeResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.UpgradeKubernetesRequest
+ */
+export class UpgradeKubernetesRequest extends Message<UpgradeKubernetesRequest> {
+  /**
+   * @generated from field: string version = 1;
+   */
+  version = "";
+
+  constructor(data?: PartialMessage<UpgradeKubernetesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.UpgradeKubernetesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpgradeKubernetesRequest {
+    return new UpgradeKubernetesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpgradeKubernetesRequest {
+    return new UpgradeKubernetesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpgradeKubernetesRequest {
+    return new UpgradeKubernetesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpgradeKubernetesRequest | PlainMessage<UpgradeKubernetesRequest> | undefined, b: UpgradeKubernetesRequest | PlainMessage<UpgradeKubernetesRequest> | undefined): boolean {
+    return proto3.util.equals(UpgradeKubernetesRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.UpgradeKubernetesResponse
+ */
+export class UpgradeKubernetesResponse extends Message<UpgradeKubernetesResponse> {
+  constructor(data?: PartialMessage<UpgradeKubernetesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.UpgradeKubernetesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpgradeKubernetesResponse {
+    return new UpgradeKubernetesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpgradeKubernetesResponse {
+    return new UpgradeKubernetesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpgradeKubernetesResponse {
+    return new UpgradeKubernetesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpgradeKubernetesResponse | PlainMessage<UpgradeKubernetesResponse> | undefined, b: UpgradeKubernetesResponse | PlainMessage<UpgradeKubernetesResponse> | undefined): boolean {
+    return proto3.util.equals(UpgradeKubernetesResponse, a, b);
+  }
+}
+

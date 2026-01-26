@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse, SystemStatsRequest, SystemStatsResponse, VersionRequest, VersionResponse } from "./daemon_pb.js";
+import { RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse, SystemStatsRequest, SystemStatsResponse, UpgradeKubernetesRequest, UpgradeKubernetesResponse, UpgradeRequest, UpgradeResponse, VersionRequest, VersionResponse } from "./daemon_pb.js";
 
 /**
  * @generated from rpc platform.daemon.v1.DaemonService.ShutdownHost
@@ -57,6 +57,34 @@ export const version = {
   kind: MethodKind.Unary,
   I: VersionRequest,
   O: VersionResponse,
+  service: {
+    typeName: "platform.daemon.v1.DaemonService"
+  }
+};
+
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.Upgrade
+ */
+export const upgrade = {
+  localName: "upgrade",
+  name: "Upgrade",
+  kind: MethodKind.Unary,
+  I: UpgradeRequest,
+  O: UpgradeResponse,
+  service: {
+    typeName: "platform.daemon.v1.DaemonService"
+  }
+};
+
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.UpgradeKubernetes
+ */
+export const upgradeKubernetes = {
+  localName: "upgradeKubernetes",
+  name: "UpgradeKubernetes",
+  kind: MethodKind.Unary,
+  I: UpgradeKubernetesRequest,
+  O: UpgradeKubernetesResponse,
   service: {
     typeName: "platform.daemon.v1.DaemonService"
   }

@@ -44,15 +44,22 @@ const (
 	DaemonServiceSystemStatsProcedure = "/platform.daemon.v1.DaemonService/SystemStats"
 	// DaemonServiceVersionProcedure is the fully-qualified name of the DaemonService's Version RPC.
 	DaemonServiceVersionProcedure = "/platform.daemon.v1.DaemonService/Version"
+	// DaemonServiceUpgradeProcedure is the fully-qualified name of the DaemonService's Upgrade RPC.
+	DaemonServiceUpgradeProcedure = "/platform.daemon.v1.DaemonService/Upgrade"
+	// DaemonServiceUpgradeKubernetesProcedure is the fully-qualified name of the DaemonService's
+	// UpgradeKubernetes RPC.
+	DaemonServiceUpgradeKubernetesProcedure = "/platform.daemon.v1.DaemonService/UpgradeKubernetes"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	daemonServiceServiceDescriptor            = v1.File_platform_daemon_v1_daemon_proto.Services().ByName("DaemonService")
-	daemonServiceShutdownHostMethodDescriptor = daemonServiceServiceDescriptor.Methods().ByName("ShutdownHost")
-	daemonServiceRebootHostMethodDescriptor   = daemonServiceServiceDescriptor.Methods().ByName("RebootHost")
-	daemonServiceSystemStatsMethodDescriptor  = daemonServiceServiceDescriptor.Methods().ByName("SystemStats")
-	daemonServiceVersionMethodDescriptor      = daemonServiceServiceDescriptor.Methods().ByName("Version")
+	daemonServiceServiceDescriptor                 = v1.File_platform_daemon_v1_daemon_proto.Services().ByName("DaemonService")
+	daemonServiceShutdownHostMethodDescriptor      = daemonServiceServiceDescriptor.Methods().ByName("ShutdownHost")
+	daemonServiceRebootHostMethodDescriptor        = daemonServiceServiceDescriptor.Methods().ByName("RebootHost")
+	daemonServiceSystemStatsMethodDescriptor       = daemonServiceServiceDescriptor.Methods().ByName("SystemStats")
+	daemonServiceVersionMethodDescriptor           = daemonServiceServiceDescriptor.Methods().ByName("Version")
+	daemonServiceUpgradeMethodDescriptor           = daemonServiceServiceDescriptor.Methods().ByName("Upgrade")
+	daemonServiceUpgradeKubernetesMethodDescriptor = daemonServiceServiceDescriptor.Methods().ByName("UpgradeKubernetes")
 )
 
 // DaemonServiceClient is a client for the platform.daemon.v1.DaemonService service.
@@ -61,6 +68,8 @@ type DaemonServiceClient interface {
 	RebootHost(context.Context, *connect.Request[v1.RebootHostRequest]) (*connect.Response[v1.RebootHostResponse], error)
 	SystemStats(context.Context, *connect.Request[v1.SystemStatsRequest]) (*connect.Response[v1.SystemStatsResponse], error)
 	Version(context.Context, *connect.Request[v1.VersionRequest]) (*connect.Response[v1.VersionResponse], error)
+	Upgrade(context.Context, *connect.Request[v1.UpgradeRequest]) (*connect.Response[v1.UpgradeResponse], error)
+	UpgradeKubernetes(context.Context, *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error)
 }
 
 // NewDaemonServiceClient constructs a client for the platform.daemon.v1.DaemonService service. By
@@ -97,15 +106,29 @@ func NewDaemonServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(daemonServiceVersionMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		upgrade: connect.NewClient[v1.UpgradeRequest, v1.UpgradeResponse](
+			httpClient,
+			baseURL+DaemonServiceUpgradeProcedure,
+			connect.WithSchema(daemonServiceUpgradeMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		upgradeKubernetes: connect.NewClient[v1.UpgradeKubernetesRequest, v1.UpgradeKubernetesResponse](
+			httpClient,
+			baseURL+DaemonServiceUpgradeKubernetesProcedure,
+			connect.WithSchema(daemonServiceUpgradeKubernetesMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // daemonServiceClient implements DaemonServiceClient.
 type daemonServiceClient struct {
-	shutdownHost *connect.Client[v1.ShutdownHostRequest, v1.ShutdownHostResponse]
-	rebootHost   *connect.Client[v1.RebootHostRequest, v1.RebootHostResponse]
-	systemStats  *connect.Client[v1.SystemStatsRequest, v1.SystemStatsResponse]
-	version      *connect.Client[v1.VersionRequest, v1.VersionResponse]
+	shutdownHost      *connect.Client[v1.ShutdownHostRequest, v1.ShutdownHostResponse]
+	rebootHost        *connect.Client[v1.RebootHostRequest, v1.RebootHostResponse]
+	systemStats       *connect.Client[v1.SystemStatsRequest, v1.SystemStatsResponse]
+	version           *connect.Client[v1.VersionRequest, v1.VersionResponse]
+	upgrade           *connect.Client[v1.UpgradeRequest, v1.UpgradeResponse]
+	upgradeKubernetes *connect.Client[v1.UpgradeKubernetesRequest, v1.UpgradeKubernetesResponse]
 }
 
 // ShutdownHost calls platform.daemon.v1.DaemonService.ShutdownHost.
@@ -128,12 +151,24 @@ func (c *daemonServiceClient) Version(ctx context.Context, req *connect.Request[
 	return c.version.CallUnary(ctx, req)
 }
 
+// Upgrade calls platform.daemon.v1.DaemonService.Upgrade.
+func (c *daemonServiceClient) Upgrade(ctx context.Context, req *connect.Request[v1.UpgradeRequest]) (*connect.Response[v1.UpgradeResponse], error) {
+	return c.upgrade.CallUnary(ctx, req)
+}
+
+// UpgradeKubernetes calls platform.daemon.v1.DaemonService.UpgradeKubernetes.
+func (c *daemonServiceClient) UpgradeKubernetes(ctx context.Context, req *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error) {
+	return c.upgradeKubernetes.CallUnary(ctx, req)
+}
+
 // DaemonServiceHandler is an implementation of the platform.daemon.v1.DaemonService service.
 type DaemonServiceHandler interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
 	RebootHost(context.Context, *connect.Request[v1.RebootHostRequest]) (*connect.Response[v1.RebootHostResponse], error)
 	SystemStats(context.Context, *connect.Request[v1.SystemStatsRequest]) (*connect.Response[v1.SystemStatsResponse], error)
 	Version(context.Context, *connect.Request[v1.VersionRequest]) (*connect.Response[v1.VersionResponse], error)
+	Upgrade(context.Context, *connect.Request[v1.UpgradeRequest]) (*connect.Response[v1.UpgradeResponse], error)
+	UpgradeKubernetes(context.Context, *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error)
 }
 
 // NewDaemonServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -166,6 +201,18 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(daemonServiceVersionMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	daemonServiceUpgradeHandler := connect.NewUnaryHandler(
+		DaemonServiceUpgradeProcedure,
+		svc.Upgrade,
+		connect.WithSchema(daemonServiceUpgradeMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	daemonServiceUpgradeKubernetesHandler := connect.NewUnaryHandler(
+		DaemonServiceUpgradeKubernetesProcedure,
+		svc.UpgradeKubernetes,
+		connect.WithSchema(daemonServiceUpgradeKubernetesMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.daemon.v1.DaemonService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DaemonServiceShutdownHostProcedure:
@@ -176,6 +223,10 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 			daemonServiceSystemStatsHandler.ServeHTTP(w, r)
 		case DaemonServiceVersionProcedure:
 			daemonServiceVersionHandler.ServeHTTP(w, r)
+		case DaemonServiceUpgradeProcedure:
+			daemonServiceUpgradeHandler.ServeHTTP(w, r)
+		case DaemonServiceUpgradeKubernetesProcedure:
+			daemonServiceUpgradeKubernetesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -199,4 +250,12 @@ func (UnimplementedDaemonServiceHandler) SystemStats(context.Context, *connect.R
 
 func (UnimplementedDaemonServiceHandler) Version(context.Context, *connect.Request[v1.VersionRequest]) (*connect.Response[v1.VersionResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.Version is not implemented"))
+}
+
+func (UnimplementedDaemonServiceHandler) Upgrade(context.Context, *connect.Request[v1.UpgradeRequest]) (*connect.Response[v1.UpgradeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.Upgrade is not implemented"))
+}
+
+func (UnimplementedDaemonServiceHandler) UpgradeKubernetes(context.Context, *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.UpgradeKubernetes is not implemented"))
 }
