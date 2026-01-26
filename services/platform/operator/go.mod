@@ -5,8 +5,10 @@ go 1.25.3
 // replace github.com/home-cloud-io/core/api => ../../../api
 
 require (
+	connectrpc.com/connect v1.16.2
 	dario.cat/mergo v1.0.2
 	github.com/go-logr/logr v1.4.3
+	github.com/home-cloud-io/core/api v0.8.8-0.20260126050606-e540866b7734
 	github.com/sethvargo/go-password v0.3.1
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
 	github.com/steady-bytes/draft/pkg/loggers v0.2.5
@@ -26,7 +28,6 @@ require (
 )
 
 require (
-	connectrpc.com/connect v1.16.2 // indirect
 	connectrpc.com/grpcreflect v1.2.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/BurntSushi/toml v1.5.0 // indirect
@@ -51,6 +52,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/docker/docker-credential-helpers v0.9.3 // indirect
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
+	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
 	github.com/evanphx/json-patch v5.9.11+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20210407135951-1de76d718b3f // indirect
