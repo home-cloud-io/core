@@ -2,9 +2,16 @@ package communicate
 
 import (
 	"context"
+	"fmt"
 
 	"connectrpc.com/connect"
+	"github.com/siderolabs/go-kubernetes/kubernetes/upgrade"
+	"github.com/siderolabs/talos/pkg/cluster"
+	k8s "github.com/siderolabs/talos/pkg/cluster/kubernetes"
+	"github.com/siderolabs/talos/pkg/machinery/api/machine"
 	"github.com/siderolabs/talos/pkg/machinery/client"
+	"github.com/siderolabs/talos/pkg/machinery/config/encoder"
+	"github.com/siderolabs/talos/pkg/machinery/constants"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -22,19 +29,12 @@ type (
 
 	rpcHandler struct {
 		logger chassis.Logger
-		// TODO: probably want to wrap this in a controller for more complex operations eventually
-		client *client.Client
 	}
 )
 
 func New(logger chassis.Logger) Rpc {
-	client, err := talos.Client()
-	if err != nil {
-		logger.WithError(err).Fatal("failed to create talos client")
-	}
 	return &rpcHandler{
 		logger,
-		client,
 	}
 }
 
@@ -46,7 +46,14 @@ func (h *rpcHandler) RegisterRPC(server chassis.Rpcer) {
 
 func (h *rpcHandler) ShutdownHost(ctx context.Context, request *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error) {
 	h.logger.Info("shutting down host")
-	err := h.client.Shutdown(ctx)
+
+	client, err := talos.Client(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(talos.ErrFailedToCreateClient)
+		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
+	}
+
+	err = client.Shutdown(ctx)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to shutdown host")
 		return nil, err
@@ -56,7 +63,14 @@ func (h *rpcHandler) ShutdownHost(ctx context.Context, request *connect.Request[
 
 func (h *rpcHandler) RebootHost(ctx context.Context, request *connect.Request[v1.RebootHostRequest]) (*connect.Response[v1.RebootHostResponse], error) {
 	h.logger.Info("rebooting host")
-	err := h.client.Reboot(ctx)
+
+	client, err := talos.Client(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(talos.ErrFailedToCreateClient)
+		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
+	}
+
+	err = client.Reboot(ctx)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to reboot host")
 		return nil, err
@@ -65,11 +79,19 @@ func (h *rpcHandler) RebootHost(ctx context.Context, request *connect.Request[v1
 }
 
 func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v1.SystemStatsRequest]) (*connect.Response[v1.SystemStatsResponse], error) {
+	h.logger.Debug("getting system stats")
+
+	client, err := talos.Client(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(talos.ErrFailedToCreateClient)
+		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
+	}
+
 	stats := &v1.SystemStats{}
 	stats.StartTime = timestamppb.Now()
 
 	// TODO: this seems to always be roughly 0%
-	computeResp, err := h.client.MachineClient.SystemStat(ctx, &emptypb.Empty{})
+	computeResp, err := client.MachineClient.SystemStat(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get load average stats")
 	}
@@ -84,7 +106,7 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	}
 
 	// TODO: returns 42% when talosctl dashboard shows 32%
-	memoryResp, err := h.client.MachineClient.Memory(ctx, &emptypb.Empty{})
+	memoryResp, err := client.MachineClient.Memory(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
 	}
@@ -97,7 +119,7 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	}
 
 	// TODO: get disk total amounts, then subtract UserVolume usage?
-	drivesResp, err := h.client.MachineClient.Mounts(ctx, &emptypb.Empty{})
+	drivesResp, err := client.MachineClient.Mounts(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
 	}
@@ -121,8 +143,15 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 }
 
 func (h *rpcHandler) Version(ctx context.Context, request *connect.Request[v1.VersionRequest]) (*connect.Response[v1.VersionResponse], error) {
+	h.logger.Debug("getting version")
 
-	resp, err := h.client.MachineClient.Version(ctx, &emptypb.Empty{})
+	client, err := talos.Client(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(talos.ErrFailedToCreateClient)
+		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
+	}
+
+	resp, err := client.MachineClient.Version(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get version")
 		return nil, err
@@ -132,4 +161,83 @@ func (h *rpcHandler) Version(ctx context.Context, request *connect.Request[v1.Ve
 		Name:    "talos",
 		Version: resp.Messages[0].Version.Tag,
 	}), nil
+}
+
+func (h *rpcHandler) Upgrade(ctx context.Context, request *connect.Request[v1.UpgradeRequest]) (*connect.Response[v1.UpgradeResponse], error) {
+	h.logger.Info("upgrading host")
+
+	client, err := talos.Client(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(talos.ErrFailedToCreateClient)
+		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
+	}
+
+	_, err = client.MachineClient.Upgrade(ctx, &machine.UpgradeRequest{
+		Image: fmt.Sprintf("%s:%s", request.Msg.Source, request.Msg.Version),
+	})
+	if err != nil {
+		h.logger.WithError(err).Error("failed to upgrade")
+		return nil, err
+	}
+	return connect.NewResponse(&v1.UpgradeResponse{}), nil
+}
+
+func (h *rpcHandler) UpgradeKubernetes(ctx context.Context, request *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error) {
+	h.logger.Info("upgrading kubernetes")
+
+	client, err := talos.Client(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(talos.ErrFailedToCreateClient)
+		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
+	}
+
+	err = upgradeKubernetes(ctx, client, request.Msg.Version)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to upgrade kubernetes")
+		return nil, fmt.Errorf("failed to upgrade kubernetes")
+	}
+	return connect.NewResponse(&v1.UpgradeKubernetesResponse{}), nil
+}
+
+func upgradeKubernetes(ctx context.Context, c *client.Client, toVersion string) error {
+
+	upgradeOptions := k8s.UpgradeOptions{
+		PrePullImages:          true,
+		UpgradeKubelet:         true,
+		KubeletImage:           constants.KubeletImage,
+		APIServerImage:         constants.KubernetesAPIServerImage,
+		ControllerManagerImage: constants.KubernetesControllerManagerImage,
+		SchedulerImage:         constants.KubernetesSchedulerImage,
+		ProxyImage:             constants.KubeProxyImage,
+	}
+
+	clientProvider := &cluster.ConfigClientProvider{
+		DefaultClient: c,
+	}
+	defer clientProvider.Close() //nolint:errcheck
+
+	state := struct {
+		cluster.ClientProvider
+		cluster.K8sProvider
+	}{
+		ClientProvider: clientProvider,
+		K8sProvider: &cluster.KubernetesClient{
+			ClientProvider: clientProvider,
+			ForceEndpoint:  upgradeOptions.ControlPlaneEndpoint,
+		},
+	}
+
+	fromVersion, err := k8s.DetectLowestVersion(ctx, &state, upgradeOptions)
+	if err != nil {
+		return err
+	}
+
+	upgradeOptions.Path, err = upgrade.NewPath(fromVersion, toVersion)
+	if err != nil {
+		return err
+	}
+
+	upgradeOptions.EncoderOpt = encoder.WithComments(encoder.CommentsAll)
+
+	return k8s.Upgrade(ctx, &state, upgradeOptions)
 }
