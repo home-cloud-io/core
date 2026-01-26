@@ -10,6 +10,7 @@ import (
 	"slices"
 	"time"
 
+	"connectrpc.com/connect"
 	"dario.cat/mergo"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
@@ -25,6 +26,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	resources "github.com/home-cloud-io/core/services/platform/operator/internal/controller/resources"
 )
@@ -35,8 +38,9 @@ import (
 // InstallReconciler reconciles a Install object
 type InstallReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
-	Config *rest.Config
+	DaemonClient dv1connect.DaemonServiceClient
+	Scheme       *runtime.Scheme
+	Config       *rest.Config
 }
 
 const (
@@ -94,7 +98,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	var err error
 
 	l.Info("reconciling gateway api crds")
-	resp, err := http.Get(fmt.Sprintf("%s/%s/standard-install.yaml", install.Spec.GatewayAPI.URL, install.Spec.GatewayAPI.Version))
+	resp, err := http.Get(fmt.Sprintf("%s/%s/standard-install.yaml", install.Spec.GatewayAPI.Source, install.Spec.GatewayAPI.Version))
 	if err != nil {
 		return err
 	}
@@ -163,6 +167,29 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		return err
 	}
 
+	if !install.Spec.Daemon.Disable {
+		if !install.Spec.Daemon.System.Disable {
+			l.Info("reconciling system install")
+			_, err := r.DaemonClient.Upgrade(ctx, connect.NewRequest(&dv1.UpgradeRequest{
+				Source:  install.Spec.Daemon.System.Source,
+				Version: install.Spec.Daemon.System.Version,
+			}))
+			if err != nil {
+				return err
+			}
+		}
+
+		if !install.Spec.Daemon.Kubernetes.Disable {
+			l.Info("reconciling kubernetes install")
+			_, err := r.DaemonClient.UpgradeKubernetes(ctx, connect.NewRequest(&dv1.UpgradeKubernetesRequest{
+				Version: install.Spec.Daemon.Kubernetes.Version,
+			}))
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	return r.updateStatus(ctx, install)
 }
 
@@ -175,14 +202,14 @@ func reconcileIstio(ctx context.Context, install *v1.Install) error {
 	iAct := action.NewInstall(cfg)
 	iAct.Version = install.Spec.Istio.Version
 	iAct.Namespace = install.Spec.Istio.Namespace
-	iAct.RepoURL = install.Spec.Istio.Repo
+	iAct.RepoURL = install.Spec.Istio.Source
 	iAct.Wait = true
 	iAct.Timeout = 5 * time.Minute
 
 	uAct := action.NewUpgrade(cfg)
 	uAct.Version = install.Spec.Istio.Version
 	uAct.Namespace = install.Spec.Istio.Namespace
-	uAct.RepoURL = install.Spec.Istio.Repo
+	uAct.RepoURL = install.Spec.Istio.Source
 	uAct.Wait = true
 	uAct.Timeout = 5 * time.Minute
 
@@ -368,7 +395,7 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 
 	if !install.Spec.GatewayAPI.Disable {
 		install.Status.GatewayAPI = v1.GatewayAPIStatus{
-			URL:     install.Spec.GatewayAPI.URL,
+			URL:     install.Spec.GatewayAPI.Source,
 			Version: install.Spec.GatewayAPI.Version,
 		}
 	} else {
@@ -377,7 +404,7 @@ func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Instal
 
 	if !install.Spec.Istio.Disable {
 		install.Status.Istio = v1.IstioStatus{
-			Repo:    install.Spec.Istio.Repo,
+			Repo:    install.Spec.Istio.Source,
 			Version: install.Spec.Istio.Version,
 		}
 	} else {

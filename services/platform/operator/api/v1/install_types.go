@@ -21,7 +21,7 @@ type GatewayAPISpec struct {
 	// Disabling will not uninstall a previous installation. Since these CRDs are cluster-scoped, this is to avoid
 	// breaking an existing installation from another source. You must uninstall manually after disabling.
 	Disable bool   `json:"disable,omitempty"`
-	URL     string `json:"url,omitempty"`
+	Source  string `json:"source,omitempty"`
 	Version string `json:"version,omitempty"`
 }
 
@@ -29,7 +29,7 @@ type IstioSpec struct {
 	Disable            bool   `json:"disable,omitempty"`
 	Namespace          string `json:"istio,omitempty"`
 	Version            string `json:"version,omitempty"`
-	Repo               string `json:"repo,omitempty"`
+	Source             string `json:"source,omitempty"`
 	IngressGatewayName string `json:"ingressGatewayName,omitempty"`
 
 	Base    BaseSpec    `json:"base,omitempty"`
@@ -73,9 +73,27 @@ type TunnelSpec struct {
 }
 
 type DaemonSpec struct {
+	Disable    bool           `json:"disable,omitempty"`
+	Image      string         `json:"image,omitempty"`
+	Tag        string         `json:"tag,omitempty"`
+	System     SystemSpec     `json:"system,omitempty"`
+	Kubernetes KubernetesSpec `json:"kubernetes,omitempty"`
+}
+
+type SystemSpec struct {
 	Disable bool   `json:"disable,omitempty"`
-	Image   string `json:"image,omitempty"`
-	Tag     string `json:"tag,omitempty"`
+	// Source represents the source URL of the system image. For example, for Talos
+	// this is the installer image: ghcr.io/siderolabs/installer
+	Source  string `json:"source,omitempty"`
+	// Version represents the version of the system to install. For example, for Talos
+	// this is the tag of the installer image: e.g. v1.11.2
+	Version string `json:"version,omitempty"`
+}
+
+type KubernetesSpec struct {
+	Disable bool   `json:"disable,omitempty"`
+	// Version is the semver of the Kubernetes release: e.g. 1.34.2
+	Version string `json:"version,omitempty"`
 }
 
 type SettingsSpec struct {
