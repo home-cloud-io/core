@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/home-cloud-io/core/services/platform/daemon/communicate"
+	"github.com/home-cloud-io/core/services/platform/daemon/server"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
@@ -10,11 +10,11 @@ import (
 func main() {
 	var (
 		logger = zerolog.New()
-		server = communicate.New(logger)
+		s      = server.New(logger)
 	)
 
 	// setup runtime
 	chassis.New(logger).
-		WithRPCHandler(server).
+		WithRPCHandler(s).
 		Start()
 }
