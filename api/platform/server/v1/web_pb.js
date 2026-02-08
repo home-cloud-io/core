@@ -113,42 +113,6 @@ export const DeleteAppResponse = /*@__PURE__*/ proto3.makeMessageType(
 );
 
 /**
- * @generated from message platform.server.v1.CheckForSystemUpdatesRequest
- */
-export const CheckForSystemUpdatesRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.CheckForSystemUpdatesRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.CheckForSystemUpdatesResponse
- */
-export const CheckForSystemUpdatesResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.CheckForSystemUpdatesResponse",
-  () => [
-    { no: 1, name: "update_available", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ],
-);
-
-/**
- * @generated from message platform.server.v1.CheckForContainerUpdatesRequest
- */
-export const CheckForContainerUpdatesRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.CheckForContainerUpdatesRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.CheckForContainerUpdatesResponse
- */
-export const CheckForContainerUpdatesResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.CheckForContainerUpdatesResponse",
-  () => [
-    { no: 1, name: "image_versions", kind: "message", T: ImageVersion, repeated: true },
-  ],
-);
-
-/**
  * @generated from message platform.server.v1.ImageVersion
  */
 export const ImageVersion = /*@__PURE__*/ proto3.makeMessageType(
@@ -159,22 +123,6 @@ export const ImageVersion = /*@__PURE__*/ proto3.makeMessageType(
     { no: 3, name: "latest", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
-);
-
-/**
- * @generated from message platform.server.v1.UpdateSystemRequest
- */
-export const UpdateSystemRequest = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.UpdateSystemRequest",
-  [],
-);
-
-/**
- * @generated from message platform.server.v1.UpdateSystemResponse
- */
-export const UpdateSystemResponse = /*@__PURE__*/ proto3.makeMessageType(
-  "platform.server.v1.UpdateSystemResponse",
-  [],
 );
 
 /**

@@ -4,39 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DeregisterPeerRequest, DeregisterPeerResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse, UpdateSystemRequest, UpdateSystemResponse } from "./web_pb.js";
-
-/**
- * Shutdown the host machine running Home Cloud
- *
- * @generated from rpc platform.server.v1.WebService.ShutdownHost
- */
-export const shutdownHost = {
-  localName: "shutdownHost",
-  name: "ShutdownHost",
-  kind: MethodKind.Unary,
-  I: ShutdownHostRequest,
-  O: ShutdownHostResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-} as const;
-
-/**
- * Restart the host machine running Home Cloud
- *
- * @generated from rpc platform.server.v1.WebService.RestartHost
- */
-export const restartHost = {
-  localName: "restartHost",
-  name: "RestartHost",
-  kind: MethodKind.Unary,
-  I: RestartHostRequest,
-  O: RestartHostResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-} as const;
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DeregisterPeerRequest, DeregisterPeerResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 
 /**
  * Install a Home Cloud application
@@ -87,54 +55,6 @@ export const deleteApp = {
 } as const;
 
 /**
- * Check for available system updates
- *
- * @generated from rpc platform.server.v1.WebService.CheckForSystemUpdates
- */
-export const checkForSystemUpdates = {
-  localName: "checkForSystemUpdates",
-  name: "CheckForSystemUpdates",
-  kind: MethodKind.Unary,
-  I: CheckForSystemUpdatesRequest,
-  O: CheckForSystemUpdatesResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-} as const;
-
-/**
- * Check for available system container updates
- *
- * @generated from rpc platform.server.v1.WebService.CheckForContainerUpdates
- */
-export const checkForContainerUpdates = {
-  localName: "checkForContainerUpdates",
-  name: "CheckForContainerUpdates",
-  kind: MethodKind.Unary,
-  I: CheckForContainerUpdatesRequest,
-  O: CheckForContainerUpdatesResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-} as const;
-
-/**
- * Install available OS update
- *
- * @generated from rpc platform.server.v1.WebService.UpdateSystem
- */
-export const updateSystem = {
-  localName: "updateSystem",
-  name: "UpdateSystem",
-  kind: MethodKind.Unary,
-  I: UpdateSystemRequest,
-  O: UpdateSystemResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-} as const;
-
-/**
  * Check the current health of all installed Home Cloud applications
  *
  * @generated from rpc platform.server.v1.WebService.AppsHealthCheck
@@ -145,22 +65,6 @@ export const appsHealthCheck = {
   kind: MethodKind.Unary,
   I: AppsHealthCheckRequest,
   O: AppsHealthCheckResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-} as const;
-
-/**
- * Get the current host machine stats (cpu, memory, drives)
- *
- * @generated from rpc platform.server.v1.WebService.GetSystemStats
- */
-export const getSystemStats = {
-  localName: "getSystemStats",
-  name: "GetSystemStats",
-  kind: MethodKind.Unary,
-  I: GetSystemStatsRequest,
-  O: GetSystemStatsResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }
@@ -183,38 +87,6 @@ export const getAppsInStore = {
 } as const;
 
 /**
- * Get the device settings
- *
- * @generated from rpc platform.server.v1.WebService.GetDeviceSettings
- */
-export const getDeviceSettings = {
-  localName: "getDeviceSettings",
-  name: "GetDeviceSettings",
-  kind: MethodKind.Unary,
-  I: GetDeviceSettingsRequest,
-  O: GetDeviceSettingsResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-} as const;
-
-/**
- * Set the device settings
- *
- * @generated from rpc platform.server.v1.WebService.SetDeviceSettings
- */
-export const setDeviceSettings = {
-  localName: "setDeviceSettings",
-  name: "SetDeviceSettings",
-  kind: MethodKind.Unary,
-  I: SetDeviceSettingsRequest,
-  O: SetDeviceSettingsResponse,
-  service: {
-    typeName: "platform.server.v1.WebService"
-  }
-} as const;
-
-/**
  * Get all installed app storage volumes
  *
  * @generated from rpc platform.server.v1.WebService.GetAppStorage
@@ -225,6 +97,54 @@ export const getAppStorage = {
   kind: MethodKind.Unary,
   I: GetAppStorageRequest,
   O: GetAppStorageResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * Shutdown the host machine running Home Cloud
+ *
+ * @generated from rpc platform.server.v1.WebService.ShutdownHost
+ */
+export const shutdownHost = {
+  localName: "shutdownHost",
+  name: "ShutdownHost",
+  kind: MethodKind.Unary,
+  I: ShutdownHostRequest,
+  O: ShutdownHostResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * Restart the host machine running Home Cloud
+ *
+ * @generated from rpc platform.server.v1.WebService.RestartHost
+ */
+export const restartHost = {
+  localName: "restartHost",
+  name: "RestartHost",
+  kind: MethodKind.Unary,
+  I: RestartHostRequest,
+  O: RestartHostResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * Get the current host machine stats (cpu, memory, drives)
+ *
+ * @generated from rpc platform.server.v1.WebService.GetSystemStats
+ */
+export const getSystemStats = {
+  localName: "getSystemStats",
+  name: "GetSystemStats",
+  kind: MethodKind.Unary,
+  I: GetSystemStatsRequest,
+  O: GetSystemStatsResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }
@@ -257,6 +177,38 @@ export const getSystemLogs = {
   kind: MethodKind.Unary,
   I: GetSystemLogsRequest,
   O: GetSystemLogsResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * Get the device settings
+ *
+ * @generated from rpc platform.server.v1.WebService.GetDeviceSettings
+ */
+export const getDeviceSettings = {
+  localName: "getDeviceSettings",
+  name: "GetDeviceSettings",
+  kind: MethodKind.Unary,
+  I: GetDeviceSettingsRequest,
+  O: GetDeviceSettingsResponse,
+  service: {
+    typeName: "platform.server.v1.WebService"
+  }
+} as const;
+
+/**
+ * Set the device settings
+ *
+ * @generated from rpc platform.server.v1.WebService.SetDeviceSettings
+ */
+export const setDeviceSettings = {
+  localName: "setDeviceSettings",
+  name: "SetDeviceSettings",
+  kind: MethodKind.Unary,
+  I: SetDeviceSettingsRequest,
+  O: SetDeviceSettingsResponse,
   service: {
     typeName: "platform.server.v1.WebService"
   }

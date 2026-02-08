@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DeregisterPeerRequest, DeregisterPeerResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, ServerEvent, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, SubscribeRequest, UpdateAppRequest, UpdateAppResponse, UpdateSystemRequest, UpdateSystemResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DeregisterPeerRequest, DeregisterPeerResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, ServerEvent, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, SubscribeRequest, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -13,26 +13,15 @@ export const WebService = {
   typeName: "platform.server.v1.WebService",
   methods: {
     /**
-     * Shutdown the host machine running Home Cloud
+     * Subscribe to the server for events
      *
-     * @generated from rpc platform.server.v1.WebService.ShutdownHost
+     * @generated from rpc platform.server.v1.WebService.Subscribe
      */
-    shutdownHost: {
-      name: "ShutdownHost",
-      I: ShutdownHostRequest,
-      O: ShutdownHostResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Restart the host machine running Home Cloud
-     *
-     * @generated from rpc platform.server.v1.WebService.RestartHost
-     */
-    restartHost: {
-      name: "RestartHost",
-      I: RestartHostRequest,
-      O: RestartHostResponse,
-      kind: MethodKind.Unary,
+    subscribe: {
+      name: "Subscribe",
+      I: SubscribeRequest,
+      O: ServerEvent,
+      kind: MethodKind.ServerStreaming,
     },
     /**
      * Install a Home Cloud application
@@ -68,39 +57,6 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Check for available system updates
-     *
-     * @generated from rpc platform.server.v1.WebService.CheckForSystemUpdates
-     */
-    checkForSystemUpdates: {
-      name: "CheckForSystemUpdates",
-      I: CheckForSystemUpdatesRequest,
-      O: CheckForSystemUpdatesResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Check for available system container updates
-     *
-     * @generated from rpc platform.server.v1.WebService.CheckForContainerUpdates
-     */
-    checkForContainerUpdates: {
-      name: "CheckForContainerUpdates",
-      I: CheckForContainerUpdatesRequest,
-      O: CheckForContainerUpdatesResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Install available OS update
-     *
-     * @generated from rpc platform.server.v1.WebService.UpdateSystem
-     */
-    updateSystem: {
-      name: "UpdateSystem",
-      I: UpdateSystemRequest,
-      O: UpdateSystemResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
      * Check the current health of all installed Home Cloud applications
      *
      * @generated from rpc platform.server.v1.WebService.AppsHealthCheck
@@ -109,17 +65,6 @@ export const WebService = {
       name: "AppsHealthCheck",
       I: AppsHealthCheckRequest,
       O: AppsHealthCheckResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Get the current host machine stats (cpu, memory, drives)
-     *
-     * @generated from rpc platform.server.v1.WebService.GetSystemStats
-     */
-    getSystemStats: {
-      name: "GetSystemStats",
-      I: GetSystemStatsRequest,
-      O: GetSystemStatsResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -134,28 +79,6 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Get the device settings
-     *
-     * @generated from rpc platform.server.v1.WebService.GetDeviceSettings
-     */
-    getDeviceSettings: {
-      name: "GetDeviceSettings",
-      I: GetDeviceSettingsRequest,
-      O: GetDeviceSettingsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Set the device settings
-     *
-     * @generated from rpc platform.server.v1.WebService.SetDeviceSettings
-     */
-    setDeviceSettings: {
-      name: "SetDeviceSettings",
-      I: SetDeviceSettingsRequest,
-      O: SetDeviceSettingsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
      * Get all installed app storage volumes
      *
      * @generated from rpc platform.server.v1.WebService.GetAppStorage
@@ -164,6 +87,39 @@ export const WebService = {
       name: "GetAppStorage",
       I: GetAppStorageRequest,
       O: GetAppStorageResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Shutdown the host machine running Home Cloud
+     *
+     * @generated from rpc platform.server.v1.WebService.ShutdownHost
+     */
+    shutdownHost: {
+      name: "ShutdownHost",
+      I: ShutdownHostRequest,
+      O: ShutdownHostResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Restart the host machine running Home Cloud
+     *
+     * @generated from rpc platform.server.v1.WebService.RestartHost
+     */
+    restartHost: {
+      name: "RestartHost",
+      I: RestartHostRequest,
+      O: RestartHostResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get the current host machine stats (cpu, memory, drives)
+     *
+     * @generated from rpc platform.server.v1.WebService.GetSystemStats
+     */
+    getSystemStats: {
+      name: "GetSystemStats",
+      I: GetSystemStatsRequest,
+      O: GetSystemStatsResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -186,6 +142,28 @@ export const WebService = {
       name: "GetSystemLogs",
       I: GetSystemLogsRequest,
       O: GetSystemLogsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get the device settings
+     *
+     * @generated from rpc platform.server.v1.WebService.GetDeviceSettings
+     */
+    getDeviceSettings: {
+      name: "GetDeviceSettings",
+      I: GetDeviceSettingsRequest,
+      O: GetDeviceSettingsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Set the device settings
+     *
+     * @generated from rpc platform.server.v1.WebService.SetDeviceSettings
+     */
+    setDeviceSettings: {
+      name: "SetDeviceSettings",
+      I: SetDeviceSettingsRequest,
+      O: SetDeviceSettingsResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -253,17 +231,6 @@ export const WebService = {
       I: DeregisterPeerRequest,
       O: DeregisterPeerResponse,
       kind: MethodKind.Unary,
-    },
-    /**
-     * Subscribe to the server for events
-     *
-     * @generated from rpc platform.server.v1.WebService.Subscribe
-     */
-    subscribe: {
-      name: "Subscribe",
-      I: SubscribeRequest,
-      O: ServerEvent,
-      kind: MethodKind.ServerStreaming,
     },
   }
 } as const;

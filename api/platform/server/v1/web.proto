@@ -8,40 +8,45 @@ import "validate/validate.proto";
 import "platform/daemon/v1/system.proto";
 
 service WebService {
-  // Shutdown the host machine running Home Cloud
-  rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
-  // Restart the host machine running Home Cloud
-  rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
+  // Subscribe to the server for events
+  rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
+
+  // APPS
+
   // Install a Home Cloud application
   rpc InstallApp(InstallAppRequest) returns (InstallAppResponse) {}
   // Update a Home Cloud application
   rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {}
   // Delete a Home Cloud application
   rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
-  // Check for available system updates
-  rpc CheckForSystemUpdates(CheckForSystemUpdatesRequest) returns (CheckForSystemUpdatesResponse) {}
-  // Check for available system container updates
-  rpc CheckForContainerUpdates(CheckForContainerUpdatesRequest) returns (CheckForContainerUpdatesResponse) {}
-  // Install available OS update
-  rpc UpdateSystem(UpdateSystemRequest) returns (UpdateSystemResponse) {}
   // Check the current health of all installed Home Cloud applications
   rpc AppsHealthCheck(AppsHealthCheckRequest) returns (AppsHealthCheckResponse) {}
-  // Get the current host machine stats (cpu, memory, drives)
-  rpc GetSystemStats(GetSystemStatsRequest) returns (GetSystemStatsResponse) {}
   // Get all apps available in the store
   rpc GetAppsInStore(GetAppsInStoreRequest) returns (GetAppsInStoreResponse) {}
-  // Get the device settings
-  rpc GetDeviceSettings(GetDeviceSettingsRequest) returns (GetDeviceSettingsResponse) {}
-  // Set the device settings
-  rpc SetDeviceSettings(SetDeviceSettingsRequest) returns (SetDeviceSettingsResponse) {}
   // Get all installed app storage volumes
   rpc GetAppStorage(GetAppStorageRequest) returns (GetAppStorageResponse) {}
+
+  // SYSTEM
+
+  // Shutdown the host machine running Home Cloud
+  rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
+  // Restart the host machine running Home Cloud
+  rpc RestartHost(RestartHostRequest) returns (RestartHostResponse) {}
+  // Get the current host machine stats (cpu, memory, drives)
+  rpc GetSystemStats(GetSystemStatsRequest) returns (GetSystemStatsResponse) {}
   // GetComponentVersions returns the versions of all system components (daemon, server, etc.)
   rpc GetComponentVersions(GetComponentVersionsRequest) returns (GetComponentVersionsResponse) {}
   // GetSystemLogs returns the past X seconds of system logs (daemon, server, fuse, etc.)
   rpc GetSystemLogs(GetSystemLogsRequest) returns (GetSystemLogsResponse) {}
 
-  // Secure Tunnelling
+  // SETTINGS
+
+  // Get the device settings
+  rpc GetDeviceSettings(GetDeviceSettingsRequest) returns (GetDeviceSettingsResponse) {}
+  // Set the device settings
+  rpc SetDeviceSettings(SetDeviceSettingsRequest) returns (SetDeviceSettingsResponse) {}
+
+  // TUNNELLING
 
   // Enables the remote access feature
   rpc EnableSecureTunnelling(EnableSecureTunnellingRequest) returns (EnableSecureTunnellingResponse) {}
@@ -55,9 +60,6 @@ service WebService {
   rpc RegisterPeer(RegisterPeerRequest) returns (RegisterPeerResponse) {}
   // DeregisterPeer removes a peer from remote access
   rpc DeregisterPeer(DeregisterPeerRequest) returns (DeregisterPeerResponse) {}
-
-  // Subscribe to the server for events
-  rpc Subscribe(SubscribeRequest) returns (stream ServerEvent) {}
 }
 
 message ShutdownHostRequest {}
@@ -89,27 +91,12 @@ message DeleteAppRequest {
 }
 message DeleteAppResponse {}
 
-message CheckForSystemUpdatesRequest {}
-message CheckForSystemUpdatesResponse {
-  bool update_available = 1;
-
-  // TODO: implement for talos and maybe eventually for other systems
-}
-
-message CheckForContainerUpdatesRequest {}
-message CheckForContainerUpdatesResponse {
-  repeated ImageVersion image_versions = 1;
-}
-
 message ImageVersion {
   string image = 1;
   string current = 2;
   string latest = 3;
   string name = 4;
 }
-
-message UpdateSystemRequest {}
-message UpdateSystemResponse {}
 
 message AppsHealthCheckRequest {}
 message AppsHealthCheckResponse {
@@ -135,7 +122,6 @@ message AppDisplay {
 }
 
 message GetSystemStatsRequest {}
-
 message GetSystemStatsResponse {
   platform.daemon.v1.SystemStats stats = 1;
 }
