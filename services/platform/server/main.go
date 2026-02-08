@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 
 	"github.com/home-cloud-io/core/services/platform/server/apps"
@@ -18,13 +19,12 @@ func main() {
 	var (
 		logger = zerolog.New()
 		actl   = apps.NewController(logger)
-		sctl   = system.NewController(logger)
+		sctl   = system.NewController(logger, actl)
 		webRPC = web.New(logger, actl, sctl)
 	)
 
 	runner := func() {
-		go actl.AppStoreCache(logger)
-		go actl.AutoUpdate(logger)
+		go actl.AutoUpdate(context.Background(), logger)
 	}
 
 	defer chassis.New(logger).

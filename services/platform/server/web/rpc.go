@@ -112,7 +112,7 @@ func (h *rpcHandler) UpdateApp(ctx context.Context, request *connect.Request[v1.
 }
 
 func (h *rpcHandler) AppsHealthCheck(ctx context.Context, request *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error) {
-	checks, err := h.actl.Healthcheck(ctx, h.logger)
+	checks, err := h.actl.PrettyHealthcheck(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to check apps health")
 		return nil, err

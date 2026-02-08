@@ -104,6 +104,22 @@ type SettingsSpec struct {
 	AutoUpdateSystem bool `json:"autoUpdateSystem,omitempty"`
 	// Hostname defines the base hostname for the install (default: home-cloud.local)
 	Hostname string `json:"hostname,omitempty"`
+	// AppStores defines the app stores to install apps from
+	AppStores []AppStore `json:"appStores,omitempty"`
+	// AutoUpdateAppsSchedule is a cron string that defines the freqency with which the server
+	// will automatically update installed Apps: e.g. (default: "0 3 * * *")
+	//
+	// TODO: currently you must restart the server after changing this value for it to take
+	// effect if updating the Kuberenetes resource directly.
+	AutoUpdateAppsSchedule string `json:"autoUpdateAppsSchedule,omitempty"`
+}
+
+type AppStore struct {
+	// URL defines where the Helm chart index of the store is: e.g. https://apps.home-cloud.io/index.yaml
+	URL string `json:"url"`
+	// RawChartURL defines where to find README.md files that populate descriptions in the
+	// App Store: e.g. https://raw.githubusercontent.com/home-cloud-io/store
+	RawChartURL string `json:"rawChartURL"`
 }
 
 type ImageVersion struct {

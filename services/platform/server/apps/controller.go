@@ -17,6 +17,7 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
+	hstrings "github.com/home-cloud-io/core/services/platform/server/utils/strings"
 )
 
 type (
@@ -34,29 +35,25 @@ type (
 		Store(ctx context.Context, logger chassis.Logger) ([]*v1.App, error)
 		// UpdateAll will update all apps to the latest available version in the store.
 		UpdateAll(ctx context.Context, logger chassis.Logger) error
-		// Healthcheck will retrieve the health of all installed apps.
-		Healthcheck(ctx context.Context, logger chassis.Logger) ([]*v1.AppHealth, error)
-		// AutoUpdate will check for and install app updates on a schedule. It is designed to
-		// be called at bootup.
-		AutoUpdate(logger chassis.Logger)
+		// PrettyHealthcheck will retrieve the health of all installed apps and include the displayName
+		// from the chart, icon, and readme/description.
+		PrettyHealthcheck(ctx context.Context, logger chassis.Logger) ([]*v1.AppHealth, error)
+		// AutoUpdate will check for and install app updates on a schedule.
+		AutoUpdate(ctx context.Context, logger chassis.Logger)
 		// GetAppStorage will retrieve the app storage volumes for all installed apps.
 		GetAppStorage(ctx context.Context, logger chassis.Logger) ([]*v1.AppStorage, error)
-		// AppStoreCache creates a new store cache that runs in the background
-		// keeping the app store up to date with the latest available apps
-		AppStoreCache(logger chassis.Logger)
 	}
 
 	controller struct {
-		k8sclient  k8sclient.Apps
-		storeCache *v1.AppStoreEntries
+		k8sclient k8sclient.Apps
+		cronID    cron.EntryID
+		cr        *cron.Cron
 	}
 )
 
 func NewController(logger chassis.Logger) Controller {
-	config := chassis.GetConfig()
-	config.SetDefault(autoUpdateCronConfigKey, "0 3 * * *")
-	config.SetDefault(rawChartBaseUrlConfigKey, "https://raw.githubusercontent.com/home-cloud-io/store")
 	return &controller{
+		// TODO: reuse client?
 		k8sclient: k8sclient.NewClient(logger),
 	}
 }
@@ -67,54 +64,62 @@ const (
 	ErrFailedToGetComponentVersions = "failed to get component versions"
 	ErrFailedToGetLogs              = "failed to get logs"
 
-	autoUpdateCronConfigKey  = "server.updates.apps_auto_update_cron"
-	rawChartBaseUrlConfigKey = "server.apps.raw_chart_base_url"
+	DefaultAutoUpdateAppsSchedule = "0 3 * * *"
 )
 
+// TODO: there is no deduplication currently so if two stores have the same applications they will simply be repeated
 func (c *controller) Store(ctx context.Context, logger chassis.Logger) ([]*v1.App, error) {
 	var (
 		err  error
 		apps []*v1.App
 	)
 
-	logger.Info("getting apps in store (from cache)")
-	for _, v := range c.storeCache.Entries {
-		// TODO: get the latest, right now this assumes the `app` slice is already sorted by version
-		// append the first app of the app store entry to to the `apps` slice
-		if len(v.Apps) > 0 {
-			apps = append(apps, v.Apps[0])
-		}
+	stores, err := c.stores(ctx, logger)
+	// return immediately if no app store returned results
+	if err != nil && len(stores) == 0 {
+		return apps, err
 	}
 
-	healths, err := c.k8sclient.Healthcheck(ctx)
-	if err != nil {
-		logger.WithError(err).Error("failed to check installed app health during store query")
-		return nil, err
-	}
+	for _, store := range stores {
 
-	// add extra information not from the index (e.g. readme and installed flag)
-	for _, app := range apps {
-		url := chassis.GetConfig().GetString(rawChartBaseUrlConfigKey)
-		resp, err := http.Get(fmt.Sprintf("%s/%s-%s/charts/%s/README.md", url, app.Name, app.Version, app.Name))
-		if err != nil {
-			logger.WithFields(chassis.Fields{
-				"app":         app.Name,
-				"app_version": app.Version,
-			}).WithError(err).Error("failed to get readme for app")
+		for _, v := range store.Entries {
+			// TODO: get the latest, right now this assumes the `app` slice is already sorted by version
+			// append the first app of the app store entry to to the `apps` slice
+			if len(v.Apps) > 0 {
+				apps = append(apps, v.Apps[0])
+			}
 		}
-		defer resp.Body.Close()
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			logger.WithFields(chassis.Fields{
-				"app":         app.Name,
-				"app_version": app.Version,
-			}).WithError(err).Error("failed to read body of response while getting readme for app")
-		}
-		app.Readme = string(body)
 
-		for _, health := range healths {
-			if app.Name == health.Name {
-				app.Installed = true
+		healths, err := c.k8sclient.Healthcheck(ctx)
+		if err != nil {
+			logger.WithError(err).Error("failed to check installed app health during store query")
+			return nil, err
+		}
+
+		// add extra information not from the index (e.g. readme and installed flag)
+		for _, app := range apps {
+
+			resp, err := http.Get(fmt.Sprintf("%s/%s-%s/charts/%s/README.md", store.RawChartUrl, app.Name, app.Version, app.Name))
+			if err != nil {
+				logger.WithFields(chassis.Fields{
+					"app":         app.Name,
+					"app_version": app.Version,
+				}).WithError(err).Error("failed to get readme for app")
+			}
+			defer resp.Body.Close()
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				logger.WithFields(chassis.Fields{
+					"app":         app.Name,
+					"app_version": app.Version,
+				}).WithError(err).Error("failed to read body of response while getting readme for app")
+			}
+			app.Readme = string(body)
+
+			for _, health := range healths {
+				if app.Name == health.Name {
+					app.Installed = true
+				}
 			}
 		}
 	}
@@ -283,7 +288,7 @@ func (c *controller) UpdateAll(ctx context.Context, logger chassis.Logger) error
 	return nil
 }
 
-func (c *controller) Healthcheck(ctx context.Context, logger chassis.Logger) ([]*v1.AppHealth, error) {
+func (c *controller) PrettyHealthcheck(ctx context.Context, logger chassis.Logger) ([]*v1.AppHealth, error) {
 	// get app health
 	apps, err := c.k8sclient.Healthcheck(ctx)
 	if err != nil {
@@ -291,7 +296,6 @@ func (c *controller) Healthcheck(ctx context.Context, logger chassis.Logger) ([]
 	}
 
 	// add in the display info from the store
-	// TODO: should move this to a different method separate from Healthcheck
 	store, err := c.Store(ctx, logger)
 	if err != nil {
 		return nil, err
@@ -321,22 +325,38 @@ func (c *controller) Healthcheck(ctx context.Context, logger chassis.Logger) ([]
 	return apps, nil
 }
 
-func (c *controller) AutoUpdate(logger chassis.Logger) {
-	cr := cron.New()
+func (c *controller) AutoUpdate(ctx context.Context, logger chassis.Logger) {
 	f := func() {
-		ctx := context.Background()
-		err := c.UpdateAll(ctx, logger)
+		err := c.UpdateAll(context.Background(), logger)
 		if err != nil {
 			logger.WithError(err).Error("failed to run auto app update job")
 		}
 	}
-	cron := chassis.GetConfig().GetString(autoUpdateCronConfigKey)
+
+	// create new if no current entry, otherwise remove old entry
+	if c.cronID == 0 {
+		c.cr = cron.New()
+	} else {
+		c.cr.Remove(c.cronID)
+	}
+
+	// get schedule from settings
+	settings, err := c.k8sclient.Settings(ctx)
+	if err != nil {
+		logger.WithError(err).Panic("failed to get settings")
+	}
+	cron := hstrings.Default(settings.AutoUpdateAppsSchedule, DefaultAutoUpdateAppsSchedule)
+
+	// add new entry
 	logger.WithField("cron", cron).Info("setting apps auto-update interval")
-	_, err := cr.AddFunc(cron, f)
+	id, err := c.cr.AddFunc(cron, f)
 	if err != nil {
 		logger.WithError(err).Panic("failed to initialize auto-update for apps")
 	}
-	cr.Start()
+	c.cronID = id
+
+	// no-op if already started
+	c.cr.Start()
 }
 
 func (c *controller) GetAppStorage(ctx context.Context, logger chassis.Logger) ([]*v1.AppStorage, error) {

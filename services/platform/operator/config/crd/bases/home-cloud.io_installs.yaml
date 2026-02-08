@@ -139,9 +139,33 @@ spec:
                 type: object
               settings:
                 properties:
+                  appStores:
+                    description: AppStores defines the app stores to install apps
+                      from
+                    items:
+                      properties:
+                        rawChartURL:
+                          description: |-
+                            RawChartURL defines where to find README.md files that populate descriptions in the
+                            App Store: e.g. https://raw.githubusercontent.com/home-cloud-io/store
+                          type: string
+                        url:
+                          description: 'URL defines where the Helm chart index of
+                            the store is: e.g. https://apps.home-cloud.io/index.yaml'
+                          type: string
+                      required:
+                      - rawChartURL
+                      - url
+                      type: object
+                    type: array
                   autoUpdateApps:
                     description: 'AutoUpdateApps (default: true)'
                     type: boolean
+                  autoUpdateAppsSchedule:
+                    description: |-
+                      AutoUpdateAppsSchedule is a cron string that defines the freqency with which the server
+                      will automatically update installed Apps: e.g. (default: "0 3 * * *")
+                    type: string
                   autoUpdateSystem:
                     description: 'AutoUpdateSystem (default: true)'
                     type: boolean

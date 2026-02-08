@@ -6,10 +6,11 @@ import (
 
 	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	"github.com/home-cloud-io/core/services/platform/server/apps"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
-	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type (
@@ -23,12 +24,13 @@ type (
 	}
 
 	controller struct {
+		actl         apps.Controller
 		k8sclient    k8sclient.System
 		daemonClient dv1connect.DaemonServiceClient
 	}
 )
 
-func NewController(logger chassis.Logger) Controller {
+func NewController(logger chassis.Logger, actl apps.Controller) Controller {
 	ctx := context.Background()
 	k := k8sclient.NewClient(logger)
 
@@ -47,6 +49,7 @@ func NewController(logger chassis.Logger) Controller {
 	}
 
 	return &controller{
+		actl:         actl,
 		k8sclient:    k,
 		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, daemonAddress),
 	}

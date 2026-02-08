@@ -33,9 +33,13 @@ type (
 		Get(ctx context.Context, key crclient.ObjectKey, obj crclient.Object) error
 		Update(ctx context.Context, obj crclient.Object) error
 		Delete(ctx context.Context, obj crclient.Object) error
+		// Settings returns the installation settings
+		Settings(ctx context.Context) (*opv1.SettingsSpec, error)
 	}
 	// Apps operates on Apps exclusively
 	Apps interface {
+		Default
+
 		// InstallApp will install the given app
 		InstallApp(ctx context.Context, spec opv1.AppSpec) error
 		// DeleteApp will delete the given app
@@ -54,7 +58,7 @@ type (
 		// AppStorage will retrieve storage volumes for the given app list
 		AppStorage(ctx context.Context, apps []opv1.App) ([]*webv1.AppStorage, error)
 	}
-	// System operates on system components (logs, versions, settings)
+	// System operates on system components (logs, versions)
 	System interface {
 		Default
 
@@ -62,8 +66,6 @@ type (
 		GetServerVersion(ctx context.Context) (version string, err error)
 		// GetLogs will retrieve the logs for all pods across the entire cluster
 		GetLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error)
-		// Settings returns the installation settings
-		Settings(ctx context.Context) (*opv1.SettingsSpec, error)
 	}
 
 	client struct {

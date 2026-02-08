@@ -110,8 +110,17 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 		return err
 	}
 
+	// check if the auto update apps schedule has changed and update the cron
+	if install.Spec.Settings.AutoUpdateAppsSchedule != settings.AutoUpdateAppsSchedule {
+		// defer this so it runs after the update happens on the kube api
+		defer c.actl.AutoUpdate(ctx, logger)
+	}
+
 	install.Spec.Settings.AutoUpdateApps = settings.AutoUpdateApps
 	install.Spec.Settings.AutoUpdateSystem = settings.AutoUpdateOs
+	install.Spec.Settings.AutoUpdateAppsSchedule = settings.AutoUpdateAppsSchedule
+	install.Spec.Settings.Hostname = settings.Hostname
+	// TODO: app stores
 
 	return c.k8sclient.Update(ctx, install)
 }
