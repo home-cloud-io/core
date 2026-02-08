@@ -10,6 +10,7 @@ import (
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	corev1 "k8s.io/api/core/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -38,8 +39,10 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		Namespace: "home-cloud-system",
 	}, wireguardServer)
 	if err != nil {
-		// TODO: check NotFound specifically
 		logger.WithError(err).Error("failed to get wireguard server config")
+		if kerrors.IsNotFound(err) {
+			return nil, errors.New("secure tunneling not enabled")
+		}
 		return nil, err
 	}
 

@@ -5,6 +5,9 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
+	corev1 "k8s.io/api/core/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
@@ -17,7 +20,7 @@ type (
 	Device interface {
 		// GetServerSettings returns the current server settings after filtering out the
 		// admin username and password.
-		GetServerSettings(ctx context.Context) (*v1.DeviceSettings, error)
+		GetServerSettings(ctx context.Context, logger chassis.Logger) (*v1.DeviceSettings, error)
 		// SetServerSettings updates the settings on the server with the given values
 		SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error
 		// GetComponentVersions returns all the versions of system components (server, daemon, etc.)
@@ -35,16 +38,64 @@ const (
 
 // DEVICE
 
-func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings, error) {
+func (c *controller) GetServerSettings(ctx context.Context, logger chassis.Logger) (*v1.DeviceSettings, error) {
 	settings, err := c.k8sclient.Settings(ctx)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: get Wireguards and populate SecureTunnelingSettings
-	return &v1.DeviceSettings{
-		AutoUpdateApps: settings.AutoUpdateApps,
-		AutoUpdateOs:   settings.AutoUpdateSystem,
-	}, nil
+	s := &v1.DeviceSettings{
+		AutoUpdateApps:          settings.AutoUpdateApps,
+		AutoUpdateOs:            settings.AutoUpdateSystem,
+		SecureTunnelingSettings: &v1.SecureTunnelingSettings{},
+	}
+
+	// get wireguard server config
+	wireguardServer := &opv1.Wireguard{}
+	err = c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      DefaultWireguardInterface,
+		Namespace: "home-cloud-system",
+	}, wireguardServer)
+	if err != nil {
+		// not found means not enabled
+		if kerrors.IsNotFound(err) {
+			return s, nil
+		}
+		logger.WithError(err).Error("failed to get wireguard server config")
+		return nil, err
+	}
+
+	// get wireguard server private key (so we can derive the public key)
+	wireguardServerSecret := &corev1.Secret{}
+	err = c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      wireguardServer.Spec.PrivateKeySecret.Name,
+		Namespace: *wireguardServer.Spec.PrivateKeySecret.Namespace,
+	}, wireguardServerSecret)
+	if err != nil {
+		logger.WithError(err).Error("failed to get wireguard server secret")
+		return nil, err
+	}
+	wireguardServerPrivateKey, err := wgtypes.ParseKey(string(wireguardServerSecret.Data["privateKey"]))
+	if err != nil {
+		logger.WithError(err).Error("failed to parse wireguard server private key")
+		return nil, err
+	}
+
+	// save to settings object
+	s.SecureTunnelingSettings = &v1.SecureTunnelingSettings{
+		Enabled: true,
+		WireguardInterfaces: []*v1.WireguardInterface{
+			{
+				Id:             wireguardServer.Spec.ID,
+				Name:           wireguardServer.Name,
+				Port:           int32(wireguardServer.Spec.ListenPort),
+				PublicKey:      wireguardServerPrivateKey.PublicKey().String(),
+				StunServer:     wireguardServer.Spec.STUNServer,
+				LocatorServers: wireguardServer.Spec.Locators,
+			},
+		},
+	}
+
+	return s, nil
 }
 
 func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {

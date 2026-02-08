@@ -27,6 +27,14 @@ type (
 		Apps
 		System
 	}
+	// Default passes through the CRUD operations of the client
+	Default interface {
+		Create(ctx context.Context, obj crclient.Object) error
+		Get(ctx context.Context, key crclient.ObjectKey, obj crclient.Object) error
+		Update(ctx context.Context, obj crclient.Object) error
+		Delete(ctx context.Context, obj crclient.Object) error
+	}
+	// Apps operates on Apps exclusively
 	Apps interface {
 		// InstallApp will install the given app
 		InstallApp(ctx context.Context, spec opv1.AppSpec) error
@@ -46,16 +54,10 @@ type (
 		// AppStorage will retrieve storage volumes for the given app list
 		AppStorage(ctx context.Context, apps []opv1.App) ([]*webv1.AppStorage, error)
 	}
+	// System operates on system components (logs, versions, settings)
 	System interface {
-		// TODO: should this be here?
-		Create(ctx context.Context, obj crclient.Object) error
-		Get(ctx context.Context, key crclient.ObjectKey, obj crclient.Object) error
-		Update(ctx context.Context, obj crclient.Object) error
-		Delete(ctx context.Context, obj crclient.Object) error
+		Default
 
-		// CurrentImages will retrieve the current images of all system containers. System
-		// containers are considered to be those in the `home-cloud-system` namespace.
-		CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error)
 		// GetServerVersion will retrieve the current k8s server version
 		GetServerVersion(ctx context.Context) (version string, err error)
 		// GetLogs will retrieve the logs for all pods across the entire cluster
@@ -161,30 +163,6 @@ func (c *client) UpdateApp(ctx context.Context, spec opv1.AppSpec) error {
 	}
 	app.Spec = spec
 	return c.client.Update(ctx, app)
-}
-
-func (c *client) CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error) {
-	var (
-		// processing as a map keeps from having duplicates
-		images = map[string]*webv1.ImageVersion{}
-		err    error
-	)
-
-	// home-cloud containers
-	err = c.getCurrentImageVersions(ctx, HomeCloudNamespace, images)
-	if err != nil {
-		return nil, err
-	}
-
-	// convert map to slice
-	imagesSlice := make([]*webv1.ImageVersion, len(images))
-	index := 0
-	for _, image := range images {
-		imagesSlice[index] = image
-		index++
-	}
-
-	return imagesSlice, nil
 }
 
 func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
