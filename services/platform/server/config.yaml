@@ -15,8 +15,6 @@ service:
 
 server:
   updates:
-    os_auto_update_cron: "0 1 * * *"
-    containers_auto_update_cron: "0 2 * * *"
     apps_auto_update_cron: "0 3 * * *"
   apps:
     store_cache_update_interval_minutes: 60

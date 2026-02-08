@@ -40,6 +40,7 @@ func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings,
 	if err != nil {
 		return nil, err
 	}
+	// TODO: get Wireguards and populate SecureTunnelingSettings
 	return &v1.DeviceSettings{
 		AutoUpdateApps: settings.AutoUpdateApps,
 		AutoUpdateOs:   settings.AutoUpdateSystem,

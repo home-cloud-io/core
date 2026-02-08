@@ -156,36 +156,6 @@ func (h *rpcHandler) RestartHost(ctx context.Context, request *connect.Request[v
 	return connect.NewResponse(&v1.RestartHostResponse{}), nil
 }
 
-func (h *rpcHandler) CheckForSystemUpdates(ctx context.Context, request *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error) {
-	h.logger.Info("check for system updates request")
-	response, err := h.sctl.CheckForOSUpdates(ctx, h.logger)
-	if err != nil {
-		h.logger.WithError(err).Error("failed to check for system updates")
-		return nil, err
-	}
-	return connect.NewResponse(response), nil
-}
-
-func (h *rpcHandler) CheckForContainerUpdates(ctx context.Context, request *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error) {
-	images, err := h.sctl.CheckForContainerUpdates(ctx, h.logger)
-	if err != nil {
-		h.logger.WithError(err).Error("failed to check for system container updates")
-		return nil, err
-	}
-	return connect.NewResponse(&v1.CheckForContainerUpdatesResponse{
-		ImageVersions: images,
-	}), err
-}
-
-func (h *rpcHandler) UpdateSystem(ctx context.Context, request *connect.Request[v1.UpdateSystemRequest]) (*connect.Response[v1.UpdateSystemResponse], error) {
-	err := h.sctl.UpdateOS(ctx, h.logger)
-	if err != nil {
-		h.logger.WithError(err).Error("failed to update system")
-		return nil, err
-	}
-	return connect.NewResponse(&v1.UpdateSystemResponse{}), nil
-}
-
 func (h *rpcHandler) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
 	stats, err := h.sctl.SystemStats(ctx, h.logger)
 	if err != nil {

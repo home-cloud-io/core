@@ -25,8 +25,6 @@ func main() {
 	runner := func() {
 		go actl.AppStoreCache(logger)
 		go actl.AutoUpdate(logger)
-		go sctl.AutoUpdateOS(logger)
-		go sctl.AutoUpdateContainers(logger)
 	}
 
 	defer chassis.New(logger).
