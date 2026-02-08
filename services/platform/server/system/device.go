@@ -99,8 +99,21 @@ func (c *controller) GetServerSettings(ctx context.Context, logger chassis.Logge
 }
 
 func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {
-	// TODO
-	return nil
+
+	install := &opv1.Install{}
+	err := c.k8sclient.Get(ctx, types.NamespacedName{
+		Namespace: k8sclient.HomeCloudNamespace,
+		Name:      "install",
+	}, install)
+	if err != nil {
+		logger.WithError(err).Error("failed to get install")
+		return err
+	}
+
+	install.Spec.Settings.AutoUpdateApps = settings.AutoUpdateApps
+	install.Spec.Settings.AutoUpdateSystem = settings.AutoUpdateOs
+
+	return c.k8sclient.Update(ctx, install)
 }
 
 func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Logger) (*v1.GetComponentVersionsResponse, error) {
