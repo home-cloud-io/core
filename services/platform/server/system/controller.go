@@ -1,10 +1,13 @@
 package system
 
 import (
+	"context"
 	"net/http"
 
 	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
@@ -26,10 +29,26 @@ type (
 )
 
 func NewController(logger chassis.Logger) Controller {
+	ctx := context.Background()
+	k := k8sclient.NewClient(logger)
+
+	install := &opv1.Install{}
+	err := k.Get(ctx, types.NamespacedName{
+		Namespace: k8sclient.HomeCloudNamespace,
+		Name:      "install",
+	}, install)
+	if err != nil {
+		logger.WithError(err).Panic("failed to get install")
+	}
+
+	daemonAddress := install.Spec.Daemon.Address
+	if daemonAddress == "" {
+		daemonAddress = DefaultDaemonAddress
+	}
+
 	return &controller{
-		k8sclient: k8sclient.NewClient(logger),
-		// TODO: make this address configurable
-		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, "http://daemon.home-cloud-system"),
+		k8sclient:    k,
+		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, daemonAddress),
 	}
 }
 
@@ -41,4 +60,5 @@ const (
 	DefaultWireguardInterface = "wg0"
 	DefaultSTUNServerAddress  = "locator1.home-cloud.io:3478"
 	DefaultLocatorAddress     = "https://locator1.home-cloud.io"
+	DefaultDaemonAddress      = "http://daemon.home-cloud-system"
 )

@@ -14,6 +14,9 @@ import (
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/talos"
 )
 
+// TODO: change this to use a Helm chart so users can simply point at a custom Helm chart
+// and install everything in one go
+
 var (
 	DaemonObjects = func(install *v1.Install) []client.Object {
 		return []client.Object{

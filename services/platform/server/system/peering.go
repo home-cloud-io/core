@@ -127,7 +127,7 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		ServerId:        wireguardServer.Spec.ID,
 		Addresses:       []string{peerAddress},
 		LocatorServers:  wireguardServer.Spec.Locators,
-		// TODO
+		// TODO: configure home cloud managed DNS server
 		// DnsServers: []string{},
 	}, nil
 }

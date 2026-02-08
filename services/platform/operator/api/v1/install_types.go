@@ -76,22 +76,23 @@ type DaemonSpec struct {
 	Disable    bool           `json:"disable,omitempty"`
 	Image      string         `json:"image,omitempty"`
 	Tag        string         `json:"tag,omitempty"`
+	Address    string         `json:"address,omitempty"`
 	System     SystemSpec     `json:"system,omitempty"`
 	Kubernetes KubernetesSpec `json:"kubernetes,omitempty"`
 }
 
 type SystemSpec struct {
-	Disable bool   `json:"disable,omitempty"`
+	Disable bool `json:"disable,omitempty"`
 	// Source represents the source URL of the system image. For example, for Talos
 	// this is the installer image: ghcr.io/siderolabs/installer
-	Source  string `json:"source,omitempty"`
+	Source string `json:"source,omitempty"`
 	// Version represents the version of the system to install. For example, for Talos
 	// this is the tag of the installer image: e.g. v1.11.2
 	Version string `json:"version,omitempty"`
 }
 
 type KubernetesSpec struct {
-	Disable bool   `json:"disable,omitempty"`
+	Disable bool `json:"disable,omitempty"`
 	// Version is the semver of the Kubernetes release: e.g. 1.34.2
 	Version string `json:"version,omitempty"`
 }

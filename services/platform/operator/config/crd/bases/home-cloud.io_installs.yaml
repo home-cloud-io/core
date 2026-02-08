@@ -41,6 +41,8 @@ spec:
             properties:
               daemon:
                 properties:
+                  address:
+                    type: string
                   disable:
                     type: boolean
                   image:
