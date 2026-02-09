@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"slices"
+	"sync"
 
 	"github.com/pion/mdns/v2"
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -21,18 +22,20 @@ type (
 	}
 	server struct {
 		logger chassis.Logger
+		mu     sync.Mutex
 		conn   *mdns.Conn
 		hosts  []string
 	}
 )
 
 const (
-	HostIPConfigKey     = "mdns.host_ip"
+	HostIPConfigKey = "mdns.host_ip"
 )
 
 func New(logger chassis.Logger) Server {
 	return &server{
 		logger: logger,
+		mu:     sync.Mutex{},
 		hosts:  make([]string, 0),
 	}
 }
@@ -98,6 +101,9 @@ func (s *server) Serve(ctx context.Context) error {
 }
 
 func (s *server) Close(ctx context.Context) error {
+	s.mu.Unlock()
+	defer s.mu.Lock()
+
 	if s.conn != nil {
 		return s.conn.Close()
 	}
@@ -105,17 +111,22 @@ func (s *server) Close(ctx context.Context) error {
 }
 
 func (s *server) AddHost(ctx context.Context, host string) error {
+	s.mu.Unlock()
+	defer s.mu.Lock()
+
+	s.logger.WithField("host", host).Info("adding host")
 	if slices.Contains(s.hosts, host) {
 		return nil
 	}
-	s.logger.WithField("host", host).Info("adding host")
 	s.hosts = append(s.hosts, host)
 	return s.Serve(ctx)
 }
 
 func (s *server) RemoveHost(ctx context.Context, host string) error {
+	s.mu.Unlock()
+	defer s.mu.Lock()
+
 	s.logger.WithField("host", host).Info("removing host")
-	// TODO: should change this to a thread-safe map using a mutex?
 	hosts := []string{}
 	for _, h := range s.hosts {
 		if h != host {
