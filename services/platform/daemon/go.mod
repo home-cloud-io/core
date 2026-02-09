@@ -9,7 +9,6 @@ go 1.25.3
 require (
 	connectrpc.com/connect v1.18.1
 	github.com/home-cloud-io/core/api v0.8.8-0.20260126050606-e540866b7734
-	github.com/mackerelio/go-osstat v0.2.5
 	github.com/siderolabs/go-kubernetes v0.2.28
 	github.com/siderolabs/talos v1.12.2
 	github.com/siderolabs/talos/pkg/machinery v1.12.2
