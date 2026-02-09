@@ -9,7 +9,9 @@ import (
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	corev1 "k8s.io/api/core/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
@@ -38,13 +40,33 @@ func (c *controller) SystemStats(ctx context.Context, loger chassis.Logger) (*dv
 func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger) error {
 	var (
 		err error
+		key wgtypes.Key
 	)
 
-	// TODO: check for existing secret and use that if it exists
-	key, err := wgtypes.GeneratePrivateKey()
+	// check for existing secret and use that if it exists
+	wireguardServerSecret := &corev1.Secret{}
+	err = c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      fmt.Sprintf("%s-private-key", DefaultWireguardInterface),
+		Namespace: k8sclient.HomeCloudNamespace,
+	}, wireguardServerSecret)
 	if err != nil {
-		logger.WithError(err).Error("failed to generate wireguard private key")
+		// generate new key if there is no existing one
+		if kerrors.IsNotFound(err) {
+			key, err = wgtypes.GeneratePrivateKey()
+			if err != nil {
+				logger.WithError(err).Error("failed to generate wireguard private key")
+				return err
+			}
+		}
+		logger.WithError(err).Error("failed to get wireguard server secret")
 		return err
+	} else {
+		// read existing secret from secret
+		key, err = wgtypes.ParseKey(string(wireguardServerSecret.Data["privateKey"]))
+		if err != nil {
+			logger.WithError(err).Error("failed to parse wireguard server private key")
+			return err
+		}
 	}
 
 	secret := &corev1.Secret{
