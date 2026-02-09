@@ -21,6 +21,7 @@ import (
 type (
 	Peering interface {
 		RegisterPeer(ctx context.Context, logger chassis.Logger) (*v1.RegisterPeerResponse, error)
+		DeregisterPeer(ctx context.Context, logger chassis.Logger, req *v1.DeregisterPeerRequest) error
 	}
 )
 
@@ -130,4 +131,58 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 		// TODO: configure home cloud managed DNS server
 		// DnsServers: []string{},
 	}, nil
+}
+
+func (c *controller) DeregisterPeer(ctx context.Context, logger chassis.Logger, req *v1.DeregisterPeerRequest) error {
+	peerSecret := &corev1.Secret{}
+	err := c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      fmt.Sprintf("%s-private-key", req.Id),
+		Namespace: "home-cloud-system",
+	}, peerSecret)
+	if err != nil {
+		logger.WithError(err).Error("failed to find peer secret")
+		return err
+	}
+	peerPrivateKey, err := wgtypes.ParseKey(string(peerSecret.Data["privateKey"]))
+	if err != nil {
+		logger.WithError(err).Error("failed to parse wireguard peer private key")
+		return err
+	}
+	peerPublicKey := peerPrivateKey.PublicKey().String()
+
+	// get wireguard server config
+	wireguardServer := &opv1.Wireguard{}
+	err = c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      DefaultWireguardInterface,
+		Namespace: "home-cloud-system",
+	}, wireguardServer)
+	if err != nil {
+		logger.WithError(err).Error("failed to get wireguard server config")
+		return err
+	}
+
+	// remove peer from server peer list
+	newPeers := []opv1.PeerSpec{}
+	for _, peer := range wireguardServer.Spec.Peers {
+		if peer.PublicKey != peerPublicKey {
+			newPeers = append(newPeers, peer)
+		}
+	}
+	wireguardServer.Spec.Peers = newPeers
+
+	// update server resources
+	err = c.k8sclient.Update(ctx, wireguardServer)
+	if err != nil {
+		logger.WithError(err).Error("failed to update wireguard server config")
+		return err
+	}
+
+	// delete peer secret
+	err = c.k8sclient.Delete(ctx, peerSecret)
+	if err != nil {
+		logger.WithError(err).Error("failed to delete wireguard peer secret")
+		return err
+	}
+
+	return nil
 }

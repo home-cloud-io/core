@@ -32,10 +32,11 @@ type (
 )
 
 const (
-	ErrFailedToInitDevice     = "failed to initialize device"
-	ErrInvalidInputValues     = "invalid input values"
-	ErrFailedToLogin          = "failed to login"
-	ErrFailedPeerRegistration = "failed to register client device as peer to the overlay network"
+	ErrFailedToInitDevice       = "failed to initialize device"
+	ErrInvalidInputValues       = "invalid input values"
+	ErrFailedToLogin            = "failed to login"
+	ErrFailedPeerRegistration   = "failed to register peer"
+	ErrFailedPeerDeregistration = "failed to deregister peer"
 )
 
 func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Rpc {
@@ -247,9 +248,13 @@ func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[
 func (h *rpcHandler) DeregisterPeer(ctx context.Context, request *connect.Request[v1.DeregisterPeerRequest]) (*connect.Response[v1.DeregisterPeerResponse], error) {
 	h.logger.Info("deregister a peer")
 
-	// TODO
+	err := h.sctl.DeregisterPeer(ctx, h.logger, request.Msg)
+	if err != nil {
+		h.logger.WithError(err).Error(ErrFailedPeerDeregistration)
+		return nil, errors.New(ErrFailedPeerDeregistration)
+	}
 
-	return nil, errors.ErrUnsupported
+	return connect.NewResponse(&v1.DeregisterPeerResponse{}), nil
 }
 
 func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
