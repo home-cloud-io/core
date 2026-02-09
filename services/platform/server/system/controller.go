@@ -8,6 +8,7 @@ import (
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/server/apps"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
+	"github.com/home-cloud-io/core/services/platform/server/utils/strings"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"k8s.io/apimachinery/pkg/types"
@@ -42,11 +43,7 @@ func NewController(logger chassis.Logger, kclient k8sclient.System, actl apps.Co
 		logger.WithError(err).Panic("failed to get install")
 	}
 
-	daemonAddress := install.Spec.Daemon.Address
-	if daemonAddress == "" {
-		daemonAddress = DefaultDaemonAddress
-	}
-
+	daemonAddress := strings.Default(install.Spec.Daemon.Address, DefaultDaemonAddress)
 	return &controller{
 		actl:         actl,
 		k8sclient:    kclient,

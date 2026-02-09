@@ -223,44 +223,6 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 	return checks, nil
 }
 
-func (c *client) GetAppPodLists(ctx context.Context) ([]*corev1.PodList, error) {
-
-	var (
-		podLists = []*corev1.PodList{}
-	)
-
-	// get all installed apps
-	apps := &opv1.AppList{}
-	err := c.client.List(ctx, apps, &crclient.ListOptions{
-		Namespace: HomeCloudNamespace,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// process each app and check all app pods for status
-	checks := make([]*webv1.AppHealth, len(apps.Items))
-	for index, app := range apps.Items {
-		checks[index] = &webv1.AppHealth{
-			Name:   app.Name,
-			Status: webv1.AppStatus_APP_STATUS_HEALTHY,
-		}
-
-		// get all pods in app namespace
-		pods := &corev1.PodList{}
-		err := c.client.List(ctx, pods, &crclient.ListOptions{
-			Namespace: app.Name,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		podLists = append(podLists, pods)
-	}
-
-	return podLists, nil
-}
-
 func (c *client) Installed(ctx context.Context, name string) (installed bool, err error) {
 	apps := &opv1.App{}
 	err = c.client.Get(ctx, types.NamespacedName{
@@ -327,30 +289,6 @@ func (c *client) GetServerVersion(ctx context.Context) (string, error) {
 		return "", err
 	}
 	return version.GitVersion, nil
-}
-
-func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, images map[string]*webv1.ImageVersion) error {
-	pods := &corev1.PodList{}
-	err := c.client.List(ctx, pods, &crclient.ListOptions{
-		Namespace: namespace,
-	})
-	if err != nil {
-		return err
-	}
-
-	// TODO: change from pods to deployments so that failed/succeeded pods don't show up as current versions
-	for _, p := range pods.Items {
-		for _, c := range p.Spec.Containers {
-			name := strings.Split(c.Image, ":")[0]
-			currentVersion := strings.Split(c.Image, ":")[1]
-			images[name] = &webv1.ImageVersion{
-				Image:   name,
-				Current: currentVersion,
-			}
-		}
-	}
-
-	return nil
 }
 
 func (c *client) GetLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error) {
