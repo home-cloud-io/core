@@ -18,9 +18,7 @@ var (
 				IngressGatewayName: "ingress-gateway",
 			},
 			Settings: v1.SettingsSpec{
-				Hostname:         "home-cloud.local",
-				AutoUpdateApps:   true,
-				AutoUpdateSystem: true,
+				Hostname: "home-cloud.local",
 			},
 		},
 	}

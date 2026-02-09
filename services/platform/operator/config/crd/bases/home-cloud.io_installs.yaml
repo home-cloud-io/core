@@ -165,6 +165,9 @@ spec:
                     description: |-
                       AutoUpdateAppsSchedule is a cron string that defines the freqency with which the server
                       will automatically update installed Apps: e.g. (default: "0 3 * * *")
+
+                      You must restart the server after changing this value for it to take
+                      effect if updating the Kuberenetes resource directly.
                     type: string
                   autoUpdateSystem:
                     description: 'AutoUpdateSystem (default: true)'

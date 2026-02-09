@@ -109,7 +109,7 @@ type SettingsSpec struct {
 	// AutoUpdateAppsSchedule is a cron string that defines the freqency with which the server
 	// will automatically update installed Apps: e.g. (default: "0 3 * * *")
 	//
-	// TODO: currently you must restart the server after changing this value for it to take
+	// You must restart the server after changing this value for it to take
 	// effect if updating the Kuberenetes resource directly.
 	AutoUpdateAppsSchedule string `json:"autoUpdateAppsSchedule,omitempty"`
 }
