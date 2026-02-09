@@ -120,7 +120,13 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 	install.Spec.Settings.AutoUpdateSystem = settings.AutoUpdateOs
 	install.Spec.Settings.AutoUpdateAppsSchedule = settings.AutoUpdateAppsSchedule
 	install.Spec.Settings.Hostname = settings.Hostname
-	// TODO: app stores
+	install.Spec.Settings.AppStores = []opv1.AppStore{}
+	for _, store := range settings.AppStores {
+		install.Spec.Settings.AppStores = append(install.Spec.Settings.AppStores, opv1.AppStore{
+			URL:         store.Url,
+			RawChartURL: store.RawChartUrl,
+		})
+	}
 
 	return c.k8sclient.Update(ctx, install)
 }
