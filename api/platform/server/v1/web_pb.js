@@ -512,8 +512,6 @@ export const DaemonVersion = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
- * A backround thread in the server will fetch the index and update the
- * cache at startup and then every 24 hours
  *
  * @generated from message platform.server.v1.AppStoreEntries
  */
@@ -522,7 +520,8 @@ export const AppStoreEntries = /*@__PURE__*/ proto3.makeMessageType(
   () => [
     { no: 1, name: "api_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "generated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Apps} },
+    { no: 3, name: "raw_chart_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Apps} },
   ],
 );
 
@@ -537,6 +536,9 @@ export const DeviceSettings = /*@__PURE__*/ proto3.makeMessageType(
     { no: 1, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 3, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
+    { no: 4, name: "hostname", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "auto_update_apps_schedule", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "app_stores", kind: "message", T: AppStore, repeated: true },
   ],
 );
 
@@ -563,6 +565,17 @@ export const WireguardInterface = /*@__PURE__*/ proto3.makeMessageType(
     { no: 4, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "stun_server", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "locator_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ],
+);
+
+/**
+ * @generated from message platform.server.v1.AppStore
+ */
+export const AppStore = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.server.v1.AppStore",
+  () => [
+    { no: 1, name: "url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "raw_chart_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 
@@ -628,24 +641,25 @@ export const RegisterPeerRequest = /*@__PURE__*/ proto3.makeMessageType(
 export const RegisterPeerResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.RegisterPeerResponse",
   () => [
-    { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "locator_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 5, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "locator_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ],
 );
 
 /**
- * TODO
- *
  * @generated from message platform.server.v1.DeregisterPeerRequest
  */
 export const DeregisterPeerRequest = /*@__PURE__*/ proto3.makeMessageType(
   "platform.server.v1.DeregisterPeerRequest",
-  [],
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
 );
 
 /**

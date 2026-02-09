@@ -1992,8 +1992,6 @@ export class DaemonVersion extends Message<DaemonVersion> {
 
 /**
  * Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
- * A backround thread in the server will fetch the index and update the
- * cache at startup and then every 24 hours
  *
  * @generated from message platform.server.v1.AppStoreEntries
  */
@@ -2009,7 +2007,12 @@ export class AppStoreEntries extends Message<AppStoreEntries> {
   generated = "";
 
   /**
-   * @generated from field: map<string, platform.server.v1.Apps> entries = 3;
+   * @generated from field: string raw_chart_url = 3;
+   */
+  rawChartUrl = "";
+
+  /**
+   * @generated from field: map<string, platform.server.v1.Apps> entries = 4;
    */
   entries: { [key: string]: Apps } = {};
 
@@ -2023,7 +2026,8 @@ export class AppStoreEntries extends Message<AppStoreEntries> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "api_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "generated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Apps} },
+    { no: 3, name: "raw_chart_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "entries", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Apps} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppStoreEntries {
@@ -2064,6 +2068,21 @@ export class DeviceSettings extends Message<DeviceSettings> {
    */
   secureTunnelingSettings?: SecureTunnelingSettings;
 
+  /**
+   * @generated from field: string hostname = 4;
+   */
+  hostname = "";
+
+  /**
+   * @generated from field: string auto_update_apps_schedule = 5;
+   */
+  autoUpdateAppsSchedule = "";
+
+  /**
+   * @generated from field: repeated platform.server.v1.AppStore app_stores = 6;
+   */
+  appStores: AppStore[] = [];
+
   constructor(data?: PartialMessage<DeviceSettings>) {
     super();
     proto3.util.initPartial(data, this);
@@ -2075,6 +2094,9 @@ export class DeviceSettings extends Message<DeviceSettings> {
     { no: 1, name: "auto_update_apps", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "auto_update_os", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 3, name: "secure_tunneling_settings", kind: "message", T: SecureTunnelingSettings },
+    { no: 4, name: "hostname", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "auto_update_apps_schedule", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "app_stores", kind: "message", T: AppStore, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeviceSettings {
@@ -2201,6 +2223,49 @@ export class WireguardInterface extends Message<WireguardInterface> {
 
   static equals(a: WireguardInterface | PlainMessage<WireguardInterface> | undefined, b: WireguardInterface | PlainMessage<WireguardInterface> | undefined): boolean {
     return proto3.util.equals(WireguardInterface, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.server.v1.AppStore
+ */
+export class AppStore extends Message<AppStore> {
+  /**
+   * @generated from field: string url = 1;
+   */
+  url = "";
+
+  /**
+   * @generated from field: string raw_chart_url = 2;
+   */
+  rawChartUrl = "";
+
+  constructor(data?: PartialMessage<AppStore>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.server.v1.AppStore";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "raw_chart_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AppStore {
+    return new AppStore().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AppStore {
+    return new AppStore().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AppStore {
+    return new AppStore().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AppStore | PlainMessage<AppStore> | undefined, b: AppStore | PlainMessage<AppStore> | undefined): boolean {
+    return proto3.util.equals(AppStore, a, b);
   }
 }
 
@@ -2433,41 +2498,46 @@ export class RegisterPeerRequest extends Message<RegisterPeerRequest> {
  */
 export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
   /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
    * client config
    *
-   * @generated from field: string private_key = 1;
+   * @generated from field: string private_key = 2;
    */
   privateKey = "";
 
   /**
-   * @generated from field: string public_key = 2;
+   * @generated from field: string public_key = 3;
    */
   publicKey = "";
 
   /**
-   * @generated from field: repeated string addresses = 3;
+   * @generated from field: repeated string addresses = 4;
    */
   addresses: string[] = [];
 
   /**
-   * @generated from field: repeated string dns_servers = 4;
+   * @generated from field: repeated string dns_servers = 5;
    */
   dnsServers: string[] = [];
 
   /**
    * server config
    *
-   * @generated from field: string server_public_key = 5;
+   * @generated from field: string server_public_key = 6;
    */
   serverPublicKey = "";
 
   /**
-   * @generated from field: string server_id = 6;
+   * @generated from field: string server_id = 7;
    */
   serverId = "";
 
   /**
-   * @generated from field: repeated string locator_servers = 7;
+   * @generated from field: repeated string locator_servers = 8;
    */
   locatorServers: string[] = [];
 
@@ -2479,13 +2549,14 @@ export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.server.v1.RegisterPeerResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 4, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "locator_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "private_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "addresses", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 5, name: "dns_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "server_public_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "server_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "locator_servers", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RegisterPeerResponse {
@@ -2506,11 +2577,14 @@ export class RegisterPeerResponse extends Message<RegisterPeerResponse> {
 }
 
 /**
- * TODO
- *
  * @generated from message platform.server.v1.DeregisterPeerRequest
  */
 export class DeregisterPeerRequest extends Message<DeregisterPeerRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
   constructor(data?: PartialMessage<DeregisterPeerRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -2519,6 +2593,7 @@ export class DeregisterPeerRequest extends Message<DeregisterPeerRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "platform.server.v1.DeregisterPeerRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeregisterPeerRequest {

@@ -266,12 +266,11 @@ message DaemonVersion {
 }
 
 // Model to cache the apps available in the store: https://apps.home-cloud.io/index.yaml
-// A backround thread in the server will fetch the index and update the
-// cache at startup and then every 24 hours
 message AppStoreEntries {
   string api_version = 1;
   string generated = 2;
-  map<string, Apps> entries = 3;
+  string raw_chart_url = 3;
+  map<string, Apps> entries = 4;
 }
 
 // User settings for the device
@@ -279,6 +278,9 @@ message DeviceSettings {
   bool auto_update_apps = 1;
   bool auto_update_os = 2;
   SecureTunnelingSettings secure_tunneling_settings = 3;
+  string hostname = 4;
+  string auto_update_apps_schedule = 5;
+  repeated AppStore app_stores = 6;
 }
 
 message SecureTunnelingSettings {
@@ -293,6 +295,11 @@ message WireguardInterface {
   string public_key = 4;
   string stun_server = 5;
   repeated string locator_servers = 6;
+}
+
+message AppStore {
+  string url = 1;
+  string raw_chart_url = 2;
 }
 
 // Subscription events
@@ -319,19 +326,21 @@ message AppInstalledEvent {
 
 message RegisterPeerRequest {}
 message RegisterPeerResponse{
+  string id = 1;
+
   // client config
-  string private_key = 1;
-  string public_key = 2;
-  repeated string addresses = 3;
-  repeated string dns_servers = 4;
+  string private_key = 2;
+  string public_key = 3;
+  repeated string addresses = 4;
+  repeated string dns_servers = 5;
 
   // server config
-  string server_public_key = 5;
-  string server_id = 6;
-  repeated string locator_servers = 7;
+  string server_public_key = 6;
+  string server_id = 7;
+  repeated string locator_servers = 8;
 }
 
 message DeregisterPeerRequest {
-  // TODO
+  string id = 1;
 }
 message DeregisterPeerResponse{}
