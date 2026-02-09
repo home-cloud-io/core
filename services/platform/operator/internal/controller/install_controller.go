@@ -38,14 +38,14 @@ import (
 // InstallReconciler reconciles a Install object
 type InstallReconciler struct {
 	client.Client
-	DaemonClient dv1connect.DaemonServiceClient
-	Scheme       *runtime.Scheme
-	Config       *rest.Config
+	Scheme *runtime.Scheme
+	Config *rest.Config
 }
 
 const (
-	InstallFinalizer = "install.home-cloud.io/finalizer"
-	ReleasesURL      = "https://github.com/home-cloud-io/core/releases/download/"
+	InstallFinalizer     = "install.home-cloud.io/finalizer"
+	ReleasesURL          = "https://github.com/home-cloud-io/core/releases/download/"
+	DefaultDaemonAddress = "http://daemon.home-cloud-system"
 )
 
 func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -168,9 +168,16 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	}
 
 	if !install.Spec.Daemon.Disable {
+		// create daemon client here so that we can use the configured address (if set)
+		daemonAddress := install.Spec.Daemon.Address
+		if daemonAddress == "" {
+			daemonAddress = DefaultDaemonAddress
+		}
+		daemonClient := dv1connect.NewDaemonServiceClient(http.DefaultClient, daemonAddress)
+
 		if !install.Spec.Daemon.System.Disable {
 			l.Info("reconciling system install")
-			_, err := r.DaemonClient.Upgrade(ctx, connect.NewRequest(&dv1.UpgradeRequest{
+			_, err := daemonClient.Upgrade(ctx, connect.NewRequest(&dv1.UpgradeRequest{
 				Source:  install.Spec.Daemon.System.Source,
 				Version: install.Spec.Daemon.System.Version,
 			}))
@@ -181,7 +188,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 
 		if !install.Spec.Daemon.Kubernetes.Disable {
 			l.Info("reconciling kubernetes install")
-			_, err := r.DaemonClient.UpgradeKubernetes(ctx, connect.NewRequest(&dv1.UpgradeKubernetesRequest{
+			_, err := daemonClient.UpgradeKubernetes(ctx, connect.NewRequest(&dv1.UpgradeKubernetesRequest{
 				Version: install.Spec.Daemon.Kubernetes.Version,
 			}))
 			if err != nil {

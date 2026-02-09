@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -17,7 +16,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
-	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller"
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/talos"
@@ -68,10 +66,9 @@ func main() {
 
 	// create install controller
 	if err = (&controller.InstallReconciler{
-		Client:       mgr.GetClient(),
-		DaemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, "http://daemon.home-cloud-system"),
-		Scheme:       mgr.GetScheme(),
-		Config:       mgr.GetConfig(),
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Config: mgr.GetConfig(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "failed to create controller", "controller", "Install")
 		os.Exit(1)
