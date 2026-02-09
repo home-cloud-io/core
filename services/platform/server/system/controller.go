@@ -36,7 +36,7 @@ func NewController(logger chassis.Logger, kclient k8sclient.System, actl apps.Co
 
 	install := &opv1.Install{}
 	err := kclient.Get(ctx, types.NamespacedName{
-		Namespace: k8sclient.HomeCloudNamespace,
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
 		Name:      "install",
 	}, install)
 	if err != nil {

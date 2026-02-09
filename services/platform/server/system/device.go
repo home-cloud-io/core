@@ -53,7 +53,7 @@ func (c *controller) GetServerSettings(ctx context.Context, logger chassis.Logge
 	wireguardServer := &opv1.Wireguard{}
 	err = c.k8sclient.Get(ctx, types.NamespacedName{
 		Name:      DefaultWireguardInterface,
-		Namespace: "home-cloud-system",
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
 	}, wireguardServer)
 	if err != nil {
 		// not found means not enabled
@@ -102,7 +102,7 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 
 	install := &opv1.Install{}
 	err := c.k8sclient.Get(ctx, types.NamespacedName{
-		Namespace: k8sclient.HomeCloudNamespace,
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
 		Name:      "install",
 	}, install)
 	if err != nil {
@@ -135,7 +135,7 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 
 	install := &opv1.Install{}
 	err := c.k8sclient.Get(ctx, types.NamespacedName{
-		Namespace: k8sclient.HomeCloudNamespace,
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
 		Name:      "install",
 	}, install)
 	if err != nil {

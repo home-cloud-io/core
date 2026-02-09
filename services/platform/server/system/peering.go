@@ -16,6 +16,7 @@ import (
 
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 )
 
 type (
@@ -37,7 +38,7 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 	wireguardServer := &opv1.Wireguard{}
 	err := c.k8sclient.Get(ctx, types.NamespacedName{
 		Name:      DefaultWireguardInterface,
-		Namespace: "home-cloud-system",
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
 	}, wireguardServer)
 	if err != nil {
 		logger.WithError(err).Error("failed to get wireguard server config")
@@ -93,7 +94,7 @@ func (c *controller) RegisterPeer(ctx context.Context, logger chassis.Logger) (*
 	peerSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-private-key", uuid.NewString()),
-			Namespace: "home-cloud-system",
+			Namespace: k8sclient.DefaultHomeCloudNamespace,
 		},
 		StringData: map[string]string{
 			"privateKey": peerPrivateKey.String(),
@@ -137,7 +138,7 @@ func (c *controller) DeregisterPeer(ctx context.Context, logger chassis.Logger, 
 	peerSecret := &corev1.Secret{}
 	err := c.k8sclient.Get(ctx, types.NamespacedName{
 		Name:      fmt.Sprintf("%s-private-key", req.Id),
-		Namespace: "home-cloud-system",
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
 	}, peerSecret)
 	if err != nil {
 		logger.WithError(err).Error("failed to find peer secret")
@@ -154,7 +155,7 @@ func (c *controller) DeregisterPeer(ctx context.Context, logger chassis.Logger, 
 	wireguardServer := &opv1.Wireguard{}
 	err = c.k8sclient.Get(ctx, types.NamespacedName{
 		Name:      DefaultWireguardInterface,
-		Namespace: "home-cloud-system",
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
 	}, wireguardServer)
 	if err != nil {
 		logger.WithError(err).Error("failed to get wireguard server config")

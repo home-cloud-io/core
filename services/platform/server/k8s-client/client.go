@@ -77,7 +77,7 @@ type (
 
 const (
 	// TODO: this needs to be dynamic
-	HomeCloudNamespace = "home-cloud-system"
+	DefaultHomeCloudNamespace = "home-cloud-system"
 )
 
 func NewClient(logger chassis.Logger) Client {
@@ -136,7 +136,7 @@ func (c *client) InstallApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       spec.Release,
-			Namespace:  HomeCloudNamespace,
+			Namespace:  DefaultHomeCloudNamespace,
 			Finalizers: []string{"apps.home-cloud.io/finalizer"},
 		},
 		Spec: spec,
@@ -148,7 +148,7 @@ func (c *client) DeleteApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      spec.Release,
-			Namespace: HomeCloudNamespace,
+			Namespace: DefaultHomeCloudNamespace,
 		},
 	}
 	return c.client.Delete(ctx, app)
@@ -158,7 +158,7 @@ func (c *client) UpdateApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{}
 	err := c.client.Get(ctx, types.NamespacedName{
 		Name:      spec.Release,
-		Namespace: HomeCloudNamespace,
+		Namespace: DefaultHomeCloudNamespace,
 	}, app)
 	if err != nil {
 		return err
@@ -172,7 +172,7 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 	// get all installed apps
 	apps := &opv1.AppList{}
 	err := c.client.List(ctx, apps, &crclient.ListOptions{
-		Namespace: HomeCloudNamespace,
+		Namespace: DefaultHomeCloudNamespace,
 	})
 	if err != nil {
 		return nil, err
@@ -226,7 +226,7 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 func (c *client) Installed(ctx context.Context, name string) (installed bool, err error) {
 	apps := &opv1.App{}
 	err = c.client.Get(ctx, types.NamespacedName{
-		Namespace: HomeCloudNamespace,
+		Namespace: DefaultHomeCloudNamespace,
 		Name:      name,
 	}, apps)
 	if err != nil {
@@ -244,7 +244,7 @@ func (c *client) Installed(ctx context.Context, name string) (installed bool, er
 func (c *client) InstalledApps(ctx context.Context) ([]opv1.App, error) {
 	apps := &opv1.AppList{}
 	err := c.client.List(ctx, apps, &crclient.ListOptions{
-		Namespace: HomeCloudNamespace,
+		Namespace: DefaultHomeCloudNamespace,
 	})
 	if err != nil {
 		return nil, err
@@ -372,7 +372,7 @@ func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSec
 func (c *client) Settings(ctx context.Context) (*opv1.SettingsSpec, error) {
 	install := &opv1.Install{}
 	err := c.client.Get(ctx, types.NamespacedName{
-		Namespace: HomeCloudNamespace,
+		Namespace: DefaultHomeCloudNamespace,
 		Name:      "install",
 	}, install)
 	if err != nil {

@@ -47,7 +47,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	wireguardServerSecret := &corev1.Secret{}
 	err = c.k8sclient.Get(ctx, types.NamespacedName{
 		Name:      fmt.Sprintf("%s-private-key", DefaultWireguardInterface),
-		Namespace: k8sclient.HomeCloudNamespace,
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
 	}, wireguardServerSecret)
 	if err != nil {
 		// generate new key if there is no existing one
@@ -72,7 +72,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-private-key", DefaultWireguardInterface),
-			Namespace: k8sclient.HomeCloudNamespace,
+			Namespace: k8sclient.DefaultHomeCloudNamespace,
 		},
 		StringData: map[string]string{
 			"privateKey": key.String(),
@@ -87,7 +87,7 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 	wgInterface := &opv1.Wireguard{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      DefaultWireguardInterface,
-			Namespace: k8sclient.HomeCloudNamespace,
+			Namespace: k8sclient.DefaultHomeCloudNamespace,
 		},
 		Spec: opv1.WireguardSpec{
 			ID:   uuid.New().String(),
@@ -125,7 +125,7 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 	wgInterface := &opv1.Wireguard{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      DefaultWireguardInterface,
-			Namespace: "home-cloud-system",
+			Namespace: k8sclient.DefaultHomeCloudNamespace,
 		},
 	}
 	err = c.k8sclient.Delete(ctx, wgInterface)
@@ -137,7 +137,7 @@ func (c *controller) DisableWireguard(ctx context.Context, logger chassis.Logger
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-private-key", DefaultWireguardInterface),
-			Namespace: "home-cloud-system",
+			Namespace: k8sclient.DefaultHomeCloudNamespace,
 		},
 	}
 	err = c.k8sclient.Delete(ctx, secret)
