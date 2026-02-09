@@ -51,10 +51,9 @@ type (
 	}
 )
 
-func NewController(logger chassis.Logger) Controller {
+func NewController(kclient k8sclient.Apps) Controller {
 	return &controller{
-		// TODO: reuse client?
-		k8sclient: k8sclient.NewClient(logger),
+		k8sclient: kclient,
 	}
 }
 

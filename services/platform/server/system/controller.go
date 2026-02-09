@@ -30,12 +30,11 @@ type (
 	}
 )
 
-func NewController(logger chassis.Logger, actl apps.Controller) Controller {
+func NewController(logger chassis.Logger, kclient k8sclient.System, actl apps.Controller) Controller {
 	ctx := context.Background()
-	k := k8sclient.NewClient(logger)
 
 	install := &opv1.Install{}
-	err := k.Get(ctx, types.NamespacedName{
+	err := kclient.Get(ctx, types.NamespacedName{
 		Namespace: k8sclient.HomeCloudNamespace,
 		Name:      "install",
 	}, install)
@@ -50,7 +49,7 @@ func NewController(logger chassis.Logger, actl apps.Controller) Controller {
 
 	return &controller{
 		actl:         actl,
-		k8sclient:    k,
+		k8sclient:    kclient,
 		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, daemonAddress),
 	}
 }
