@@ -10,10 +10,9 @@ require (
 	connectrpc.com/connect v1.18.1
 	github.com/coreos/go-iptables v0.8.0
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.8.7
+	github.com/home-cloud-io/core/api v0.9.0
 	github.com/home-cloud-io/core/services/platform/daemon v0.0.38
-	// TODO: change to v0.0.4 when available
-	github.com/home-cloud-io/core/services/platform/operator v0.0.3-0.20260110225306-fbaff52d3d5c
+	github.com/home-cloud-io/core/services/platform/operator v0.1.0
 	github.com/netbirdio/netbird v0.59.7
 	github.com/pion/stun/v2 v2.0.0
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
