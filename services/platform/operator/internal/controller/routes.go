@@ -30,7 +30,7 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 				ParentRefs: []gwv1.ParentReference{
 					{
 						// TODO: derive these from Install CRD
-						Name:      GatewayName,
+						Name:      gwv1.ObjectName(GatewayName),
 						Namespace: &GatewayNamespace,
 					},
 				},
