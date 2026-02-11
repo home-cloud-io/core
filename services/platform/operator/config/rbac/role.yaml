@@ -30,3 +30,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - home-cloud.io
+  resources:
+  - installs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - home-cloud.io
+  resources:
+  - installs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - home-cloud.io
+  resources:
+  - installs/status
+  verbs:
+  - get
+  - patch
+  - update

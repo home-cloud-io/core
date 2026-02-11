@@ -1,0 +1,246 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  name: installs.home-cloud.io
+spec:
+  group: home-cloud.io
+  names:
+    kind: Install
+    listKind: InstallList
+    plural: installs
+    singular: install
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: Install is the Schema for the installs API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: InstallSpec defines the desired state of Install
+            properties:
+              daemon:
+                properties:
+                  address:
+                    type: string
+                  disable:
+                    type: boolean
+                  image:
+                    type: string
+                  kubernetes:
+                    properties:
+                      disable:
+                        type: boolean
+                      version:
+                        description: 'Version is the semver of the Kubernetes release:
+                          e.g. 1.34.2'
+                        type: string
+                    type: object
+                  system:
+                    properties:
+                      disable:
+                        type: boolean
+                      source:
+                        description: |-
+                          Source represents the source URL of the system image. For example, for Talos
+                          this is the installer image: ghcr.io/siderolabs/installer
+                        type: string
+                      version:
+                        description: |-
+                          Version represents the version of the system to install. For example, for Talos
+                          this is the tag of the installer image: e.g. v1.11.2
+                        type: string
+                    type: object
+                  tag:
+                    type: string
+                type: object
+              gatewayApi:
+                properties:
+                  disable:
+                    description: |-
+                      Disabling will not uninstall a previous installation. Since these CRDs are cluster-scoped, this is to avoid
+                      breaking an existing installation from another source. You must uninstall manually after disabling.
+                    type: boolean
+                  source:
+                    type: string
+                  version:
+                    type: string
+                type: object
+              istio:
+                properties:
+                  base:
+                    properties:
+                      values:
+                        type: string
+                    type: object
+                  cni:
+                    properties:
+                      values:
+                        type: string
+                    type: object
+                  disable:
+                    type: boolean
+                  ingressGatewayName:
+                    type: string
+                  istio:
+                    type: string
+                  istiod:
+                    properties:
+                      values:
+                        type: string
+                    type: object
+                  source:
+                    type: string
+                  version:
+                    type: string
+                  ztunnel:
+                    properties:
+                      values:
+                        type: string
+                    type: object
+                type: object
+              mdns:
+                properties:
+                  disable:
+                    type: boolean
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              server:
+                properties:
+                  disable:
+                    type: boolean
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              settings:
+                properties:
+                  appStores:
+                    description: AppStores defines the app stores to install apps
+                      from
+                    items:
+                      properties:
+                        rawChartURL:
+                          description: |-
+                            RawChartURL defines where to find README.md files that populate descriptions in the
+                            App Store: e.g. https://raw.githubusercontent.com/home-cloud-io/store
+                          type: string
+                        url:
+                          description: 'URL defines where the Helm chart index of
+                            the store is: e.g. https://apps.home-cloud.io/index.yaml'
+                          type: string
+                      required:
+                      - rawChartURL
+                      - url
+                      type: object
+                    type: array
+                  autoUpdateApps:
+                    description: 'AutoUpdateApps (default: true)'
+                    type: boolean
+                  autoUpdateAppsSchedule:
+                    description: |-
+                      AutoUpdateAppsSchedule is a cron string that defines the freqency with which the server
+                      will automatically update installed Apps: e.g. (default: "0 3 * * *")
+
+                      You must restart the server after changing this value for it to take
+                      effect if updating the Kuberenetes resource directly.
+                    type: string
+                  autoUpdateSystem:
+                    description: 'AutoUpdateSystem (default: true)'
+                    type: boolean
+                  hostname:
+                    description: 'Hostname defines the base hostname for the install
+                      (default: home-cloud.local)'
+                    type: string
+                type: object
+              tunnel:
+                properties:
+                  disable:
+                    type: boolean
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              version:
+                type: string
+            required:
+            - version
+            type: object
+          status:
+            description: InstallStatus defines the observed state of Install
+            properties:
+              daemon:
+                properties:
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              gatewayApi:
+                properties:
+                  url:
+                    type: string
+                  version:
+                    type: string
+                type: object
+              istio:
+                properties:
+                  repo:
+                    type: string
+                  version:
+                    type: string
+                type: object
+              mdns:
+                properties:
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              server:
+                properties:
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              tunnel:
+                properties:
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              version:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
