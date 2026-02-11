@@ -2,20 +2,21 @@ module github.com/home-cloud-io/core/services/platform/daemon
 
 go 1.25.3
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
 // replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 
 require (
 	connectrpc.com/connect v1.18.1
 	github.com/cosi-project/runtime v1.12.0
-	github.com/home-cloud-io/core/api v0.8.8-0.20260126050606-e540866b7734
+	github.com/home-cloud-io/core/api v0.9.0
 	github.com/siderolabs/go-kubernetes v0.2.28
 	github.com/siderolabs/talos v1.12.2
 	github.com/siderolabs/talos/pkg/machinery v1.12.2
 	github.com/steady-bytes/draft/pkg/chassis v0.4.5
 	github.com/steady-bytes/draft/pkg/loggers v0.2.3
 	go.yaml.in/yaml/v4 v4.0.0-rc.3
+	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 )
@@ -138,7 +139,6 @@ require (
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251111163417-95abcf5c77ba // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251111163417-95abcf5c77ba // indirect
-	google.golang.org/grpc v1.76.0 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

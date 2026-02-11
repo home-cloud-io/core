@@ -162,8 +162,8 @@ github.com/hashicorp/raft-boltdb/v2 v2.3.0 h1:fPpQR1iGEVYjZ2OELvUHX600VAK5qmdnDE
 github.com/hashicorp/raft-boltdb/v2 v2.3.0/go.mod h1:YHukhB04ChJsLHLJEUD6vjFyLX2L3dsX3wPBZcX4tmc=
 github.com/hexops/gotextdiff v1.0.3 h1:gitA9+qJrrTCsiCl7+kh75nPqQt1cx4ZkudSTLoUqJM=
 github.com/hexops/gotextdiff v1.0.3/go.mod h1:pSWU5MAI3yDq+fZBTazCSJysOMbxWL1BSow5/V2vxeg=
-github.com/home-cloud-io/core/api v0.8.8-0.20260126050606-e540866b7734 h1:e5YA6QLz/9evNy6sP1jt7EQbYHWa4Q/67r1+GHhZ1NY=
-github.com/home-cloud-io/core/api v0.8.8-0.20260126050606-e540866b7734/go.mod h1:4G9DoubvZUuMFZOM63P6AOHyQ5Ulm9X2ilJ1EshIvjc=
+github.com/home-cloud-io/core/api v0.9.0 h1:O7Ee40cmfbbIGE3S043GpWG/o527EPYYDbv08EZIqJs=
+github.com/home-cloud-io/core/api v0.9.0/go.mod h1:mtzBH1+4DOFogaF6ZwhNkJUApaNLVri4l8KdxYbhduA=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/josharian/native v1.1.0 h1:uuaP0hAbW7Y4l0ZRQ6C9zfb7Mg1mbFKry/xzDAfmtLA=
