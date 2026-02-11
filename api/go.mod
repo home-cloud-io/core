@@ -1,6 +1,6 @@
 module github.com/home-cloud-io/core/api
 
-go 1.22.5
+go 1.25.3
 
 require (
 	connectrpc.com/connect v1.16.2
