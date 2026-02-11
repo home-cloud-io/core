@@ -3,13 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"os"
 
-	sv1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	sv1Connect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
-
-	"connectrpc.com/connect"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -17,17 +11,8 @@ import (
 )
 
 var (
-	HomeCloudServerAddress = func() string {
-		if os.Getenv("DRAFT_SERVICE_ENV") == "test" {
-			return "http://localhost:8000"
-		}
-		return "http://server.home-cloud-system.svc.cluster.local:8090"
-	}()
-
-	GatewayName = "ingress-gateway"
-)
-
-var (
+	// TODO: get this value from the install
+	GatewayName      = "ingress-gateway"
 	GatewayNamespace = gwv1.Namespace("istio-system")
 )
 
@@ -44,12 +29,15 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 			CommonRouteSpec: gwv1.CommonRouteSpec{
 				ParentRefs: []gwv1.ParentReference{
 					{
-						Name:      gwv1.ObjectName(GatewayName),
+						// TODO: derive these from Install CRD
+						Name:      GatewayName,
 						Namespace: &GatewayNamespace,
 					},
 				},
 			},
 			// TODO: change this to subdomain? (*.home-cloud.local)
+			// subdomains don't work on Windows with mDNS so this would require running our
+			// own DNS server (which we want to do anyway)
 			Hostnames: []gwv1.Hostname{gwv1.Hostname(fmt.Sprintf("%s.local", route.Name))},
 			Rules: []gwv1.HTTPRouteRule{
 				{
@@ -71,15 +59,6 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 		return err
 	}
 
-	// add route (mDNS hostname) to server
-	_, err = sv1Connect.NewInternalServiceClient(http.DefaultClient, HomeCloudServerAddress).
-		AddMdnsHost(ctx, connect.NewRequest(&sv1.AddMdnsHostRequest{
-			Hostname: route.Name,
-		}))
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -93,15 +72,6 @@ func (r *AppReconciler) deleteRoute(ctx context.Context, namespace string, route
 		},
 	})
 	if !errors.IsNotFound(err) {
-		return err
-	}
-
-	// remove route (mDNS hostname) from server
-	_, err = sv1Connect.NewInternalServiceClient(http.DefaultClient, HomeCloudServerAddress).
-		RemoveMdnsHost(ctx, connect.NewRequest(&sv1.RemoveMdnsHostRequest{
-			Hostname: route,
-		}))
-	if err != nil {
 		return err
 	}
 
