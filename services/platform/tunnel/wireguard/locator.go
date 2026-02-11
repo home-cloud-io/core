@@ -15,9 +15,9 @@ import (
 
 	lv1 "github.com/home-cloud-io/core/api/platform/locator/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/locator/v1/v1connect"
-	"github.com/home-cloud-io/core/services/platform/daemon/host/encryption"
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/services/platform/tunnel/stun"
+	"github.com/home-cloud-io/services/platform/tunnel/wireguard/encryption"
 )
 
 type LocatorClient struct {
