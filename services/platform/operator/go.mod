@@ -2,13 +2,13 @@ module github.com/home-cloud-io/core/services/platform/operator
 
 go 1.25.3
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
 require (
 	connectrpc.com/connect v1.16.2
 	dario.cat/mergo v1.0.2
 	github.com/go-logr/logr v1.4.3
-	github.com/home-cloud-io/core/api v0.8.8-0.20260126050606-e540866b7734
+	github.com/home-cloud-io/core/api v0.9.0
 	github.com/sethvargo/go-password v0.3.1
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
 	github.com/steady-bytes/draft/pkg/loggers v0.2.5

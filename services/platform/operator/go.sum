@@ -209,8 +209,8 @@ github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245 h1:Nyeelmxya
 github.com/hashicorp/raft-boltdb v0.0.0-20231115180007-027066e4d245/go.mod h1:nTakvJ4XYq45UXtn0DbwR4aU9ZdjlnIenpbs6Cd+FM0=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0 h1:fPpQR1iGEVYjZ2OELvUHX600VAK5qmdnDEv3eXOwZUA=
 github.com/hashicorp/raft-boltdb/v2 v2.3.0/go.mod h1:YHukhB04ChJsLHLJEUD6vjFyLX2L3dsX3wPBZcX4tmc=
-github.com/home-cloud-io/core/api v0.8.8-0.20260126050606-e540866b7734 h1:e5YA6QLz/9evNy6sP1jt7EQbYHWa4Q/67r1+GHhZ1NY=
-github.com/home-cloud-io/core/api v0.8.8-0.20260126050606-e540866b7734/go.mod h1:4G9DoubvZUuMFZOM63P6AOHyQ5Ulm9X2ilJ1EshIvjc=
+github.com/home-cloud-io/core/api v0.9.0 h1:O7Ee40cmfbbIGE3S043GpWG/o527EPYYDbv08EZIqJs=
+github.com/home-cloud-io/core/api v0.9.0/go.mod h1:mtzBH1+4DOFogaF6ZwhNkJUApaNLVri4l8KdxYbhduA=
 github.com/huandu/xstrings v1.5.0 h1:2ag3IFq9ZDANvthTwTiqSSZLjDc+BedvHPAp5tJy2TI=
 github.com/huandu/xstrings v1.5.0/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
