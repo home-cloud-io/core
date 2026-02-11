@@ -7,16 +7,15 @@ import (
 	"strings"
 	"time"
 
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
-	"github.com/home-cloud-io/core/services/platform/server/apps"
-	"github.com/home-cloud-io/core/services/platform/server/system"
-
 	"connectrpc.com/connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
+	"github.com/home-cloud-io/core/services/platform/server/apps"
+	"github.com/home-cloud-io/core/services/platform/server/system"
 )
 
 type (
@@ -33,10 +32,11 @@ type (
 )
 
 const (
-	ErrFailedToInitDevice     = "failed to initialize device"
-	ErrInvalidInputValues     = "invalid input values"
-	ErrFailedToLogin          = "failed to login"
-	ErrFailedPeerRegistration = "failed to register client device as peer to the overlay network"
+	ErrFailedToInitDevice       = "failed to initialize device"
+	ErrInvalidInputValues       = "invalid input values"
+	ErrFailedToLogin            = "failed to login"
+	ErrFailedPeerRegistration   = "failed to register peer"
+	ErrFailedPeerDeregistration = "failed to deregister peer"
 )
 
 func New(logger chassis.Logger, actl apps.Controller, sctl system.Controller) Rpc {
@@ -113,7 +113,7 @@ func (h *rpcHandler) UpdateApp(ctx context.Context, request *connect.Request[v1.
 }
 
 func (h *rpcHandler) AppsHealthCheck(ctx context.Context, request *connect.Request[v1.AppsHealthCheckRequest]) (*connect.Response[v1.AppsHealthCheckResponse], error) {
-	checks, err := h.actl.Healthcheck(ctx, h.logger)
+	checks, err := h.actl.PrettyHealthcheck(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to check apps health")
 		return nil, err
@@ -138,81 +138,29 @@ func (h *rpcHandler) GetAppsInStore(ctx context.Context, request *connect.Reques
 // SYSTEM
 
 func (h *rpcHandler) ShutdownHost(ctx context.Context, request *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error) {
-	err := h.sctl.ShutdownHost()
+	h.logger.Info("shutdown host request")
+	err := h.sctl.ShutdownHost(ctx)
 	if err != nil {
+		h.logger.WithError(err).Error("failed to shutdown host")
 		return nil, err
 	}
 	return connect.NewResponse(&v1.ShutdownHostResponse{}), nil
 }
 
 func (h *rpcHandler) RestartHost(ctx context.Context, request *connect.Request[v1.RestartHostRequest]) (*connect.Response[v1.RestartHostResponse], error) {
-	err := h.sctl.RestartHost()
+	h.logger.Info("restart host request")
+	err := h.sctl.RestartHost(ctx)
 	if err != nil {
+		h.logger.WithError(err).Error("failed to restart host")
 		return nil, err
 	}
 	return connect.NewResponse(&v1.RestartHostResponse{}), nil
 }
 
-func (h *rpcHandler) CheckForSystemUpdates(ctx context.Context, request *connect.Request[v1.CheckForSystemUpdatesRequest]) (*connect.Response[v1.CheckForSystemUpdatesResponse], error) {
-	h.logger.Info("check for system updates request")
-	response, err := h.sctl.CheckForOSUpdates(ctx, h.logger)
-	if err != nil {
-		h.logger.WithError(err).Error("failed to check for system updates")
-		return nil, err
-	}
-	return connect.NewResponse(response), nil
-}
-
-func (h *rpcHandler) CheckForContainerUpdates(ctx context.Context, request *connect.Request[v1.CheckForContainerUpdatesRequest]) (*connect.Response[v1.CheckForContainerUpdatesResponse], error) {
-	images, err := h.sctl.CheckForContainerUpdates(ctx, h.logger)
-	if err != nil {
-		h.logger.WithError(err).Error("failed to check for system container updates")
-		return nil, err
-	}
-	return connect.NewResponse(&v1.CheckForContainerUpdatesResponse{
-		ImageVersions: images,
-	}), err
-}
-
-func (h *rpcHandler) ChangeDaemonVersion(ctx context.Context, request *connect.Request[v1.ChangeDaemonVersionRequest]) (*connect.Response[v1.ChangeDaemonVersionResponse], error) {
-	err := h.sctl.ChangeDaemonVersion(&dv1.ChangeDaemonVersionCommand{
-		Version:    request.Msg.Version,
-		SrcHash:    request.Msg.SrcHash,
-		VendorHash: request.Msg.VendorHash,
-	})
-	if err != nil {
-		h.logger.WithError(err).Error("failed to change daemon version")
-		return nil, err
-	}
-	return connect.NewResponse(&v1.ChangeDaemonVersionResponse{}), nil
-}
-
-func (h *rpcHandler) InstallOSUpdate(ctx context.Context, request *connect.Request[v1.InstallOSUpdateRequest]) (*connect.Response[v1.InstallOSUpdateResponse], error) {
-	err := h.sctl.InstallOSUpdate()
-	if err != nil {
-		h.logger.WithError(err).Error("failed to change install os update")
-		return nil, err
-	}
-	return connect.NewResponse(&v1.InstallOSUpdateResponse{}), nil
-}
-
-func (h *rpcHandler) SetSystemImage(ctx context.Context, request *connect.Request[v1.SetSystemImageRequest]) (*connect.Response[v1.SetSystemImageResponse], error) {
-	err := h.sctl.SetSystemImage(&dv1.SetSystemImageCommand{
-		CurrentImage:   request.Msg.CurrentImage,
-		RequestedImage: request.Msg.RequestedImage,
-	})
-	if err != nil {
-		h.logger.WithError(err).Error("failed to set system image")
-		return nil, err
-	}
-	return connect.NewResponse(&v1.SetSystemImageResponse{}), nil
-}
-
 func (h *rpcHandler) GetSystemStats(ctx context.Context, request *connect.Request[v1.GetSystemStatsRequest]) (*connect.Response[v1.GetSystemStatsResponse], error) {
-	// grab the in-memory cache of current system stats
-	stats := system.CurrentStats
-	if stats == nil {
-		h.logger.Error("failed to get system stats")
+	stats, err := h.sctl.SystemStats(ctx, h.logger)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to get system stats")
 		return nil, errors.New("failed to get system stats")
 	}
 	return connect.NewResponse(&v1.GetSystemStatsResponse{
@@ -220,75 +168,10 @@ func (h *rpcHandler) GetSystemStats(ctx context.Context, request *connect.Reques
 	}), nil
 }
 
-// IsDeviceSetup checks if the device is setup. It's also the first request made by the FE when loading. If the device is not setup, the FE will redirect to the setup page.
-// A device is considered setup (or will return true) if the device has a username, password, and the `Settings` object is not empty in `blueprint`.
-func (h *rpcHandler) IsDeviceSetup(ctx context.Context, request *connect.Request[v1.IsDeviceSetupRequest]) (*connect.Response[v1.IsDeviceSetupResponse], error) {
-	h.logger.Info("checking if device is setup")
-	isSetup, err := h.sctl.IsDeviceSetup(ctx)
-	if err != nil {
-		return nil, fmt.Errorf(system.ErrFailedToGetSettings)
-	}
-
-	return connect.NewResponse(&v1.IsDeviceSetupResponse{Setup: isSetup}), nil
-}
-
-func (h *rpcHandler) InitializeDevice(ctx context.Context, request *connect.Request[v1.InitializeDeviceRequest]) (*connect.Response[v1.InitializeDeviceResponse], error) {
-	h.logger.Info("requested to set up device for the first time")
-
-	var msg = request.Msg
-	if err := msg.ValidateAll(); err != nil {
-		return nil, err
-	}
-
-	// convert the request to the `DeviceSettings` object
-	deviceSettings := &v1.DeviceSettings{
-		AdminUser: &v1.User{
-			Username: msg.GetUsername(),
-			Password: msg.GetPassword(),
-		},
-		Timezone:       msg.GetTimezone(),
-		AutoUpdateApps: msg.GetAutoUpdateApps(),
-		AutoUpdateOs:   msg.GetAutoUpdateOs(),
-		SecureTunnelingSettings: &v1.SecureTunnelingSettings{
-			Enabled: false,
-		},
-	}
-
-	err := h.sctl.InitializeDevice(ctx, h.logger, deviceSettings)
-	if err != nil {
-		if err.Error() == system.ErrDeviceAlreadySetup {
-			return connect.NewResponse(&v1.InitializeDeviceResponse{Setup: true}), nil
-		}
-
-		h.logger.Error(err.Error())
-		return nil, err
-	}
-
-	return connect.NewResponse(&v1.InitializeDeviceResponse{Setup: true}), nil
-}
-
-func (h *rpcHandler) Login(ctx context.Context, request *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
-	h.logger.Info("login request")
-
-	msg := request.Msg
-	if err := msg.Validate(); err != nil {
-		h.logger.WithError(err).Error(ErrInvalidInputValues)
-		return nil, fmt.Errorf(ErrInvalidInputValues)
-	}
-
-	res, err := h.sctl.Login(ctx, msg.GetUsername(), msg.GetPassword())
-	if err != nil {
-		h.logger.WithError(err).Error(ErrFailedToLogin)
-		return nil, fmt.Errorf(ErrFailedToLogin)
-	}
-
-	return connect.NewResponse(&v1.LoginResponse{Token: res}), nil
-}
-
 func (h *rpcHandler) GetDeviceSettings(ctx context.Context, request *connect.Request[v1.GetDeviceSettingsRequest]) (*connect.Response[v1.GetDeviceSettingsResponse], error) {
 	h.logger.Info("getting device settings")
 
-	settings, err := h.sctl.GetServerSettings(ctx)
+	settings, err := h.sctl.GetServerSettings(ctx, h.logger)
 	if err != nil {
 		h.logger.WithError(err).Error(system.ErrFailedToGetSettings)
 		return nil, errors.New(system.ErrFailedToGetSettings)
@@ -362,6 +245,18 @@ func (h *rpcHandler) RegisterPeer(ctx context.Context, request *connect.Request[
 	return connect.NewResponse(resp), nil
 }
 
+func (h *rpcHandler) DeregisterPeer(ctx context.Context, request *connect.Request[v1.DeregisterPeerRequest]) (*connect.Response[v1.DeregisterPeerResponse], error) {
+	h.logger.Info("deregister a peer")
+
+	err := h.sctl.DeregisterPeer(ctx, h.logger, request.Msg)
+	if err != nil {
+		h.logger.WithError(err).Error(ErrFailedPeerDeregistration)
+		return nil, errors.New(ErrFailedPeerDeregistration)
+	}
+
+	return connect.NewResponse(&v1.DeregisterPeerResponse{}), nil
+}
+
 func (h *rpcHandler) RegisterToLocator(ctx context.Context, request *connect.Request[v1.RegisterToLocatorRequest]) (*connect.Response[v1.RegisterToLocatorResponse], error) {
 	h.logger.WithField("msg", request.Msg).Info("registering to locator")
 
@@ -411,14 +306,6 @@ func (h *rpcHandler) GetSystemLogs(ctx context.Context, request *connect.Request
 		h.logger.WithError(err).Error(apps.ErrFailedToGetLogs)
 		return nil, errors.New(apps.ErrFailedToGetLogs)
 	}
-
-	deviceLogs, err := h.sctl.GetDeviceLogs(ctx, h.logger, int64(request.Msg.SinceSeconds))
-	if err != nil {
-		h.logger.WithError(err).Error(apps.ErrFailedToGetLogs)
-		return nil, errors.New(apps.ErrFailedToGetLogs)
-	}
-
-	logs = append(logs, deviceLogs...)
 
 	domainsMap := make(map[string]struct{})
 	namespacesMap := make(map[string]struct{})

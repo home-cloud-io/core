@@ -7,10 +7,6 @@ import (
 	"strings"
 	"time"
 
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
@@ -20,6 +16,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	crclient "sigs.k8s.io/controller-runtime/pkg/client"
+
+	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 )
 
 type (
@@ -27,16 +27,28 @@ type (
 		Apps
 		System
 	}
+	// Default passes through the CRUD operations of the client
+	Default interface {
+		Create(ctx context.Context, obj crclient.Object) error
+		Get(ctx context.Context, key crclient.ObjectKey, obj crclient.Object) error
+		Update(ctx context.Context, obj crclient.Object) error
+		Delete(ctx context.Context, obj crclient.Object) error
+		// Settings returns the installation settings
+		Settings(ctx context.Context) (*opv1.SettingsSpec, error)
+	}
+	// Apps operates on Apps exclusively
 	Apps interface {
-		// Install will install the given app
-		Install(ctx context.Context, spec opv1.AppSpec) error
-		// Delete will delete the given app
-		Delete(ctx context.Context, spec opv1.AppSpec) error
-		// Update will update the given app
+		Default
+
+		// InstallApp will install the given app
+		InstallApp(ctx context.Context, spec opv1.AppSpec) error
+		// DeleteApp will delete the given app
+		DeleteApp(ctx context.Context, spec opv1.AppSpec) error
+		// UpdateApp will update the given app
 		//
 		// NOTE: An empty value on the spec will be applied as empty and will NOT
 		// default to the existing value.
-		Update(ctx context.Context, spec opv1.AppSpec) error
+		UpdateApp(ctx context.Context, spec opv1.AppSpec) error
 		// Installed returns whether or not the app with the given name is currently installed
 		Installed(ctx context.Context, name string) (installed bool, err error)
 		// Healthcheck will retrieve the health of all installed apps
@@ -46,11 +58,10 @@ type (
 		// AppStorage will retrieve storage volumes for the given app list
 		AppStorage(ctx context.Context, apps []opv1.App) ([]*webv1.AppStorage, error)
 	}
+	// System operates on system components (logs, versions)
 	System interface {
-		// CurrentImages will retrieve the current images of all system containers. System
-		// containers are considered to be those in the `home-cloud-system` and `draft-system`
-		// namespaces.
-		CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error)
+		Default
+
 		// GetServerVersion will retrieve the current k8s server version
 		GetServerVersion(ctx context.Context) (version string, err error)
 		// GetLogs will retrieve the logs for all pods across the entire cluster
@@ -65,8 +76,8 @@ type (
 )
 
 const (
-	homeCloudNamespace = "home-cloud-system"
-	draftNamespace     = "draft-system"
+	// TODO: this needs to be dynamic
+	DefaultHomeCloudNamespace = "home-cloud-system"
 )
 
 func NewClient(logger chassis.Logger) Client {
@@ -105,11 +116,27 @@ func NewClient(logger chassis.Logger) Client {
 	}
 }
 
-func (c *client) Install(ctx context.Context, spec opv1.AppSpec) error {
+func (c *client) Create(ctx context.Context, obj crclient.Object) error {
+	return c.client.Create(ctx, obj)
+}
+
+func (c *client) Get(ctx context.Context, key crclient.ObjectKey, obj crclient.Object) error {
+	return c.client.Get(ctx, key, obj)
+}
+
+func (c *client) Update(ctx context.Context, obj crclient.Object) error {
+	return c.client.Update(ctx, obj)
+}
+
+func (c *client) Delete(ctx context.Context, obj crclient.Object) error {
+	return c.client.Delete(ctx, obj)
+}
+
+func (c *client) InstallApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       spec.Release,
-			Namespace:  homeCloudNamespace,
+			Namespace:  DefaultHomeCloudNamespace,
 			Finalizers: []string{"apps.home-cloud.io/finalizer"},
 		},
 		Spec: spec,
@@ -117,21 +144,21 @@ func (c *client) Install(ctx context.Context, spec opv1.AppSpec) error {
 	return c.client.Create(ctx, app)
 }
 
-func (c *client) Delete(ctx context.Context, spec opv1.AppSpec) error {
+func (c *client) DeleteApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      spec.Release,
-			Namespace: homeCloudNamespace,
+			Namespace: DefaultHomeCloudNamespace,
 		},
 	}
 	return c.client.Delete(ctx, app)
 }
 
-func (c *client) Update(ctx context.Context, spec opv1.AppSpec) error {
+func (c *client) UpdateApp(ctx context.Context, spec opv1.AppSpec) error {
 	app := &opv1.App{}
 	err := c.client.Get(ctx, types.NamespacedName{
 		Name:      spec.Release,
-		Namespace: homeCloudNamespace,
+		Namespace: DefaultHomeCloudNamespace,
 	}, app)
 	if err != nil {
 		return err
@@ -140,42 +167,12 @@ func (c *client) Update(ctx context.Context, spec opv1.AppSpec) error {
 	return c.client.Update(ctx, app)
 }
 
-func (c *client) CurrentImages(ctx context.Context) ([]*webv1.ImageVersion, error) {
-	var (
-		// processing as a map keeps from having duplicates
-		images = map[string]*webv1.ImageVersion{}
-		err    error
-	)
-
-	// draft containers
-	err = c.getCurrentImageVersions(ctx, draftNamespace, images)
-	if err != nil {
-		return nil, err
-	}
-
-	// home-cloud containers
-	err = c.getCurrentImageVersions(ctx, homeCloudNamespace, images)
-	if err != nil {
-		return nil, err
-	}
-
-	// convert map to slice
-	imagesSlice := make([]*webv1.ImageVersion, len(images))
-	index := 0
-	for _, image := range images {
-		imagesSlice[index] = image
-		index++
-	}
-
-	return imagesSlice, nil
-}
-
 func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 
 	// get all installed apps
 	apps := &opv1.AppList{}
 	err := c.client.List(ctx, apps, &crclient.ListOptions{
-		Namespace: homeCloudNamespace,
+		Namespace: DefaultHomeCloudNamespace,
 	})
 	if err != nil {
 		return nil, err
@@ -226,48 +223,10 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 	return checks, nil
 }
 
-func (c *client) GetAppPodLists(ctx context.Context) ([]*corev1.PodList, error) {
-
-	var (
-		podLists = []*corev1.PodList{}
-	)
-
-	// get all installed apps
-	apps := &opv1.AppList{}
-	err := c.client.List(ctx, apps, &crclient.ListOptions{
-		Namespace: homeCloudNamespace,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// process each app and check all app pods for status
-	checks := make([]*webv1.AppHealth, len(apps.Items))
-	for index, app := range apps.Items {
-		checks[index] = &webv1.AppHealth{
-			Name:   app.Name,
-			Status: webv1.AppStatus_APP_STATUS_HEALTHY,
-		}
-
-		// get all pods in app namespace
-		pods := &corev1.PodList{}
-		err := c.client.List(ctx, pods, &crclient.ListOptions{
-			Namespace: app.Name,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		podLists = append(podLists, pods)
-	}
-
-	return podLists, nil
-}
-
 func (c *client) Installed(ctx context.Context, name string) (installed bool, err error) {
 	apps := &opv1.App{}
 	err = c.client.Get(ctx, types.NamespacedName{
-		Namespace: homeCloudNamespace,
+		Namespace: DefaultHomeCloudNamespace,
 		Name:      name,
 	}, apps)
 	if err != nil {
@@ -285,7 +244,7 @@ func (c *client) Installed(ctx context.Context, name string) (installed bool, er
 func (c *client) InstalledApps(ctx context.Context) ([]opv1.App, error) {
 	apps := &opv1.AppList{}
 	err := c.client.List(ctx, apps, &crclient.ListOptions{
-		Namespace: homeCloudNamespace,
+		Namespace: DefaultHomeCloudNamespace,
 	})
 	if err != nil {
 		return nil, err
@@ -330,29 +289,6 @@ func (c *client) GetServerVersion(ctx context.Context) (string, error) {
 		return "", err
 	}
 	return version.GitVersion, nil
-}
-
-func (c *client) getCurrentImageVersions(ctx context.Context, namespace string, images map[string]*webv1.ImageVersion) error {
-	pods := &corev1.PodList{}
-	err := c.client.List(ctx, pods, &crclient.ListOptions{
-		Namespace: namespace,
-	})
-	if err != nil {
-		return err
-	}
-
-	for _, p := range pods.Items {
-		for _, c := range p.Spec.Containers {
-			name := strings.Split(c.Image, ":")[0]
-			currentVersion := strings.Split(c.Image, ":")[1]
-			images[name] = &webv1.ImageVersion{
-				Image:   name,
-				Current: currentVersion,
-			}
-		}
-	}
-
-	return nil
 }
 
 func (c *client) GetLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error) {
@@ -431,4 +367,16 @@ func (c *client) getPodLogs(ctx context.Context, logger chassis.Logger, sinceSec
 	}
 
 	return logs
+}
+
+func (c *client) Settings(ctx context.Context) (*opv1.SettingsSpec, error) {
+	install := &opv1.Install{}
+	err := c.client.Get(ctx, types.NamespacedName{
+		Namespace: DefaultHomeCloudNamespace,
+		Name:      "install",
+	}, install)
+	if err != nil {
+		return nil, err
+	}
+	return &install.Spec.Settings, nil
 }
