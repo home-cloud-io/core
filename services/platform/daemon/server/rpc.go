@@ -9,10 +9,15 @@ import (
 	"github.com/siderolabs/talos/pkg/cluster"
 	k8s "github.com/siderolabs/talos/pkg/cluster/kubernetes"
 	"github.com/siderolabs/talos/pkg/machinery/api/machine"
+	"github.com/siderolabs/talos/pkg/machinery/cel"
+	"github.com/siderolabs/talos/pkg/machinery/cel/celenv"
 	"github.com/siderolabs/talos/pkg/machinery/client"
 	"github.com/siderolabs/talos/pkg/machinery/config/encoder"
+	"github.com/siderolabs/talos/pkg/machinery/config/types/block"
 	"github.com/siderolabs/talos/pkg/machinery/constants"
 	"github.com/steady-bytes/draft/pkg/chassis"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -198,6 +203,58 @@ func (h *rpcHandler) UpgradeKubernetes(ctx context.Context, request *connect.Req
 	}
 	return connect.NewResponse(&v1.UpgradeKubernetesResponse{}), nil
 }
+
+func (h *rpcHandler) CreateVolume(ctx context.Context, request *connect.Request[v1.CreateVolumeRequest]) (*connect.Response[v1.CreateVolumeResponse], error) {
+	h.logger.Info("creating volume")
+
+	var minSize block.ByteSize
+	err := minSize.UnmarshalText([]byte(request.Msg.MinSize))
+	if err != nil {
+		h.logger.WithError(err).Warn("invalid min_size")
+		return nil, status.Error(codes.InvalidArgument, "invalid min_size")
+	}
+
+	var maxSize block.Size
+	err = maxSize.UnmarshalText([]byte(request.Msg.MaxSize))
+	if err != nil {
+		h.logger.WithError(err).Warn("invalid max_size")
+		return nil, status.Error(codes.InvalidArgument, "invalid max_size")
+	}
+
+	uvc := block.NewUserVolumeConfigV1Alpha1()
+	uvc.MetaName = request.Msg.Name
+	uvc.ProvisioningSpec = block.ProvisioningSpec{
+		DiskSelectorSpec: block.DiskSelector{
+			// TODO: will probably want to expose this expression on the API
+			Match: cel.MustExpression(cel.ParseBooleanExpression("!system_disk", celenv.DiskLocator())),
+		},
+		ProvisioningMinSize: minSize,
+		ProvisioningMaxSize: maxSize,
+	}
+
+	_, err = uvc.Validate(talos.ValidationMode{})
+	if err != nil {
+		h.logger.WithError(err).Warn("failed UserVolumeConfig validation")
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	id, err := talos.CreateUserVolume(ctx, h.logger, uvc)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to create volume")
+		return nil, err
+	}
+
+	return connect.NewResponse(&v1.CreateVolumeResponse{
+		Id: id,
+	}), nil
+}
+
+func (h *rpcHandler) DeleteVolume(ctx context.Context, request *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error) {
+	h.logger.Error("unimplemented")
+	return nil, status.Error(codes.Unimplemented, "unimplemented")
+}
+
+// helpers
 
 func upgradeKubernetes(ctx context.Context, c *client.Client, toVersion string) error {
 
