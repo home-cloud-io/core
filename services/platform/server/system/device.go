@@ -2,41 +2,29 @@ package system
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"path/filepath"
-	"sort"
-	"strings"
+
+	"connectrpc.com/connect"
+	"github.com/steady-bytes/draft/pkg/chassis"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
+	corev1 "k8s.io/api/core/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/types"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
-
-	"github.com/steady-bytes/draft/pkg/chassis"
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 )
 
 type (
 	Device interface {
 		// GetServerSettings returns the current server settings after filtering out the
 		// admin username and password.
-		GetServerSettings(ctx context.Context) (*v1.DeviceSettings, error)
+		GetServerSettings(ctx context.Context, logger chassis.Logger) (*v1.DeviceSettings, error)
 		// SetServerSettings updates the settings on the server with the given values
 		SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error
-		// IsDeviceSetup checks if the device is already setup by checking if the DEFAULT_DEVICE_SETTINGS_KEY key exists in the key-value store
-		// with the default settings model
-		IsDeviceSetup(ctx context.Context) (bool, error)
-		// InitializeDevice initializes the device with the given settings. It first checks if the device is already setup
-		// Uses the user-provided password to set the password for the "admin" user on the device
-		// and save the remaining settings in the key-value store
-		InitializeDevice(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error
-		// Login receives a username and password and returns a token.
-		//
-		// NOTE: the token is unimplemented so this only checks the validity of the password for now
-		Login(ctx context.Context, username, password string) (string, error)
 		// GetComponentVersions returns all the versions of system components (server, daemon, etc.)
 		GetComponentVersions(ctx context.Context, logger chassis.Logger) (*v1.GetComponentVersionsResponse, error)
-		// GetDeviceLogs returns the logs from the daemon for the given seconds in the past
-		GetDeviceLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error)
 	}
 )
 
@@ -50,244 +38,182 @@ const (
 
 // DEVICE
 
-func (c *controller) GetServerSettings(ctx context.Context) (*v1.DeviceSettings, error) {
-	settings := &v1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
+func (c *controller) GetServerSettings(ctx context.Context, logger chassis.Logger) (*v1.DeviceSettings, error) {
+	settings, err := c.k8sclient.Settings(ctx)
 	if err != nil {
 		return nil, err
 	}
+	s := &v1.DeviceSettings{
+		AutoUpdateApps:          settings.AutoUpdateApps,
+		AutoUpdateOs:            settings.AutoUpdateSystem,
+		SecureTunnelingSettings: &v1.SecureTunnelingSettings{},
+	}
 
-	settings.AdminUser.Password = "" // don't return the password
+	// get wireguard server config
+	wireguardServer := &opv1.Wireguard{}
+	err = c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      DefaultWireguardInterface,
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
+	}, wireguardServer)
+	if err != nil {
+		// not found means not enabled
+		if kerrors.IsNotFound(err) {
+			return s, nil
+		}
+		logger.WithError(err).Error("failed to get wireguard server config")
+		return nil, err
+	}
 
-	return settings, nil
+	// get wireguard server private key (so we can derive the public key)
+	wireguardServerSecret := &corev1.Secret{}
+	err = c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      wireguardServer.Spec.PrivateKeySecret.Name,
+		Namespace: *wireguardServer.Spec.PrivateKeySecret.Namespace,
+	}, wireguardServerSecret)
+	if err != nil {
+		logger.WithError(err).Error("failed to get wireguard server secret")
+		return nil, err
+	}
+	wireguardServerPrivateKey, err := wgtypes.ParseKey(string(wireguardServerSecret.Data["privateKey"]))
+	if err != nil {
+		logger.WithError(err).Error("failed to parse wireguard server private key")
+		return nil, err
+	}
+
+	// save to settings object
+	s.SecureTunnelingSettings = &v1.SecureTunnelingSettings{
+		Enabled: true,
+		WireguardInterfaces: []*v1.WireguardInterface{
+			{
+				Id:             wireguardServer.Spec.ID,
+				Name:           wireguardServer.Name,
+				Port:           int32(wireguardServer.Spec.ListenPort),
+				PublicKey:      wireguardServerPrivateKey.PublicKey().String(),
+				StunServer:     wireguardServer.Spec.STUNServer,
+				LocatorServers: wireguardServer.Spec.Locators,
+			},
+		},
+	}
+
+	return s, nil
 }
 
 func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {
 
-	// set the device settings on the host (via the daemon)
-	err := c.saveSettings(ctx, logger, &dv1.SaveSettingsCommand{
-		AdminPassword:  settings.AdminUser.Password,
-		TimeZone:       settings.Timezone,
-		EnableSsh:      settings.EnableSsh,
-		TrustedSshKeys: settings.TrustedSshKeys,
-	})
+	install := &opv1.Install{}
+	err := c.k8sclient.Get(ctx, types.NamespacedName{
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
+		Name:      "install",
+	}, install)
 	if err != nil {
+		logger.WithError(err).Error("failed to get install")
 		return err
 	}
 
-	// salt and hash given password if set
-	// otherwise, get existing value from cache
-	if settings.AdminUser.Password != "" {
-		logger.Info("updating admin user password")
-		// get seed salt value from blueprint
-		seed, err := getSaltValue(ctx)
-		if err != nil {
-			return err
-		} else {
-			// salt & hash the meat before you put in on the grill
-			settings.AdminUser.Password = hashPassword(settings.AdminUser.Password, []byte(seed))
-		}
-	} else {
-		existingSettings := &v1.DeviceSettings{}
-		err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, existingSettings)
-		if err != nil {
-			return fmt.Errorf(ErrFailedToGetSettings)
-		}
-		settings.AdminUser.Password = existingSettings.AdminUser.Password
+	// check if the auto update apps schedule has changed and update the cron
+	if install.Spec.Settings.AutoUpdateAppsSchedule != settings.AutoUpdateAppsSchedule {
+		// defer this so it runs after the update happens on the kube api
+		defer c.actl.AutoUpdate(ctx, logger)
 	}
 
-	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		return errors.New(ErrFailedToCreateSettings)
+	install.Spec.Settings.AutoUpdateApps = settings.AutoUpdateApps
+	install.Spec.Settings.AutoUpdateSystem = settings.AutoUpdateOs
+	install.Spec.Settings.AutoUpdateAppsSchedule = settings.AutoUpdateAppsSchedule
+	install.Spec.Settings.Hostname = settings.Hostname
+	install.Spec.Settings.AppStores = []opv1.AppStore{}
+	for _, store := range settings.AppStores {
+		install.Spec.Settings.AppStores = append(install.Spec.Settings.AppStores, opv1.AppStore{
+			URL:         store.Url,
+			RawChartURL: store.RawChartUrl,
+		})
 	}
 
-	return nil
-}
-
-func (c *controller) IsDeviceSetup(ctx context.Context) (bool, error) {
-	// list is used to get all the `DeviceSettings` objects in the key-value store
-	// it will not fail if the key does not exist like `Get` would
-	settings := &v1.DeviceSettings{}
-	list, err := kvclient.List(ctx, settings)
-	if err != nil {
-		return false, errors.New(ErrFailedToGetSettings)
-	}
-
-	if len(list) == 0 {
-		return false, nil
-	}
-	return true, nil
-}
-
-func (c *controller) InitializeDevice(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error {
-	yes, err := c.IsDeviceSetup(ctx)
-	if err != nil {
-		return errors.New(ErrFailedToGetSettings)
-	} else if yes {
-		logger.Warn("device is already set up")
-		return errors.New(ErrDeviceAlreadySetup)
-	}
-
-	// set the device settings on the host (via the daemon)
-	err = c.saveSettings(ctx, logger, &dv1.SaveSettingsCommand{
-		AdminPassword:  settings.AdminUser.Password,
-		TimeZone:       settings.Timezone,
-		EnableSsh:      settings.EnableSsh,
-		TrustedSshKeys: settings.TrustedSshKeys,
-	})
-	if err != nil {
-		return err
-	}
-
-	// get seed salt value from blueprint
-	seed, err := getSaltValue(ctx)
-	if err != nil {
-		return err
-	} else {
-		// salt & hash the meat before you put in on the grill
-		settings.AdminUser.Password = hashPassword(settings.AdminUser.Password, []byte(seed))
-	}
-
-	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		return errors.New(ErrFailedToCreateSettings)
-	}
-
-	return nil
-}
-
-func (c *controller) Login(ctx context.Context, username, password string) (string, error) {
-	settings := &v1.DeviceSettings{}
-	err := kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
-	}
-
-	salt, err := getSaltValue(ctx)
-	if err != nil {
-		return "", errors.New(ErrFailedToGetSettings)
-	}
-
-	// Check if the password is correct. If not, return an error
-	if hashPassword(password, []byte(salt)) != settings.AdminUser.Password {
-		return "", errors.New("invalid username or password")
-	}
-
-	// TODO: forge token
-
-	return "JWT_TOKEN", nil
+	return c.k8sclient.Update(ctx, install)
 }
 
 func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Logger) (*v1.GetComponentVersionsResponse, error) {
 
-	var (
-		versions = []*dv1.ComponentVersion{}
-	)
+	install := &opv1.Install{}
+	err := c.k8sclient.Get(ctx, types.NamespacedName{
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
+		Name:      "install",
+	}, install)
+	if err != nil {
+		logger.WithError(err).Error("failed to get install")
+		return nil, err
+	}
+
+	resp := &v1.GetComponentVersionsResponse{
+		Platform: []*dv1.ComponentVersion{
+			{
+				Name:    "server",
+				Domain:  "platform",
+				Version: install.Status.Server.Tag,
+			},
+			{
+				Name:    "mdns",
+				Domain:  "platform",
+				Version: install.Status.MDNS.Tag,
+			},
+			{
+				Name:    "tunnel",
+				Domain:  "platform",
+				Version: install.Status.Tunnel.Tag,
+			},
+			{
+				Name:    "daemon",
+				Domain:  "platform",
+				Version: install.Status.Daemon.Tag,
+			},
+		},
+		System: []*dv1.ComponentVersion{
+			{
+				Name:    "home-cloud",
+				Domain:  "system",
+				Version: install.Status.Version,
+			},
+			{
+				Name:    "istio",
+				Domain:  "system",
+				Version: install.Status.Istio.Version,
+			},
+			{
+				Name:    "gateway-api",
+				Domain:  "system",
+				Version: install.Status.GatewayAPI.Version,
+			},
+		},
+	}
 
 	k8sVersion, err := c.k8sclient.GetServerVersion(ctx)
 	if err != nil {
-		versions = append(versions, &dv1.ComponentVersion{
-			Name:    "k8s",
+		resp.System = append(resp.System, &dv1.ComponentVersion{
+			Name:    "kubernetes",
 			Domain:  "system",
 			Version: err.Error(),
 		})
 	} else {
-		versions = append(versions, &dv1.ComponentVersion{
-			Name:    "k8s",
+		resp.System = append(resp.System, &dv1.ComponentVersion{
+			Name:    "kubernetes",
 			Domain:  "system",
 			Version: k8sVersion,
 		})
 	}
 
-	imageVersions, err := c.k8sclient.CurrentImages(ctx)
+	osVersion, err := c.daemonClient.Version(ctx, connect.NewRequest(&dv1.VersionRequest{}))
 	if err != nil {
-		versions = append(versions, &dv1.ComponentVersion{
-			Name:    "images",
-			Domain:  "platform",
-			Version: err.Error(),
-		})
-	} else {
-		for _, image := range imageVersions {
-			versions = append(versions, &dv1.ComponentVersion{
-				Name:    componentFromImage(image.Image),
-				Domain:  "platform",
-				Version: image.Current,
-			})
-		}
-	}
-
-	logger.Info("requesting component versions from daemon")
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_RequestComponentVersionsCommand{
-			RequestComponentVersionsCommand: &dv1.RequestComponentVersionsCommand{},
-		},
-	}, nil)
-	if err != nil {
-		versions = append(versions, &dv1.ComponentVersion{
-			Name:    "daemon",
-			Domain:  "platform",
-			Version: err.Error(),
-		}, &dv1.ComponentVersion{
-			Name:    "nixos",
+		resp.System = append(resp.System, &dv1.ComponentVersion{
+			Name:    "unknown",
 			Domain:  "system",
 			Version: err.Error(),
 		})
-	}
-	e := response.GetComponentVersions()
-	versions = append(versions, e.Components...)
-
-	// sort versions
-	sort.Slice(versions, func(i, j int) bool {
-		return versions[i].Name < versions[j].Name
-	})
-
-	return buildComponentVersionsResponse(logger, versions), nil
-}
-
-func (c *controller) GetDeviceLogs(ctx context.Context, logger chassis.Logger, sinceSeconds int64) ([]*dv1.Log, error) {
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_RequestLogsCommand{
-			RequestLogsCommand: &dv1.RequestLogsCommand{
-				SinceSeconds: uint32(sinceSeconds),
-			},
-		},
-	}, nil)
-	if err != nil {
-		return nil, err
-	}
-	e := response.GetLogs()
-	if e.Error != "" {
-		return nil, errors.New(e.Error)
+	} else {
+		resp.System = append(resp.System, &dv1.ComponentVersion{
+			Name:    osVersion.Msg.Name,
+			Domain:  "system",
+			Version: osVersion.Msg.Version,
+		})
 	}
 
-	return e.Logs, nil
-}
-
-// HELPERS
-
-func componentFromImage(image string) string {
-	s := strings.Split(filepath.Base(image), "-")
-	return s[len(s)-1]
-}
-
-func buildComponentVersionsResponse(logger chassis.Logger, versions []*dv1.ComponentVersion) *v1.GetComponentVersionsResponse {
-	var (
-		response = &v1.GetComponentVersionsResponse{
-			Platform: []*dv1.ComponentVersion{},
-			System:   []*dv1.ComponentVersion{},
-		}
-	)
-
-	for _, v := range versions {
-		switch v.Domain {
-		case "platform":
-			response.Platform = append(response.Platform, v)
-		case "system":
-			response.System = append(response.System, v)
-		default:
-			logger.WithField("component_version", v).Warn("unsupported component version received")
-		}
-	}
-
-	return response
+	return resp, nil
 }

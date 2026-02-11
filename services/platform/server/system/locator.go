@@ -2,13 +2,12 @@ package system
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"slices"
 
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
-	kvclient "github.com/home-cloud-io/core/services/platform/server/kv-client"
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
+
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type (
@@ -19,67 +18,42 @@ type (
 )
 
 func (c *controller) AddLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) (err error) {
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_AddLocatorServerCommand{
-			AddLocatorServerCommand: &dv1.AddLocatorServerCommand{
-				LocatorAddress:     locatorAddress,
-				WireguardInterface: wgInterfaceName,
-			},
-		},
-	}, nil)
+	// get wireguard resource
+	wgInterface := &opv1.Wireguard{}
+	err = c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      wgInterfaceName,
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
+	}, wgInterface)
 	if err != nil {
 		return err
 	}
-	e := response.GetLocatorServerAdded()
-	if e.Error != "" {
-		return errors.New(e.Error)
-	}
 
-	settings := &v1.DeviceSettings{}
-	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		return err
+	// add locator if new
+	if slices.Contains(wgInterface.Spec.Locators, locatorAddress) {
+		return nil
 	}
-	settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers = append(settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers, locatorAddress)
-	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		return fmt.Errorf("failed to save settings")
-	}
+	wgInterface.Spec.Locators = append(wgInterface.Spec.Locators, locatorAddress)
 
-	return nil
+	// update resource
+	return c.k8sclient.Update(ctx, wgInterface)
 }
 
 func (c *controller) RemoveLocator(ctx context.Context, wgInterfaceName string, locatorAddress string) (err error) {
-	response, err := com.Request(ctx, &dv1.ServerMessage{
-		Message: &dv1.ServerMessage_RemoveLocatorServerCommand{
-			RemoveLocatorServerCommand: &dv1.RemoveLocatorServerCommand{
-				LocatorAddress:     locatorAddress,
-				WireguardInterface: wgInterfaceName,
-			},
-		},
-	}, nil)
+	// get wireguard resource
+	wgInterface := &opv1.Wireguard{}
+	err = c.k8sclient.Get(ctx, types.NamespacedName{
+		Name:      wgInterfaceName,
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
+	}, wgInterface)
 	if err != nil {
 		return err
 	}
-	e := response.GetLocatorServerRemoved()
-	if e.Error != "" {
-		return errors.New(e.Error)
-	}
 
-	settings := &v1.DeviceSettings{}
-	err = kvclient.Get(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		return err
-	}
-	for i, l := range settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers {
-		if l == locatorAddress {
-			settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers = slices.Delete(settings.SecureTunnelingSettings.WireguardInterfaces[0].LocatorServers, i, i+1)
-		}
-	}
-	_, err = kvclient.Set(ctx, kvclient.DEFAULT_DEVICE_SETTINGS_KEY, settings)
-	if err != nil {
-		return fmt.Errorf("failed to save settings")
-	}
+	// remove locator
+	wgInterface.Spec.Locators = slices.DeleteFunc(wgInterface.Spec.Locators, func(s string) bool {
+		return s == locatorAddress
+	})
 
-	return nil
+	// update resource
+	return c.k8sclient.Update(ctx, wgInterface)
 }

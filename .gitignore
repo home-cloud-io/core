@@ -4,3 +4,6 @@ node_modules
 dist
 vendor
 tmp
+_out
+TODO
+.vscode
