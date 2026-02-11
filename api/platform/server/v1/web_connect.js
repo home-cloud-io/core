@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AppsHealthCheckRequest, AppsHealthCheckResponse, ChangeDaemonVersionRequest, ChangeDaemonVersionResponse, CheckForContainerUpdatesRequest, CheckForContainerUpdatesResponse, CheckForSystemUpdatesRequest, CheckForSystemUpdatesResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InitializeDeviceRequest, InitializeDeviceResponse, InstallAppRequest, InstallAppResponse, InstallOSUpdateRequest, InstallOSUpdateResponse, IsDeviceSetupRequest, IsDeviceSetupResponse, LoginRequest, LoginResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, ServerEvent, SetDeviceSettingsRequest, SetDeviceSettingsResponse, SetSystemImageRequest, SetSystemImageResponse, ShutdownHostRequest, ShutdownHostResponse, SubscribeRequest, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
+import { AppsHealthCheckRequest, AppsHealthCheckResponse, DeleteAppRequest, DeleteAppResponse, DeregisterFromLocatorRequest, DeregisterFromLocatorResponse, DeregisterPeerRequest, DeregisterPeerResponse, DisableSecureTunnellingRequest, DisableSecureTunnellingResponse, EnableSecureTunnellingRequest, EnableSecureTunnellingResponse, GetAppsInStoreRequest, GetAppsInStoreResponse, GetAppStorageRequest, GetAppStorageResponse, GetComponentVersionsRequest, GetComponentVersionsResponse, GetDeviceSettingsRequest, GetDeviceSettingsResponse, GetSystemLogsRequest, GetSystemLogsResponse, GetSystemStatsRequest, GetSystemStatsResponse, InstallAppRequest, InstallAppResponse, RegisterPeerRequest, RegisterPeerResponse, RegisterToLocatorRequest, RegisterToLocatorResponse, RestartHostRequest, RestartHostResponse, ServerEvent, SetDeviceSettingsRequest, SetDeviceSettingsResponse, ShutdownHostRequest, ShutdownHostResponse, SubscribeRequest, UpdateAppRequest, UpdateAppResponse } from "./web_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -12,6 +12,83 @@ import { MethodKind } from "@bufbuild/protobuf";
 export const WebService = {
   typeName: "platform.server.v1.WebService",
   methods: {
+    /**
+     * Subscribe to the server for events
+     *
+     * @generated from rpc platform.server.v1.WebService.Subscribe
+     */
+    subscribe: {
+      name: "Subscribe",
+      I: SubscribeRequest,
+      O: ServerEvent,
+      kind: MethodKind.ServerStreaming,
+    },
+    /**
+     * Install a Home Cloud application
+     *
+     * @generated from rpc platform.server.v1.WebService.InstallApp
+     */
+    installApp: {
+      name: "InstallApp",
+      I: InstallAppRequest,
+      O: InstallAppResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Update a Home Cloud application
+     *
+     * @generated from rpc platform.server.v1.WebService.UpdateApp
+     */
+    updateApp: {
+      name: "UpdateApp",
+      I: UpdateAppRequest,
+      O: UpdateAppResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Delete a Home Cloud application
+     *
+     * @generated from rpc platform.server.v1.WebService.DeleteApp
+     */
+    deleteApp: {
+      name: "DeleteApp",
+      I: DeleteAppRequest,
+      O: DeleteAppResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Check the current health of all installed Home Cloud applications
+     *
+     * @generated from rpc platform.server.v1.WebService.AppsHealthCheck
+     */
+    appsHealthCheck: {
+      name: "AppsHealthCheck",
+      I: AppsHealthCheckRequest,
+      O: AppsHealthCheckResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get all apps available in the store
+     *
+     * @generated from rpc platform.server.v1.WebService.GetAppsInStore
+     */
+    getAppsInStore: {
+      name: "GetAppsInStore",
+      I: GetAppsInStoreRequest,
+      O: GetAppsInStoreResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get all installed app storage volumes
+     *
+     * @generated from rpc platform.server.v1.WebService.GetAppStorage
+     */
+    getAppStorage: {
+      name: "GetAppStorage",
+      I: GetAppStorageRequest,
+      O: GetAppStorageResponse,
+      kind: MethodKind.Unary,
+    },
     /**
      * Shutdown the host machine running Home Cloud
      *
@@ -35,105 +112,6 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Install a Home Cloud application
-     *
-     * @generated from rpc platform.server.v1.WebService.InstallApp
-     */
-    installApp: {
-      name: "InstallApp",
-      I: InstallAppRequest,
-      O: InstallAppResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Delete a Home Cloud application
-     *
-     * @generated from rpc platform.server.v1.WebService.DeleteApp
-     */
-    deleteApp: {
-      name: "DeleteApp",
-      I: DeleteAppRequest,
-      O: DeleteAppResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Update a Home Cloud application
-     *
-     * @generated from rpc platform.server.v1.WebService.UpdateApp
-     */
-    updateApp: {
-      name: "UpdateApp",
-      I: UpdateAppRequest,
-      O: UpdateAppResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Check for available NixOS and Daemon updates
-     *
-     * @generated from rpc platform.server.v1.WebService.CheckForSystemUpdates
-     */
-    checkForSystemUpdates: {
-      name: "CheckForSystemUpdates",
-      I: CheckForSystemUpdatesRequest,
-      O: CheckForSystemUpdatesResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Check for available system (draft and home cloud) container updates
-     *
-     * @generated from rpc platform.server.v1.WebService.CheckForContainerUpdates
-     */
-    checkForContainerUpdates: {
-      name: "CheckForContainerUpdates",
-      I: CheckForContainerUpdatesRequest,
-      O: CheckForContainerUpdatesResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Change the currently installed Daemon version
-     *
-     * @generated from rpc platform.server.v1.WebService.ChangeDaemonVersion
-     */
-    changeDaemonVersion: {
-      name: "ChangeDaemonVersion",
-      I: ChangeDaemonVersionRequest,
-      O: ChangeDaemonVersionResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Install available NixOS updates (call after calling CheckForSystemUpdates)
-     *
-     * @generated from rpc platform.server.v1.WebService.InstallOSUpdate
-     */
-    installOSUpdate: {
-      name: "InstallOSUpdate",
-      I: InstallOSUpdateRequest,
-      O: InstallOSUpdateResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Set a system (draft and home cloud) container image (used for updating images)
-     *
-     * @generated from rpc platform.server.v1.WebService.SetSystemImage
-     */
-    setSystemImage: {
-      name: "SetSystemImage",
-      I: SetSystemImageRequest,
-      O: SetSystemImageResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Check the current health of all installed Home Cloud applications
-     *
-     * @generated from rpc platform.server.v1.WebService.AppsHealthCheck
-     */
-    appsHealthCheck: {
-      name: "AppsHealthCheck",
-      I: AppsHealthCheckRequest,
-      O: AppsHealthCheckResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
      * Get the current host machine stats (cpu, memory, drives)
      *
      * @generated from rpc platform.server.v1.WebService.GetSystemStats
@@ -142,83 +120,6 @@ export const WebService = {
       name: "GetSystemStats",
       I: GetSystemStatsRequest,
       O: GetSystemStatsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Check to validate if the device has gone through the onboarding process
-     *
-     * @generated from rpc platform.server.v1.WebService.IsDeviceSetup
-     */
-    isDeviceSetup: {
-      name: "IsDeviceSetup",
-      I: IsDeviceSetupRequest,
-      O: IsDeviceSetupResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Initialize the device with the user's credentials and settings
-     *
-     * @generated from rpc platform.server.v1.WebService.InitializeDevice
-     */
-    initializeDevice: {
-      name: "InitializeDevice",
-      I: InitializeDeviceRequest,
-      O: InitializeDeviceResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Login to the device
-     *
-     * @generated from rpc platform.server.v1.WebService.Login
-     */
-    login: {
-      name: "Login",
-      I: LoginRequest,
-      O: LoginResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Get all apps available in the store
-     *
-     * @generated from rpc platform.server.v1.WebService.GetAppsInStore
-     */
-    getAppsInStore: {
-      name: "GetAppsInStore",
-      I: GetAppsInStoreRequest,
-      O: GetAppsInStoreResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Get the device settings
-     *
-     * @generated from rpc platform.server.v1.WebService.GetDeviceSettings
-     */
-    getDeviceSettings: {
-      name: "GetDeviceSettings",
-      I: GetDeviceSettingsRequest,
-      O: GetDeviceSettingsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Set the device settings
-     *
-     * @generated from rpc platform.server.v1.WebService.SetDeviceSettings
-     */
-    setDeviceSettings: {
-      name: "SetDeviceSettings",
-      I: SetDeviceSettingsRequest,
-      O: SetDeviceSettingsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Get all installed app storage volumes
-     *
-     * @generated from rpc platform.server.v1.WebService.GetAppStorage
-     */
-    getAppStorage: {
-      name: "GetAppStorage",
-      I: GetAppStorageRequest,
-      O: GetAppStorageResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -241,6 +142,28 @@ export const WebService = {
       name: "GetSystemLogs",
       I: GetSystemLogsRequest,
       O: GetSystemLogsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Get the device settings
+     *
+     * @generated from rpc platform.server.v1.WebService.GetDeviceSettings
+     */
+    getDeviceSettings: {
+      name: "GetDeviceSettings",
+      I: GetDeviceSettingsRequest,
+      O: GetDeviceSettingsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Set the device settings
+     *
+     * @generated from rpc platform.server.v1.WebService.SetDeviceSettings
+     */
+    setDeviceSettings: {
+      name: "SetDeviceSettings",
+      I: SetDeviceSettingsRequest,
+      O: SetDeviceSettingsResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -288,7 +211,7 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * RegisterPeer is used to connect a client to the home-cloud overlay network
+     * RegisterPeer adds a peer to remote access
      *
      * @generated from rpc platform.server.v1.WebService.RegisterPeer
      */
@@ -299,15 +222,15 @@ export const WebService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Subscribe to the server for events
+     * DeregisterPeer removes a peer from remote access
      *
-     * @generated from rpc platform.server.v1.WebService.Subscribe
+     * @generated from rpc platform.server.v1.WebService.DeregisterPeer
      */
-    subscribe: {
-      name: "Subscribe",
-      I: SubscribeRequest,
-      O: ServerEvent,
-      kind: MethodKind.ServerStreaming,
+    deregisterPeer: {
+      name: "DeregisterPeer",
+      I: DeregisterPeerRequest,
+      O: DeregisterPeerResponse,
+      kind: MethodKind.Unary,
     },
   }
 };

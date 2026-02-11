@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package platform.daemon.v1;
+
+option go_package = "github.com/home-cloud-io/core/api/platform/daemon/v1";
+
+import "platform/daemon/v1/system.proto";
+import "validate/validate.proto";
+
+service DaemonService {
+  rpc ShutdownHost(ShutdownHostRequest) returns (ShutdownHostResponse) {}
+  rpc RebootHost(RebootHostRequest) returns (RebootHostResponse) {}
+  rpc SystemStats(SystemStatsRequest) returns (SystemStatsResponse) {}
+  rpc Version(VersionRequest) returns (VersionResponse) {}
+  rpc Upgrade(UpgradeRequest) returns (UpgradeResponse) {}
+  rpc UpgradeKubernetes(UpgradeKubernetesRequest) returns (UpgradeKubernetesResponse) {}
+  rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {}
+  rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {}
+}
+
+message ShutdownHostRequest {}
+message ShutdownHostResponse {}
+
+message RebootHostRequest {}
+message RebootHostResponse {}
+
+message SystemStatsRequest {}
+message SystemStatsResponse {
+  platform.daemon.v1.SystemStats stats = 1;
+}
+
+message VersionRequest {}
+message VersionResponse {
+  string name = 1;
+  string version = 2;
+}
+
+message UpgradeRequest {
+  string source = 1;
+  string version = 2;
+}
+message UpgradeResponse {}
+
+message UpgradeKubernetesRequest {
+  string version = 1;
+}
+message UpgradeKubernetesResponse {}
+
+message CreateVolumeRequest {
+  string name = 1;
+  // minimum size of the volume: parsed with https://github.com/dustin/go-humanize
+  string min_size = 2; 
+  // maximum size of the volume: parsed with https://github.com/dustin/go-humanize
+  string max_size = 3;
+}
+message CreateVolumeResponse {
+  // identifier of the created volume, to be used when calling DeleteVolume() 
+  string id = 1;
+  string path = 2;
+}
+
+message DeleteVolumeRequest {
+  string id = 1;
+}
+message DeleteVolumeResponse {}
