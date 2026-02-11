@@ -27,7 +27,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	resources "github.com/home-cloud-io/core/services/platform/operator/internal/controller/resources"
 )
@@ -168,12 +167,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	}
 
 	if !install.Spec.Daemon.Disable {
-		// create daemon client here so that we can use the configured address (if set)
-		daemonAddress := install.Spec.Daemon.Address
-		if daemonAddress == "" {
-			daemonAddress = DefaultDaemonAddress
-		}
-		daemonClient := dv1connect.NewDaemonServiceClient(http.DefaultClient, daemonAddress)
+		daemonClient := DaemonClient(install.Spec.Daemon.Address)
 
 		if !install.Spec.Daemon.System.Disable {
 			l.Info("reconciling system install")

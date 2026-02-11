@@ -2,7 +2,7 @@ module github.com/home-cloud-io/core/services/platform/operator
 
 go 1.25.3
 
-// replace github.com/home-cloud-io/core/api => ../../../api
+replace github.com/home-cloud-io/core/api => ../../../api
 
 require (
 	connectrpc.com/connect v1.16.2
