@@ -1,0 +1,5 @@
+service:
+  name: operator
+  domain: platform
+  logging:
+    level: debug

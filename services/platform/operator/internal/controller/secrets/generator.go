@@ -1,48 +1,27 @@
 package secrets
 
 import (
-	"time"
+	"fmt"
 
-	"golang.org/x/exp/rand"
+	"github.com/sethvargo/go-password/password"
 )
 
-func Generate(passwordLength int, disableSpecialCharacters bool) []byte {
-	// Character sets for generating passwords
-	lowerCase := "abcdefghijklmnopqrstuvwxyz" // lowercase
-	upperCase := "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // uppercase
-	numbers := "0123456789"                   // numbers
-	specialChar := "!@#$%^&*()_-+={}[/?]"     // special characters
-
-	// Variable for storing password
-	password := ""
-
-	// Initialize the random number generator
-	source := rand.NewSource(uint64(time.Now().UnixNano()))
-	rng := rand.New(source)
-
-	// Generate password character by character
-	for n := 0; n < passwordLength; n++ {
-		// Generate a random number to choose a character set
-		randNum := rng.Intn(4)
-		if disableSpecialCharacters {
-			randNum = rng.Intn(3)
-		}
-
-		switch randNum {
-		case 0:
-			randCharNum := rng.Intn(len(lowerCase))
-			password += string(lowerCase[randCharNum])
-		case 1:
-			randCharNum := rng.Intn(len(upperCase))
-			password += string(upperCase[randCharNum])
-		case 2:
-			randCharNum := rng.Intn(len(numbers))
-			password += string(numbers[randCharNum])
-		case 3:
-			randCharNum := rng.Intn(len(specialChar))
-			password += string(specialChar[randCharNum])
-		}
+func Generate(passwordLength int, disableSpecialCharacters bool) ([]byte, error) {
+	if passwordLength < 15 {
+		return nil, fmt.Errorf("password length %d is too short: must be greater than 15", passwordLength)
 	}
 
-	return []byte(password)
+	if disableSpecialCharacters && passwordLength < 23 {
+		return nil, fmt.Errorf("password length of %d is too short: must be greater than 23 when special characters are disabled", passwordLength)
+	}
+
+	numDigits := passwordLength / 2
+	numSymbols := 0
+	if !disableSpecialCharacters {
+		numDigits = passwordLength / 3
+		numSymbols = passwordLength / 3
+	}
+
+	p, err := password.Generate(passwordLength, numDigits, numSymbols, false, true)
+	return []byte(p), err
 }
