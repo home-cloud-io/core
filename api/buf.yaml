@@ -18,7 +18,3 @@ build:
   excludes:
     - gen/
     - vendor/
-deps:
-  - buf.build/googleapis/googleapis
-  - buf.build/srikrsna/protoc-gen-gotag
-  - buf.build/envoyproxy/protoc-gen-validate

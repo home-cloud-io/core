@@ -4,6 +4,7 @@ go 1.25.3
 
 require (
 	connectrpc.com/connect v1.16.2
-	github.com/envoyproxy/protoc-gen-validate v1.1.0
 	google.golang.org/protobuf v1.34.2
 )
+
+require golang.org/x/net v0.26.0 // indirect
