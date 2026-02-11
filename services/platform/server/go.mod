@@ -2,25 +2,18 @@ module github.com/home-cloud-io/core/services/platform/server
 
 go 1.25.3
 
-replace github.com/home-cloud-io/core/api => ../../../api
+// replace github.com/home-cloud-io/core/api => ../../../api
 
-replace github.com/home-cloud-io/core/services/platform/operator => ../../../services/platform/operator
-
-// replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
-
-// replace github.com/steady-bytes/draft/api => ../../../../../steady-bytes/draft/api
+// replace github.com/home-cloud-io/core/services/platform/operator => ../../../services/platform/operator
 
 require (
 	connectrpc.com/connect v1.16.2
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.8.8-0.20260126050606-e540866b7734
-	// TODO: change to v0.0.4 when available
-	github.com/home-cloud-io/core/services/platform/operator v0.0.3-0.20260125031625-8891c9036f53
+	github.com/home-cloud-io/core/api v0.9.0
+	github.com/home-cloud-io/core/services/platform/operator v0.1.1
 	github.com/robfig/cron/v3 v3.0.0
-	github.com/steady-bytes/draft/api v1.0.0 // indirect
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
 	github.com/steady-bytes/draft/pkg/loggers v0.2.5
-	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
 	golang.org/x/mod v0.29.0
 	golang.org/x/sync v0.16.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
@@ -78,6 +71,7 @@ require (
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/spf13/viper v1.18.2 // indirect
+	github.com/steady-bytes/draft/api v1.0.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.etcd.io/bbolt v1.4.2 // indirect
@@ -85,6 +79,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
