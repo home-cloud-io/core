@@ -14,6 +14,8 @@ service DaemonService {
   rpc Version(VersionRequest) returns (VersionResponse) {}
   rpc Upgrade(UpgradeRequest) returns (UpgradeResponse) {}
   rpc UpgradeKubernetes(UpgradeKubernetesRequest) returns (UpgradeKubernetesResponse) {}
+  rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {}
+  rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -43,3 +45,20 @@ message UpgradeKubernetesRequest {
   string version = 1;
 }
 message UpgradeKubernetesResponse {}
+
+message CreateVolumeRequest {
+  string name = 1;
+  // minimum size of the volume: parsed with https://github.com/dustin/go-humanize
+  string min_size = 2; 
+  // maximum size of the volume: parsed with https://github.com/dustin/go-humanize
+  string max_size = 3;
+}
+message CreateVolumeResponse {
+  // identifier of the created volume, to be used when calling DeleteVolume() 
+  string id = 1;
+}
+
+message DeleteVolumeRequest {
+  string id = 1;
+}
+message DeleteVolumeResponse {}

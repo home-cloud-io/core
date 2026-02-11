@@ -415,3 +415,163 @@ export class UpgradeKubernetesResponse extends Message<UpgradeKubernetesResponse
   }
 }
 
+/**
+ * @generated from message platform.daemon.v1.CreateVolumeRequest
+ */
+export class CreateVolumeRequest extends Message<CreateVolumeRequest> {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * minimum size of the volume: parsed with https://github.com/dustin/go-humanize
+   *
+   * @generated from field: string min_size = 2;
+   */
+  minSize = "";
+
+  /**
+   * maximum size of the volume: parsed with https://github.com/dustin/go-humanize
+   *
+   * @generated from field: string max_size = 3;
+   */
+  maxSize = "";
+
+  constructor(data?: PartialMessage<CreateVolumeRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.CreateVolumeRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "min_size", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "max_size", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateVolumeRequest {
+    return new CreateVolumeRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateVolumeRequest {
+    return new CreateVolumeRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateVolumeRequest {
+    return new CreateVolumeRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateVolumeRequest | PlainMessage<CreateVolumeRequest> | undefined, b: CreateVolumeRequest | PlainMessage<CreateVolumeRequest> | undefined): boolean {
+    return proto3.util.equals(CreateVolumeRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.CreateVolumeResponse
+ */
+export class CreateVolumeResponse extends Message<CreateVolumeResponse> {
+  /**
+   * identifier of the created volume, to be used when calling DeleteVolume() 
+   *
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  constructor(data?: PartialMessage<CreateVolumeResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.CreateVolumeResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateVolumeResponse {
+    return new CreateVolumeResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateVolumeResponse {
+    return new CreateVolumeResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateVolumeResponse {
+    return new CreateVolumeResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateVolumeResponse | PlainMessage<CreateVolumeResponse> | undefined, b: CreateVolumeResponse | PlainMessage<CreateVolumeResponse> | undefined): boolean {
+    return proto3.util.equals(CreateVolumeResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.DeleteVolumeRequest
+ */
+export class DeleteVolumeRequest extends Message<DeleteVolumeRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  constructor(data?: PartialMessage<DeleteVolumeRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.DeleteVolumeRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteVolumeRequest {
+    return new DeleteVolumeRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteVolumeRequest {
+    return new DeleteVolumeRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteVolumeRequest {
+    return new DeleteVolumeRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteVolumeRequest | PlainMessage<DeleteVolumeRequest> | undefined, b: DeleteVolumeRequest | PlainMessage<DeleteVolumeRequest> | undefined): boolean {
+    return proto3.util.equals(DeleteVolumeRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message platform.daemon.v1.DeleteVolumeResponse
+ */
+export class DeleteVolumeResponse extends Message<DeleteVolumeResponse> {
+  constructor(data?: PartialMessage<DeleteVolumeResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "platform.daemon.v1.DeleteVolumeResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteVolumeResponse {
+    return new DeleteVolumeResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteVolumeResponse {
+    return new DeleteVolumeResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteVolumeResponse {
+    return new DeleteVolumeResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteVolumeResponse | PlainMessage<DeleteVolumeResponse> | undefined, b: DeleteVolumeResponse | PlainMessage<DeleteVolumeResponse> | undefined): boolean {
+    return proto3.util.equals(DeleteVolumeResponse, a, b);
+  }
+}
+

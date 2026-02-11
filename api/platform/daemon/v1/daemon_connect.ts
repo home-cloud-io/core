@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse, SystemStatsRequest, SystemStatsResponse, UpgradeKubernetesRequest, UpgradeKubernetesResponse, UpgradeRequest, UpgradeResponse, VersionRequest, VersionResponse } from "./daemon_pb.js";
+import { CreateVolumeRequest, CreateVolumeResponse, DeleteVolumeRequest, DeleteVolumeResponse, RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse, SystemStatsRequest, SystemStatsResponse, UpgradeKubernetesRequest, UpgradeKubernetesResponse, UpgradeRequest, UpgradeResponse, VersionRequest, VersionResponse } from "./daemon_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -64,6 +64,24 @@ export const DaemonService = {
       name: "UpgradeKubernetes",
       I: UpgradeKubernetesRequest,
       O: UpgradeKubernetesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc platform.daemon.v1.DaemonService.CreateVolume
+     */
+    createVolume: {
+      name: "CreateVolume",
+      I: CreateVolumeRequest,
+      O: CreateVolumeResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc platform.daemon.v1.DaemonService.DeleteVolume
+     */
+    deleteVolume: {
+      name: "DeleteVolume",
+      I: DeleteVolumeRequest,
+      O: DeleteVolumeResponse,
       kind: MethodKind.Unary,
     },
   }

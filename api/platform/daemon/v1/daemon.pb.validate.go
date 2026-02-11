@@ -1289,3 +1289,421 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpgradeKubernetesResponseValidationError{}
+
+// Validate checks the field values on CreateVolumeRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CreateVolumeRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreateVolumeRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CreateVolumeRequestMultiError, or nil if none found.
+func (m *CreateVolumeRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreateVolumeRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	// no validation rules for MinSize
+
+	// no validation rules for MaxSize
+
+	if len(errors) > 0 {
+		return CreateVolumeRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// CreateVolumeRequestMultiError is an error wrapping multiple validation
+// errors returned by CreateVolumeRequest.ValidateAll() if the designated
+// constraints aren't met.
+type CreateVolumeRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreateVolumeRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreateVolumeRequestMultiError) AllErrors() []error { return m }
+
+// CreateVolumeRequestValidationError is the validation error returned by
+// CreateVolumeRequest.Validate if the designated constraints aren't met.
+type CreateVolumeRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateVolumeRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateVolumeRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateVolumeRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateVolumeRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateVolumeRequestValidationError) ErrorName() string {
+	return "CreateVolumeRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateVolumeRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateVolumeRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateVolumeRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateVolumeRequestValidationError{}
+
+// Validate checks the field values on CreateVolumeResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CreateVolumeResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreateVolumeResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CreateVolumeResponseMultiError, or nil if none found.
+func (m *CreateVolumeResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreateVolumeResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return CreateVolumeResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// CreateVolumeResponseMultiError is an error wrapping multiple validation
+// errors returned by CreateVolumeResponse.ValidateAll() if the designated
+// constraints aren't met.
+type CreateVolumeResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreateVolumeResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreateVolumeResponseMultiError) AllErrors() []error { return m }
+
+// CreateVolumeResponseValidationError is the validation error returned by
+// CreateVolumeResponse.Validate if the designated constraints aren't met.
+type CreateVolumeResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateVolumeResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateVolumeResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateVolumeResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateVolumeResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateVolumeResponseValidationError) ErrorName() string {
+	return "CreateVolumeResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateVolumeResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateVolumeResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateVolumeResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateVolumeResponseValidationError{}
+
+// Validate checks the field values on DeleteVolumeRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteVolumeRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteVolumeRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteVolumeRequestMultiError, or nil if none found.
+func (m *DeleteVolumeRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteVolumeRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return DeleteVolumeRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteVolumeRequestMultiError is an error wrapping multiple validation
+// errors returned by DeleteVolumeRequest.ValidateAll() if the designated
+// constraints aren't met.
+type DeleteVolumeRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteVolumeRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteVolumeRequestMultiError) AllErrors() []error { return m }
+
+// DeleteVolumeRequestValidationError is the validation error returned by
+// DeleteVolumeRequest.Validate if the designated constraints aren't met.
+type DeleteVolumeRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteVolumeRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteVolumeRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteVolumeRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteVolumeRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteVolumeRequestValidationError) ErrorName() string {
+	return "DeleteVolumeRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteVolumeRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteVolumeRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteVolumeRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteVolumeRequestValidationError{}
+
+// Validate checks the field values on DeleteVolumeResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteVolumeResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteVolumeResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteVolumeResponseMultiError, or nil if none found.
+func (m *DeleteVolumeResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteVolumeResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return DeleteVolumeResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteVolumeResponseMultiError is an error wrapping multiple validation
+// errors returned by DeleteVolumeResponse.ValidateAll() if the designated
+// constraints aren't met.
+type DeleteVolumeResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteVolumeResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteVolumeResponseMultiError) AllErrors() []error { return m }
+
+// DeleteVolumeResponseValidationError is the validation error returned by
+// DeleteVolumeResponse.Validate if the designated constraints aren't met.
+type DeleteVolumeResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteVolumeResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteVolumeResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteVolumeResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteVolumeResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteVolumeResponseValidationError) ErrorName() string {
+	return "DeleteVolumeResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteVolumeResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteVolumeResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteVolumeResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteVolumeResponseValidationError{}

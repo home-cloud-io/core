@@ -112,3 +112,43 @@ export const UpgradeKubernetesResponse = /*@__PURE__*/ proto3.makeMessageType(
   [],
 );
 
+/**
+ * @generated from message platform.daemon.v1.CreateVolumeRequest
+ */
+export const CreateVolumeRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.CreateVolumeRequest",
+  () => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "min_size", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "max_size", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.CreateVolumeResponse
+ */
+export const CreateVolumeResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.CreateVolumeResponse",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.DeleteVolumeRequest
+ */
+export const DeleteVolumeRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.DeleteVolumeRequest",
+  () => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ],
+);
+
+/**
+ * @generated from message platform.daemon.v1.DeleteVolumeResponse
+ */
+export const DeleteVolumeResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "platform.daemon.v1.DeleteVolumeResponse",
+  [],
+);
+

@@ -49,6 +49,12 @@ const (
 	// DaemonServiceUpgradeKubernetesProcedure is the fully-qualified name of the DaemonService's
 	// UpgradeKubernetes RPC.
 	DaemonServiceUpgradeKubernetesProcedure = "/platform.daemon.v1.DaemonService/UpgradeKubernetes"
+	// DaemonServiceCreateVolumeProcedure is the fully-qualified name of the DaemonService's
+	// CreateVolume RPC.
+	DaemonServiceCreateVolumeProcedure = "/platform.daemon.v1.DaemonService/CreateVolume"
+	// DaemonServiceDeleteVolumeProcedure is the fully-qualified name of the DaemonService's
+	// DeleteVolume RPC.
+	DaemonServiceDeleteVolumeProcedure = "/platform.daemon.v1.DaemonService/DeleteVolume"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -60,6 +66,8 @@ var (
 	daemonServiceVersionMethodDescriptor           = daemonServiceServiceDescriptor.Methods().ByName("Version")
 	daemonServiceUpgradeMethodDescriptor           = daemonServiceServiceDescriptor.Methods().ByName("Upgrade")
 	daemonServiceUpgradeKubernetesMethodDescriptor = daemonServiceServiceDescriptor.Methods().ByName("UpgradeKubernetes")
+	daemonServiceCreateVolumeMethodDescriptor      = daemonServiceServiceDescriptor.Methods().ByName("CreateVolume")
+	daemonServiceDeleteVolumeMethodDescriptor      = daemonServiceServiceDescriptor.Methods().ByName("DeleteVolume")
 )
 
 // DaemonServiceClient is a client for the platform.daemon.v1.DaemonService service.
@@ -70,6 +78,8 @@ type DaemonServiceClient interface {
 	Version(context.Context, *connect.Request[v1.VersionRequest]) (*connect.Response[v1.VersionResponse], error)
 	Upgrade(context.Context, *connect.Request[v1.UpgradeRequest]) (*connect.Response[v1.UpgradeResponse], error)
 	UpgradeKubernetes(context.Context, *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error)
+	CreateVolume(context.Context, *connect.Request[v1.CreateVolumeRequest]) (*connect.Response[v1.CreateVolumeResponse], error)
+	DeleteVolume(context.Context, *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error)
 }
 
 // NewDaemonServiceClient constructs a client for the platform.daemon.v1.DaemonService service. By
@@ -118,6 +128,18 @@ func NewDaemonServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(daemonServiceUpgradeKubernetesMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		createVolume: connect.NewClient[v1.CreateVolumeRequest, v1.CreateVolumeResponse](
+			httpClient,
+			baseURL+DaemonServiceCreateVolumeProcedure,
+			connect.WithSchema(daemonServiceCreateVolumeMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		deleteVolume: connect.NewClient[v1.DeleteVolumeRequest, v1.DeleteVolumeResponse](
+			httpClient,
+			baseURL+DaemonServiceDeleteVolumeProcedure,
+			connect.WithSchema(daemonServiceDeleteVolumeMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -129,6 +151,8 @@ type daemonServiceClient struct {
 	version           *connect.Client[v1.VersionRequest, v1.VersionResponse]
 	upgrade           *connect.Client[v1.UpgradeRequest, v1.UpgradeResponse]
 	upgradeKubernetes *connect.Client[v1.UpgradeKubernetesRequest, v1.UpgradeKubernetesResponse]
+	createVolume      *connect.Client[v1.CreateVolumeRequest, v1.CreateVolumeResponse]
+	deleteVolume      *connect.Client[v1.DeleteVolumeRequest, v1.DeleteVolumeResponse]
 }
 
 // ShutdownHost calls platform.daemon.v1.DaemonService.ShutdownHost.
@@ -161,6 +185,16 @@ func (c *daemonServiceClient) UpgradeKubernetes(ctx context.Context, req *connec
 	return c.upgradeKubernetes.CallUnary(ctx, req)
 }
 
+// CreateVolume calls platform.daemon.v1.DaemonService.CreateVolume.
+func (c *daemonServiceClient) CreateVolume(ctx context.Context, req *connect.Request[v1.CreateVolumeRequest]) (*connect.Response[v1.CreateVolumeResponse], error) {
+	return c.createVolume.CallUnary(ctx, req)
+}
+
+// DeleteVolume calls platform.daemon.v1.DaemonService.DeleteVolume.
+func (c *daemonServiceClient) DeleteVolume(ctx context.Context, req *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error) {
+	return c.deleteVolume.CallUnary(ctx, req)
+}
+
 // DaemonServiceHandler is an implementation of the platform.daemon.v1.DaemonService service.
 type DaemonServiceHandler interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
@@ -169,6 +203,8 @@ type DaemonServiceHandler interface {
 	Version(context.Context, *connect.Request[v1.VersionRequest]) (*connect.Response[v1.VersionResponse], error)
 	Upgrade(context.Context, *connect.Request[v1.UpgradeRequest]) (*connect.Response[v1.UpgradeResponse], error)
 	UpgradeKubernetes(context.Context, *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error)
+	CreateVolume(context.Context, *connect.Request[v1.CreateVolumeRequest]) (*connect.Response[v1.CreateVolumeResponse], error)
+	DeleteVolume(context.Context, *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error)
 }
 
 // NewDaemonServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -213,6 +249,18 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(daemonServiceUpgradeKubernetesMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	daemonServiceCreateVolumeHandler := connect.NewUnaryHandler(
+		DaemonServiceCreateVolumeProcedure,
+		svc.CreateVolume,
+		connect.WithSchema(daemonServiceCreateVolumeMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	daemonServiceDeleteVolumeHandler := connect.NewUnaryHandler(
+		DaemonServiceDeleteVolumeProcedure,
+		svc.DeleteVolume,
+		connect.WithSchema(daemonServiceDeleteVolumeMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.daemon.v1.DaemonService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DaemonServiceShutdownHostProcedure:
@@ -227,6 +275,10 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 			daemonServiceUpgradeHandler.ServeHTTP(w, r)
 		case DaemonServiceUpgradeKubernetesProcedure:
 			daemonServiceUpgradeKubernetesHandler.ServeHTTP(w, r)
+		case DaemonServiceCreateVolumeProcedure:
+			daemonServiceCreateVolumeHandler.ServeHTTP(w, r)
+		case DaemonServiceDeleteVolumeProcedure:
+			daemonServiceDeleteVolumeHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -258,4 +310,12 @@ func (UnimplementedDaemonServiceHandler) Upgrade(context.Context, *connect.Reque
 
 func (UnimplementedDaemonServiceHandler) UpgradeKubernetes(context.Context, *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.UpgradeKubernetes is not implemented"))
+}
+
+func (UnimplementedDaemonServiceHandler) CreateVolume(context.Context, *connect.Request[v1.CreateVolumeRequest]) (*connect.Response[v1.CreateVolumeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.CreateVolume is not implemented"))
+}
+
+func (UnimplementedDaemonServiceHandler) DeleteVolume(context.Context, *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.DeleteVolume is not implemented"))
 }

@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { MethodKind } from "@bufbuild/protobuf";
-import { RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse, SystemStatsRequest, SystemStatsResponse, UpgradeKubernetesRequest, UpgradeKubernetesResponse, UpgradeRequest, UpgradeResponse, VersionRequest, VersionResponse } from "./daemon_pb.js";
+import { CreateVolumeRequest, CreateVolumeResponse, DeleteVolumeRequest, DeleteVolumeResponse, RebootHostRequest, RebootHostResponse, ShutdownHostRequest, ShutdownHostResponse, SystemStatsRequest, SystemStatsResponse, UpgradeKubernetesRequest, UpgradeKubernetesResponse, UpgradeRequest, UpgradeResponse, VersionRequest, VersionResponse } from "./daemon_pb.js";
 
 /**
  * @generated from rpc platform.daemon.v1.DaemonService.ShutdownHost
@@ -85,6 +85,34 @@ export const upgradeKubernetes = {
   kind: MethodKind.Unary,
   I: UpgradeKubernetesRequest,
   O: UpgradeKubernetesResponse,
+  service: {
+    typeName: "platform.daemon.v1.DaemonService"
+  }
+} as const;
+
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.CreateVolume
+ */
+export const createVolume = {
+  localName: "createVolume",
+  name: "CreateVolume",
+  kind: MethodKind.Unary,
+  I: CreateVolumeRequest,
+  O: CreateVolumeResponse,
+  service: {
+    typeName: "platform.daemon.v1.DaemonService"
+  }
+} as const;
+
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.DeleteVolume
+ */
+export const deleteVolume = {
+  localName: "deleteVolume",
+  name: "DeleteVolume",
+  kind: MethodKind.Unary,
+  I: DeleteVolumeRequest,
+  O: DeleteVolumeResponse,
   service: {
     typeName: "platform.daemon.v1.DaemonService"
   }
