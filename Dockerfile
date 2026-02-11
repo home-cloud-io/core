@@ -57,7 +57,8 @@ RUN upx main
 FROM alpine:${ALPINE_VERSION} AS runner
 
 # Install dependencies
-RUN apk add -U --no-cache ca-certificates
+# TODO: only need iptables for tunnel service so should probably just layer the image
+RUN apk add -U --no-cache ca-certificates iptables
 
 # Copy the binary from go-builder
 COPY --from=go-builder /app/main /etc/main
@@ -67,11 +68,3 @@ WORKDIR /etc
 
 # Run
 ENTRYPOINT ["/etc/main"]
-
-# Runtime arguments
-ARG HTTP_PORT=8080
-ARG GRPC_PORT=8090
-
-# Expose needed ports
-EXPOSE ${HTTP_PORT}
-EXPOSE ${GRPC_PORT}
