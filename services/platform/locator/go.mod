@@ -1,6 +1,6 @@
 module github.com/home-cloud-io/core/services/platform/locator
 
-go 1.23.6
+go 1.25.3
 
 // replace github.com/home-cloud-io/core/api => ../../../api
 
@@ -11,12 +11,12 @@ replace golang.zx2c4.com/wireguard => github.com/netbirdio/wireguard-go v0.0.0-2
 require (
 	connectrpc.com/connect v1.16.2
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.8.1
+	github.com/home-cloud-io/core/api v0.9.0
 	github.com/netbirdio/netbird v0.39.2
 	github.com/pion/stun/v2 v2.0.0
 	github.com/pion/turn/v4 v4.0.0
-	github.com/steady-bytes/draft/pkg/chassis v0.4.5
-	github.com/steady-bytes/draft/pkg/loggers v0.2.2
+	github.com/steady-bytes/draft/pkg/chassis v0.6.1
+	github.com/steady-bytes/draft/pkg/loggers v0.2.5
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.65.0
 )
@@ -42,7 +42,6 @@ require (
 	github.com/caddyserver/certmagic v0.21.3 // indirect
 	github.com/caddyserver/zerossl v0.1.3 // indirect
 	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.15.0 // indirect
-	github.com/envoyproxy/go-control-plane v0.12.0 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
