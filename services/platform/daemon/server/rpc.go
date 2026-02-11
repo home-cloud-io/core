@@ -245,7 +245,8 @@ func (h *rpcHandler) CreateVolume(ctx context.Context, request *connect.Request[
 	}
 
 	return connect.NewResponse(&v1.CreateVolumeResponse{
-		Id: id,
+		Id:   id,
+		Path: fmt.Sprintf("/var/mnt/%s", request.Msg.Name),
 	}), nil
 }
 
