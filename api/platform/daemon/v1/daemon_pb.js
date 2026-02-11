@@ -131,6 +131,7 @@ export const CreateVolumeResponse = /*@__PURE__*/ proto3.makeMessageType(
   "platform.daemon.v1.CreateVolumeResponse",
   () => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ],
 );
 

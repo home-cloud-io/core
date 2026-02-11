@@ -479,6 +479,11 @@ export class CreateVolumeResponse extends Message<CreateVolumeResponse> {
    */
   id = "";
 
+  /**
+   * @generated from field: string path = 2;
+   */
+  path = "";
+
   constructor(data?: PartialMessage<CreateVolumeResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -488,6 +493,7 @@ export class CreateVolumeResponse extends Message<CreateVolumeResponse> {
   static readonly typeName = "platform.daemon.v1.CreateVolumeResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateVolumeResponse {

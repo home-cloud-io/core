@@ -1422,6 +1422,8 @@ func (m *CreateVolumeResponse) validate(all bool) error {
 
 	// no validation rules for Id
 
+	// no validation rules for Path
+
 	if len(errors) > 0 {
 		return CreateVolumeResponseMultiError(errors)
 	}

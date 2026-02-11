@@ -56,6 +56,7 @@ message CreateVolumeRequest {
 message CreateVolumeResponse {
   // identifier of the created volume, to be used when calling DeleteVolume() 
   string id = 1;
+  string path = 2;
 }
 
 message DeleteVolumeRequest {
