@@ -1,6 +1,6 @@
 {
   "name": "@home-cloud/api",
-  "version": "0.8.7",
+  "version": "0.9.0",
   "description": "Home Cloud API specification. Generated from proto3 using ConnectRPC.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
