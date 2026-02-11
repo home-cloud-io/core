@@ -1,4 +1,7 @@
 ## Append samples of your project ##
 resources:
 - v1_app.yaml
+- _v1_homecloudoperator.yaml
+- _v1_install.yaml
+- v1_wireguard.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples
