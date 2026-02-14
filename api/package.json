@@ -1,6 +1,6 @@
 {
   "name": "@home-cloud/api",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Home Cloud API specification. Generated from proto3 using ConnectRPC.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,12 +10,11 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@bufbuild/buf": "^1.47.2",
-    "@bufbuild/protobuf": "^1.10.0",
-    "@bufbuild/protoc-gen-es": "^1.10.0",
-    "@connectrpc/connect": "^1.6.1",
-    "@connectrpc/connect-query": "^1.4.2",
-    "@connectrpc/protoc-gen-connect-es": "^1.6.1",
-    "@connectrpc/protoc-gen-connect-query": "^1.4.2",
+    "@bufbuild/protobuf": "^2.2.2",
+    "@bufbuild/protoc-gen-es": "^2.2.2",
+    "@connectrpc/connect": "^2.0.0",
+    "@connectrpc/connect-query": "^2.0.0",
+    "@connectrpc/protoc-gen-connect-query": "^2.0.0",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }

@@ -1,26 +1,14 @@
-version: v1
+version: v2
 plugins:
-  - plugin: es
+  - local: protoc-gen-es
     out: .
+    include_imports: true
     opt:
       - target=ts
-  - plugin: es
-    out: .
-    opt:
       - target=js
-  - plugin: connect-es
+  - local: protoc-gen-connect-query
     out: .
+    include_imports: true
     opt:
       - target=ts
-  - plugin: connect-es
-    out: .
-    opt:
-      - target=js
-  - name: connect-query
-    out: .
-    opt:
-      - target=ts
-  - name: connect-query
-    out: .
-    opt:
       - target=js
