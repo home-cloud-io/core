@@ -191,6 +191,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		}
 	}
 
+	l.Info("reconcile complete")
 	return r.updateStatus(ctx, install)
 }
 
