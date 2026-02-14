@@ -2,7 +2,7 @@ ARG GO_VERSION=1.25.3
 ARG ALPINE_VERSION=3.18
 
 # Build web client (if needed)
-FROM node:18 AS web-client-builder
+FROM node:22 AS web-client-builder
 WORKDIR /web
 
 ARG DOMAIN

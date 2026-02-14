@@ -52,7 +52,7 @@ jobs:
       - uses: actions/setup-node@v4
         if:  steps.check_files.outputs.files_exists == 'true'
         with:
-          node-version: 18
+          node-version: 22
           cache-dependency-path: services/${{ matrix.service-path }}/web-client/package-lock.json
 
       - name: Install Node dependencies
