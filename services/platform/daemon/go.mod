@@ -7,9 +7,9 @@ go 1.25.3
 // replace github.com/steady-bytes/draft/pkg/chassis => ../../../../../steady-bytes/draft/pkg/chassis
 
 require (
-	connectrpc.com/connect v1.18.1
+	connectrpc.com/connect v1.19.1
 	github.com/cosi-project/runtime v1.12.0
-	github.com/home-cloud-io/core/api v0.9.0
+	github.com/home-cloud-io/core/api v0.9.2
 	github.com/siderolabs/go-kubernetes v0.2.28
 	github.com/siderolabs/talos v1.12.2
 	github.com/siderolabs/talos/pkg/machinery v1.12.2
@@ -17,7 +17,7 @@ require (
 	github.com/steady-bytes/draft/pkg/loggers v0.2.3
 	go.yaml.in/yaml/v4 v4.0.0-rc.3
 	google.golang.org/grpc v1.76.0
-	google.golang.org/protobuf v1.36.10
+	google.golang.org/protobuf v1.36.11
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 )
 
