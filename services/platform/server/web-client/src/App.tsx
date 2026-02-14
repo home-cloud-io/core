@@ -37,23 +37,23 @@ const { Header, Sider, Content } = Layout;
 const App: React.FC = () => {
   const [api, contextHolder] = message.useMessage();
   const [collapsed, setCollapsed] = useState(false);
-  const [disabled, setDisabled] = useState(false);
+  const [disabled] = useState(false);
   const [primary] = React.useState('#643f91');
   const navigate = useNavigate();
 
   const useRestartHost = useMutation(restartHost, {
-    onSuccess(data, variables, context) {
+    onSuccess() {
       api['success']('Restarting...');
     },
-    onError(error, variables, context) {
+    onError(error) {
       api['warning'](`Failed to restart: ${error.rawMessage}`);
     },
   });
   const useShutdownHost = useMutation(shutdownHost, {
-    onSuccess(data, variables, context) {
+    onSuccess() {
       api['success']('Shutting down...');
     },
-    onError(error, variables, context) {
+    onError(error) {
       api['warning'](`Failed to shutdown: ${error.rawMessage}`);
     },
   });
