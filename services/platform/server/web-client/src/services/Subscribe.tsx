@@ -4,11 +4,11 @@ import React, {
   useContext,
   useEffect,
   useState,
-} from 'react';
-import { createConnectTransport } from '@connectrpc/connect-web';
-import { createClient } from '@connectrpc/connect';
-import { WebService } from '@home-cloud/api/platform/server/v1/web_connect';
-import { ServerEvent } from '@home-cloud/api/platform/server/v1/web_pb';
+} from "react";
+import { createConnectTransport } from "@connectrpc/connect-web";
+import { createClient } from "@connectrpc/connect";
+import { WebService } from "@home-cloud/api/platform/server/v1/web_pb";
+import { ServerEvent } from "@home-cloud/api/platform/server/v1/web_pb";
 
 export const SubscribeContext = React.createContext({ client: WebService });
 
@@ -54,21 +54,23 @@ export function EventsProvider(props: Props) {
   );
 }
 
-// NOTE: this will load twice because of React.StrictMode loading all components twice
 export function EventListener() {
   const { setConnected, setEvent } = useEvents() as ProviderValue;
 
   useEffect(() => {
-    console.log('initializing event listener');
+    console.log("initializing event listener");
     const listen = async function () {
       try {
-        for await (const event of client.subscribe({})) {
+        console.log("listening for events");
+        for await (const res of client.subscribe({})) {
+          // TODO: this never fires
+          console.log("received event");
           setConnected(true);
           // ignore heartbeats
-          if (event.event.case === 'heartbeat') {
+          if (res.event.case === "heartbeat") {
             continue;
           }
-          setEvent(event);
+          setEvent(res);
         }
       } catch (err) {
         console.warn(`event stream failed: ${err}`);
@@ -78,8 +80,9 @@ export function EventListener() {
     };
     (async () => {
       while (true) {
-        console.log('connecting to event stream');
+        console.log("connecting to event stream");
         await listen();
+        console.log("disconnected event stream");
       }
     })();
   });

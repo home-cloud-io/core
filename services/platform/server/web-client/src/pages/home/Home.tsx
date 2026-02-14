@@ -15,6 +15,7 @@ import {
   Tooltip,
   ProgressProps,
 } from "antd";
+import { create } from "@bufbuild/protobuf";
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -26,7 +27,7 @@ import {
   appsHealthCheck,
   getSystemStats,
 } from "@home-cloud/api/platform/server/v1/web-WebService_connectquery";
-import { SystemStats } from "@home-cloud/api/platform/daemon/v1/system_pb";
+import { SystemStats, SystemStatsSchema } from "@home-cloud/api/platform/daemon/v1/system_pb";
 import { ProviderValue, useEvents } from "../../services/Subscribe";
 import { useNavigate } from "react-router-dom";
 
@@ -50,8 +51,9 @@ export function DeviceDetails() {
     refetchInterval: 2000,
   });
   const { connected } = useEvents() as ProviderValue;
+  console.log("connected: ", connected)
 
-  var stats = new SystemStats();
+  var stats = create(SystemStatsSchema);
   if (data?.stats) {
     stats = data.stats;
   }

@@ -1,12 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router } from 'react-router-dom';
-import './index.css';
-import Entrypoint from './App';
-import { createConnectTransport } from '@connectrpc/connect-web';
-import { TransportProvider } from '@connectrpc/connect-query';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { EventListener, EventsProvider } from './services/Subscribe';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter as Router } from "react-router-dom";
+import "./index.css";
+import Entrypoint from "./App";
+import { createConnectTransport } from "@connectrpc/connect-web";
+import { TransportProvider } from "@connectrpc/connect-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { EventListener, EventsProvider } from "./services/Subscribe";
 
 export const transport = createConnectTransport({
   baseUrl: window.location.origin,
@@ -15,19 +15,19 @@ export const transport = createConnectTransport({
 const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 root.render(
-  <React.StrictMode>
-    <TransportProvider transport={transport}>
-      <EventsProvider>
-        <EventListener />
+  <TransportProvider transport={transport}>
+    <EventsProvider>
+      <EventListener />
+      <React.StrictMode>
         <QueryClientProvider client={queryClient}>
           <Router>
             <Entrypoint />
           </Router>
         </QueryClientProvider>
-      </EventsProvider>
-    </TransportProvider>
-  </React.StrictMode>
+      </React.StrictMode>
+    </EventsProvider>
+  </TransportProvider>,
 );

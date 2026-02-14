@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery } from '@connectrpc/connect-query';
+import { create } from '@bufbuild/protobuf';
 import {
   deleteApp,
   getAppsInStore,
   installApp,
 } from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
-import {
-  App,
-  DeleteAppRequest,
-  InstallAppRequest,
-} from '@home-cloud/api/platform/server/v1/web_pb';
+import { App, DeleteAppRequestSchema, InstallAppRequestSchema } from '@home-cloud/api/platform/server/v1/web_pb';
 import {
   Alert,
   Spin,
@@ -102,7 +99,7 @@ export default function AppStorePage() {
 
   const handleInstall = (app: App) => {
     useInstallApp.mutate(
-      new InstallAppRequest({
+      create(InstallAppRequestSchema, {
         repo: 'apps.home-cloud.io',
         chart: app.name,
         release: app.name,
@@ -115,7 +112,7 @@ export default function AppStorePage() {
     // TODO: handle this with an event loop from the server
     app.installed = false;
     useDeleteApp.mutate(
-      new DeleteAppRequest({
+      create(DeleteAppRequestSchema, {
         release: app.name,
       })
     );

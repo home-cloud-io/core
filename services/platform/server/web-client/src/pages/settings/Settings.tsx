@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useMutation, useQuery } from "@connectrpc/connect-query";
+import { create } from "@bufbuild/protobuf";
 import {
   List,
   Divider,
@@ -19,24 +20,21 @@ import {
   Modal,
 } from "antd";
 import {
-  ClockCircleOutlined,
   CloudServerOutlined,
-  CodeOutlined,
-  KeyOutlined,
   LoadingOutlined,
   MinusCircleOutlined,
   PlusOutlined,
   RedoOutlined,
   SearchOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
-import TextArea from "antd/es/input/TextArea";
+
 import {
-  DeviceSettings,
-  SetDeviceSettingsRequest,
-  RegisterToLocatorRequest,
-  DeregisterFromLocatorRequest,
+  DeviceSettingsSchema,
+  SetDeviceSettingsRequestSchema,
+  RegisterToLocatorRequestSchema,
+  DeregisterFromLocatorRequestSchema,
 } from "@home-cloud/api/platform/server/v1/web_pb";
+
 import {
   deregisterFromLocator,
   disableSecureTunnelling,
@@ -50,33 +48,10 @@ import { Option } from "antd/es/mentions";
 
 const deviceSettingsHelp = [
   {
-    title: "Timezone",
-    avatar: <ClockCircleOutlined />,
-    description:
-      "Choose the timezone where you live. This makes sure the time on your Home Cloud server works its best.",
-  },
-  {
-    title: "Username/Password",
-    avatar: <UserOutlined />,
-    description: "Change the username and password of your administrator user.",
-  },
-  {
-    title: "Auto update apps/operating system",
+    title: "Auto update apps/system",
     avatar: <RedoOutlined />,
     description:
       "When enabled, your Home Cloud server will routinely check for and install updates. We recommend keeping these on.",
-  },
-  {
-    title: "Enable SSH",
-    avatar: <CodeOutlined />,
-    description:
-      "When enabled, your Home Cloud server will be available for SSH connections. We only recommend turning this on if you really know what you're doing.",
-  },
-  {
-    title: "Trusted SSH keys",
-    avatar: <KeyOutlined />,
-    description:
-      "Instead of using your username and password when logging in over SSH, you can adding public SSH keys here (one per line).",
   },
 ];
 
@@ -139,19 +114,13 @@ export default function SettingsPage() {
 }
 
 type DeviceSettingsFormFields = {
-  timezone: string;
-  username: string;
-  password?: string;
   autoUpdateApps: boolean;
   autoUpdateOS: boolean;
-  enableSSH: boolean;
-  trustedSSHKeys?: string;
 };
 
 function DeviceSettingsForm() {
   const [api, contextHolder] = notification.useNotification();
   const [saving, setSaving] = useState(false);
-  const [enableSsh, setEnableSsh] = useState(false);
   const { data, error, isLoading } = useQuery(getDeviceSettings);
   const useSetDeviceSettings = useMutation(setDeviceSettings, {
     onSuccess(data, variables, context) {
@@ -169,41 +138,26 @@ function DeviceSettingsForm() {
     },
   });
 
-  var settings = useMemo(() => new DeviceSettings(), []);
+  var settings = useMemo(() => create(DeviceSettingsSchema), []);
   if (data?.settings) {
     settings = data.settings;
   }
 
-  useEffect(() => {
-    setEnableSsh(settings.enableSsh);
-  }, [settings]);
-
   const handleSave = (values: DeviceSettingsFormFields) => {
     setSaving(true);
     useSetDeviceSettings.mutate(
-      new SetDeviceSettingsRequest({
+      create(SetDeviceSettingsRequestSchema, {
         settings: {
-          adminUser: {
-            username: values.username,
-            password: values.password,
-          },
-          timezone: values.timezone,
           autoUpdateApps: values.autoUpdateApps,
           autoUpdateOs: values.autoUpdateOS,
-          enableSsh: values.enableSSH,
-          trustedSshKeys: values.trustedSSHKeys?.split("\n"),
         },
       })
     );
   };
 
   const fields: DeviceSettingsFormFields = {
-    timezone: settings.timezone,
-    username: settings.adminUser?.username || "",
     autoUpdateApps: settings.autoUpdateApps,
     autoUpdateOS: settings.autoUpdateOs,
-    enableSSH: settings.enableSsh,
-    trustedSSHKeys: settings.trustedSshKeys.join("\n"),
   };
 
   return (
@@ -229,36 +183,6 @@ function DeviceSettingsForm() {
           disabled={saving || error != null}
         >
           <Form.Item<DeviceSettingsFormFields>
-            label="Timezone"
-            name="timezone"
-            rules={[{ required: true, message: "Please select a timezone" }]}
-          >
-            <Select>
-              <Select.Option value="America/New_York">
-                Eastern (US)
-              </Select.Option>
-              <Select.Option value="America/Chicago">
-                Central (US)
-              </Select.Option>
-              <Select.Option value="America/Denver">
-                Mountain (US)
-              </Select.Option>
-              <Select.Option value="America/Los_Angeles">
-                Pacific (US)
-              </Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item<DeviceSettingsFormFields>
-            label="Username"
-            name="username"
-            rules={[{ required: true, message: "Please select a username" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item<DeviceSettingsFormFields> label="Password" name="password">
-            <Input.Password placeholder="(leave blank for no change)" />
-          </Form.Item>
-          <Form.Item<DeviceSettingsFormFields>
             label="Auto update apps"
             name="autoUpdateApps"
             rules={[{ required: true }]}
@@ -272,21 +196,6 @@ function DeviceSettingsForm() {
           >
             <Switch />
           </Form.Item>
-          <Form.Item<DeviceSettingsFormFields>
-            label="Enable SSH"
-            name="enableSSH"
-            rules={[{ required: true }]}
-          >
-            <Switch onChange={() => setEnableSsh(!enableSsh)} />
-          </Form.Item>
-          {enableSsh && (
-            <Form.Item<DeviceSettingsFormFields>
-              label="Trusted SSH keys"
-              name="trustedSSHKeys"
-            >
-              <TextArea placeholder="Enter one key per line" />
-            </Form.Item>
-          )}
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={saving}>
               Save
@@ -451,7 +360,7 @@ function LocatorListItem(props: LocatorListItemProps) {
   const handleDeregister = (locatorAddress: string) => {
     setDeregistering(true);
     useDeregisterToLocator.mutate(
-      new DeregisterFromLocatorRequest({
+      create(DeregisterFromLocatorRequestSchema, {
         locatorAddress: locatorAddress,
         wireguardInterface: "wg0",
       })
@@ -514,7 +423,7 @@ function AddLocatorModal(props: AddLocatorModalProps) {
   const handleRegister = (values: RegisterLocatorFormFields) => {
     setRegistering(true);
     useRegisterToLocator.mutate(
-      new RegisterToLocatorRequest({
+      create(RegisterToLocatorRequestSchema, {
         locatorAddress: values.stockSelection === "custom" ? values.customSelection : values.stockSelection,
         wireguardInterface: "wg0",
       })
