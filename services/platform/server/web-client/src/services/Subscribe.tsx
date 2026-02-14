@@ -54,6 +54,7 @@ export function EventsProvider(props: Props) {
   );
 }
 
+// NOTE: this doesn't work when running in npm dev mode (I think because the npm proxy can't handle the http2 stream?)
 export function EventListener() {
   const { setConnected, setEvent } = useEvents() as ProviderValue;
 
@@ -63,7 +64,6 @@ export function EventListener() {
       try {
         console.log("listening for events");
         for await (const res of client.subscribe({})) {
-          // TODO: this never fires
           console.log("received event");
           setConnected(true);
           // ignore heartbeats
