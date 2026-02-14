@@ -7,11 +7,11 @@ go 1.25.3
 // replace github.com/home-cloud-io/core/services/platform/operator => ../../../services/platform/operator
 
 require (
-	connectrpc.com/connect v1.18.1
+	connectrpc.com/connect v1.19.1
 	github.com/coreos/go-iptables v0.8.0
 	github.com/golang/protobuf v1.5.4
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.9.0
+	github.com/home-cloud-io/core/api v0.9.2
 	github.com/home-cloud-io/core/services/platform/operator v0.1.1
 	github.com/netbirdio/netbird v0.59.7
 	github.com/pion/stun/v2 v2.0.0
@@ -117,7 +117,7 @@ require (
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250826171959-ef028d996bc1 // indirect
 	google.golang.org/grpc v1.75.1 // indirect
-	google.golang.org/protobuf v1.36.8 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

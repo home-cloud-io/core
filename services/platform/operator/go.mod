@@ -5,10 +5,10 @@ go 1.25.3
 // replace github.com/home-cloud-io/core/api => ../../../api
 
 require (
-	connectrpc.com/connect v1.16.2
+	connectrpc.com/connect v1.19.1
 	dario.cat/mergo v1.0.2
 	github.com/go-logr/logr v1.4.3
-	github.com/home-cloud-io/core/api v0.9.0
+	github.com/home-cloud-io/core/api v0.9.2
 	github.com/sethvargo/go-password v0.3.1
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
 	github.com/steady-bytes/draft/pkg/loggers v0.2.5
@@ -52,7 +52,6 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/docker/docker-credential-helpers v0.9.3 // indirect
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
-	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
 	github.com/evanphx/json-patch v5.9.11+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20210407135951-1de76d718b3f // indirect
@@ -163,7 +162,7 @@ require (
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250826171959-ef028d996bc1 // indirect
 	google.golang.org/grpc v1.75.1 // indirect
-	google.golang.org/protobuf v1.36.8 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

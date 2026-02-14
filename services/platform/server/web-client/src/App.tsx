@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  UploadOutlined,
   HomeOutlined,
   SettingOutlined,
   PoweroffOutlined,
@@ -22,57 +21,39 @@ import { ConfigProvider } from 'antd';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 
 import HomePage from './pages/home/Home';
-import UploadPage from './pages/upload/Upload';
 import SettingsPage from './pages/settings/Settings';
 import AppStorePage from './pages/store/Store';
-import { useMutation, useQuery } from '@connectrpc/connect-query';
+import { useMutation } from '@connectrpc/connect-query';
 import {
-  isDeviceSetup,
   restartHost,
   shutdownHost,
 } from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
-import DeviceOnboardPage from './pages/device/Onboard';
 import AboutPage from './pages/about/About';
 
 import logo from './assets/logo-white-flat.png';
-import UpdatesPage from './pages/about/Updates';
 import LogsPage from './pages/about/Logs';
 const { Header, Sider, Content } = Layout;
 
 const App: React.FC = () => {
   const [api, contextHolder] = message.useMessage();
   const [collapsed, setCollapsed] = useState(false);
-  const [disabled, setDisabled] = useState(false);
+  const [disabled] = useState(false);
   const [primary] = React.useState('#643f91');
-  const { data, error } = useQuery(isDeviceSetup);
   const navigate = useNavigate();
 
-  if (error) {
-    console.warn(`failed to get device setup: ${error.rawMessage}`);
-  }
-
-  useEffect(() => {
-    if (data && !data.setup) {
-      console.log('redirecting to device setup');
-      setCollapsed(true);
-      setDisabled(true);
-      navigate('/getting-started');
-    }
-  }, [navigate, data]);
-
   const useRestartHost = useMutation(restartHost, {
-    onSuccess(data, variables, context) {
+    onSuccess() {
       api['success']('Restarting...');
     },
-    onError(error, variables, context) {
+    onError(error) {
       api['warning'](`Failed to restart: ${error.rawMessage}`);
     },
   });
   const useShutdownHost = useMutation(shutdownHost, {
-    onSuccess(data, variables, context) {
+    onSuccess() {
       api['success']('Shutting down...');
     },
-    onError(error, variables, context) {
+    onError(error) {
       api['warning'](`Failed to shutdown: ${error.rawMessage}`);
     },
   });
@@ -159,12 +140,6 @@ const App: React.FC = () => {
                   disabled: disabled,
                 },
                 {
-                  label: 'Upload',
-                  key: '/upload',
-                  icon: <UploadOutlined />,
-                  disabled: disabled,
-                },
-                {
                   label: 'Settings',
                   key: '/settings',
                   icon: <SettingOutlined />,
@@ -187,16 +162,9 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" Component={HomePage} />
               <Route path="/store" Component={AppStorePage} />
-              <Route path="/upload" Component={UploadPage} />
-              <Route path="/updates" Component={UpdatesPage} />
               <Route path="/settings" Component={SettingsPage} />
               <Route path="/about" Component={AboutPage} />
               <Route path="/about/logs" Component={LogsPage} />
-              <Route path="/about/updates" Component={UpdatesPage} />
-              <Route
-                path="/getting-started"
-                element={<DeviceOnboardPage setDisabled={setDisabled} />}
-              />
             </Routes>
           </Content>
         </Layout>

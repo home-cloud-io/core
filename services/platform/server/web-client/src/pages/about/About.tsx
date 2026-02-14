@@ -13,7 +13,6 @@ import {
 import {
   FileSearchOutlined,
   LoadingOutlined,
-  SyncOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@connectrpc/connect-query';
 import {
@@ -89,13 +88,6 @@ export function Links() {
   return (
     <Card title="Info" bordered={false}>
       <Flex vertical gap="small" style={{ width: '100%' }}>
-        <Button
-          block
-          color="primary"
-          onClick={() => navigate('/about/updates')}
-        >
-          <SyncOutlined /> Updates
-        </Button>
         <Button block color="primary" onClick={() => navigate('/about/logs')}>
           <FileSearchOutlined /> Logs
         </Button>

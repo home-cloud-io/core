@@ -337,19 +337,23 @@ func (h *rpcHandler) GetSystemLogs(ctx context.Context, request *connect.Request
 }
 
 func (h *rpcHandler) Subscribe(ctx context.Context, request *connect.Request[v1.SubscribeRequest], stream *connect.ServerStream[v1.ServerEvent]) error {
-	h.logger.Info("establishing client stream")
 	id := events.AddStream(stream)
+	log := h.logger.WithField("stream_id", id)
+	log.Info("establishing client stream")
+	defer func() {
+		log.Info("closing stream")
+		events.CloseStream(id)
+	}()
 	for {
 		err := stream.Send(&v1.ServerEvent{
 			Event: &v1.ServerEvent_Heartbeat{},
 		})
 		if err != nil {
-			events.CloseStream(id)
 			if err.Error() == "canceled: http2: stream closed" || strings.Contains(err.Error(), "write: broken pipe") {
-				h.logger.Info("stream closed by client")
+				log.Info("stream closed by client")
 				return nil
 			}
-			h.logger.WithError(err).Warn("failed to send client heartbeat")
+			log.WithError(err).Warn("failed to send client heartbeat")
 			return err
 		}
 		time.Sleep(5 * time.Second)

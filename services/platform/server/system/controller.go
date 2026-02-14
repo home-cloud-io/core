@@ -43,7 +43,12 @@ func NewController(logger chassis.Logger, kclient k8sclient.System, actl apps.Co
 		logger.WithError(err).Panic("failed to get install")
 	}
 
-	daemonAddress := strings.Default(install.Spec.Daemon.Address, DefaultDaemonAddress)
+	defaultAddress := DefaultDaemonAddress
+	if chassis.GetConfig().Env() == "local" {
+		defaultAddress = "http://localhost:9000"
+	}
+
+	daemonAddress := strings.Default(install.Spec.Daemon.Address, defaultAddress)
 	return &controller{
 		actl:         actl,
 		k8sclient:    kclient,

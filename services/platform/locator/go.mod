@@ -9,9 +9,9 @@ go 1.25.3
 replace golang.zx2c4.com/wireguard => github.com/netbirdio/wireguard-go v0.0.0-20241230120307-6a676aebaaf6
 
 require (
-	connectrpc.com/connect v1.16.2
+	connectrpc.com/connect v1.19.1
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.9.0
+	github.com/home-cloud-io/core/api v0.9.2
 	github.com/netbirdio/netbird v0.39.2
 	github.com/pion/stun/v2 v2.0.0
 	github.com/pion/turn/v4 v4.0.0
@@ -108,7 +108,7 @@ require (
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard v0.0.0-20230704135630-469159ecf7d1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
-	google.golang.org/protobuf v1.35.2 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gvisor.dev/gvisor v0.0.0-20231020174304-b8a429915ff1 // indirect

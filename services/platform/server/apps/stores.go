@@ -28,7 +28,8 @@ type (
 const (
 	ErrFailedToPopulateAppStore = "failed to populate app store"
 
-	DefaultAppStoreURL = "https://apps.home-cloud.io/index.yaml"
+	DefaultAppStoreURL         = "https://apps.home-cloud.io/index.yaml"
+	DefaultAppStoreRawChartURL = "https://raw.githubusercontent.com/home-cloud-io/store"
 )
 
 func (c *controller) stores(ctx context.Context, logger chassis.Logger) ([]*v1.AppStoreEntries, error) {
@@ -43,7 +44,8 @@ func (c *controller) stores(ctx context.Context, logger chassis.Logger) ([]*v1.A
 	if settings.AppStores == nil || len(settings.AppStores) == 0 {
 		settings.AppStores = []opv1.AppStore{
 			{
-				URL: DefaultAppStoreURL,
+				URL:         DefaultAppStoreURL,
+				RawChartURL: DefaultAppStoreRawChartURL,
 			},
 		}
 	}

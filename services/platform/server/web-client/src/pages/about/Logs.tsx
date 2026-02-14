@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Flex,
   Space,
@@ -10,18 +10,19 @@ import {
   Table,
   TableColumnsType,
   Button,
-} from 'antd';
-import { ArrowLeftOutlined, SyncOutlined } from '@ant-design/icons';
-import { useQuery } from '@connectrpc/connect-query';
-import { getSystemLogs } from '@home-cloud/api/platform/server/v1/web-WebService_connectquery';
-import { useNavigate } from 'react-router-dom';
+} from "antd";
+import { timestampDate } from "@bufbuild/protobuf/wkt";
+import { ArrowLeftOutlined, SyncOutlined } from "@ant-design/icons";
+import { useQuery } from "@connectrpc/connect-query";
+import { getSystemLogs } from "@home-cloud/api/platform/server/v1/web-WebService_connectquery";
+import { useNavigate } from "react-router-dom";
 
 export default function LogsPage() {
   const navigate = useNavigate();
   return (
     <Flex justify="center">
-      <Space direction="vertical" size="large" style={{ flex: 'auto' }}>
-        <Button onClick={() => navigate('/about')}>
+      <Space direction="vertical" size="large" style={{ flex: "auto" }}>
+        <Button onClick={() => navigate("/about")}>
           <ArrowLeftOutlined />
           Back
         </Button>
@@ -47,8 +48,8 @@ export function Logs() {
       sinceSeconds: 300,
     },
     {
-        refetchInterval: 5 * 1000,
-    }
+      refetchInterval: 5 * 1000,
+    },
   );
   const [logs, setLogs] = useState<LogType[]>([]);
   const [columns, setColumns] = useState<TableColumnsType<LogType>>([]);
@@ -61,7 +62,7 @@ export function Logs() {
         namespace: log.namespace,
         domain: log.domain,
         log: log.log,
-        timestamp: log.timestamp?.toDate(),
+        timestamp: timestampDate(log.timestamp!),
       }));
       setLogs(a);
     }
@@ -69,9 +70,9 @@ export function Logs() {
     if (data) {
       const c: TableColumnsType<LogType> = [
         {
-          title: 'Timestamp',
-          dataIndex: 'timestamp',
-          sortOrder: 'descend',
+          title: "Timestamp",
+          dataIndex: "timestamp",
+          sortOrder: "descend",
           sorter: (a, b) => {
             if (a.timestamp && b.timestamp) {
               return a.timestamp.valueOf() - b.timestamp.valueOf();
@@ -84,13 +85,13 @@ export function Logs() {
           ),
         },
         {
-          title: 'Domain',
-          dataIndex: 'domain',
+          title: "Domain",
+          dataIndex: "domain",
           filters: data.domains.map((x) => ({
             text: x,
             value: x,
           })),
-          filterMode: 'tree',
+          filterMode: "tree",
           filterSearch: true,
           onFilter: (value, log) => log.domain.includes(value as string),
           render: (value, record, index) => (
@@ -98,13 +99,13 @@ export function Logs() {
           ),
         },
         {
-          title: 'Group',
-          dataIndex: 'namespace',
+          title: "Group",
+          dataIndex: "namespace",
           filters: data.namespaces.map((x) => ({
             text: x,
             value: x,
           })),
-          filterMode: 'tree',
+          filterMode: "tree",
           filterSearch: true,
           onFilter: (value, log) => log.namespace.includes(value as string),
           render: (value, record, index) => (
@@ -114,13 +115,13 @@ export function Logs() {
           ),
         },
         {
-          title: 'Source',
-          dataIndex: 'source',
+          title: "Source",
+          dataIndex: "source",
           filters: data.sources.map((x) => ({
             text: x,
             value: x,
           })),
-          filterMode: 'tree',
+          filterMode: "tree",
           filterSearch: true,
           onFilter: (value, log) => log.source.includes(value as string),
           render: (value, record, index) => (
@@ -128,11 +129,11 @@ export function Logs() {
           ),
         },
         {
-          title: 'Log',
-          dataIndex: 'log',
+          title: "Log",
+          dataIndex: "log",
           render: (value, record, index) => (
             <Typography
-              style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}
+              style={{ whiteSpace: "pre-wrap", fontFamily: "monospace" }}
             >
               {record.log}
             </Typography>
@@ -181,13 +182,13 @@ export function Logs() {
 /* eslint-disable no-bitwise */
 const stringToColour = (str: string) => {
   let hash = 0;
-  str.split('').forEach((char) => {
+  str.split("").forEach((char) => {
     hash = char.charCodeAt(0) + ((hash << 5) - hash);
   });
-  let colour = '#';
+  let colour = "#";
   for (let i = 0; i < 3; i++) {
     const value = (hash >> (i * 8)) & 0xff;
-    colour += value.toString(16).padStart(2, '0');
+    colour += value.toString(16).padStart(2, "0");
   }
   return colour;
 };
