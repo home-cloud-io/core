@@ -11,6 +11,7 @@ import (
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/client-go/discovery"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -55,6 +56,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	discoveryClient, err := discovery.NewDiscoveryClientForConfig(mgr.GetConfig())
+	if err != nil {
+		setupLog.Error(err, "failed to create discovery client")
+		os.Exit(1)
+	}
+
 	// create app controller
 	if err = (&controller.AppReconciler{
 		Client: mgr.GetClient(),
@@ -66,9 +73,10 @@ func main() {
 
 	// create install controller
 	if err = (&controller.InstallReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Config: mgr.GetConfig(),
+		Client:          mgr.GetClient(),
+		DiscoveryClient: discoveryClient,
+		Scheme:          mgr.GetScheme(),
+		Config:          mgr.GetConfig(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "failed to create controller", "controller", "Install")
 		os.Exit(1)

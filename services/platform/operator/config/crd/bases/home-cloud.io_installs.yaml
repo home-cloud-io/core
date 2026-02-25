@@ -198,6 +198,18 @@ spec:
                 properties:
                   image:
                     type: string
+                  kubernetes:
+                    properties:
+                      version:
+                        type: string
+                    type: object
+                  system:
+                    properties:
+                      repo:
+                        type: string
+                      version:
+                        type: string
+                    type: object
                   tag:
                     type: string
                 type: object

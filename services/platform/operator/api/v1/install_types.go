@@ -28,8 +28,8 @@ type GatewayAPISpec struct {
 type IstioSpec struct {
 	Disable            bool   `json:"disable,omitempty"`
 	Namespace          string `json:"istio,omitempty"`
-	Version            string `json:"version,omitempty"`
 	Source             string `json:"source,omitempty"`
+	Version            string `json:"version,omitempty"`
 	IngressGatewayName string `json:"ingressGatewayName,omitempty"`
 
 	Base    BaseSpec    `json:"base,omitempty"`
@@ -130,22 +130,22 @@ type ImageVersion struct {
 // InstallStatus defines the observed state of Install
 type InstallStatus struct {
 	Version    string           `json:"version,omitempty"`
-	GatewayAPI GatewayAPIStatus `json:"gatewayApi,omitempty"`
-	Istio      IstioStatus      `json:"istio,omitempty"`
-	Server     ServerStatus     `json:"server,omitempty"`
-	Tunnel     TunnelStatus     `json:"tunnel,omitempty"`
-	MDNS       MDNSStatus       `json:"mdns,omitempty"`
-	Daemon     DaemonStatus     `json:"daemon,omitempty"`
+	GatewayAPI *GatewayAPIStatus `json:"gatewayApi,omitempty"`
+	Istio      *IstioStatus      `json:"istio,omitempty"`
+	Server     *ServerStatus     `json:"server,omitempty"`
+	Tunnel     *TunnelStatus     `json:"tunnel,omitempty"`
+	MDNS       *MDNSStatus       `json:"mdns,omitempty"`
+	Daemon     *DaemonStatus     `json:"daemon,omitempty"`
 }
 
 type GatewayAPIStatus struct {
-	URL     string `json:"url,omitempty"`
+	Source  string `json:"url,omitempty"`
 	Version string `json:"version,omitempty"`
 }
 
 type IstioStatus struct {
+	Source  string `json:"repo,omitempty"`
 	Version string `json:"version,omitempty"`
-	Repo    string `json:"repo,omitempty"`
 }
 
 type ServerStatus struct {
@@ -164,8 +164,19 @@ type TunnelStatus struct {
 }
 
 type DaemonStatus struct {
-	Image string `json:"image,omitempty"`
-	Tag   string `json:"tag,omitempty"`
+	Image      string           `json:"image,omitempty"`
+	Tag        string           `json:"tag,omitempty"`
+	System     *SystemStatus     `json:"system,omitempty"`
+	Kubernetes *KubernetesStatus `json:"kubernetes,omitempty"`
+}
+
+type SystemStatus struct {
+	Source  string `json:"repo,omitempty"`
+	Version string `json:"version,omitempty"`
+}
+
+type KubernetesStatus struct {
+	Version string `json:"version,omitempty"`
 }
 
 //+kubebuilder:object:root=true
