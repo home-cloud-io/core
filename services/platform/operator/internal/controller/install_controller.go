@@ -19,6 +19,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -37,8 +38,9 @@ import (
 // InstallReconciler reconciles a Install object
 type InstallReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
-	Config *rest.Config
+	DiscoveryClient *discovery.DiscoveryClient
+	Scheme          *runtime.Scheme
+	Config          *rest.Config
 }
 
 const (
@@ -88,24 +90,24 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, r.tryDeletions(ctx, install)
 	}
 
+	// update status as reconcile ends so that we always have the latest status before next
+	// reconcile iteration. this way we don't try and install components that are already installed
+	defer r.Status().Update(ctx, install)
+
 	l.Info("Reconciling Install")
 	return ctrl.Result{}, r.reconcile(ctx, install)
 }
 
 func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) error {
 	l := log.FromContext(ctx)
-	var err error
 
-	l.Info("reconciling gateway api crds")
-	resp, err := http.Get(fmt.Sprintf("%s/%s/standard-install.yaml", install.Spec.GatewayAPI.Source, install.Spec.GatewayAPI.Version))
-	if err != nil {
-		return err
-	}
-	err = r.apply(ctx, resp.Body)
+	// GATEWAY API
+	err := r.reconcileGatewayAPI(ctx, install)
 	if err != nil {
 		return err
 	}
 
+	// NAMESPACES
 	l.Info("reconciling namespaces")
 	for _, o := range resources.NamespaceObjects(install) {
 		err = kubeCreateOrUpdate(ctx, r.Client, o)
@@ -113,8 +115,13 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 			return err
 		}
 	}
+	// no status update
 
+	// ISTIO
 	if !install.Spec.Istio.Disable {
+		// NOTE: we can't simply skip an istio install if the version hasn't changed since the values
+		// might have changed with no version bump
+
 		l.Info("reconciling ingress gateway")
 		err = r.installResources(ctx, resources.GatewayObjects(install))
 		if err != nil {
@@ -126,8 +133,14 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		if err != nil {
 			return err
 		}
+
+		install.Status.Istio = &v1.IstioStatus{
+			Source:  install.Spec.Istio.Source,
+			Version: install.Spec.Istio.Version,
+		}
 	} else {
-		if install.Status.Istio.Version != "" {
+		// only try and uninstall if currently installed
+		if install.Status.Istio != nil {
 			l.Info("istio is disabled: removing ingress gateway")
 			err = r.uninstallResources(ctx, resources.GatewayObjects(install))
 			if err != nil {
@@ -140,59 +153,218 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 				return err
 			}
 		}
+		install.Status.Istio = nil
 	}
 
-	installed := install.Status.Server.Tag != ""
+	// SERVER
+	installed := install.Status.Server != nil
 	err = r.reconcileObjects(ctx, "server", install.Spec.Server.Disable, installed, resources.ServerObjects(install))
 	if err != nil {
 		return err
 	}
+	if !install.Spec.Server.Disable {
+		install.Status.Server = &v1.ServerStatus{
+			Image: install.Spec.Server.Image,
+			Tag:   install.Spec.Server.Tag,
+		}
+	} else {
+		install.Status.Server = nil
+	}
 
-	installed = install.Status.MDNS.Tag != ""
+	// MDNS
+	installed = install.Status.MDNS != nil
 	err = r.reconcileObjects(ctx, "mdns", install.Spec.MDNS.Disable, installed, resources.MDNSObjects(install))
 	if err != nil {
 		return err
 	}
+	if !install.Spec.MDNS.Disable {
+		install.Status.MDNS = &v1.MDNSStatus{
+			Image: install.Spec.MDNS.Image,
+			Tag:   install.Spec.MDNS.Tag,
+		}
+	} else {
+		install.Status.MDNS = nil
+	}
 
-	installed = install.Status.Tunnel.Tag != ""
+	// TUNNEL
+	installed = install.Status.Tunnel != nil
 	err = r.reconcileObjects(ctx, "tunnel", install.Spec.Tunnel.Disable, installed, resources.TunnelObjects(install))
 	if err != nil {
 		return err
 	}
+	if !install.Spec.Tunnel.Disable {
+		install.Status.Tunnel = &v1.TunnelStatus{
+			Image: install.Spec.Tunnel.Image,
+			Tag:   install.Spec.Tunnel.Tag,
+		}
+	} else {
+		install.Status.Tunnel = nil
+	}
 
-	installed = install.Status.Daemon.Tag != ""
+	// DAEMON
+	installed = install.Status.Daemon != nil
 	err = r.reconcileObjects(ctx, "daemon", install.Spec.Daemon.Disable, installed, resources.DaemonObjects(install))
 	if err != nil {
 		return err
 	}
-
 	if !install.Spec.Daemon.Disable {
-		daemonClient := DaemonClient(install.Spec.Daemon.Address)
+		install.Status.Daemon = &v1.DaemonStatus{
+			Image: install.Spec.Daemon.Image,
+			Tag:   install.Spec.Daemon.Tag,
+		}
+	} else {
+		install.Status.Daemon = nil
+	}
 
-		if !install.Spec.Daemon.System.Disable {
-			l.Info("reconciling system install")
-			_, err := daemonClient.Upgrade(ctx, connect.NewRequest(&dv1.UpgradeRequest{
-				Source:  install.Spec.Daemon.System.Source,
-				Version: install.Spec.Daemon.System.Version,
-			}))
+	// SYSTEM
+	err = r.reconcileSystem(ctx, install)
+	if err != nil {
+		return err
+	}
+
+	// KUBERNETES
+	err = r.reconcileKubernetes(ctx, install)
+	if err != nil {
+		return err
+	}
+
+	// HOME CLOUD
+	install.Status.Version = install.Spec.Version
+
+	return nil
+}
+
+func (r *InstallReconciler) reconcileGatewayAPI(ctx context.Context, install *v1.Install) error {
+	l := log.FromContext(ctx)
+
+	if !install.Spec.GatewayAPI.Disable {
+		if install.Status.GatewayAPI == nil ||
+			install.Spec.GatewayAPI.Source != install.Status.GatewayAPI.Source ||
+			install.Spec.GatewayAPI.Version != install.Status.GatewayAPI.Version {
+			l.Info("reconciling gateway api crds")
+
+			resp, err := http.Get(fmt.Sprintf("%s/%s/standard-install.yaml", install.Spec.GatewayAPI.Source, install.Spec.GatewayAPI.Version))
 			if err != nil {
 				return err
 			}
+			err = r.apply(ctx, resp.Body)
+			if err != nil {
+				return err
+			}
+
+			install.Status.GatewayAPI = &v1.GatewayAPIStatus{
+				Source:  install.Spec.GatewayAPI.Source,
+				Version: install.Spec.GatewayAPI.Version,
+			}
+		} else {
+			l.V(1).Info("unchanged gateway api install: skipping reconcile")
+			return nil
 		}
 
-		if !install.Spec.Daemon.Kubernetes.Disable {
-			l.Info("reconciling kubernetes install")
-			_, err := daemonClient.UpgradeKubernetes(ctx, connect.NewRequest(&dv1.UpgradeKubernetesRequest{
-				Version: install.Spec.Daemon.Kubernetes.Version,
-			}))
-			if err != nil {
-				return err
+	} else {
+		install.Status.GatewayAPI = nil
+	}
+	return nil
+}
+
+func (r *InstallReconciler) reconcileSystem(ctx context.Context, install *v1.Install) error {
+	l := log.FromContext(ctx)
+
+	// skip if daemon or system is disabled
+	if install.Spec.Daemon.Disable || install.Spec.Daemon.System.Disable {
+		l.V(1).Info("daemon or system disabled: skipping reconcile")
+		install.Status.Daemon.System = nil
+		return nil
+	}
+
+	// only upgrade if not installed or the source/version is changed
+	if install.Status.Daemon.System == nil ||
+		install.Spec.Daemon.System.Source != install.Status.Daemon.System.Source ||
+		install.Spec.Daemon.System.Version != install.Status.Daemon.System.Version {
+
+		l.V(1).Info("reconciling system install")
+		daemonClient := DaemonClient(install.Spec.Daemon.Address)
+
+		// first check the spec version against the daemon since an upgrade may have broken the previous reconcile iteration
+		// before status could be written and we want to avoid an infinite loop of triggering the same upgrade over and over
+		versionResp, err := daemonClient.Version(ctx, connect.NewRequest(&dv1.VersionRequest{}))
+		if err != nil {
+			return err
+		}
+		if versionResp.Msg.Version == install.Spec.Daemon.System.Version {
+			l.V(1).Info("new system version already installed: updating status")
+			install.Status.Daemon.System = &v1.SystemStatus{
+				// TODO: should Version() return source?
+				Source:  install.Spec.Daemon.System.Source,
+				Version: install.Spec.Daemon.System.Version,
 			}
+			return nil
+		}
+
+		l.Info("upgrading system install")
+		_, err = daemonClient.Upgrade(ctx, connect.NewRequest(&dv1.UpgradeRequest{
+			Source:  install.Spec.Daemon.System.Source,
+			Version: install.Spec.Daemon.System.Version,
+		}))
+		if err != nil {
+			return err
+		}
+		l.Info("system upgrade complete")
+		install.Status.Daemon.System = &v1.SystemStatus{
+			Source:  install.Spec.Daemon.System.Source,
+			Version: install.Spec.Daemon.System.Version,
 		}
 	}
 
-	l.Info("reconcile complete")
-	return r.updateStatus(ctx, install)
+	l.V(1).Info("unchanged system install: skipping reconcile")
+	return nil
+}
+
+func (r *InstallReconciler) reconcileKubernetes(ctx context.Context, install *v1.Install) error {
+	l := log.FromContext(ctx)
+
+	// skip if daemon or kubernetes is disabled
+	if install.Spec.Daemon.Disable || install.Spec.Daemon.Kubernetes.Disable {
+		l.V(1).Info("daemon or kubernetes disabled: skipping reconcile")
+		install.Status.Daemon.Kubernetes = nil
+		return nil
+	}
+
+	// only upgrade if not installed or the version is changed
+	if install.Status.Daemon.Kubernetes == nil ||
+		install.Spec.Daemon.Kubernetes.Version != install.Status.Daemon.Kubernetes.Version {
+		l.V(1).Info("reconciling kubernetes install")
+		daemonClient := DaemonClient(install.Spec.Daemon.Address)
+
+		// first check the spec version against the cluster since an upgrade may have broken the previous reconcile
+		// call before status could be written and we want to avoid an infinite loop of triggering the same upgrade over and over
+		version, err := r.DiscoveryClient.ServerVersion()
+		if err != nil {
+			return err
+		}
+		if version.GitVersion == install.Spec.Daemon.Kubernetes.Version {
+			l.V(1).Info("kubernetes version already installed: updating status")
+			install.Status.Daemon.Kubernetes = &v1.KubernetesStatus{
+				Version: install.Spec.Daemon.Kubernetes.Version,
+			}
+			return nil
+		}
+
+		l.Info("upgrading kubernetes install")
+		_, err = daemonClient.UpgradeKubernetes(ctx, connect.NewRequest(&dv1.UpgradeKubernetesRequest{
+			Version: install.Spec.Daemon.Kubernetes.Version,
+		}))
+		if err != nil {
+			return err
+		}
+		l.Info("kubernetes upgrade complete")
+		install.Status.Daemon.Kubernetes = &v1.KubernetesStatus{
+			Version: install.Spec.Daemon.Kubernetes.Version,
+		}
+	}
+
+	l.V(1).Info("unchanged kubernetes install: skipping reconcile")
+	return nil
 }
 
 func reconcileIstio(ctx context.Context, install *v1.Install) error {
@@ -301,12 +473,13 @@ func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) 
 func (r *InstallReconciler) reconcileObjects(ctx context.Context, name string, disable bool, installed bool, objects []client.Object) error {
 	l := log.FromContext(ctx)
 
-	// uninstall if disabled and currently installed
-	if disable && installed {
+	if disable {
+		// uninstall if disabled and currently installed
 		if installed {
 			l.Info(fmt.Sprintf("%s is disabled: removing previous installation", name))
 			return r.uninstallResources(ctx, objects)
 		}
+		return nil
 	}
 
 	// otherwise create/update
@@ -391,66 +564,6 @@ func helmGet(cfg *action.Configuration, releaseName string) (*release.Release, e
 	return release, nil
 }
 
-func (r *InstallReconciler) updateStatus(ctx context.Context, install *v1.Install) error {
-
-	install.Status.Version = install.Spec.Version
-
-	if !install.Spec.GatewayAPI.Disable {
-		install.Status.GatewayAPI = v1.GatewayAPIStatus{
-			URL:     install.Spec.GatewayAPI.Source,
-			Version: install.Spec.GatewayAPI.Version,
-		}
-	} else {
-		install.Status.GatewayAPI = v1.GatewayAPIStatus{}
-	}
-
-	if !install.Spec.Istio.Disable {
-		install.Status.Istio = v1.IstioStatus{
-			Repo:    install.Spec.Istio.Source,
-			Version: install.Spec.Istio.Version,
-		}
-	} else {
-		install.Status.Istio = v1.IstioStatus{}
-	}
-
-	if !install.Spec.Server.Disable {
-		install.Status.Server = v1.ServerStatus{
-			Image: install.Spec.Server.Image,
-			Tag:   install.Spec.Server.Tag,
-		}
-	} else {
-		install.Status.Server = v1.ServerStatus{}
-	}
-
-	if !install.Spec.MDNS.Disable {
-		install.Status.MDNS = v1.MDNSStatus{
-			Image: install.Spec.MDNS.Image,
-			Tag:   install.Spec.MDNS.Tag,
-		}
-	} else {
-		install.Status.MDNS = v1.MDNSStatus{}
-	}
-
-	if !install.Spec.Tunnel.Disable {
-		install.Status.Tunnel = v1.TunnelStatus{
-			Image: install.Spec.Tunnel.Image,
-			Tag:   install.Spec.Tunnel.Tag,
-		}
-	} else {
-		install.Status.Tunnel = v1.TunnelStatus{}
-	}
-
-	if !install.Spec.Daemon.Disable {
-		install.Status.Daemon = v1.DaemonStatus{
-			Image: install.Spec.Daemon.Image,
-			Tag:   install.Spec.Daemon.Tag,
-		}
-	} else {
-		install.Status.Daemon = v1.DaemonStatus{}
-	}
-
-	return r.Status().Update(ctx, install)
-}
 
 func helmInstallOrUpgrade(ctx context.Context, cfg *action.Configuration, iAct *action.Install, uAct *action.Upgrade, values string) error {
 	l := log.FromContext(ctx)
