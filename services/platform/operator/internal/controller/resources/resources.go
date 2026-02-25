@@ -16,6 +16,26 @@ var (
 			Istio: v1.IstioSpec{
 				Namespace:          "istio-system",
 				IngressGatewayName: "ingress-gateway",
+				Istiod: v1.IstiodSpec{
+					// The default istiod resources are cpu=500m and memory=2048Mi which is wayyyy
+					// oversized for the typical Home Cloud installation.
+					Values: `
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+`,
+				},
+				Ztunnel: v1.ZtunnelSpec{
+					// The default ztunnel resources are cpu=200m and memory=512Mi which is wayyyy
+					// oversized for the typical Home Cloud installation.
+					Values: `
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+`,
+				},
 			},
 			Settings: v1.SettingsSpec{
 				Hostname: "home-cloud.local",
