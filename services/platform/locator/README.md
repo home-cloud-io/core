@@ -15,4 +15,3 @@ The Locator is no longer needed once the tunnel is established until the connect
 ## Running a Locator
 
 <!-- DOCKER COMPOSE AND CONFIG -->
-

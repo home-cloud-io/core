@@ -74,7 +74,7 @@ spec:
               drop:
                 - ALL
           env:
-            - name: HOST_IP
+            - name: DRAFT_MDNS_HOST_IP
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
