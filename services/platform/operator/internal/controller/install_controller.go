@@ -201,6 +201,21 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		install.Status.Tunnel = nil
 	}
 
+	// OPERATOR
+	installed = install.Status.Operator != nil
+	err = r.reconcileObjects(ctx, "operator", install.Spec.Operator.Disable, installed, resources.OperatorObjects(install))
+	if err != nil {
+		return err
+	}
+	if !install.Spec.Operator.Disable {
+		install.Status.Operator = &v1.OperatorStatus{
+			Image: install.Spec.Operator.Image,
+			Tag:   install.Spec.Operator.Tag,
+		}
+	} else {
+		install.Status.Operator = nil
+	}
+
 	// DAEMON
 	installed = install.Status.Daemon != nil
 	err = r.reconcileObjects(ctx, "daemon", install.Spec.Daemon.Disable, installed, resources.DaemonObjects(install))
@@ -229,7 +244,34 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	}
 
 	// HOME CLOUD
-	install.Status.Version = install.Spec.Version
+	err = r.reconcileHomeCloudCRDs(ctx, install)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *InstallReconciler) reconcileHomeCloudCRDs(ctx context.Context, install *v1.Install) error {
+	l := log.FromContext(ctx)
+
+	if install.Spec.Version != install.Status.Version {
+		l.Info("reconciling home cloud crds")
+
+		resp, err := http.Get(fmt.Sprintf("%s/%s/crds.yaml", ReleasesURL, install.Spec.Version))
+		if err != nil {
+			return err
+		}
+		err = r.apply(ctx, resp.Body)
+		if err != nil {
+			return err
+		}
+
+		install.Status.Version = install.Spec.Version
+	} else {
+		l.V(1).Info("unchanged home cloud crds: skipping reconcile")
+		return nil
+	}
 
 	return nil
 }
@@ -442,7 +484,8 @@ func uninstallIstio(ctx context.Context, install *v1.Install) error {
 
 func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) error {
 
-	// NOTE: we do not delete any CRDs (gateway API/istio) as they could be in use by other applications
+	// NOTE: we do not delete any CRDs as they could be in use by other applications
+	// 			 we also do not uninstall operator resources for obvious reasons
 
 	err := r.uninstallResources(ctx, slices.Concat(
 		resources.GatewayObjects(install),
@@ -563,7 +606,6 @@ func helmGet(cfg *action.Configuration, releaseName string) (*release.Release, e
 	}
 	return release, nil
 }
-
 
 func helmInstallOrUpgrade(ctx context.Context, cfg *action.Configuration, iAct *action.Install, uAct *action.Upgrade, values string) error {
 	l := log.FromContext(ctx)
