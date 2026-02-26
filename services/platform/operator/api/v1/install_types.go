@@ -12,6 +12,7 @@ type InstallSpec struct {
 	Server     ServerSpec     `json:"server,omitempty"`
 	MDNS       MDNSSpec       `json:"mdns,omitempty"`
 	Tunnel     TunnelSpec     `json:"tunnel,omitempty"`
+	Operator   OperatorSpec   `json:"operator,omitempty"`
 	// TODO: document API
 	Daemon   DaemonSpec   `json:"daemon,omitempty"`
 	Settings SettingsSpec `json:"settings,omitempty"`
@@ -67,6 +68,12 @@ type MDNSSpec struct {
 }
 
 type TunnelSpec struct {
+	Disable bool   `json:"disable,omitempty"`
+	Image   string `json:"image,omitempty"`
+	Tag     string `json:"tag,omitempty"`
+}
+
+type OperatorSpec struct {
 	Disable bool   `json:"disable,omitempty"`
 	Image   string `json:"image,omitempty"`
 	Tag     string `json:"tag,omitempty"`
@@ -129,12 +136,13 @@ type ImageVersion struct {
 
 // InstallStatus defines the observed state of Install
 type InstallStatus struct {
-	Version    string           `json:"version,omitempty"`
+	Version    string            `json:"version,omitempty"`
 	GatewayAPI *GatewayAPIStatus `json:"gatewayApi,omitempty"`
 	Istio      *IstioStatus      `json:"istio,omitempty"`
 	Server     *ServerStatus     `json:"server,omitempty"`
-	Tunnel     *TunnelStatus     `json:"tunnel,omitempty"`
 	MDNS       *MDNSStatus       `json:"mdns,omitempty"`
+	Tunnel     *TunnelStatus     `json:"tunnel,omitempty"`
+	Operator   *OperatorStatus   `json:"operator,omitempty"`
 	Daemon     *DaemonStatus     `json:"daemon,omitempty"`
 }
 
@@ -163,9 +171,14 @@ type TunnelStatus struct {
 	Tag   string `json:"tag,omitempty"`
 }
 
+type OperatorStatus struct {
+	Image string `json:"image,omitempty"`
+	Tag   string `json:"tag,omitempty"`
+}
+
 type DaemonStatus struct {
-	Image      string           `json:"image,omitempty"`
-	Tag        string           `json:"tag,omitempty"`
+	Image      string            `json:"image,omitempty"`
+	Tag        string            `json:"tag,omitempty"`
 	System     *SystemStatus     `json:"system,omitempty"`
 	Kubernetes *KubernetesStatus `json:"kubernetes,omitempty"`
 }
