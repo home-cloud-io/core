@@ -101,8 +101,8 @@ func (s *server) Serve(ctx context.Context) error {
 }
 
 func (s *server) Close(ctx context.Context) error {
-	s.mu.Unlock()
-	defer s.mu.Lock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	if s.conn != nil {
 		return s.conn.Close()
@@ -111,8 +111,8 @@ func (s *server) Close(ctx context.Context) error {
 }
 
 func (s *server) AddHost(ctx context.Context, host string) error {
-	s.mu.Unlock()
-	defer s.mu.Lock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	s.logger.WithField("host", host).Info("adding host")
 	if slices.Contains(s.hosts, host) {
@@ -123,8 +123,8 @@ func (s *server) AddHost(ctx context.Context, host string) error {
 }
 
 func (s *server) RemoveHost(ctx context.Context, host string) error {
-	s.mu.Unlock()
-	defer s.mu.Lock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	s.logger.WithField("host", host).Info("removing host")
 	hosts := []string{}
