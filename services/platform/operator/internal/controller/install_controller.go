@@ -101,8 +101,31 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) error {
 	l := log.FromContext(ctx)
 
+	// OPERATOR
+	// install the operator before the other components since it may be necessary to patch a bug in itself to
+	// prevent getting locked up on other components
+	installed := install.Status.Operator != nil
+	err := r.reconcileObjects(ctx, "operator", install.Spec.Operator.Disable, installed, resources.OperatorObjects(install))
+	if err != nil {
+		return err
+	}
+	if !install.Spec.Operator.Disable {
+		install.Status.Operator = &v1.OperatorStatus{
+			Image: install.Spec.Operator.Image,
+			Tag:   install.Spec.Operator.Tag,
+		}
+	} else {
+		install.Status.Operator = nil
+	}
+
+	// Home Cloud CRDs
+	err = r.reconcileHomeCloudCRDs(ctx, install)
+	if err != nil {
+		return err
+	}
+
 	// GATEWAY API
-	err := r.reconcileGatewayAPI(ctx, install)
+	err = r.reconcileGatewayAPI(ctx, install)
 	if err != nil {
 		return err
 	}
@@ -157,7 +180,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	}
 
 	// SERVER
-	installed := install.Status.Server != nil
+	installed = install.Status.Server != nil
 	err = r.reconcileObjects(ctx, "server", install.Spec.Server.Disable, installed, resources.ServerObjects(install))
 	if err != nil {
 		return err
@@ -201,21 +224,6 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		install.Status.Tunnel = nil
 	}
 
-	// OPERATOR
-	installed = install.Status.Operator != nil
-	err = r.reconcileObjects(ctx, "operator", install.Spec.Operator.Disable, installed, resources.OperatorObjects(install))
-	if err != nil {
-		return err
-	}
-	if !install.Spec.Operator.Disable {
-		install.Status.Operator = &v1.OperatorStatus{
-			Image: install.Spec.Operator.Image,
-			Tag:   install.Spec.Operator.Tag,
-		}
-	} else {
-		install.Status.Operator = nil
-	}
-
 	// DAEMON
 	installed = install.Status.Daemon != nil
 	err = r.reconcileObjects(ctx, "daemon", install.Spec.Daemon.Disable, installed, resources.DaemonObjects(install))
@@ -239,12 +247,6 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 
 	// KUBERNETES
 	err = r.reconcileKubernetes(ctx, install)
-	if err != nil {
-		return err
-	}
-
-	// HOME CLOUD
-	err = r.reconcileHomeCloudCRDs(ctx, install)
 	if err != nil {
 		return err
 	}
