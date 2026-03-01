@@ -128,6 +128,15 @@ spec:
                   tag:
                     type: string
                 type: object
+              operator:
+                properties:
+                  disable:
+                    type: boolean
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               server:
                 properties:
                   disable:
@@ -228,6 +237,13 @@ spec:
                     type: string
                 type: object
               mdns:
+                properties:
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              operator:
                 properties:
                   image:
                     type: string

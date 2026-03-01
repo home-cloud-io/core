@@ -31,20 +31,31 @@ var (
 				},
 				Rules: []rbacv1.PolicyRule{
 					{
-						Verbs: []string{
-							"*",
+						APIGroups: []string{
+							"home-cloud.io",
 						},
-						APIGroups: []string{"home-cloud.io"},
-						Resources: []string{"apps", "installs", "wireguards"},
+						Resources: []string{
+							"apps",
+							"installs",
+							"wireguards",
+						},
+						Verbs: []string{
+							"get",
+							"list",
+							"create",
+							"update",
+							"delete",
+						},
 					},
 					{
+						APIGroups: []string{""},
+						Resources: []string{"secrets"},
 						Verbs: []string{
 							"get",
 							"create",
+							"update",
 							"delete",
 						},
-						APIGroups: []string{""},
-						Resources: []string{"secrets"},
 					},
 				},
 			},
@@ -69,17 +80,17 @@ var (
 					Name:      "manage-home-cloud-apps",
 					Namespace: install.Namespace,
 				},
+				RoleRef: rbacv1.RoleRef{
+					APIGroup: "rbac.authorization.k8s.io",
+					Kind:     "Role",
+					Name:     "manage-home-cloud-apps",
+				},
 				Subjects: []rbacv1.Subject{
 					{
 						Kind:      "ServiceAccount",
 						Name:      "server",
 						Namespace: install.Namespace,
 					},
-				},
-				RoleRef: rbacv1.RoleRef{
-					APIGroup: "rbac.authorization.k8s.io",
-					Kind:     "Role",
-					Name:     "manage-home-cloud-apps",
 				},
 			},
 			&rbacv1.ClusterRoleBinding{

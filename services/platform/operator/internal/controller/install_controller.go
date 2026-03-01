@@ -29,7 +29,7 @@ import (
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	resources "github.com/home-cloud-io/core/services/platform/operator/internal/controller/resources"
+	"github.com/home-cloud-io/core/services/platform/operator/resources"
 )
 
 // TODO: cancel install on crd update so that failed installs don't get stuck until timeout
@@ -101,8 +101,31 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) error {
 	l := log.FromContext(ctx)
 
+	// OPERATOR
+	// install the operator before the other components since it may be necessary to patch a bug in itself to
+	// prevent getting locked up on other components
+	installed := install.Status.Operator != nil
+	err := r.reconcileObjects(ctx, "operator", install.Spec.Operator.Disable, installed, resources.OperatorObjects(install))
+	if err != nil {
+		return err
+	}
+	if !install.Spec.Operator.Disable {
+		install.Status.Operator = &v1.OperatorStatus{
+			Image: install.Spec.Operator.Image,
+			Tag:   install.Spec.Operator.Tag,
+		}
+	} else {
+		install.Status.Operator = nil
+	}
+
+	// Home Cloud CRDs
+	err = r.reconcileHomeCloudCRDs(ctx, install)
+	if err != nil {
+		return err
+	}
+
 	// GATEWAY API
-	err := r.reconcileGatewayAPI(ctx, install)
+	err = r.reconcileGatewayAPI(ctx, install)
 	if err != nil {
 		return err
 	}
@@ -157,7 +180,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	}
 
 	// SERVER
-	installed := install.Status.Server != nil
+	installed = install.Status.Server != nil
 	err = r.reconcileObjects(ctx, "server", install.Spec.Server.Disable, installed, resources.ServerObjects(install))
 	if err != nil {
 		return err
@@ -228,8 +251,29 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		return err
 	}
 
-	// HOME CLOUD
-	install.Status.Version = install.Spec.Version
+	return nil
+}
+
+func (r *InstallReconciler) reconcileHomeCloudCRDs(ctx context.Context, install *v1.Install) error {
+	l := log.FromContext(ctx)
+
+	if install.Spec.Version != install.Status.Version {
+		l.Info("reconciling home cloud crds")
+
+		resp, err := http.Get(fmt.Sprintf("%s/%s/crds.yaml", ReleasesURL, install.Spec.Version))
+		if err != nil {
+			return err
+		}
+		err = r.apply(ctx, resp.Body)
+		if err != nil {
+			return err
+		}
+
+		install.Status.Version = install.Spec.Version
+	} else {
+		l.V(1).Info("unchanged home cloud crds: skipping reconcile")
+		return nil
+	}
 
 	return nil
 }
@@ -442,7 +486,8 @@ func uninstallIstio(ctx context.Context, install *v1.Install) error {
 
 func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) error {
 
-	// NOTE: we do not delete any CRDs (gateway API/istio) as they could be in use by other applications
+	// NOTE: we do not delete any CRDs as they could be in use by other applications
+	// 			 we also do not uninstall operator resources for obvious reasons
 
 	err := r.uninstallResources(ctx, slices.Concat(
 		resources.GatewayObjects(install),
@@ -563,7 +608,6 @@ func helmGet(cfg *action.Configuration, releaseName string) (*release.Release, e
 	}
 	return release, nil
 }
-
 
 func helmInstallOrUpgrade(ctx context.Context, cfg *action.Configuration, iAct *action.Install, uAct *action.Upgrade, values string) error {
 	l := log.FromContext(ctx)
