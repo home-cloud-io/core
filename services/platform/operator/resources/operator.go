@@ -15,6 +15,10 @@ import (
 )
 
 var (
+	// NOTE: For these resources specifically, they have the TypeMeta manually configured.
+	//       This is not necessary for most usecases but it allows `tools/releaser` to use
+	//       these definitions to create the releasable `operator.yaml` consistent with what
+	//       the operator will reconcile itself.
 	OperatorObjects = func(install *v1.Install) []client.Object {
 		return []client.Object{
 			&corev1.ServiceAccount{
