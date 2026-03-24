@@ -181,6 +181,14 @@ spec:
                   autoUpdateSystem:
                     description: 'AutoUpdateSystem (default: true)'
                     type: boolean
+                  autoUpdateSystemSchedule:
+                    description: |-
+                      AutoUpdateSystemSchedule is a cron string that defines the freqency with which the server
+                      will automatically update system components: e.g. (default: "0 1 * * *")
+
+                      You must restart the server after changing this value for it to take
+                      effect if updating the Kuberenetes resource directly.
+                    type: string
                   hostname:
                     description: 'Hostname defines the base hostname for the install
                       (default: home-cloud.local)'

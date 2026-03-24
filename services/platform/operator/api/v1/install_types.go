@@ -119,6 +119,12 @@ type SettingsSpec struct {
 	// You must restart the server after changing this value for it to take
 	// effect if updating the Kuberenetes resource directly.
 	AutoUpdateAppsSchedule string `json:"autoUpdateAppsSchedule,omitempty"`
+	// AutoUpdateSystemSchedule is a cron string that defines the freqency with which the server
+	// will automatically update system components: e.g. (default: "0 1 * * *")
+	//
+	// You must restart the server after changing this value for it to take
+	// effect if updating the Kuberenetes resource directly.
+	AutoUpdateSystemSchedule string `json:"autoUpdateSystemSchedule,omitempty"`
 }
 
 type AppStore struct {

@@ -5718,7 +5718,7 @@ func (m *DeviceSettings) validate(all bool) error {
 
 	// no validation rules for AutoUpdateApps
 
-	// no validation rules for AutoUpdateOs
+	// no validation rules for AutoUpdateSystem
 
 	if all {
 		switch v := interface{}(m.GetSecureTunnelingSettings()).(type) {
@@ -5752,6 +5752,8 @@ func (m *DeviceSettings) validate(all bool) error {
 	// no validation rules for Hostname
 
 	// no validation rules for AutoUpdateAppsSchedule
+
+	// no validation rules for AutoUpdateSystemSchedule
 
 	for idx, item := range m.GetAppStores() {
 		_, _ = idx, item

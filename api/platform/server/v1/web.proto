@@ -275,11 +275,12 @@ message AppStoreEntries {
 // User settings for the device
 message DeviceSettings {
   bool auto_update_apps = 1;
-  bool auto_update_os = 2;
+  bool auto_update_system = 2;
   SecureTunnelingSettings secure_tunneling_settings = 3;
   string hostname = 4;
   string auto_update_apps_schedule = 5;
-  repeated AppStore app_stores = 6;
+  string auto_update_system_schedule = 6;
+  repeated AppStore app_stores = 7;
 }
 
 message SecureTunnelingSettings {
