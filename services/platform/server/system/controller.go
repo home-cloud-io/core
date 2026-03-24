@@ -9,6 +9,7 @@ import (
 	"github.com/home-cloud-io/core/services/platform/server/apps"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 	"github.com/home-cloud-io/core/services/platform/server/utils/strings"
+	"github.com/robfig/cron/v3"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"k8s.io/apimachinery/pkg/types"
@@ -28,6 +29,8 @@ type (
 		actl         apps.Controller
 		k8sclient    k8sclient.System
 		daemonClient dv1connect.DaemonServiceClient
+		cronID    cron.EntryID
+		cr        *cron.Cron
 	}
 )
 

@@ -17,7 +17,6 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
-	hstrings "github.com/home-cloud-io/core/services/platform/server/utils/strings"
 )
 
 type (
@@ -39,7 +38,7 @@ type (
 		// from the chart, icon, and readme/description.
 		PrettyHealthcheck(ctx context.Context, logger chassis.Logger) ([]*v1.AppHealth, error)
 		// AutoUpdate will check for and install app updates on a schedule.
-		AutoUpdate(ctx context.Context, logger chassis.Logger)
+		AutoUpdate(ctx context.Context, logger chassis.Logger, schedule string)
 		// GetAppStorage will retrieve the app storage volumes for all installed apps.
 		GetAppStorage(ctx context.Context, logger chassis.Logger) ([]*v1.AppStorage, error)
 	}
@@ -324,7 +323,7 @@ func (c *controller) PrettyHealthcheck(ctx context.Context, logger chassis.Logge
 	return apps, nil
 }
 
-func (c *controller) AutoUpdate(ctx context.Context, logger chassis.Logger) {
+func (c *controller) AutoUpdate(ctx context.Context, logger chassis.Logger, schedule string) {
 	f := func() {
 		err := c.UpdateAll(context.Background(), logger)
 		if err != nil {
@@ -339,16 +338,9 @@ func (c *controller) AutoUpdate(ctx context.Context, logger chassis.Logger) {
 		c.cr.Remove(c.cronID)
 	}
 
-	// get schedule from settings
-	settings, err := c.k8sclient.Settings(ctx)
-	if err != nil {
-		logger.WithError(err).Panic("failed to get settings")
-	}
-	cron := hstrings.Default(settings.AutoUpdateAppsSchedule, DefaultAutoUpdateAppsSchedule)
-
 	// add new entry
-	logger.WithField("cron", cron).Info("setting apps auto-update interval")
-	id, err := c.cr.AddFunc(cron, f)
+	logger.WithField("cron", schedule).Info("setting apps auto-update interval")
+	id, err := c.cr.AddFunc(schedule, f)
 	if err != nil {
 		logger.WithError(err).Panic("failed to initialize auto-update for apps")
 	}

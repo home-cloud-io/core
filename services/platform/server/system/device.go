@@ -2,10 +2,13 @@ package system
 
 import (
 	"context"
+	"net/http"
 
 	"connectrpc.com/connect"
+	"github.com/robfig/cron/v3"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
+	"gopkg.in/yaml.v3"
 	corev1 "k8s.io/api/core/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -13,7 +16,9 @@ import (
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	"github.com/home-cloud-io/core/services/platform/server/apps"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
+	hstrings "github.com/home-cloud-io/core/services/platform/server/utils/strings"
 )
 
 type (
@@ -23,14 +28,20 @@ type (
 		GetServerSettings(ctx context.Context, logger chassis.Logger) (*v1.DeviceSettings, error)
 		// SetServerSettings updates the settings on the server with the given values
 		SetServerSettings(ctx context.Context, logger chassis.Logger, settings *v1.DeviceSettings) error
+		// AutoUpdate will check for and install the latest Home Cloud version on a schedule
+		AutoUpdate(ctx context.Context, logger chassis.Logger, schedule string)
+		// Update will check for and install the latest Home Cloud version once
+		Update(ctx context.Context, logger chassis.Logger) error
 		// GetComponentVersions returns all the versions of system components (server, daemon, etc.)
 		GetComponentVersions(ctx context.Context, logger chassis.Logger) (*v1.GetComponentVersionsResponse, error)
 	}
 )
 
 const (
-	ErrDeviceAlreadySetup = "device already setup"
+	DefaultAutoUpdateSystemSchedule = "0 1 * * *"
+	LatestReleaseManifestURL        = "https://github.com/home-cloud-io/core/releases/latest/download/manifest.yaml"
 
+	ErrDeviceAlreadySetup     = "device already setup"
 	ErrFailedToCreateSettings = "failed to create device settings"
 	ErrFailedToGetSettings    = "failed to get device settings"
 	ErrFailedToSetSettings    = "failed to save device settings"
@@ -44,9 +55,21 @@ func (c *controller) GetServerSettings(ctx context.Context, logger chassis.Logge
 		return nil, err
 	}
 	s := &v1.DeviceSettings{
-		AutoUpdateApps:          settings.AutoUpdateApps,
-		AutoUpdateOs:            settings.AutoUpdateSystem,
-		SecureTunnelingSettings: &v1.SecureTunnelingSettings{},
+		Hostname:                 settings.Hostname,
+		AutoUpdateApps:           settings.AutoUpdateApps,
+		AutoUpdateSystem:         settings.AutoUpdateSystem,
+		AutoUpdateAppsSchedule:   settings.AutoUpdateAppsSchedule,
+		AutoUpdateSystemSchedule: settings.AutoUpdateSystemSchedule,
+		AppStores:                []*v1.AppStore{},
+		SecureTunnelingSettings:  &v1.SecureTunnelingSettings{},
+	}
+
+	// set app stores
+	for _, store := range settings.AppStores {
+		s.AppStores = append(s.AppStores, &v1.AppStore{
+			Url:         store.URL,
+			RawChartUrl: store.RawChartURL,
+		})
 	}
 
 	// get wireguard server config
@@ -111,15 +134,22 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 	}
 
 	// check if the auto update apps schedule has changed and update the cron
+	settings.AutoUpdateAppsSchedule = hstrings.Default(settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule)
 	if install.Spec.Settings.AutoUpdateAppsSchedule != settings.AutoUpdateAppsSchedule {
-		// defer this so it runs after the update happens on the kube api
-		defer c.actl.AutoUpdate(ctx, logger)
+		c.actl.AutoUpdate(ctx, logger, settings.AutoUpdateAppsSchedule)
 	}
 
-	install.Spec.Settings.AutoUpdateApps = settings.AutoUpdateApps
-	install.Spec.Settings.AutoUpdateSystem = settings.AutoUpdateOs
-	install.Spec.Settings.AutoUpdateAppsSchedule = settings.AutoUpdateAppsSchedule
+	// check if the auto update system schedule has changed and update the cron
+	settings.AutoUpdateSystemSchedule = hstrings.Default(settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule)
+	if install.Spec.Settings.AutoUpdateSystemSchedule != settings.AutoUpdateSystemSchedule {
+		c.AutoUpdate(ctx, logger, settings.AutoUpdateSystemSchedule)
+	}
+
 	install.Spec.Settings.Hostname = settings.Hostname
+	install.Spec.Settings.AutoUpdateApps = settings.AutoUpdateApps
+	install.Spec.Settings.AutoUpdateSystem = settings.AutoUpdateSystem
+	install.Spec.Settings.AutoUpdateAppsSchedule = settings.AutoUpdateAppsSchedule
+	install.Spec.Settings.AutoUpdateSystemSchedule = settings.AutoUpdateSystemSchedule
 	install.Spec.Settings.AppStores = []opv1.AppStore{}
 	for _, store := range settings.AppStores {
 		install.Spec.Settings.AppStores = append(install.Spec.Settings.AppStores, opv1.AppStore{
@@ -127,6 +157,66 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 			RawChartURL: store.RawChartUrl,
 		})
 	}
+
+	return c.k8sclient.Update(ctx, install)
+}
+
+func (c *controller) AutoUpdate(ctx context.Context, logger chassis.Logger, schedule string) {
+	f := func() {
+		err := c.Update(context.Background(), logger)
+		if err != nil {
+			logger.WithError(err).Error("failed to run auto system update job")
+		}
+	}
+
+	// create new if no current entry, otherwise remove old entry
+	if c.cronID == 0 {
+		c.cr = cron.New()
+	} else {
+		c.cr.Remove(c.cronID)
+	}
+
+	// add new entry
+	logger.WithField("cron", schedule).Info("setting system auto-update interval")
+	id, err := c.cr.AddFunc(schedule, f)
+	if err != nil {
+		logger.WithError(err).Panic("failed to initialize auto-update for system")
+	}
+	c.cronID = id
+
+	// no-op if already started
+	c.cr.Start()
+}
+
+func (c *controller) Update(ctx context.Context, logger chassis.Logger) error {
+	install := &opv1.Install{}
+	err := c.k8sclient.Get(ctx, types.NamespacedName{
+		Namespace: k8sclient.DefaultHomeCloudNamespace,
+		Name:      "install",
+	}, install)
+	if err != nil {
+		logger.WithError(err).Error("failed to get install")
+		return err
+	}
+
+	// get version manifest from repo
+	resp, err := http.Get(LatestReleaseManifestURL)
+	if err != nil {
+		logger.WithError(err).Error("failed to download latest release manifest")
+		return err
+	}
+
+	// decode body into spec
+	dec := yaml.NewDecoder(resp.Body)
+	latest := opv1.InstallSpec{}
+	err = dec.Decode(&latest)
+	if err != nil {
+		logger.WithError(err).Error("failed to decode latest release manifest")
+		return err
+	}
+
+	// TODO: should probably have a semver check to avoid downgrading?
+	install.Spec.Version = latest.Version
 
 	return c.k8sclient.Update(ctx, install)
 }
