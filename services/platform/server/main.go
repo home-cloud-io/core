@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"embed"
 
 	"github.com/home-cloud-io/core/services/platform/server/apps"
@@ -25,15 +24,8 @@ func main() {
 		webRPC  = web.New(logger, actl, sctl)
 	)
 
-	// TODO: on reboot this will always grab default... need to rethink this
-	runner := func() {
-		go actl.AutoUpdate(context.Background(), logger, apps.DefaultAutoUpdateAppsSchedule)
-		go sctl.AutoUpdate(context.Background(), logger, system.DefaultAutoUpdateSystemSchedule)
-	}
-
 	defer chassis.New(logger).
 		WithClientApplication(files, "web-client/dist").
 		WithRPCHandler(webRPC).
-		WithRunner(runner).
 		Start()
 }

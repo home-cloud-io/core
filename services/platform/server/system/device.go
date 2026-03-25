@@ -189,6 +189,8 @@ func (c *controller) AutoUpdate(ctx context.Context, logger chassis.Logger, sche
 }
 
 func (c *controller) Update(ctx context.Context, logger chassis.Logger) error {
+	logger.Info("running update check for system")
+
 	install := &opv1.Install{}
 	err := c.k8sclient.Get(ctx, types.NamespacedName{
 		Namespace: k8sclient.DefaultHomeCloudNamespace,

@@ -9,6 +9,7 @@ import (
 	"github.com/home-cloud-io/core/services/platform/server/apps"
 	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
 	"github.com/home-cloud-io/core/services/platform/server/utils/strings"
+	hstrings "github.com/home-cloud-io/core/services/platform/server/utils/strings"
 	"github.com/robfig/cron/v3"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -29,8 +30,8 @@ type (
 		actl         apps.Controller
 		k8sclient    k8sclient.System
 		daemonClient dv1connect.DaemonServiceClient
-		cronID    cron.EntryID
-		cr        *cron.Cron
+		cronID       cron.EntryID
+		cr           *cron.Cron
 	}
 )
 
@@ -52,11 +53,23 @@ func NewController(logger chassis.Logger, kclient k8sclient.System, actl apps.Co
 	}
 
 	daemonAddress := strings.Default(install.Spec.Daemon.Address, defaultAddress)
-	return &controller{
+	c := &controller{
 		actl:         actl,
 		k8sclient:    kclient,
 		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, daemonAddress),
 	}
+
+	// run app auto update if configured
+	if install.Spec.Settings.AutoUpdateApps {
+		go c.actl.AutoUpdate(ctx, logger, hstrings.Default(install.Spec.Settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule))
+	}
+
+	// run system auto update if configured
+	if install.Spec.Settings.AutoUpdateSystem {
+		go c.AutoUpdate(ctx, logger, hstrings.Default(install.Spec.Settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule))
+	}
+
+	return c
 }
 
 const (

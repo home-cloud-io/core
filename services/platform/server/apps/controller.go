@@ -232,7 +232,7 @@ func (c *controller) Update(ctx context.Context, logger chassis.Logger, request 
 }
 
 func (c *controller) UpdateAll(ctx context.Context, logger chassis.Logger) error {
-	logger.Info("updating all apps")
+	logger.Info("running update check for all apps")
 
 	storeApps, err := c.Store(ctx, logger)
 	if err != nil {
