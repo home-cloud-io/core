@@ -7,6 +7,8 @@ replace github.com/home-cloud-io/core/services/platform/operator => ../../servic
 require (
 	github.com/home-cloud-io/core/services/platform/operator v0.1.1
 	github.com/spf13/cobra v1.10.2
+	github.com/steady-bytes/draft/tools/dctl v0.2.4
+	gopkg.in/yaml.v3 v3.0.1
 	sigs.k8s.io/yaml v1.6.0
 )
 
@@ -42,7 +44,6 @@ require (
 	golang.org/x/tools v0.37.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/api v0.34.1 // indirect
 	k8s.io/apimachinery v0.34.1 // indirect
 	k8s.io/client-go v0.34.1 // indirect

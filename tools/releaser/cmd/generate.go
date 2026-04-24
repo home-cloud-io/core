@@ -1,20 +1,24 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"sigs.k8s.io/yaml"
+	"github.com/steady-bytes/draft/tools/dctl/output"
+	"gopkg.in/yaml.v3"
+	k8syaml "sigs.k8s.io/yaml"
 
+	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/resources"
 )
 
 var (
-	path        string
-	out         string
-	operatorTag string
+	path string
+	out  string
 
 	crdFiles = []string{
 		"home-cloud.io_apps.yaml",
@@ -23,7 +27,11 @@ var (
 	}
 )
 
-// generateCmd represents the generate command
+const (
+	// TODO: get from server or operator package
+	LatestReleaseManifestURL = "https://github.com/home-cloud-io/core/releases/latest/download/manifest.yaml"
+)
+
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate Home Cloud release files",
@@ -31,20 +39,87 @@ var generateCmd = &cobra.Command{
 
 		fmt.Printf("Input path: %s\n", path)
 		fmt.Printf("Output path: %s\n", out)
-		fmt.Printf("Operator tag: %s\n", operatorTag)
 
-		err := crdsRelease()
+		spec, err := manifestRelease()
 		if err != nil {
 			return err
 		}
 
-		err = operatorRelease()
+		err = crdsRelease()
+		if err != nil {
+			return err
+		}
+
+		err = operatorRelease(spec)
 		if err != nil {
 			return err
 		}
 
 		return nil
 	},
+}
+
+func manifestRelease() (*opv1.InstallSpec, error) {
+	f, err := os.Create(filepath.Join(out, "manifest.yaml"))
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	// get version manifest from repo``
+	resp, err := http.Get(LatestReleaseManifestURL)
+	if err != nil {
+		return nil, err
+	}
+
+	// decode body into spec
+	dec := yaml.NewDecoder(resp.Body)
+	latest := &opv1.InstallSpec{}
+	err = dec.Decode(latest)
+	if err != nil {
+		return nil, err
+	}
+
+	output.Print("Version: %s -> ?", latest.Version)
+	latest.Version = GetWithDefault(latest.Version)
+
+	output.Print("Gateway API: %s -> ?", latest.GatewayAPI.Version)
+	latest.GatewayAPI.Version = GetWithDefault(latest.GatewayAPI.Version)
+
+	output.Print("Istio: %s -> ?", latest.Istio.Version)
+	latest.Istio.Version = GetWithDefault(latest.Istio.Version)
+
+	output.Print("Server: %s -> ?", latest.Server.Tag)
+	latest.Server.Tag = GetWithDefault(latest.Server.Tag)
+
+	output.Print("mDNS: %s -> ?", latest.MDNS.Tag)
+	latest.MDNS.Tag = GetWithDefault(latest.MDNS.Tag)
+
+	output.Print("Tunnel: %s -> ?", latest.Tunnel.Tag)
+	latest.Tunnel.Tag = GetWithDefault(latest.Tunnel.Tag)
+
+	output.Print("Operator: %s -> ?", latest.Operator.Tag)
+	latest.Operator.Tag = GetWithDefault(latest.Operator.Tag)
+
+	output.Print("Daemon: %s -> ?", latest.Daemon.Tag)
+	latest.Daemon.Tag = GetWithDefault(latest.Daemon.Tag)
+
+	output.Print("Talos: %s -> ?", latest.Daemon.System.Version)
+	latest.Daemon.System.Version = GetWithDefault(latest.Daemon.System.Version)
+
+	output.Print("Kubernetes: %s -> ?", latest.Daemon.Kubernetes.Version)
+	latest.Daemon.Kubernetes.Version = GetWithDefault(latest.Daemon.Kubernetes.Version)
+
+	data, err := k8syaml.Marshal(latest)
+	if err != nil {
+		return nil, err
+	}
+	_, err = f.Write(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return latest, nil
 }
 
 func crdsRelease() error {
@@ -71,7 +146,7 @@ func crdsRelease() error {
 	return nil
 }
 
-func operatorRelease() error {
+func operatorRelease(spec *opv1.InstallSpec) error {
 	f, err := os.Create(filepath.Join(out, "operator.yaml"))
 	if err != nil {
 		return err
@@ -79,13 +154,15 @@ func operatorRelease() error {
 	defer f.Close()
 
 	install := resources.DefaultInstall
-	install.Spec.Operator.Image = "ghcr.io/home-cloud-io/operator"
-	install.Spec.Operator.Tag = operatorTag
+	install.Spec.Operator = &opv1.OperatorSpec{
+		Image: spec.Operator.Image,
+		Tag: spec.Operator.Tag,
+	}
 
 	objects := resources.OperatorObjects(install)
 
 	for _, obj := range objects {
-		data, err := yaml.Marshal(obj)
+		data, err := k8syaml.Marshal(obj)
 		if err != nil {
 			return err
 		}
@@ -107,5 +184,20 @@ func init() {
 
 	generateCmd.Flags().StringVarP(&path, "path", "p", "../../", "Path to the root of the home-cloud-io/core repository")
 	generateCmd.Flags().StringVarP(&out, "out", "o", "out/", "Output path to write generated files to")
-	generateCmd.Flags().StringVarP(&operatorTag, "operator-tag", "t", "latest", "Operator tag")
+}
+
+// TODO: move to github.com/steady-bytes/draft/tools/dctl/input
+func GetWithDefault(d string) string {
+	var i string
+	scanner := bufio.NewScanner(os.Stdin)
+	if scanner.Scan() {
+		i = scanner.Text()
+	}
+	switch i {
+	case "quit":
+		os.Exit(0)
+	case "":
+		return d
+	}
+	return i
 }
