@@ -41,6 +41,8 @@ type InstallReconciler struct {
 	DiscoveryClient *discovery.DiscoveryClient
 	Scheme          *runtime.Scheme
 	Config          *rest.Config
+	// global cancel function to shutdown the manager (useful for operator upgrades)
+	Cancel          context.CancelFunc
 }
 
 const (
@@ -118,9 +120,19 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		return err
 	}
 	if !install.Spec.Operator.Disable {
-		install.Status.Operator = &v1.OperatorStatus{
-			Image: install.Spec.Operator.Image,
-			Tag:   install.Spec.Operator.Tag,
+		if install.Spec.Operator.Tag != install.Status.Operator.Tag ||
+			install.Spec.Operator.Image != install.Status.Operator.Image {
+			install.Status.Operator = &v1.OperatorStatus{
+				Image: install.Spec.Operator.Image,
+				Tag:   install.Spec.Operator.Tag,
+			}
+			err := r.Status().Update(ctx, install)
+			if err != nil {
+				return err
+			}
+
+			// shutdown if operator has updated so that the new replica can take over
+			r.Cancel()
 		}
 	} else {
 		install.Status.Operator = nil
@@ -724,8 +736,13 @@ func (r *InstallReconciler) apply(ctx context.Context, reader io.Reader) error {
 		applyOpts := metav1.ApplyOptions{FieldManager: "home-cloud-operator"}
 		_, err = dynamicClient.Resource(gvr).Apply(context.TODO(), obj.GetName(), obj, applyOpts)
 		if err != nil {
-			l.Error(err, "failed to apply object", "kind", obj.GetKind(), "name", obj.GetName())
-			return err
+			l.Error(err, "failed to apply object, attempting forced apply", "kind", obj.GetKind(), "name", obj.GetName())
+			applyOpts.Force = true
+			_, err = dynamicClient.Resource(gvr).Apply(context.TODO(), obj.GetName(), obj, applyOpts)
+			if err != nil {
+				l.Error(err, "failed to apply object with force, aborting", "kind", obj.GetKind(), "name", obj.GetName())
+				return err
+			}
 		}
 		l.V(1).Info("applied YAML for object", "kind", obj.GetKind(), "name", obj.GetName())
 	}
