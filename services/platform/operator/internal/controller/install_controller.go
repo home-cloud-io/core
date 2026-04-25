@@ -259,6 +259,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		return err
 	}
 
+	l.Info("reconcile complete")
 	return nil
 }
 
