@@ -262,6 +262,11 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 				Domain:  "platform",
 				Version: install.Status.Daemon.Tag,
 			},
+			{
+				Name:    "operator",
+				Domain:  "platform",
+				Version: install.Status.Operator.Tag,
+			},
 		},
 		System: []*dv1.ComponentVersion{
 			{
