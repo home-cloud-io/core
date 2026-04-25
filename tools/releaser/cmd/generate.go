@@ -10,6 +10,8 @@ import (
 	"github.com/steady-bytes/draft/tools/dctl/input"
 	"github.com/steady-bytes/draft/tools/dctl/output"
 	"gopkg.in/yaml.v3"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8syaml "sigs.k8s.io/yaml"
 
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
@@ -40,6 +42,12 @@ var generateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		err = installRelease(spec)
+		if err != nil {
+			return err
+		}
+		os.Exit(0)
 
 		err = crdsRelease()
 		if err != nil {
@@ -118,6 +126,42 @@ func manifestRelease() (*opv1.InstallSpec, error) {
 	return latest, nil
 }
 
+func installRelease(spec *opv1.InstallSpec) error {
+	f, err := os.Create(filepath.Join(out, "install.yaml"))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	install := &opv1.Install{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "home-cloud.io/v1",
+			Kind:       "Install",
+		},
+		ObjectMeta: v1.ObjectMeta{
+			Name:      "install",
+			Namespace: "home-cloud-system",
+			Finalizers: []string{
+				"install.home-cloud.io/finalizer",
+			},
+		},
+		Spec: opv1.InstallSpec{
+			Version: spec.Version,
+		},
+	}
+
+	data, err := k8syaml.Marshal(install)
+	if err != nil {
+		return err
+	}
+	_, err = f.Write(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func crdsRelease() error {
 	f, err := os.Create(filepath.Join(out, "crds.yaml"))
 	if err != nil {
@@ -152,7 +196,7 @@ func operatorRelease(spec *opv1.InstallSpec) error {
 	install := resources.DefaultInstall
 	install.Spec.Operator = &opv1.OperatorSpec{
 		Image: spec.Operator.Image,
-		Tag: spec.Operator.Tag,
+		Tag:   spec.Operator.Tag,
 	}
 
 	objects := resources.OperatorObjects(install)
