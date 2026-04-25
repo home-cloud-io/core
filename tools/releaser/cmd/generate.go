@@ -1,19 +1,20 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"github.com/steady-bytes/draft/tools/dctl/input"
 	"github.com/steady-bytes/draft/tools/dctl/output"
 	"gopkg.in/yaml.v3"
 	k8syaml "sigs.k8s.io/yaml"
 
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/resources"
+	"github.com/home-cloud-io/core/services/platform/server/system"
 )
 
 var (
@@ -25,11 +26,6 @@ var (
 		"home-cloud.io_installs.yaml",
 		"home-cloud.io_wireguards.yaml",
 	}
-)
-
-const (
-	// TODO: get from server or operator package
-	LatestReleaseManifestURL = "https://github.com/home-cloud-io/core/releases/latest/download/manifest.yaml"
 )
 
 var generateCmd = &cobra.Command{
@@ -67,7 +63,7 @@ func manifestRelease() (*opv1.InstallSpec, error) {
 	defer f.Close()
 
 	// get version manifest from repo``
-	resp, err := http.Get(LatestReleaseManifestURL)
+	resp, err := http.Get(system.LatestReleaseManifestURL)
 	if err != nil {
 		return nil, err
 	}
@@ -188,16 +184,9 @@ func init() {
 
 // TODO: move to github.com/steady-bytes/draft/tools/dctl/input
 func GetWithDefault(d string) string {
-	var i string
-	scanner := bufio.NewScanner(os.Stdin)
-	if scanner.Scan() {
-		i = scanner.Text()
-	}
-	switch i {
-	case "quit":
-		os.Exit(0)
-	case "":
-		return d
+	i := input.Get()
+	if i == "" {
+		i = d
 	}
 	return i
 }
