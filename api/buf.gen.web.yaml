@@ -3,12 +3,6 @@ plugins:
   - local: protoc-gen-es
     out: .
     include_imports: true
-    opt:
-      - target=ts
-      - target=js
   - local: protoc-gen-connect-query
     out: .
     include_imports: true
-    opt:
-      - target=ts
-      - target=js
