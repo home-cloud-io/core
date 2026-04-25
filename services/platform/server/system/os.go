@@ -57,9 +57,10 @@ func (c *controller) EnableWireguard(ctx context.Context, logger chassis.Logger)
 				logger.WithError(err).Error("failed to generate wireguard private key")
 				return err
 			}
+		} else {
+			logger.WithError(err).Error("failed to get wireguard server secret")
+			return err
 		}
-		logger.WithError(err).Error("failed to get wireguard server secret")
-		return err
 	} else {
 		// read existing secret from secret
 		key, err = wgtypes.ParseKey(string(wireguardServerSecret.Data["privateKey"]))

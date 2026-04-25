@@ -141,6 +141,9 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 		logger.WithError(err).Error("failed to get install")
 		return err
 	}
+	if install.Spec.Settings == nil {
+		install.Spec.Settings = &opv1.SettingsSpec{}
+	}
 
 	if settings.AutoUpdateApps {
 		c.actl.AutoUpdate(ctx, logger, hstrings.Default(settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule))
