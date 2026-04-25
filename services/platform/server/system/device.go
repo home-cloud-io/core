@@ -72,6 +72,15 @@ func (c *controller) GetServerSettings(ctx context.Context, logger chassis.Logge
 		})
 	}
 
+	if len(s.AppStores) == 0 {
+		s.AppStores = []*v1.AppStore{
+			{
+				Url:         apps.DefaultAppStoreURL,
+				RawChartUrl: apps.DefaultAppStoreRawChartURL,
+			},
+		}
+	}
+
 	// get wireguard server config
 	wireguardServer := &opv1.Wireguard{}
 	err = c.k8sclient.Get(ctx, types.NamespacedName{
@@ -133,16 +142,12 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 		return err
 	}
 
-	// check if the auto update apps schedule has changed and update the cron
-	settings.AutoUpdateAppsSchedule = hstrings.Default(settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule)
-	if install.Spec.Settings.AutoUpdateAppsSchedule != settings.AutoUpdateAppsSchedule {
-		c.actl.AutoUpdate(ctx, logger, settings.AutoUpdateAppsSchedule)
+	if settings.AutoUpdateApps {
+		c.actl.AutoUpdate(ctx, logger, hstrings.Default(settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule))
 	}
 
-	// check if the auto update system schedule has changed and update the cron
-	settings.AutoUpdateSystemSchedule = hstrings.Default(settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule)
-	if install.Spec.Settings.AutoUpdateSystemSchedule != settings.AutoUpdateSystemSchedule {
-		c.AutoUpdate(ctx, logger, settings.AutoUpdateSystemSchedule)
+	if settings.AutoUpdateSystem {
+		c.AutoUpdate(ctx, logger, hstrings.Default(settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule))
 	}
 
 	install.Spec.Settings.Hostname = settings.Hostname
