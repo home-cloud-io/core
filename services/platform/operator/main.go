@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -48,11 +49,16 @@ func main() {
 	logr := logger.NewLogger(log.WithFields(nil))
 	ctrl.SetLogger(logr)
 
+	globalCtx, globalCancel := context.WithCancel(ctrl.SetupSignalHandler())
+
 	// configure manager
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Logger:                 logr,
-		Scheme:                 scheme,
-		HealthProbeBindAddress: ":" + chassis.GetConfig().GetString("service.network.bind_port"),
+		Logger:                        logr,
+		Scheme:                        scheme,
+		HealthProbeBindAddress:        ":" + chassis.GetConfig().GetString("service.network.bind_port"),
+		LeaderElection:                true,
+		LeaderElectionID:              "operator.home-cloud.io",
+		LeaderElectionReleaseOnCancel: true,
 	})
 	if err != nil {
 		log.WithError(err).Error("failed to create manager")
@@ -80,6 +86,7 @@ func main() {
 		DiscoveryClient: discoveryClient,
 		Scheme:          mgr.GetScheme(),
 		Config:          mgr.GetConfig(),
+		Cancel:          globalCancel,
 	}).SetupWithManager(mgr); err != nil {
 		log.WithField("controller", "Install").WithError(err).Error("failed to create controller")
 		os.Exit(1)
@@ -97,7 +104,7 @@ func main() {
 
 	// start manager
 	log.Warn("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(globalCtx); err != nil {
 		log.WithError(err).Error("problem running manager")
 		os.Exit(1)
 	}
