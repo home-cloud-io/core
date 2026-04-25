@@ -10,10 +10,10 @@ require (
 	connectrpc.com/connect v1.19.1
 	github.com/google/uuid v1.6.0
 	github.com/home-cloud-io/core/api v0.9.3
-	github.com/home-cloud-io/core/services/platform/operator v0.1.2
+	github.com/home-cloud-io/core/services/platform/operator v0.1.3
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
-	github.com/steady-bytes/draft/pkg/loggers v0.2.5
+	github.com/steady-bytes/draft/pkg/loggers v0.2.6
 	golang.org/x/mod v0.29.0
 	golang.org/x/sync v0.16.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6

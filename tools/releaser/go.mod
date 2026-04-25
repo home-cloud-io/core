@@ -7,7 +7,7 @@ replace github.com/home-cloud-io/core/services/platform/operator => ../../servic
 replace github.com/home-cloud-io/core/services/platform/server => ../../services/platform/server
 
 require (
-	github.com/home-cloud-io/core/services/platform/operator v0.1.2
+	github.com/home-cloud-io/core/services/platform/operator v0.1.3
 	github.com/home-cloud-io/core/services/platform/server v0.0.0
 	github.com/spf13/cobra v1.10.2
 	github.com/steady-bytes/draft/tools/dctl v0.2.4

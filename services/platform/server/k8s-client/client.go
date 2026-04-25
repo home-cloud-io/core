@@ -378,5 +378,8 @@ func (c *client) Settings(ctx context.Context) (*opv1.SettingsSpec, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &install.Spec.Settings, nil
+	if install.Spec.Settings == nil {
+		install.Spec.Settings = &opv1.SettingsSpec{}
+	}
+	return install.Spec.Settings, nil
 }

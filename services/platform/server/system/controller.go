@@ -52,21 +52,26 @@ func NewController(logger chassis.Logger, kclient k8sclient.System, actl apps.Co
 		defaultAddress = "http://localhost:9000"
 	}
 
-	daemonAddress := strings.Default(install.Spec.Daemon.Address, defaultAddress)
+	daemonAddress := defaultAddress
+	if install.Spec.Daemon != nil {
+		daemonAddress = strings.Default(install.Spec.Daemon.Address, defaultAddress)
+	}
 	c := &controller{
 		actl:         actl,
 		k8sclient:    kclient,
 		daemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, daemonAddress),
 	}
 
-	// run app auto update if configured
-	if install.Spec.Settings.AutoUpdateApps {
-		go c.actl.AutoUpdate(ctx, logger, hstrings.Default(install.Spec.Settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule))
-	}
+	if install.Spec.Settings != nil {
+		// run app auto update if configured
+		if install.Spec.Settings.AutoUpdateApps {
+			go c.actl.AutoUpdate(ctx, logger, hstrings.Default(install.Spec.Settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule))
+		}
 
-	// run system auto update if configured
-	if install.Spec.Settings.AutoUpdateSystem {
-		go c.AutoUpdate(ctx, logger, hstrings.Default(install.Spec.Settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule))
+		// run system auto update if configured
+		if install.Spec.Settings.AutoUpdateSystem {
+			go c.AutoUpdate(ctx, logger, hstrings.Default(install.Spec.Settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule))
+		}
 	}
 
 	return c
