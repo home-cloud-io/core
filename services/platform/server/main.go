@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"embed"
 
 	"github.com/home-cloud-io/core/services/platform/server/apps"
@@ -25,13 +24,8 @@ func main() {
 		webRPC  = web.New(logger, actl, sctl)
 	)
 
-	runner := func() {
-		go actl.AutoUpdate(context.Background(), logger)
-	}
-
 	defer chassis.New(logger).
 		WithClientApplication(files, "web-client/dist").
 		WithRPCHandler(webRPC).
-		WithRunner(runner).
 		Start()
 }

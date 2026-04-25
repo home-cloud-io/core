@@ -12,7 +12,7 @@ type sink struct {
 
 func NewLogger(logger chassis.Logger) logr.Logger {
 	return logr.New(&sink{
-		log: logger.WithCallDepth(5),
+		log: logger.WithCallDepth(4),
 	})
 }
 
@@ -20,9 +20,7 @@ func NewLogger(logger chassis.Logger) logr.Logger {
 
 // Init receives optional information about the logr library for LogSink
 // implementations that need it.
-func (s *sink) Init(info logr.RuntimeInfo) {
-	s.log = s.log.WithCallDepth(info.CallDepth)
-}
+func (s *sink) Init(info logr.RuntimeInfo) {}
 
 // Enabled tests whether this LogSink is enabled at the specified V-level.
 // For example, commandline flags might be used to set the logging

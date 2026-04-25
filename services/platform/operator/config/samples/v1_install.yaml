@@ -8,4 +8,4 @@ metadata:
 spec:
   version: v0.0.1-beta
   settings:
-    hostname: dev.local
+    hostname: home-cloud.local

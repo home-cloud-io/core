@@ -26,6 +26,8 @@ import {
   PlusOutlined,
   RedoOutlined,
   SearchOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 
 import {
@@ -33,6 +35,7 @@ import {
   SetDeviceSettingsRequestSchema,
   RegisterToLocatorRequestSchema,
   DeregisterFromLocatorRequestSchema,
+  AppStore,
 } from "@home-cloud/api/platform/server/v1/web_pb";
 
 import {
@@ -115,7 +118,10 @@ export default function SettingsPage() {
 
 type DeviceSettingsFormFields = {
   autoUpdateApps: boolean;
-  autoUpdateOS: boolean;
+  autoUpdateSystem: boolean;
+  autoUpdateAppsSchedule: string;
+  autoUpdateSystemSchedule: string;
+  appStores: AppStore[];
 };
 
 function DeviceSettingsForm() {
@@ -149,16 +155,24 @@ function DeviceSettingsForm() {
       create(SetDeviceSettingsRequestSchema, {
         settings: {
           autoUpdateApps: values.autoUpdateApps,
-          autoUpdateOs: values.autoUpdateOS,
+          autoUpdateSystem: values.autoUpdateSystem,
+          autoUpdateAppsSchedule: values.autoUpdateAppsSchedule,
+          autoUpdateSystemSchedule: values.autoUpdateSystemSchedule,
+          appStores: values.appStores,
         },
-      })
+      }),
     );
   };
 
   const fields: DeviceSettingsFormFields = {
     autoUpdateApps: settings.autoUpdateApps,
-    autoUpdateOS: settings.autoUpdateOs,
+    autoUpdateSystem: settings.autoUpdateSystem,
+    autoUpdateAppsSchedule: settings.autoUpdateAppsSchedule,
+    autoUpdateSystemSchedule: settings.autoUpdateSystemSchedule,
+    appStores: settings.appStores,
   };
+
+  console.log(fields.appStores);
 
   return (
     <>
@@ -190,12 +204,83 @@ function DeviceSettingsForm() {
             <Switch />
           </Form.Item>
           <Form.Item<DeviceSettingsFormFields>
+            label="Apps update schedule"
+            name="autoUpdateAppsSchedule"
+          >
+            <Input
+              placeholder="0 3 * * * (daily at 3am)"
+              prefix={<ClockCircleOutlined />}
+            />
+          </Form.Item>
+          <Form.Item<DeviceSettingsFormFields>
             label="Auto update system"
-            name="autoUpdateOS"
+            name="autoUpdateSystem"
             rules={[{ required: true }]}
           >
             <Switch />
           </Form.Item>
+          <Form.Item<DeviceSettingsFormFields>
+            label="System update schedule"
+            name="autoUpdateSystemSchedule"
+          >
+            <Input
+              placeholder="0 1 * * * (daily at 1am)"
+              prefix={<ClockCircleOutlined />}
+            />
+          </Form.Item>
+          <p>App Stores (advanced)</p>
+          <Form.List name="appStores">
+            {(appStores, { add, remove }) => (
+              <>
+                {appStores.map((store) => (
+                  <Badge
+                    count={
+                      <CloseCircleOutlined
+                        style={{ color: "#f5222d" }}
+                        onClick={() => remove(store.name)}
+                      />
+                    }
+                  >
+                    {/* TODO: this style width is a hack */}
+                    <Card type="inner" style={{ width: 400 }}>
+                      <Form.Item<AppStore[]>
+                        label="Chart index.yaml URL"
+                        name={[store.name, "url"]}
+                        rules={[{ required: true, message: "Missing URL" }]}
+                        tooltip="https://<GITHUB_USERNAME>.github.io/<REPO_NAME>/index.yaml"
+                      >
+                        <Input placeholder="https://<GITHUB_USERNAME>.github.io/<REPO_NAME>/index.yaml" />
+                      </Form.Item>
+                      <Form.Item<AppStore[]>
+                        label="Raw chart URL"
+                        name={[store.name, "rawChartUrl"]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Missing raw chart URL",
+                          },
+                        ]}
+                        tooltip="https://raw.githubusercontent.com/<GITHUB_USERNAME>/<REPO_NAME>"
+                      >
+                        <Input placeholder="https://raw.githubusercontent.com/<GITHUB_USERNAME>/<REPO_NAME>" />
+                      </Form.Item>
+                    </Card>
+                  </Badge>
+                ))}
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                  >
+                    Add store
+                  </Button>
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
+          <Divider />
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={saving}>
               Save
@@ -268,7 +353,7 @@ function OnTheGoSettingsForm() {
       ) {
         setLocators(
           data.settings.secureTunnelingSettings?.wireguardInterfaces[0]
-            .locatorServers
+            .locatorServers,
         );
       }
     }
@@ -343,7 +428,7 @@ function LocatorListItem(props: LocatorListItemProps) {
   const useDeregisterToLocator = useMutation(deregisterFromLocator, {
     onSuccess(data, variables, context) {
       setDeregistering(false);
-      props.refetch()
+      props.refetch();
     },
     onError(error, variables, context) {
       setDeregistering(false);
@@ -363,7 +448,7 @@ function LocatorListItem(props: LocatorListItemProps) {
       create(DeregisterFromLocatorRequestSchema, {
         locatorAddress: locatorAddress,
         wireguardInterface: "wg0",
-      })
+      }),
     );
   };
   return (
@@ -424,9 +509,12 @@ function AddLocatorModal(props: AddLocatorModalProps) {
     setRegistering(true);
     useRegisterToLocator.mutate(
       create(RegisterToLocatorRequestSchema, {
-        locatorAddress: values.stockSelection === "custom" ? values.customSelection : values.stockSelection,
+        locatorAddress:
+          values.stockSelection === "custom"
+            ? values.customSelection
+            : values.stockSelection,
         wireguardInterface: "wg0",
-      })
+      }),
     );
   };
 

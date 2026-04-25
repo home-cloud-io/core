@@ -24,8 +24,7 @@ import (
 )
 
 var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
+	scheme = runtime.NewScheme()
 )
 
 func init() {
@@ -44,21 +43,25 @@ func main() {
 	log := zerolog.New()
 	_ = chassis.New(log).DisableMux()
 	log.SetLevel(chassis.GetConfig().LogLevel())
-	ctrl.SetLogger(logger.NewLogger(log))
+
+	// clean copy of logger for controllers
+	logr := logger.NewLogger(log.WithFields(nil))
+	ctrl.SetLogger(logr)
 
 	// configure manager
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+		Logger:                 logr,
 		Scheme:                 scheme,
 		HealthProbeBindAddress: ":" + chassis.GetConfig().GetString("service.network.bind_port"),
 	})
 	if err != nil {
-		setupLog.Error(err, "failed to create manager")
+		log.WithError(err).Error("failed to create manager")
 		os.Exit(1)
 	}
 
 	discoveryClient, err := discovery.NewDiscoveryClientForConfig(mgr.GetConfig())
 	if err != nil {
-		setupLog.Error(err, "failed to create discovery client")
+		log.WithError(err).Error("failed to create discovery client")
 		os.Exit(1)
 	}
 
@@ -67,7 +70,7 @@ func main() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "failed to create controller", "controller", "App")
+		log.WithField("controller", "app").WithError(err).Error("failed to create controller")
 		os.Exit(1)
 	}
 
@@ -78,24 +81,24 @@ func main() {
 		Scheme:          mgr.GetScheme(),
 		Config:          mgr.GetConfig(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "failed to create controller", "controller", "Install")
+		log.WithField("controller", "Install").WithError(err).Error("failed to create controller")
 		os.Exit(1)
 	}
 
 	// add health/ready checks
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
-		setupLog.Error(err, "failed to set up health check")
+		log.WithError(err).Error("failed to set up health check")
 		os.Exit(1)
 	}
 	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
-		setupLog.Error(err, "failed to set up ready check")
+		log.WithError(err).Error("failed to set up ready check")
 		os.Exit(1)
 	}
 
 	// start manager
-	setupLog.Info("starting manager")
+	log.Warn("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-		setupLog.Error(err, "problem running manager")
+		log.WithError(err).Error("problem running manager")
 		os.Exit(1)
 	}
 }

@@ -92,9 +92,17 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	// update status as reconcile ends so that we always have the latest status before next
 	// reconcile iteration. this way we don't try and install components that are already installed
-	defer r.Status().Update(ctx, install)
+	oldStatus := install.Status.DeepCopy()
+	defer func() {
+		// guard against infinite reconcile loop with updating same status
+		if reflect.DeepEqual(install.Status.Version, *oldStatus) {
+			err := r.Status().Update(ctx, install)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}()
 
-	l.Info("Reconciling Install")
 	return ctrl.Result{}, r.reconcile(ctx, install)
 }
 
