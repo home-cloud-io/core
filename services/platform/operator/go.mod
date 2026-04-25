@@ -11,7 +11,7 @@ require (
 	github.com/home-cloud-io/core/api v0.9.2
 	github.com/sethvargo/go-password v0.3.1
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
-	github.com/steady-bytes/draft/pkg/loggers v0.2.5
+	github.com/steady-bytes/draft/pkg/loggers v0.2.6
 	github.com/stretchr/testify v1.11.1
 	github.com/uptrace/bun v1.2.15
 	github.com/uptrace/bun/dialect/pgdialect v1.2.15

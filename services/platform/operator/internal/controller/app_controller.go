@@ -138,6 +138,14 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 		return err
 	}
 
+	// create routes
+	for _, route := range appConfig.Routes {
+		err = r.createRoute(ctx, appConfig.Namespace, route)
+		if err != nil {
+			return err
+		}
+	}
+
 	return r.updateStatus(ctx, app)
 }
 
@@ -171,6 +179,14 @@ func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
 	_, err = act.Run(app.Spec.Release, chart, values)
 	if err != nil {
 		return err
+	}
+
+	// update routes
+	for _, route := range appConfig.Routes {
+		err = r.createRoute(ctx, appConfig.Namespace, route)
+		if err != nil {
+			return err
+		}
 	}
 
 	return r.updateStatus(ctx, app)
@@ -258,14 +274,6 @@ func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, app
 	// create database (and users/initialization scripts)
 	for _, d := range appConfig.Databases {
 		err := r.createDatabase(ctx, d, appConfig.Namespace)
-		if err != nil {
-			return err
-		}
-	}
-
-	// create routes
-	for _, route := range appConfig.Routes {
-		err = r.createRoute(ctx, appConfig.Namespace, route)
 		if err != nil {
 			return err
 		}
