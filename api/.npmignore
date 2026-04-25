@@ -1,0 +1,8 @@
+*.yaml
+*.proto
+*.go
+Dockerfile
+buf.lock
+go.mod
+go.sum
+.nvmrc

@@ -7,15 +7,15 @@ import (
 // InstallSpec defines the desired state of Install
 type InstallSpec struct {
 	Version    string         `json:"version"`
-	GatewayAPI GatewayAPISpec `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
-	Istio      IstioSpec      `json:"istio,omitempty"`
-	Server     ServerSpec     `json:"server,omitempty"`
-	MDNS       MDNSSpec       `json:"mdns,omitempty"`
-	Tunnel     TunnelSpec     `json:"tunnel,omitempty"`
-	Operator   OperatorSpec   `json:"operator,omitempty"`
+	GatewayAPI *GatewayAPISpec `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
+	Istio      *IstioSpec      `json:"istio,omitempty"`
+	Server     *ServerSpec     `json:"server,omitempty"`
+	MDNS       *MDNSSpec       `json:"mdns,omitempty"`
+	Tunnel     *TunnelSpec     `json:"tunnel,omitempty"`
+	Operator   *OperatorSpec   `json:"operator,omitempty"`
 	// TODO: document API
-	Daemon   DaemonSpec   `json:"daemon,omitempty"`
-	Settings SettingsSpec `json:"settings,omitempty"`
+	Daemon   *DaemonSpec   `json:"daemon,omitempty"`
+	Settings *SettingsSpec `json:"settings,omitempty"`
 }
 
 type GatewayAPISpec struct {
@@ -33,10 +33,10 @@ type IstioSpec struct {
 	Version            string `json:"version,omitempty"`
 	IngressGatewayName string `json:"ingressGatewayName,omitempty"`
 
-	Base    BaseSpec    `json:"base,omitempty"`
-	Istiod  IstiodSpec  `json:"istiod,omitempty"`
-	CNI     CNISpec     `json:"cni,omitempty"`
-	Ztunnel ZtunnelSpec `json:"ztunnel,omitempty"`
+	Base    *BaseSpec    `json:"base,omitempty"`
+	Istiod  *IstiodSpec  `json:"istiod,omitempty"`
+	CNI     *CNISpec     `json:"cni,omitempty"`
+	Ztunnel *ZtunnelSpec `json:"ztunnel,omitempty"`
 }
 
 type BaseSpec struct {
@@ -84,8 +84,8 @@ type DaemonSpec struct {
 	Image      string         `json:"image,omitempty"`
 	Tag        string         `json:"tag,omitempty"`
 	Address    string         `json:"address,omitempty"`
-	System     SystemSpec     `json:"system,omitempty"`
-	Kubernetes KubernetesSpec `json:"kubernetes,omitempty"`
+	System     *SystemSpec     `json:"system,omitempty"`
+	Kubernetes *KubernetesSpec `json:"kubernetes,omitempty"`
 }
 
 type SystemSpec struct {
@@ -119,6 +119,12 @@ type SettingsSpec struct {
 	// You must restart the server after changing this value for it to take
 	// effect if updating the Kuberenetes resource directly.
 	AutoUpdateAppsSchedule string `json:"autoUpdateAppsSchedule,omitempty"`
+	// AutoUpdateSystemSchedule is a cron string that defines the freqency with which the server
+	// will automatically update system components: e.g. (default: "0 1 * * *")
+	//
+	// You must restart the server after changing this value for it to take
+	// effect if updating the Kuberenetes resource directly.
+	AutoUpdateSystemSchedule string `json:"autoUpdateSystemSchedule,omitempty"`
 }
 
 type AppStore struct {

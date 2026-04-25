@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
@@ -17,6 +19,7 @@ var (
 )
 
 func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route AppRoute) error {
+	hostname := fmt.Sprintf("%s.local", route.Name)
 
 	// create httproute
 	port := gwv1.PortNumber(int32(route.Service.Port))
@@ -38,7 +41,7 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 			// TODO: change this to subdomain? (*.home-cloud.local)
 			// subdomains don't work on Windows with mDNS so this would require running our
 			// own DNS server (which we want to do anyway)
-			Hostnames: []gwv1.Hostname{gwv1.Hostname(fmt.Sprintf("%s.local", route.Name))},
+			Hostnames: []gwv1.Hostname{gwv1.Hostname(hostname)},
 			Rules: []gwv1.HTTPRouteRule{
 				{
 					BackendRefs: []gwv1.HTTPBackendRef{
@@ -56,6 +59,21 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 		},
 	})
 	if client.IgnoreAlreadyExists(err) != nil {
+		return err
+	}
+
+	// annotate service for dns
+	service := &corev1.Service{}
+	err = r.Client.Get(ctx, types.NamespacedName{
+		Name:      route.Service.Name,
+		Namespace: namespace,
+	}, service)
+	if err != nil {
+		return err
+	}
+	service.Annotations["home-cloud.io/dns"] = hostname
+	err = r.Client.Update(ctx, service)
+	if err != nil {
 		return err
 	}
 

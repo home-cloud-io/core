@@ -41,7 +41,7 @@ func (c *controller) stores(ctx context.Context, logger chassis.Logger) ([]*v1.A
 		return nil, err
 	}
 
-	if settings.AppStores == nil || len(settings.AppStores) == 0 {
+	if len(settings.AppStores) == 0 {
 		settings.AppStores = []opv1.AppStore{
 			{
 				URL:         DefaultAppStoreURL,

@@ -13,10 +13,12 @@ var (
 			Namespace: "home-cloud-system",
 		},
 		Spec: v1.InstallSpec{
-			Istio: v1.IstioSpec{
+			GatewayAPI: &v1.GatewayAPISpec{},
+			Istio: &v1.IstioSpec{
 				Namespace:          "istio-system",
 				IngressGatewayName: "ingress-gateway",
-				Istiod: v1.IstiodSpec{
+				Base:               &v1.BaseSpec{},
+				Istiod: &v1.IstiodSpec{
 					// The default istiod resources are cpu=500m and memory=2048Mi which is wayyyy
 					// oversized for the typical Home Cloud installation.
 					Values: `
@@ -26,7 +28,8 @@ resources:
     memory: 100Mi
 `,
 				},
-				Ztunnel: v1.ZtunnelSpec{
+				CNI: &v1.CNISpec{},
+				Ztunnel: &v1.ZtunnelSpec{
 					// The default ztunnel resources are cpu=200m and memory=512Mi which is wayyyy
 					// oversized for the typical Home Cloud installation.
 					Values: `
@@ -37,7 +40,15 @@ resources:
 `,
 				},
 			},
-			Settings: v1.SettingsSpec{
+			Server:   &v1.ServerSpec{},
+			MDNS:     &v1.MDNSSpec{},
+			Tunnel:   &v1.TunnelSpec{},
+			Operator: &v1.OperatorSpec{},
+			Daemon: &v1.DaemonSpec{
+				System:     &v1.SystemSpec{},
+				Kubernetes: &v1.KubernetesSpec{},
+			},
+			Settings: &v1.SettingsSpec{
 				Hostname: "home-cloud.local",
 			},
 		},

@@ -9,8 +9,8 @@ go 1.25.3
 require (
 	connectrpc.com/connect v1.19.1
 	github.com/google/uuid v1.6.0
-	github.com/home-cloud-io/core/api v0.9.2
-	github.com/home-cloud-io/core/services/platform/operator v0.1.1
+	github.com/home-cloud-io/core/api v0.9.3
+	github.com/home-cloud-io/core/services/platform/operator v0.1.2
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/steady-bytes/draft/pkg/chassis v0.6.1
 	github.com/steady-bytes/draft/pkg/loggers v0.2.5
