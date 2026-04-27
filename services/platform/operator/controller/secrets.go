@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/secrets"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/secrets"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"

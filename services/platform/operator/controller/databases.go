@@ -13,7 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/secrets"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/secrets"
 )
 
 const (

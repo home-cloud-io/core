@@ -11,7 +11,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/talos"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/talos"
 )
 
 // TODO: change this to use a Helm chart so users can simply point at a custom Helm chart

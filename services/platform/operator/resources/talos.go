@@ -2,7 +2,7 @@ package resources
 
 import (
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/talos"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/talos"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"

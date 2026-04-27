@@ -20,10 +20,9 @@ import (
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/core/services/platform/operator/internal/controller"
-	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/talos"
+	"github.com/home-cloud-io/core/services/platform/operator/controller"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/talos"
 	"github.com/home-cloud-io/core/services/platform/operator/logger"
-
 	"github.com/home-cloud-io/core/services/platform/operator/server/apps"
 	k8sclient "github.com/home-cloud-io/core/services/platform/operator/server/k8s-client"
 	"github.com/home-cloud-io/core/services/platform/operator/server/system"
@@ -49,7 +48,7 @@ func init() {
 
 func main() {
 	// configure chassis
-	c := chassis.New(zerolog.New()).DisableMux()
+	c := chassis.New(zerolog.New())
 	defer c.Start()
 
 	var (
@@ -70,7 +69,7 @@ func main() {
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Logger:                        logr,
 		Scheme:                        scheme,
-		HealthProbeBindAddress:        ":" + chassis.GetConfig().GetString("service.network.bind_port"),
+		HealthProbeBindAddress:        "",
 		LeaderElection:                true,
 		LeaderElectionID:              "operator.home-cloud.io",
 		LeaderElectionReleaseOnCancel: true,
