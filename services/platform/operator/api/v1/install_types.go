@@ -9,7 +9,6 @@ type InstallSpec struct {
 	Version    string         `json:"version"`
 	GatewayAPI *GatewayAPISpec `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
 	Istio      *IstioSpec      `json:"istio,omitempty"`
-	Server     *ServerSpec     `json:"server,omitempty"`
 	MDNS       *MDNSSpec       `json:"mdns,omitempty"`
 	Tunnel     *TunnelSpec     `json:"tunnel,omitempty"`
 	Operator   *OperatorSpec   `json:"operator,omitempty"`
@@ -53,12 +52,6 @@ type CNISpec struct {
 
 type ZtunnelSpec struct {
 	Values string `json:"values,omitempty"`
-}
-
-type ServerSpec struct {
-	Disable bool   `json:"disable,omitempty"`
-	Image   string `json:"image,omitempty"`
-	Tag     string `json:"tag,omitempty"`
 }
 
 type MDNSSpec struct {
@@ -145,7 +138,6 @@ type InstallStatus struct {
 	Version    string            `json:"version,omitempty"`
 	GatewayAPI *GatewayAPIStatus `json:"gatewayApi,omitempty"`
 	Istio      *IstioStatus      `json:"istio,omitempty"`
-	Server     *ServerStatus     `json:"server,omitempty"`
 	MDNS       *MDNSStatus       `json:"mdns,omitempty"`
 	Tunnel     *TunnelStatus     `json:"tunnel,omitempty"`
 	Operator   *OperatorStatus   `json:"operator,omitempty"`
@@ -160,11 +152,6 @@ type GatewayAPIStatus struct {
 type IstioStatus struct {
 	Source  string `json:"repo,omitempty"`
 	Version string `json:"version,omitempty"`
-}
-
-type ServerStatus struct {
-	Image string `json:"image,omitempty"`
-	Tag   string `json:"tag,omitempty"`
 }
 
 type MDNSStatus struct {

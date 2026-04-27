@@ -137,15 +137,6 @@ spec:
                   tag:
                     type: string
                 type: object
-              server:
-                properties:
-                  disable:
-                    type: boolean
-                  image:
-                    type: string
-                  tag:
-                    type: string
-                type: object
               settings:
                 properties:
                   appStores:
@@ -252,13 +243,6 @@ spec:
                     type: string
                 type: object
               operator:
-                properties:
-                  image:
-                    type: string
-                  tag:
-                    type: string
-                type: object
-              server:
                 properties:
                   image:
                     type: string

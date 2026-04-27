@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 )
@@ -107,7 +108,7 @@ var (
 									LivenessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path: "/healthz",
+												Path: "/",
 												Port: intstr.FromString("http"),
 											},
 										},
@@ -115,7 +116,7 @@ var (
 									ReadinessProbe: &corev1.Probe{
 										ProbeHandler: corev1.ProbeHandler{
 											HTTPGet: &corev1.HTTPGetAction{
-												Path: "/readyz",
+												Path: "/",
 												Port: intstr.FromString("http"),
 											},
 										},
@@ -140,6 +141,78 @@ var (
 								},
 							},
 						},
+					},
+				},
+			},
+			&corev1.Service{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "v1",
+					Kind:       "Service",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "operator",
+					Namespace: install.Namespace,
+					Labels: map[string]string{
+						"app": "operator",
+					},
+					Annotations: map[string]string{
+						"home-cloud.io/dns": install.Spec.Settings.Hostname,
+					},
+				},
+				Spec: corev1.ServiceSpec{
+					Type: corev1.ServiceTypeClusterIP,
+					Ports: []corev1.ServicePort{
+						{
+							Name:       "http",
+							Port:       80,
+							TargetPort: intstr.FromInt(8090),
+						},
+					},
+					Selector: map[string]string{
+						"app": "operator",
+					},
+				},
+			},
+			&gwv1.HTTPRoute{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "gateway.networking.k8s.io/v1",
+					Kind:       "HTTPRoute",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "operator",
+					Namespace: install.Namespace,
+				},
+				Spec: gwv1.HTTPRouteSpec{
+					CommonRouteSpec: gwv1.CommonRouteSpec{
+						ParentRefs: []gwv1.ParentReference{
+							{
+								Name:      gwv1.ObjectName(install.Spec.Istio.IngressGatewayName),
+								Namespace: ptr.To(gwv1.Namespace(install.Spec.Istio.Namespace)),
+							},
+						},
+					},
+					Hostnames: []gwv1.Hostname{
+						gwv1.Hostname(install.Spec.Settings.Hostname),
+					},
+					Rules: []gwv1.HTTPRouteRule{
+						{
+							BackendRefs: []gwv1.HTTPBackendRef{
+								{
+									BackendRef: gwv1.BackendRef{
+										BackendObjectReference: gwv1.BackendObjectReference{
+											Name: "operator",
+											Port: ptr.To[gwv1.PortNumber](80),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				// TODO: is this necessary for releaser? Otherwise we get a status.parents=null
+				Status: gwv1.HTTPRouteStatus{
+					RouteStatus: gwv1.RouteStatus{
+						Parents: []gwv1.RouteParentStatus{},
 					},
 				},
 			},

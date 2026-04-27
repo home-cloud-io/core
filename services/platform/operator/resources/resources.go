@@ -40,7 +40,6 @@ resources:
 `,
 				},
 			},
-			Server:   &v1.ServerSpec{},
 			MDNS:     &v1.MDNSSpec{},
 			Tunnel:   &v1.TunnelSpec{},
 			Operator: &v1.OperatorSpec{},
@@ -55,7 +54,6 @@ resources:
 		Status: v1.InstallStatus{
 			GatewayAPI: &v1.GatewayAPIStatus{},
 			Istio: &v1.IstioStatus{},
-			Server: &v1.ServerStatus{},
 			MDNS: &v1.MDNSStatus{},
 			Tunnel: &v1.TunnelStatus{},
 			Operator: &v1.OperatorStatus{},

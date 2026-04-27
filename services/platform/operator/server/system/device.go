@@ -247,11 +247,6 @@ func (c *controller) GetComponentVersions(ctx context.Context, logger chassis.Lo
 	resp := &v1.GetComponentVersionsResponse{
 		Platform: []*dv1.ComponentVersion{
 			{
-				Name:    "server",
-				Domain:  "platform",
-				Version: install.Status.Server.Tag,
-			},
-			{
 				Name:    "mdns",
 				Domain:  "platform",
 				Version: install.Status.MDNS.Tag,

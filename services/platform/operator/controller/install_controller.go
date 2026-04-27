@@ -200,21 +200,6 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		install.Status.Istio = nil
 	}
 
-	// SERVER
-	installed = install.Status.Server != nil
-	err = r.reconcileObjects(ctx, "server", install.Spec.Server.Disable, installed, resources.ServerObjects(install))
-	if err != nil {
-		return err
-	}
-	if !install.Spec.Server.Disable {
-		install.Status.Server = &v1.ServerStatus{
-			Image: install.Spec.Server.Image,
-			Tag:   install.Spec.Server.Tag,
-		}
-	} else {
-		install.Status.Server = nil
-	}
-
 	// MDNS
 	installed = install.Status.MDNS != nil
 	err = r.reconcileObjects(ctx, "mdns", install.Spec.MDNS.Disable, installed, resources.MDNSObjects(install))
@@ -513,7 +498,6 @@ func (r *InstallReconciler) uninstall(ctx context.Context, install *v1.Install) 
 
 	err := r.uninstallResources(ctx, slices.Concat(
 		resources.GatewayObjects(install),
-		resources.ServerObjects(install),
 		resources.MDNSObjects(install),
 		resources.TunnelObjects(install),
 		resources.DaemonObjects(install),
