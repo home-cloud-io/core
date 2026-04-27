@@ -16,9 +16,9 @@ import (
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/core/services/platform/server/apps"
-	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
-	hstrings "github.com/home-cloud-io/core/services/platform/server/utils/strings"
+	"github.com/home-cloud-io/core/services/platform/operator/server/apps"
+	k8sclient "github.com/home-cloud-io/core/services/platform/operator/server/k8s-client"
+	hstrings "github.com/home-cloud-io/core/services/platform/operator/server/utils/strings"
 )
 
 type (
@@ -175,6 +175,7 @@ func (c *controller) AutoUpdate(ctx context.Context, logger chassis.Logger, sche
 		if err != nil {
 			logger.WithError(err).Error("failed to run auto system update job")
 		}
+		logger.Info("update check finished")
 	}
 
 	// create new if no current entry, otherwise remove old entry

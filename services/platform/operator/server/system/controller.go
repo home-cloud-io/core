@@ -6,10 +6,10 @@ import (
 
 	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/core/services/platform/server/apps"
-	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
-	"github.com/home-cloud-io/core/services/platform/server/utils/strings"
-	hstrings "github.com/home-cloud-io/core/services/platform/server/utils/strings"
+	"github.com/home-cloud-io/core/services/platform/operator/server/apps"
+	k8sclient "github.com/home-cloud-io/core/services/platform/operator/server/k8s-client"
+	"github.com/home-cloud-io/core/services/platform/operator/server/utils/strings"
+	hstrings "github.com/home-cloud-io/core/services/platform/operator/server/utils/strings"
 	"github.com/robfig/cron/v3"
 
 	"github.com/steady-bytes/draft/pkg/chassis"

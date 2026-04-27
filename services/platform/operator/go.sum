@@ -209,6 +209,8 @@ github.com/hashicorp/raft-boltdb/v2 v2.3.0 h1:fPpQR1iGEVYjZ2OELvUHX600VAK5qmdnDE
 github.com/hashicorp/raft-boltdb/v2 v2.3.0/go.mod h1:YHukhB04ChJsLHLJEUD6vjFyLX2L3dsX3wPBZcX4tmc=
 github.com/home-cloud-io/core/api v0.9.2 h1:9FtCmLcT0aP9DFMp+vsbRKMiMJQCnydyLczlNrqxSRU=
 github.com/home-cloud-io/core/api v0.9.2/go.mod h1:WimcEp8EmNy7efnGtEan5BqxPYOzsP+gUWYA072i9Nk=
+github.com/home-cloud-io/core/api v0.9.3 h1:O7Lwbb6wZd1b9SQ8hCzBV1LR1PkzTduntvL8D5RKCwE=
+github.com/home-cloud-io/core/api v0.9.3/go.mod h1:WimcEp8EmNy7efnGtEan5BqxPYOzsP+gUWYA072i9Nk=
 github.com/huandu/xstrings v1.5.0 h1:2ag3IFq9ZDANvthTwTiqSSZLjDc+BedvHPAp5tJy2TI=
 github.com/huandu/xstrings v1.5.0/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
@@ -351,6 +353,8 @@ github.com/redis/go-redis/v9 v9.7.3/go.mod h1:bGUrSggJ9X9GUmZpZNEOQKaANxSGgOEBRl
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.7 h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=
 github.com/rivo/uniseg v0.4.7/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
+github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=
+github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/rs/cors v1.10.1 h1:L0uuZVXIKlI1SShY2nhFfo44TYvDPQ1w4oFkUJNfhyo=
@@ -392,8 +396,8 @@ github.com/spf13/viper v1.18.2 h1:LUXCnvUvSM6FXAsj6nnfc8Q2tp1dIgUfY9Kc8GsSOiQ=
 github.com/spf13/viper v1.18.2/go.mod h1:EKmWIqdnk5lOcmR72yw6hS+8OPYcwD0jteitLMVB+yk=
 github.com/steady-bytes/draft/api v1.0.0 h1:QIvboAJgU0fBOV6BKChLMhHYIjBTR53+LJaR3w3g0NY=
 github.com/steady-bytes/draft/api v1.0.0/go.mod h1:mlwxjvRiqvwySGdzVmF8voFhMffWq2F7dyd+xt6kENA=
-github.com/steady-bytes/draft/pkg/chassis v0.6.1 h1:2q25EJPi9yMJ0AJ9K7BOWwUxIe3IxIlUwOmTCVAXjB8=
-github.com/steady-bytes/draft/pkg/chassis v0.6.1/go.mod h1:B/b4s/czQydwL3BXk2CIUkVigxpcX2yp1tPC8btIX8Y=
+github.com/steady-bytes/draft/pkg/chassis v0.6.2 h1:aoweFwCa0gz988u7PA/2U/jN9GD/XY+CPwdGaHCxICw=
+github.com/steady-bytes/draft/pkg/chassis v0.6.2/go.mod h1:B/b4s/czQydwL3BXk2CIUkVigxpcX2yp1tPC8btIX8Y=
 github.com/steady-bytes/draft/pkg/loggers v0.2.6 h1:I4XHMG4SM+yZkNAdlsuK5+RBRu5xh2/Ns5yERHrO1E8=
 github.com/steady-bytes/draft/pkg/loggers v0.2.6/go.mod h1:edI39ystYSrhu0Gpw0LbYoNK9XY3RuzgT0lqES/DB8A=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
@@ -558,6 +562,8 @@ golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8T
 golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10 h1:3GDAcqdIg1ozBNLgPy4SLT84nfcBjr6rhGtXYtrkWLU=
+golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10/go.mod h1:T97yPqesLiNrOYxkwmhMI0ZIlJDm+p0PMR8eRVeR5tQ=
 gomodules.xyz/jsonpatch/v2 v2.4.0 h1:Ci3iUJyx9UeRx7CeFN8ARgGbkESwJK+KB9lLcWxY/Zw=
 gomodules.xyz/jsonpatch/v2 v2.4.0/go.mod h1:AH3dM2RI6uoBZxn3LVrfvJ3E0/9dG4cSrbuBJT4moAY=
 gonum.org/v1/gonum v0.16.0 h1:5+ul4Swaf3ESvrOnidPp4GZbzf0mxVQpDCYUQE7OJfk=

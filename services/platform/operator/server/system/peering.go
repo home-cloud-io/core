@@ -16,7 +16,7 @@ import (
 
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	k8sclient "github.com/home-cloud-io/core/services/platform/server/k8s-client"
+	k8sclient "github.com/home-cloud-io/core/services/platform/operator/server/k8s-client"
 )
 
 type (

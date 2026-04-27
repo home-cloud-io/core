@@ -14,8 +14,8 @@ import (
 
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/server/v1/v1connect"
-	"github.com/home-cloud-io/core/services/platform/server/apps"
-	"github.com/home-cloud-io/core/services/platform/server/system"
+	"github.com/home-cloud-io/core/services/platform/operator/server/apps"
+	"github.com/home-cloud-io/core/services/platform/operator/server/system"
 )
 
 type (

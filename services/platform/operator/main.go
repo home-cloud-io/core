@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -22,9 +23,16 @@ import (
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller"
 	"github.com/home-cloud-io/core/services/platform/operator/internal/controller/talos"
 	"github.com/home-cloud-io/core/services/platform/operator/logger"
+
+	"github.com/home-cloud-io/core/services/platform/operator/server/apps"
+	k8sclient "github.com/home-cloud-io/core/services/platform/operator/server/k8s-client"
+	"github.com/home-cloud-io/core/services/platform/operator/server/system"
+	"github.com/home-cloud-io/core/services/platform/operator/server/web"
 )
 
 var (
+	//go:embed web-client/dist/*
+	files  embed.FS
 	scheme = runtime.NewScheme()
 )
 
@@ -40,12 +48,20 @@ func init() {
 }
 
 func main() {
-	// configure logger
-	log := zerolog.New()
-	_ = chassis.New(log).DisableMux()
+	// configure chassis
+	c := chassis.New(zerolog.New()).DisableMux()
+	defer c.Start()
+
+	var (
+		kclient = k8sclient.NewClient(c.Logger())
+		actl    = apps.NewController(kclient)
+		sctl    = system.NewController(c.Logger(), kclient, actl)
+	)
+	c = c.WithClientApplication(files, "web-client/dist").
+		WithRPCHandler(web.New(c.Logger(), actl, sctl))
 
 	// clean copy of logger for controllers
-	logr := logger.NewLogger(log.WithFields(nil))
+	logr := logger.NewLogger(c.Logger().WithFields(nil))
 	ctrl.SetLogger(logr)
 
 	globalCtx, globalCancel := context.WithCancel(ctrl.SetupSignalHandler())
@@ -61,13 +77,13 @@ func main() {
 		LeaderElectionNamespace:       "home-cloud-system",
 	})
 	if err != nil {
-		log.WithError(err).Error("failed to create manager")
+		c.Logger().WithError(err).Error("failed to create manager")
 		os.Exit(1)
 	}
 
 	discoveryClient, err := discovery.NewDiscoveryClientForConfig(mgr.GetConfig())
 	if err != nil {
-		log.WithError(err).Error("failed to create discovery client")
+		c.Logger().WithError(err).Error("failed to create discovery client")
 		os.Exit(1)
 	}
 
@@ -76,7 +92,7 @@ func main() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		log.WithField("controller", "app").WithError(err).Error("failed to create controller")
+		c.Logger().WithField("controller", "app").WithError(err).Error("failed to create controller")
 		os.Exit(1)
 	}
 
@@ -88,24 +104,28 @@ func main() {
 		Config:          mgr.GetConfig(),
 		Cancel:          globalCancel,
 	}).SetupWithManager(mgr); err != nil {
-		log.WithField("controller", "Install").WithError(err).Error("failed to create controller")
+		c.Logger().WithField("controller", "Install").WithError(err).Error("failed to create controller")
 		os.Exit(1)
 	}
 
 	// add health/ready checks
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
-		log.WithError(err).Error("failed to set up health check")
+		c.Logger().WithError(err).Error("failed to set up health check")
 		os.Exit(1)
 	}
 	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
-		log.WithError(err).Error("failed to set up ready check")
+		c.Logger().WithError(err).Error("failed to set up ready check")
 		os.Exit(1)
 	}
 
 	// start manager
-	log.Warn("starting manager")
-	if err := mgr.Start(globalCtx); err != nil {
-		log.WithError(err).Error("problem running manager")
-		os.Exit(1)
-	}
+	c.Logger().Info("starting manager")
+	go func() {
+		err := mgr.Start(globalCtx)
+		if err != nil {
+			c.Logger().WithError(err).Error("problem running manager")
+		}
+		// send interupt to the chassis
+		chassis.Closer() <- os.Interrupt
+	}()
 }
