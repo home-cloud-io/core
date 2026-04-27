@@ -98,10 +98,11 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	defer func() {
 		// guard against infinite reconcile loop with updating same status
 		if reflect.DeepEqual(install.Status.Version, *oldStatus) {
-			err := r.Status().Update(ctx, install)
-			if err != nil {
-				panic(err)
-			}
+			return
+		}
+		err := r.Status().Update(ctx, install)
+		if err != nil {
+			panic(err)
 		}
 	}()
 
