@@ -43,7 +43,6 @@ func main() {
 	// configure logger
 	log := zerolog.New()
 	_ = chassis.New(log).DisableMux()
-	log.SetLevel(chassis.GetConfig().LogLevel())
 
 	// clean copy of logger for controllers
 	logr := logger.NewLogger(log.WithFields(nil))
@@ -59,6 +58,7 @@ func main() {
 		LeaderElection:                true,
 		LeaderElectionID:              "operator.home-cloud.io",
 		LeaderElectionReleaseOnCancel: true,
+		LeaderElectionNamespace:       "home-cloud-system",
 	})
 	if err != nil {
 		log.WithError(err).Error("failed to create manager")
