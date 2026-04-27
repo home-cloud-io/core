@@ -47,7 +47,6 @@ var generateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		os.Exit(0)
 
 		err = crdsRelease()
 		if err != nil {
