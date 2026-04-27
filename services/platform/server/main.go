@@ -16,16 +16,15 @@ import (
 var files embed.FS
 
 func main() {
+	c := chassis.New(zerolog.New())
+	defer c.Start()
+
 	var (
-		logger  = zerolog.New()
-		kclient = k8sclient.NewClient(logger)
+		kclient = k8sclient.NewClient(c.Logger())
 		actl    = apps.NewController(kclient)
-		sctl    = system.NewController(logger, kclient, actl)
-		webRPC  = web.New(logger, actl, sctl)
+		sctl    = system.NewController(c.Logger(), kclient, actl)
 	)
 
-	defer chassis.New(logger).
-		WithClientApplication(files, "web-client/dist").
-		WithRPCHandler(webRPC).
-		Start()
+	c = c.WithClientApplication(files, "web-client/dist").
+		WithRPCHandler(web.New(c.Logger(), actl, sctl))
 }
