@@ -30,8 +30,8 @@ import (
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/controller/daemon"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/installs/resources"
 	"github.com/home-cloud-io/core/services/platform/operator/controller/shared"
-	"github.com/home-cloud-io/core/services/platform/operator/resources"
 )
 
 // TODO: cancel install on crd update so that failed installs don't get stuck until timeout
