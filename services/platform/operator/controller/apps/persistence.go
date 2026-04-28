@@ -1,4 +1,4 @@
-package controller
+package apps
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/daemon"
 )
 
 // TODO: think about making this pluggable for different types of PV sources (ie. not just host path)
@@ -42,7 +43,7 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 
 	// if daemon is enabled, create volume before creating PV/PVC and use the returned path
 	if !install.Spec.Daemon.Disable {
-		resp, err := DaemonClient(install.Spec.Daemon.Address).CreateVolume(ctx, connect.NewRequest(&dv1.CreateVolumeRequest{
+		resp, err := daemon.DaemonClient(install.Spec.Daemon.Address).CreateVolume(ctx, connect.NewRequest(&dv1.CreateVolumeRequest{
 			Name:    objName,
 			MinSize: p.Size,
 			// TODO: update App spec to have min/max

@@ -1,4 +1,4 @@
-package controller
+package installs
 
 import (
 	"context"
@@ -29,6 +29,8 @@ import (
 
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/daemon"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/shared"
 	"github.com/home-cloud-io/core/services/platform/operator/resources"
 )
 
@@ -334,7 +336,7 @@ func (r *InstallReconciler) reconcileSystem(ctx context.Context, install *v1.Ins
 		install.Spec.Daemon.System.Version != install.Status.Daemon.System.Version {
 
 		l.V(1).Info("reconciling system install")
-		daemonClient := DaemonClient(install.Spec.Daemon.Address)
+		daemonClient := daemon.DaemonClient(install.Spec.Daemon.Address)
 
 		// first check the spec version against the daemon since an upgrade may have broken the previous reconcile iteration
 		// before status could be written and we want to avoid an infinite loop of triggering the same upgrade over and over
@@ -385,7 +387,7 @@ func (r *InstallReconciler) reconcileKubernetes(ctx context.Context, install *v1
 	if install.Status.Daemon.Kubernetes == nil ||
 		install.Spec.Daemon.Kubernetes.Version != install.Status.Daemon.Kubernetes.Version {
 		l.V(1).Info("reconciling kubernetes install")
-		daemonClient := DaemonClient(install.Spec.Daemon.Address)
+		daemonClient := daemon.DaemonClient(install.Spec.Daemon.Address)
 
 		// first check the spec version against the cluster since an upgrade may have broken the previous reconcile
 		// call before status could be written and we want to avoid an infinite loop of triggering the same upgrade over and over
@@ -420,7 +422,7 @@ func (r *InstallReconciler) reconcileKubernetes(ctx context.Context, install *v1
 
 func reconcileIstio(ctx context.Context, install *v1.Install) error {
 
-	cfg, err := createHelmAction(install.Spec.Istio.Namespace)
+	cfg, err := shared.CreateHelmAction(install.Spec.Istio.Namespace)
 	if err != nil {
 		return err
 	}
@@ -470,7 +472,7 @@ func reconcileIstio(ctx context.Context, install *v1.Install) error {
 }
 
 func uninstallIstio(ctx context.Context, install *v1.Install) error {
-	actionConfiguration, err := createHelmAction(install.Spec.Istio.Namespace)
+	actionConfiguration, err := shared.CreateHelmAction(install.Spec.Istio.Namespace)
 	if err != nil {
 		return err
 	}
@@ -658,7 +660,7 @@ func helmInstallOrUpgrade(ctx context.Context, cfg *action.Configuration, iAct *
 func helmInstall(ctx context.Context, cfg *action.Configuration, act *action.Install, values map[string]interface{}) error {
 	l := log.FromContext(ctx)
 	l.Info("installing helm chart", "chart", act.ChartPathOptions.RepoURL)
-	c, err := getChart(act.ChartPathOptions, act.ReleaseName)
+	c, err := shared.GetChart(act.ChartPathOptions, act.ReleaseName)
 	if err != nil {
 		return err
 	}
@@ -672,7 +674,7 @@ func helmInstall(ctx context.Context, cfg *action.Configuration, act *action.Ins
 func helmUpgrade(ctx context.Context, cfg *action.Configuration, releaseName string, act *action.Upgrade, values map[string]interface{}) error {
 	l := log.FromContext(ctx)
 	l.Info("upgrading helm release", "release", releaseName)
-	c, err := getChart(act.ChartPathOptions, releaseName)
+	c, err := shared.GetChart(act.ChartPathOptions, releaseName)
 	if err != nil {
 		return err
 	}

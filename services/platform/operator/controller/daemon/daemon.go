@@ -1,4 +1,4 @@
-package controller
+package daemon
 
 import (
 	"net/http"
@@ -6,6 +6,11 @@ import (
 	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
+
+const (
+	DefaultDaemonAddress = "http://daemon.home-cloud-system"
+)
+
 
 // DaemonClient creates a DaemonServiceClient and defaults the address if not set
 func DaemonClient(address string) dv1connect.DaemonServiceClient {

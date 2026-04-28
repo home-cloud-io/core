@@ -1,10 +1,8 @@
-package controller
+package apps
 
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
 	"time"
 
 	"dario.cat/mergo"
@@ -14,7 +12,6 @@ import (
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/registry"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -25,6 +22,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/shared"
 )
 
 const AppFinalizer = "apps.home-cloud.io/finalizer"
@@ -118,7 +116,7 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 	}
 
 	// construct helm configuration
-	actionConfiguration, err := createHelmAction(app.Namespace)
+	actionConfiguration, err := shared.CreateHelmAction(app.Namespace)
 	if err != nil {
 		return err
 	}
@@ -163,7 +161,7 @@ func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
 	}
 
 	// construct helm configuration
-	actionConfiguration, err := createHelmAction(app.Namespace)
+	actionConfiguration, err := shared.CreateHelmAction(app.Namespace)
 	if err != nil {
 		return err
 	}
@@ -193,7 +191,7 @@ func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
 }
 
 func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
-	actionConfiguration, err := createHelmAction(app.Namespace)
+	actionConfiguration, err := shared.CreateHelmAction(app.Namespace)
 	if err != nil {
 		return err
 	}
@@ -306,30 +304,6 @@ func (r *AppReconciler) tryDeletions(ctx context.Context, app *v1.App) error {
 
 // HELPERS
 
-// createHelmAction creates a helm action configuration with the given namespace.
-func createHelmAction(namespace string) (*action.Configuration, error) {
-	settings := cli.New()
-	settings.SetNamespace(namespace)
-	actionConfig := new(action.Configuration)
-
-	// action.DebugLog wrapper around logr.Logger
-	l := func(format string, args ...any) {
-		log.Log.V(-1).Info(fmt.Sprintf(format, args...))
-	}
-
-	if err := actionConfig.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), l); err != nil {
-		return nil, err
-	}
-
-	registryClient, err := registry.NewClient(registry.ClientOptWriter(io.Discard))
-	if err != nil {
-		return nil, err
-	}
-
-	actionConfig.RegistryClient = registryClient
-	return actionConfig, nil
-}
-
 // getChartAndValues returns the chart and values for a given app by downloading the chart from the registry and converting the values
 // from the string in the CRD to a map.
 func getChartAndValues(opt action.ChartPathOptions, app *v1.App) (*chart.Chart, map[string]interface{}, error) {
@@ -356,20 +330,6 @@ func getChartAndValues(opt action.ChartPathOptions, app *v1.App) (*chart.Chart, 
 	return chart, values, nil
 }
 
-func getChart(opt action.ChartPathOptions, chart string) (*chart.Chart, error) {
-	// download the chart to the file system
-	path, err := opt.LocateChart(chart, cli.New())
-	if err != nil {
-		return nil, err
-	}
-	// load chart from file
-	c, err := loader.Load(path)
-	if err != nil {
-		return nil, err
-	}
-	return c, nil
-}
-
 // shouldUpgrade determines if the given app needs upgrading based on the version and values.
 func shouldUpgrade(app *v1.App) bool {
 	installedVersion := app.Status.Version
@@ -393,7 +353,7 @@ func repoURL(app *v1.App) string {
 
 func config(app *v1.App) (config *AppConfig, err error) {
 	// get chart from app spec
-	actionConfiguration, err := createHelmAction(app.Namespace)
+	actionConfiguration, err := shared.CreateHelmAction(app.Namespace)
 	if err != nil {
 		return nil, err
 	}

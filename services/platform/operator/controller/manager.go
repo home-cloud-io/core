@@ -17,6 +17,8 @@ import (
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/apps"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/installs"
 	"github.com/home-cloud-io/core/services/platform/operator/controller/talos"
 	"github.com/home-cloud-io/core/services/platform/operator/logger"
 )
@@ -65,7 +67,7 @@ func Start(l chassis.Logger) {
 	}
 
 	// create app controller
-	if err = (&AppReconciler{
+	if err = (&apps.AppReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
@@ -78,7 +80,7 @@ func Start(l chassis.Logger) {
 	ctx, cancel := context.WithCancel(ctrl.SetupSignalHandler())
 
 	// create install controller
-	if err = (&InstallReconciler{
+	if err = (&installs.InstallReconciler{
 		Client:          mgr.GetClient(),
 		DiscoveryClient: discoveryClient,
 		Scheme:          mgr.GetScheme(),
