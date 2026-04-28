@@ -17,7 +17,6 @@ import (
 var files embed.FS
 
 func main() {
-	// configure chassis
 	c := chassis.New(zerolog.New())
 	defer c.Start()
 
