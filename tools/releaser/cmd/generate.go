@@ -15,7 +15,7 @@ import (
 	k8syaml "sigs.k8s.io/yaml"
 
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/core/services/platform/operator/resources"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/installs/resources"
 	"github.com/home-cloud-io/core/services/platform/operator/server/system"
 )
 
