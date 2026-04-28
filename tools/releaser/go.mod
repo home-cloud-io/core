@@ -4,11 +4,8 @@ go 1.25.3
 
 replace github.com/home-cloud-io/core/services/platform/operator => ../../services/platform/operator
 
-replace github.com/home-cloud-io/core/services/platform/server => ../../services/platform/server
-
 require (
 	github.com/home-cloud-io/core/services/platform/operator v0.1.3
-	github.com/home-cloud-io/core/services/platform/server v0.0.0
 	github.com/spf13/cobra v1.10.2
 	github.com/steady-bytes/draft/tools/dctl v0.2.4
 	gopkg.in/yaml.v3 v3.0.1
@@ -55,7 +52,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
-	github.com/robfig/cron/v3 v3.0.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/cors v1.10.1 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
@@ -82,7 +79,7 @@ require (
 	golang.org/x/term v0.35.0 // indirect
 	golang.org/x/text v0.29.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
-	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6 // indirect
+	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250826171959-ef028d996bc1 // indirect
 	google.golang.org/grpc v1.75.1 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect

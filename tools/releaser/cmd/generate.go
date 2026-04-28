@@ -15,8 +15,8 @@ import (
 	k8syaml "sigs.k8s.io/yaml"
 
 	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/core/services/platform/operator/resources"
-	"github.com/home-cloud-io/core/services/platform/server/system"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/installs/resources"
+	"github.com/home-cloud-io/core/services/platform/operator/server/system"
 )
 
 var (
@@ -91,9 +91,6 @@ func manifestRelease() (*opv1.InstallSpec, error) {
 
 	output.Print("Istio: %s -> ?", latest.Istio.Version)
 	latest.Istio.Version = GetWithDefault(latest.Istio.Version)
-
-	output.Print("Server: %s -> ?", latest.Server.Tag)
-	latest.Server.Tag = GetWithDefault(latest.Server.Tag)
 
 	output.Print("mDNS: %s -> ?", latest.MDNS.Tag)
 	latest.MDNS.Tag = GetWithDefault(latest.MDNS.Tag)

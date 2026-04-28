@@ -1,6 +1,14 @@
 service:
   name: operator
   domain: platform
+  env: local
+
   logging:
     level: debug
-  env: local
+
+  network:
+    bind_address: localhost
+    bind_port: 8000
+    internal:
+      host: host.docker.internal
+      port: 8000

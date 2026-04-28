@@ -1,6 +1,66 @@
 {
-  "name": "placeholder",
+  "name": "@home-cloud/web-client",
+  "version": "0.0.1",
+  "description": "Home Cloud Web Client",
   "scripts": {
-    "build": ""
-  }
+    "start": "react-scripts start",
+    "build": "BUILD_PATH='./dist' react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "author": "Home Cloud",
+  "license": "Apache-2.0",
+  "proxy": "http://localhost:8000",
+  "dependencies": {
+    "@bufbuild/buf": "^1.47.2",
+    "@bufbuild/protobuf": "^2.2.2",
+    "@connectrpc/connect": "^2.0.0",
+    "@connectrpc/connect-query": "^2.0.0",
+    "@connectrpc/connect-web": "^2.0.0",
+    "@home-cloud/api": "^0.9.6",
+    "@reduxjs/toolkit": "^2.3.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.119",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "antd": "^5.22.1",
+    "install": "^0.13.0",
+    "marked": "^15.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/home-cloud-io/core.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/home-cloud-io/core/issues"
+  },
+  "homepage": "https://home-cloud.io"
 }
