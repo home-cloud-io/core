@@ -8,12 +8,11 @@ For more info: https://home-cloud.io/
 
 This repository contains the core components that make up the Home Cloud platform. These include:
 
-- [**daemon**](./services/platform/daemon/README.md): a system service that manages a [Talos](https://talos.dev) installation and low-level host commands (like reboots)
-- [**locator**](./services/platform/locator/README.md): a zero-trust service discovery engine to enable remote access to Home Cloud servers when not at home
-- [**mdns**](./services/platform/mdns/README.md): a lightweight [mDNS](https://en.wikipedia.org/wiki/Multicast_DNS) server which creates mDNS entries based off of Kubernetes Service annotations
-- [**operator**](./services/platform/operator/README.md): a Kubernetes operator which manages the Home Cloud installation itself as well as user installed Apps
-- [**server**](./services/platform/server/README.md): the primary service that manages users, settings, and hosts the Home Cloud web interface
-- [**tunnel**](./services/platform/tunnel/README.md): a small Kubernetes operator which uses the [**locator**](./services/platform/locator/README.md) to create Wireguard tunnels to mobile devices
+- [**daemon**](./services/platform/daemon/README.md): a system service that manages a [Talos](https://talos.dev) installation and low-level host commands (like reboots).
+- [**locator**](./services/platform/locator/README.md): a zero-trust service discovery engine to enable remote access to Home Cloud servers when not at home.
+- [**mdns**](./services/platform/mdns/README.md): a lightweight [mDNS](https://en.wikipedia.org/wiki/Multicast_DNS) server which creates mDNS entries based off of Kubernetes Service annotations.
+- [**operator**](./services/platform/operator/README.md): a Kubernetes operator which manages the Home Cloud installation itself as well as user installed Apps. It also hosts the web client and API that manages users, settings, and all other user actions.
+- [**tunnel**](./services/platform/tunnel/README.md): a small Kubernetes operator which uses the [**locator**](./services/platform/locator/README.md) to create Wireguard tunnels to mobile devices.
 
 ## Requirements
 
@@ -122,3 +121,52 @@ npm start
 ```
 
 This will open your browser to the web client running locally on `localhost:3000` and proxying all requests to the home cloud server running on `localhost:8000`.
+
+### Install Steps
+
+```bash
+# install talosctl
+curl -sL https://talos.dev/install | sh
+# install kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+# get from machine display out
+export MACHINE_IP="192.168.1.183"
+
+# generate config files
+talosctl gen secrets -o secrets.yaml
+talosctl gen config --with-secrets secrets.yaml home-cloud https://${MACHINE_IP}:6443
+
+# update `install.disk` in controlplane.yaml
+talosctl --nodes ${MACHINE_IP} get disks --insecure
+
+# add home cloud specific config to controlplane.yaml
+
+# apply config
+talosctl apply-config --insecure --nodes ${MACHINE_IP} --file controlplane.yaml
+
+# save config
+talosctl config merge ./talosconfig
+
+# set endpoint
+talosctl config endpoint ${MACHINE_IP}
+talosctl --nodes ${MACHINE_IP} get disks --insecure
+
+# install kubernetes
+talosctl bootstrap --nodes ${MACHINE_IP}
+
+# save kubeconfig
+talosctl kubeconfig kubeconfig --nodes ${MACHINE_IP}
+export KUBECONFIG=./kubeconfig
+
+# check connection
+kubectl get nodes
+
+# install home cloud manifests
+kubectl apply -f https://github.com/home-cloud-io/core/releases/latest/download/crds.yaml
+kubectl apply -f https://github.com/home-cloud-io/core/releases/latest/download/operator.yaml
+kubectl apply -f https://github.com/home-cloud-io/core/releases/latest/download/install.yaml
+
+# wait until the operator is ready
+kubectl get deployment operator -n home-cloud-system -w
+```
