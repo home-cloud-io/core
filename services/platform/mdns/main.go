@@ -1,86 +1,70 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	"os"
 
-	k8sclient "github.com/home-cloud-io/services/platform/mdns/k8s-client"
-	"github.com/home-cloud-io/services/platform/mdns/mdns"
-	"github.com/home-cloud-io/services/platform/mdns/services"
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
+	"k8s.io/apimachinery/pkg/runtime"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
-	"k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/client-go/informers"
+	"github.com/home-cloud-io/core/services/platform/mdns/mdns"
+	"github.com/home-cloud-io/core/services/platform/operator/logger"
 )
 
-const (
-	namespace = "home-cloud"
+var (
+	scheme   = runtime.NewScheme()
+	setupLog = ctrl.Log.WithName("setup")
 )
 
-type (
-	Runner struct {
-		logger chassis.Logger
-	}
-)
-
-func main() {
-	var (
-		logger = zerolog.New()
-		runner = &Runner{logger: logger}
-	)
-
-	defer chassis.New(logger).
-		DisableMux().
-		WithRunner(runner.run).
-		Start()
+func init() {
+	// initialize scheme
+	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 }
 
-func (r *Runner) run() {
-	if chassis.GetConfig().GetString(mdns.HostIPConfigKey) == "" {
-		r.logger.Fatal(fmt.Sprintf("%s config value required but not set", mdns.HostIPConfigKey))
-	}
+func main() {
+	// configure logger
+	log := zerolog.New()
+	_ = chassis.New(log).DisableMux()
+	log.SetLevel(chassis.GetConfig().LogLevel())
+	ctrl.SetLogger(logger.NewLogger(log))
 
-	ctx := context.Background()
-	k8sClient := k8sclient.NewClient(r.logger)
-
-	// channels
-	notifyMdns := make(chan services.Resource)
-	stopper := make(chan struct{})
-
-	// closers
-	defer close(stopper)
-	defer runtime.HandleCrash()
-
-	// run listener in the background
-	factory := informers.NewSharedInformerFactory(k8sClient, 0)
-	serviceController, err := services.NewServicesWatcher(factory, notifyMdns)
+	// configure manager
+	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+		Scheme:                 scheme,
+		Metrics: server.Options{
+			BindAddress: "0",
+		},
+		HealthProbeBindAddress: "",
+		// no need for election since mdns needs to run as a single replica StatefulSet
+		LeaderElection: false,
+	})
 	if err != nil {
-		r.logger.WithError(err).Panic("failed to initialize services watcher")
+		setupLog.Error(err, "failed to create manager")
+		os.Exit(1)
 	}
-	go serviceController.Run(r.logger, stopper)
 
-	// initialize server
-	mdnsServer := mdns.New(r.logger)
+	// create service controller
+	if err = (&mdns.Reconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Server: mdns.New(log),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "failed to create controller", "controller", "mDNS")
+		os.Exit(1)
+	}
 
-	// listen for resource events
-	for {
-		select {
-		case resource := <-notifyMdns:
-			switch resource.Action {
-			case services.Added:
-				err := mdnsServer.AddHost(ctx, resource.Hostname)
-				if err != nil {
-					r.logger.WithError(err).Error("failed to add host")
-				}
-			case services.Deleted:
-				err := mdnsServer.RemoveHost(ctx, resource.Hostname)
-				if err != nil {
-					r.logger.WithError(err).Error("failed to remove host")
-				}
-			}
-		case <-stopper:
-			r.logger.Info("stopping program")
-		}
+	// start manager
+	setupLog.Info("starting manager")
+	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+		setupLog.Error(err, "problem running manager")
+		os.Exit(1)
 	}
 }

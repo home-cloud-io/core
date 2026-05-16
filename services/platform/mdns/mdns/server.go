@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"slices"
 	"sync"
 
 	"github.com/pion/mdns/v2"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
+
+	"github.com/home-cloud-io/core/services/platform/mdns/mdns/set"
 )
 
 type (
@@ -24,7 +25,7 @@ type (
 		logger chassis.Logger
 		mu     sync.Mutex
 		conn   *mdns.Conn
-		hosts  []string
+		hosts  *set.Set[string]
 	}
 )
 
@@ -36,11 +37,13 @@ func New(logger chassis.Logger) Server {
 	return &server{
 		logger: logger,
 		mu:     sync.Mutex{},
-		hosts:  make([]string, 0),
+		hosts:  set.New[string](),
 	}
 }
 
 func (s *server) Serve(ctx context.Context) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	addr4, err := net.ResolveUDPAddr("udp4", mdns.DefaultAddressIPv4)
 	if err != nil {
@@ -64,7 +67,7 @@ func (s *server) Serve(ctx context.Context) error {
 		return err
 	}
 
-	if len(s.hosts) == 0 {
+	if s.hosts.Empty() {
 		return s.Close(ctx)
 	}
 
@@ -75,7 +78,7 @@ func (s *server) Serve(ctx context.Context) error {
 		return fmt.Errorf("invalid host IP: %s", hostIPString)
 	}
 	conn, err := mdns.Server(ipv4.NewPacketConn(l4), ipv6.NewPacketConn(l6), &mdns.Config{
-		LocalNames:   s.hosts,
+		LocalNames:   s.hosts.Items(),
 		LocalAddress: hostIP,
 	})
 	if err != nil {
@@ -83,7 +86,7 @@ func (s *server) Serve(ctx context.Context) error {
 	}
 	s.logger.WithFields(chassis.Fields{
 		"address": hostIP,
-		"hosts":   s.hosts,
+		"hosts":   s.hosts.Items(),
 	}).Info("registered host IP")
 
 	// close old conn
@@ -101,9 +104,6 @@ func (s *server) Serve(ctx context.Context) error {
 }
 
 func (s *server) Close(ctx context.Context) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	if s.conn != nil {
 		return s.conn.Close()
 	}
@@ -111,28 +111,16 @@ func (s *server) Close(ctx context.Context) error {
 }
 
 func (s *server) AddHost(ctx context.Context, host string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	s.logger.WithField("host", host).Info("adding host")
-	if slices.Contains(s.hosts, host) {
+	if s.hosts.Has(host) {
 		return nil
 	}
-	s.hosts = append(s.hosts, host)
+	s.hosts.Add(host)
 	return s.Serve(ctx)
 }
 
 func (s *server) RemoveHost(ctx context.Context, host string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	s.logger.WithField("host", host).Info("removing host")
-	hosts := []string{}
-	for _, h := range s.hosts {
-		if h != host {
-			hosts = append(hosts, h)
-		}
-	}
-	s.hosts = hosts
+	s.hosts.Remove(host)
 	return s.Serve(ctx)
 }
