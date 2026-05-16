@@ -150,7 +150,6 @@ talosctl config merge ./talosconfig
 
 # set endpoint
 talosctl config endpoint ${MACHINE_IP}
-talosctl --nodes ${MACHINE_IP} get disks --insecure
 
 # install kubernetes
 talosctl bootstrap --nodes ${MACHINE_IP}
@@ -163,6 +162,7 @@ export KUBECONFIG=./kubeconfig
 kubectl get nodes
 
 # install home cloud manifests
+kubectl create namespace home-cloud-system
 kubectl apply -f https://github.com/home-cloud-io/core/releases/latest/download/crds.yaml
 kubectl apply -f https://github.com/home-cloud-io/core/releases/latest/download/operator.yaml
 kubectl apply -f https://github.com/home-cloud-io/core/releases/latest/download/install.yaml
