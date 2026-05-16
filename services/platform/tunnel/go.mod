@@ -1,4 +1,4 @@
-module github.com/home-cloud-io/services/platform/tunnel
+module github.com/home-cloud-io/core/services/platform/tunnel
 
 go 1.25.3
 
