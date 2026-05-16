@@ -173,6 +173,7 @@ var (
 					},
 				},
 			},
+			// TODO: remove this from operator.go so that operator can be installed with GatewayAPI
 			&gwv1.HTTPRoute{
 				TypeMeta: metav1.TypeMeta{
 					APIVersion: "gateway.networking.k8s.io/v1",

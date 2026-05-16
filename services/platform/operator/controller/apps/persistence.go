@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"connectrpc.com/connect"
+	"dario.cat/mergo"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -14,6 +15,7 @@ import (
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/controller/daemon"
+	"github.com/home-cloud-io/core/services/platform/operator/controller/installs/resources"
 )
 
 // TODO: think about making this pluggable for different types of PV sources (ie. not just host path)
@@ -30,11 +32,18 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 		storageClassName = "manual"
 	)
 
+	// get current install config
 	install := &v1.Install{}
 	err := r.Client.Get(ctx, types.NamespacedName{
 		Name:      "install",
 		Namespace: "home-cloud-system",
 	}, install)
+	if err != nil {
+		return err
+	}
+
+	// set defaults: any values set on the resource will override the defaults
+	err = mergo.Merge(install, resources.DefaultInstall)
 	if err != nil {
 		return err
 	}
