@@ -16,6 +16,7 @@ var (
 			GatewayAPI: &v1.GatewayAPISpec{},
 			Istio: &v1.IstioSpec{
 				Namespace:          "istio-system",
+				// TODO: do this through a separate Gateway resources so that people can run without Istio
 				IngressGatewayName: "ingress-gateway",
 				Base:               &v1.BaseSpec{},
 				Istiod: &v1.IstiodSpec{

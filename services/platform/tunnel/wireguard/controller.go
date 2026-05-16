@@ -22,7 +22,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/services/platform/tunnel/stun"
+	"github.com/home-cloud-io/core/services/platform/tunnel/stun"
 )
 
 type WireguardReconciler struct {

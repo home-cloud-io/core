@@ -16,8 +16,8 @@ import (
 
 	v1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
 	"github.com/home-cloud-io/core/services/platform/operator/logger"
-	"github.com/home-cloud-io/services/platform/tunnel/stun"
-	"github.com/home-cloud-io/services/platform/tunnel/wireguard"
+	"github.com/home-cloud-io/core/services/platform/tunnel/stun"
+	"github.com/home-cloud-io/core/services/platform/tunnel/wireguard"
 )
 
 var (
