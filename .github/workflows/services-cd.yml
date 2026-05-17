@@ -12,7 +12,8 @@ on:
 
 env:
   REGISTRY: ${{ vars.REGISTRY || 'ghcr.io' }}
-  TARGET_PLATFORMS: linux/amd64,linux/arm64
+  # TODO: build arm64 too
+  TARGET_PLATFORMS: linux/amd64
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
