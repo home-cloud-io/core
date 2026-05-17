@@ -10,7 +10,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 )
@@ -170,50 +169,6 @@ var (
 					},
 					Selector: map[string]string{
 						"app": "operator",
-					},
-				},
-			},
-			// TODO: remove this from operator.go so that operator can be installed with GatewayAPI
-			&gwv1.HTTPRoute{
-				TypeMeta: metav1.TypeMeta{
-					APIVersion: "gateway.networking.k8s.io/v1",
-					Kind:       "HTTPRoute",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "operator",
-					Namespace: install.Namespace,
-				},
-				Spec: gwv1.HTTPRouteSpec{
-					CommonRouteSpec: gwv1.CommonRouteSpec{
-						ParentRefs: []gwv1.ParentReference{
-							{
-								Name:      gwv1.ObjectName(install.Spec.Istio.IngressGatewayName),
-								Namespace: ptr.To(gwv1.Namespace(install.Spec.Istio.Namespace)),
-							},
-						},
-					},
-					Hostnames: []gwv1.Hostname{
-						gwv1.Hostname(install.Spec.Settings.Hostname),
-					},
-					Rules: []gwv1.HTTPRouteRule{
-						{
-							BackendRefs: []gwv1.HTTPBackendRef{
-								{
-									BackendRef: gwv1.BackendRef{
-										BackendObjectReference: gwv1.BackendObjectReference{
-											Name: "operator",
-											Port: ptr.To[gwv1.PortNumber](80),
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-				// TODO: is this necessary for releaser? Otherwise we get a status.parents=null
-				Status: gwv1.HTTPRouteStatus{
-					RouteStatus: gwv1.RouteStatus{
-						Parents: []gwv1.RouteParentStatus{},
 					},
 				},
 			},
