@@ -13,23 +13,12 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  collect_dirs:
-    runs-on: ubuntu-latest
-    outputs:
-      dirs: ${{ steps.dirs.outputs.dirs }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: dirs
-        run: echo "dirs=$(ls -d pkg/*/ | jq --raw-input --slurp --compact-output 'split("\n")[:-1]')" >> ${GITHUB_OUTPUT}
-
   test:
-    name: Test (${{ matrix.module }})
-    needs: collect_dirs
+    name: Test `pkg/`
     runs-on: ubuntu-latest
     strategy:
       matrix:
         go-version: ['1.26.x']
-        module: ${{ fromJson(needs.collect_dirs.outputs.dirs) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -41,5 +30,5 @@ jobs:
           cache-dependency-path: go.sum
 
       - name: Test
-        working-directory: ${{ matrix.module }}
+        working-directory: pkg/
         run: go test ./...
