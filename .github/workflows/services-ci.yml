@@ -18,25 +18,18 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  build-and-test:
-    name: Build-Test (${{ matrix.service }})
+  test:
+    name: Test (${{ matrix.service }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ['1.26.x']
+        go-version: ["1.26.x"]
         service: [daemon, locator, mdns, operator, tunnel]
-    env:
-      GOPRIVATE: github.com/home-cloud-io/core
     steps:
       - uses: actions/checkout@v4
 
-      - name: Git config
-        env:
-          GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
-        run: |
-          git config --global url."https://${GH_ACCESS_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-
-      - uses: actions/setup-go@v5
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
           cache-dependency-path: go.sum
@@ -45,12 +38,8 @@ jobs:
         working-directory: cmd/${{ matrix.service }}
         run: go test ./...
 
-      - name: Build
-        working-directory: cmd/${{ matrix.service }}
-        run: go build main.go
-
-  docker-image:
-    name: Docker Image (${{ matrix.service }})
+  docker:
+    name: Docker (${{ matrix.service }})
     runs-on: ubuntu-latest
     strategy:
       matrix:

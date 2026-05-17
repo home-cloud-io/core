@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   test:
-    name: Test `pkg/`
+    name: Test pkg/
     runs-on: ubuntu-latest
     strategy:
       matrix:
