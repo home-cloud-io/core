@@ -20,11 +20,11 @@ concurrency:
 
 jobs:
   test:
-    name: Build-Test (${{ matrix.service-path }})
+    name: Test (${{ matrix.service }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ['1.26.x']
+        go-version: ["1.26.x"]
         service: [daemon, locator, mdns, operator, tunnel]
     steps:
       - uses: actions/checkout@v4
