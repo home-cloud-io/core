@@ -32,6 +32,8 @@ jobs:
         module: ${{ fromJson(needs.collect_dirs.outputs.dirs) }}
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
         with:
