@@ -9,6 +9,8 @@ on:
       - api/**
       - cmd/**
       - pkg/**
+    tags:
+      - v**
 
 env:
   REGISTRY: ${{ vars.REGISTRY || 'ghcr.io' }}
