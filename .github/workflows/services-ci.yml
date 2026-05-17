@@ -58,12 +58,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract service info
-        id: info
-        run: |
-          echo "domain=$(dirname ${{ matrix.service }})" >> $GITHUB_OUTPUT
-          echo "service=$(basename ${{ matrix.service }})" >> $GITHUB_OUTPUT
-
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
@@ -75,7 +69,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ steps.info.outputs.service }}
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.service }}
           tags: |
             type=sha
 
@@ -89,12 +83,10 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile
+          file: cmd/${{ matrix.service }}/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ env.TARGET_PLATFORMS }}
           build-args: |
-            DOMAIN=${{ steps.info.outputs.domain}}
-            SERVICE=${{ steps.info.outputs.service}}
             GITHUB_TOKEN=${{ secrets.GH_ACCESS_TOKEN }}
