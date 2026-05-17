@@ -1,4 +1,4 @@
-# Home Cloud Core
+# Home Cloud
 
 The easy-to-use solution that enables you to say goodbye to the high-cost, privacy nightmare of Big Tech services so that you can finally take back control over your digital life!
 
@@ -18,7 +18,7 @@ This repository contains the core components that make up the Home Cloud platfor
 
 To work on the Home Cloud core platform you'll need a couple of things installed:
 
-* [Go](https://golang.org/doc/install) - v1.25+
+* [Go](https://golang.org/doc/install) - v1.26+
 * [Docker](https://docs.docker.com/get-docker/)
 * [Node (recommend nvm)](https://github.com/nvm-sh/nvm)
 * [talosctl](https://docs.siderolabs.com/talos/latest/getting-started/quickstart)
@@ -70,27 +70,9 @@ kubectl create namespace home-cloud-system
 First install the Home Cloud CRDs to the cluster:
 
 ```sh
-cd services/platform/operator
-kubectl apply -f services/platform/operator/config/crd/bases/home-cloud.io_apps.yaml
-kubectl apply -f services/platform/operator/config/crd/bases/home-cloud.io_installs.yaml
-kubectl apply -f services/platform/operator/config/crd/bases/home-cloud.io_wireguards.yaml
-```
-
-### server
-
-Before running the server, we need to first build the web client that is hosted by the server:
-
-```sh
-cd services/platform/server/web-client
-npm install
-npm run build
-```
-
-Now you can start the server (you may need to change the KUBECONFIG path):
-
-```sh
-cd ..
-KUBECONFIG=~/.kube/config go run main.go
+kubectl apply -f https://github.com/home-cloud-io/core/releases/latest/download/crds.yaml
+kubectl apply -f https://github.com/home-cloud-io/core/releases/latest/download/operator.yaml
+kubectl apply -f https://github.com/home-cloud-io/core/releases/latest/download/install.yaml
 ```
 
 ### daemon
@@ -98,17 +80,29 @@ KUBECONFIG=~/.kube/config go run main.go
 You can run the daemon with:
 
 ```sh
-cd services/platform/daemon
+cd cmd/daemon
 go run main.go
 ```
 
 ### operator
 
+Before running the operator, we need to first build the web client that is hosted by the operator:
+
+```sh
+# install api dependencies
+cd api
+npm install
+# install client dependencies
+cd ../web/client
+npm install
+npm run build
+```
+
 You can run the operator with:
 
 ```sh
-cd services/platform/operator
-go run main.go
+cd cmd/operator
+go run -flags=client main.go
 ```
 
 ### web client
@@ -116,7 +110,7 @@ go run main.go
 If you're developing the web client, you can run it in development mode:
 
 ```sh
-cd services/platform/server/web-client
+cd web/client
 npm start
 ```
 
