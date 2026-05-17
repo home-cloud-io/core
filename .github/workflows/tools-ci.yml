@@ -5,6 +5,8 @@ on:
     branches:
       - main
     paths:
+      - api/**
+      - pkg/**
       - tools/**
 
 concurrency:
@@ -12,21 +14,13 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  changed:
-    name: Prepare
-    uses: ./.github/workflows/changes.yml
-    with:
-      path: tools
-
   build-and-test:
     name: Build-Test (${{ matrix.tool }})
-    needs: [changed]
     runs-on: ubuntu-latest
-    if: needs.changed.outputs.any_changed == 'true'
     strategy:
       matrix:
-        go-version: ['1.21.x']
-        tool: ${{ fromJSON(needs.changed.outputs.matrix) }}
+        go-version: ['1.26.x']
+        tool: [ releaser ]
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +29,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-          cache-dependency-path: tools/${{ matrix.tool }}/go.sum
+          cache-dependency-path: go.sum
 
       - name: Test
         working-directory: tools/${{ matrix.tool }}

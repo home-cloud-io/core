@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - api/**
       - pkg/**
 
 concurrency:
@@ -12,30 +13,30 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  changed:
-    name: Prepare
-    uses: ./.github/workflows/changes.yml
-    with:
-      path: pkg
+  collect_dirs:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.dirs.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: dirs
+        run: echo "dirs=$(ls -d pkg/*/ | jq --raw-input --slurp --compact-output 'split("\n")[:-1]')" >> ${GITHUB_OUTPUT}
 
   test:
     name: Test (${{ matrix.module }})
-    needs: [changed]
+    needs: collect_dirs
     runs-on: ubuntu-latest
-    if: needs.changed.outputs.any_changed == 'true'
     strategy:
       matrix:
-        go-version: ['1.21.x']
-        module: ${{ fromJSON(needs.changed.outputs.matrix) }}
+        go-version: ['1.26.x']
+        module: ${{ fromJson(needs.collect_dirs.outputs.dirs) }}
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-          cache-dependency-path: pkg/${{ matrix.module }}/go.sum
+          cache-dependency-path: go.sum
 
       - name: Test
         working-directory: pkg/${{ matrix.module }}

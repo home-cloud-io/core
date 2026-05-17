@@ -30,7 +30,7 @@ jobs:
     if: needs.changed.outputs.any_changed == 'true'
     strategy:
       matrix:
-        go-version: ['1.21.x']
+        go-version: ['1.26.x']
         service-path: ${{ fromJSON(needs.changed.outputs.matrix) }}
     env:
       GOPRIVATE: github.com/home-cloud-io/core
