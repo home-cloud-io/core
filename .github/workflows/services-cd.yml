@@ -1,6 +1,7 @@
 name: services - CD
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -61,7 +62,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.service }}
           tags: |
             type=sha
-            type=edge,branch=main
+            type=raw,value=latest,enable={{is_default_branch}}
             type=schedule,pattern={{date 'YYYYMMDD-hhmmss' tz='America/Chicago'}}
 
       - name: Set up QEMU
