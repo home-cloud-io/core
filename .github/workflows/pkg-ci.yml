@@ -39,5 +39,5 @@ jobs:
           cache-dependency-path: go.sum
 
       - name: Test
-        working-directory: pkg/${{ matrix.module }}
+        working-directory: ${{ matrix.module }}
         run: go test ./...
