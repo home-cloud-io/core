@@ -14,9 +14,9 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8syaml "sigs.k8s.io/yaml"
 
-	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/core/services/platform/operator/controller/installs/resources"
-	"github.com/home-cloud-io/core/services/platform/operator/server/system"
+	opv1 "github.com/home-cloud-io/core/api/crds/v1"
+	"github.com/home-cloud-io/core/cmd/operator/server/system"
+	"github.com/home-cloud-io/core/pkg/install/resources"
 )
 
 var (
@@ -69,7 +69,7 @@ func manifestRelease() (*opv1.InstallSpec, error) {
 	}
 	defer f.Close()
 
-	// get version manifest from repo``
+	// get version manifest from repo
 	resp, err := http.Get(system.LatestReleaseManifestURL)
 	if err != nil {
 		return nil, err

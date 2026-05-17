@@ -1,0 +1,6 @@
+service:
+  name: home-cloud-mdns
+  domain: platform
+
+mdns:
+  host_ip: <YOUR_IP_ADDRESS>
