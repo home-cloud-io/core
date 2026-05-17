@@ -8,12 +8,12 @@ For more info: https://home-cloud.io/
 
 This repository contains the core components that make up the Home Cloud platform. These include:
 
-- [**daemon**](./services/platform/daemon/README.md): a system service that manages a [Talos](https://talos.dev) installation and low-level host commands (like reboots)
-- [**locator**](./services/platform/locator/README.md): a zero-trust service discovery engine to enable remote access to Home Cloud servers when not at home
-- [**mdns**](./services/platform/mdns/README.md): a lightweight [mDNS](https://en.wikipedia.org/wiki/Multicast_DNS) server which creates mDNS entries based off of Kubernetes Service annotations
-- [**operator**](./services/platform/operator/README.md): a Kubernetes operator which manages the Home Cloud installation itself as well as user installed Apps
-- [**server**](./services/platform/server/README.md): the primary service that manages users, settings, and hosts the Home Cloud web interface
-- [**tunnel**](./services/platform/tunnel/README.md): a small Kubernetes operator which uses the [**locator**](./services/platform/locator/README.md) to create Wireguard tunnels to mobile devices
+- [**daemon**](./cmd/daemon/README.md): a system service that manages a [Talos](https://talos.dev) installation and low-level host commands (like reboots)
+- [**locator**](./cmd/locator/README.md): a zero-trust service discovery engine to enable remote access to Home Cloud servers when not at home
+- [**mdns**](./cmd/mdns/README.md): a lightweight [mDNS](https://en.wikipedia.org/wiki/Multicast_DNS) server which creates mDNS entries based off of Kubernetes Service annotations
+- [**operator**](./cmd/operator/README.md): a Kubernetes operator which manages the Home Cloud installation itself as well as user installed Apps
+- [**server**](./cmd/server/README.md): the primary service that manages users, settings, and hosts the Home Cloud web interface
+- [**tunnel**](./cmd/tunnel/README.md): a small Kubernetes operator which uses the [**locator**](./cmd/locator/README.md) to create Wireguard tunnels to mobile devices
 
 ## Requirements
 

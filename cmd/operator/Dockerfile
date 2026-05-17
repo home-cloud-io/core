@@ -3,15 +3,20 @@ ARG NODE_VERSION=22
 
 # Build web client
 FROM node:${NODE_VERSION} AS web-client-builder
-WORKDIR /web
 
 # Install node modules
-COPY ./services/platform/operator/web-client/package*.json .
+WORKDIR /build/api
+COPY ./api/package*.json .
+RUN npm install
+WORKDIR /build/web/client
+COPY ./web/client/package*.json .
 RUN npm install
 
 # Build dist
-COPY ./services/platform/operator/web-client .
+WORKDIR /build
+COPY . .
 ENV NODE_ENV=production
+WORKDIR /build/web/client
 RUN npm run build
 
 # Build final binary
@@ -29,11 +34,11 @@ go mod verify
 
 # Copy over code
 COPY . .
-COPY --from=web-client-builder /web/dist ./services/platform/operator/web-client/dist
+COPY --from=web-client-builder /build/web/client/dist ./web/client/dist
 
 # Build the binary
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
-    CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o main ./services/platform/operator/main.go
+    CGO_ENABLED=0 go build -tags=client -ldflags="-s -w" -trimpath -o main ./cmd/operator/main.go
 
 # Final image
 FROM scratch

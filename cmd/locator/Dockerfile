@@ -19,7 +19,7 @@ RUN ls -la
 
 # Build the binary
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
-    CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o main ./services/platform/locator/main.go
+    CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o main ./cmd/locator/main.go
 
 # Final image
 FROM scratch
