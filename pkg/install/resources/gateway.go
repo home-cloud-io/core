@@ -56,6 +56,39 @@ var (
 `,
 				},
 			},
+			&gwv1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "operator",
+					Namespace: install.Namespace,
+				},
+				Spec: gwv1.HTTPRouteSpec{
+					CommonRouteSpec: gwv1.CommonRouteSpec{
+						ParentRefs: []gwv1.ParentReference{
+							{
+								Name:      gwv1.ObjectName(install.Spec.Istio.IngressGatewayName),
+								Namespace: ptr.To(gwv1.Namespace(install.Spec.Istio.Namespace)),
+							},
+						},
+					},
+					Hostnames: []gwv1.Hostname{
+						gwv1.Hostname(install.Spec.Settings.Hostname),
+					},
+					Rules: []gwv1.HTTPRouteRule{
+						{
+							BackendRefs: []gwv1.HTTPBackendRef{
+								{
+									BackendRef: gwv1.BackendRef{
+										BackendObjectReference: gwv1.BackendObjectReference{
+											Name: "operator",
+											Port: ptr.To[gwv1.PortNumber](80),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		}
 	}
 )
