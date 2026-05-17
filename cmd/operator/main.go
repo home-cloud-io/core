@@ -1,8 +1,6 @@
 package main
 
 import (
-	"embed"
-
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"github.com/steady-bytes/draft/pkg/loggers/zerolog"
 
@@ -11,10 +9,8 @@ import (
 	k8sclient "github.com/home-cloud-io/core/cmd/operator/server/k8s-client"
 	"github.com/home-cloud-io/core/cmd/operator/server/system"
 	"github.com/home-cloud-io/core/cmd/operator/server/web"
+	"github.com/home-cloud-io/core/web/client"
 )
-
-//go:embed web-client/dist/*
-var files embed.FS
 
 func main() {
 	c := chassis.New(zerolog.New())
@@ -26,7 +22,7 @@ func main() {
 		sctl    = system.NewController(c.Logger(), kclient, actl)
 	)
 
-	c = c.WithClientApplication(files, "web-client/dist").
+	c = c.WithClientApplication(client.Files, client.Root).
 		WithRPCHandler(web.New(c.Logger(), actl, sctl)).
 		WithRunner(func() {
 			controller.Start(c.Logger())
