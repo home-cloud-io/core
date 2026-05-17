@@ -1,6 +1,7 @@
 name: Publish Docker API builder image
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
