@@ -2,4 +2,4 @@ name: home-cloud
 repo: github.com/home-cloud-io/core
 trunk_branch: main
 api:
-  image_name: ghcr.io/home-cloud-io/core-api-builder:main
+  image_name: ghcr.io/home-cloud-io/api-builder:latest

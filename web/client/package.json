@@ -1,0 +1,58 @@
+{
+  "name": "@home-cloud/web-client",
+  "version": "0.0.1",
+  "description": "Home Cloud Web Client",
+  "scripts": {
+    "start": "vite",
+    "build": "BUILD_PATH='./dist' vite build",
+    "dev": "vite"
+  },
+  "author": "Home Cloud",
+  "license": "Apache-2.0",
+  "proxy": "http://localhost:8000",
+  "dependencies": {
+    "@ant-design/icons": "^6.2.3",
+    "@bufbuild/protobuf": "^2.2.2",
+    "@connectrpc/connect": "^2.0.0",
+    "@connectrpc/connect-query": "^2.0.0",
+    "@connectrpc/connect-web": "^2.0.0",
+    "@home-cloud/api": "file:../../api",
+    "@tanstack/react-query": "^5.100.10",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@types/node": "^16.18.119",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "antd": "^5.22.1",
+    "marked": "^15.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/home-cloud-io/core.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/home-cloud-io/core/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@vitejs/plugin-react": "^6.0.0",
+    "vite": "^8.0.0",
+    "vite-tsconfig-paths": "^4.3.2"
+  }
+}

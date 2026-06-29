@@ -1,4 +1,6 @@
-FROM golang:1.21-alpine
+ARG GO_VERSION=1.26.3
+
+FROM golang:${GO_VERSION}-alpine
 
 RUN apk add --update --no-cache npm
 

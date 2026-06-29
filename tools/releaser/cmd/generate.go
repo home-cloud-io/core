@@ -14,9 +14,9 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8syaml "sigs.k8s.io/yaml"
 
-	opv1 "github.com/home-cloud-io/core/services/platform/operator/api/v1"
-	"github.com/home-cloud-io/core/services/platform/operator/controller/installs/resources"
-	"github.com/home-cloud-io/core/services/platform/operator/server/system"
+	opv1 "github.com/home-cloud-io/core/api/crds/v1"
+	"github.com/home-cloud-io/core/cmd/operator/server/system"
+	"github.com/home-cloud-io/core/pkg/install/resources"
 )
 
 var (
@@ -69,7 +69,7 @@ func manifestRelease() (*opv1.InstallSpec, error) {
 	}
 	defer f.Close()
 
-	// get version manifest from repo``
+	// get version manifest from repo
 	resp, err := http.Get(system.LatestReleaseManifestURL)
 	if err != nil {
 		return nil, err
@@ -85,24 +85,16 @@ func manifestRelease() (*opv1.InstallSpec, error) {
 
 	output.Print("Version: %s -> ?", latest.Version)
 	latest.Version = GetWithDefault(latest.Version)
+	latest.MDNS.Tag = latest.Version
+	latest.Tunnel.Tag = latest.Version
+	latest.Operator.Tag = latest.Version
+	latest.Daemon.Tag = latest.Version
 
 	output.Print("Gateway API: %s -> ?", latest.GatewayAPI.Version)
 	latest.GatewayAPI.Version = GetWithDefault(latest.GatewayAPI.Version)
 
 	output.Print("Istio: %s -> ?", latest.Istio.Version)
 	latest.Istio.Version = GetWithDefault(latest.Istio.Version)
-
-	output.Print("mDNS: %s -> ?", latest.MDNS.Tag)
-	latest.MDNS.Tag = GetWithDefault(latest.MDNS.Tag)
-
-	output.Print("Tunnel: %s -> ?", latest.Tunnel.Tag)
-	latest.Tunnel.Tag = GetWithDefault(latest.Tunnel.Tag)
-
-	output.Print("Operator: %s -> ?", latest.Operator.Tag)
-	latest.Operator.Tag = GetWithDefault(latest.Operator.Tag)
-
-	output.Print("Daemon: %s -> ?", latest.Daemon.Tag)
-	latest.Daemon.Tag = GetWithDefault(latest.Daemon.Tag)
 
 	output.Print("Talos: %s -> ?", latest.Daemon.System.Version)
 	latest.Daemon.System.Version = GetWithDefault(latest.Daemon.System.Version)
@@ -165,9 +157,7 @@ func crdsRelease() error {
 	}
 	defer f.Close()
 
-	operatorPath := filepath.Join(path, "services", "platform", "operator")
-	crdPath := filepath.Join(operatorPath, "config", "crd", "bases")
-
+	crdPath := filepath.Join(path, "api", "crds", "v1", "manifests")
 	for _, file := range crdFiles {
 		data, err := os.ReadFile(filepath.Join(crdPath, file))
 		if err != nil {

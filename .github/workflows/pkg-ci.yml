@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - api/**
       - pkg/**
 
 concurrency:
@@ -12,21 +13,12 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  changed:
-    name: Prepare
-    uses: ./.github/workflows/changes.yml
-    with:
-      path: pkg
-
   test:
-    name: Test (${{ matrix.module }})
-    needs: [changed]
+    name: Test pkg/
     runs-on: ubuntu-latest
-    if: needs.changed.outputs.any_changed == 'true'
     strategy:
       matrix:
-        go-version: ['1.21.x']
-        module: ${{ fromJSON(needs.changed.outputs.matrix) }}
+        go-version: ['1.26.x']
 
     steps:
       - uses: actions/checkout@v4
@@ -35,8 +27,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-          cache-dependency-path: pkg/${{ matrix.module }}/go.sum
+          cache-dependency-path: go.sum
 
       - name: Test
-        working-directory: pkg/${{ matrix.module }}
+        working-directory: pkg/
         run: go test ./...
