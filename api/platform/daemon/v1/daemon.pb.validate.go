@@ -1968,6 +1968,8 @@ func (m *LoadDiskRequest) validate(all bool) error {
 
 	// no validation rules for Device
 
+	// no validation rules for Name
+
 	if len(errors) > 0 {
 		return LoadDiskRequestMultiError(errors)
 	}

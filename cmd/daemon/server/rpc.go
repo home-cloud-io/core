@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"connectrpc.com/connect"
 	"github.com/cosi-project/runtime/pkg/resource"
@@ -318,16 +319,14 @@ func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.L
 		h.logger.WithError(err).Error("failed to get disk")
 		return nil, err
 	}
-	disk := getResp.(*blockpb.Device)
-
-	// TODO: construct CEL expression: uuid -> wwid -> serial -> symlinks
+	disk := getResp.Spec().(*blockpb.DiskSpec)
 
 	uvc := block.NewUserVolumeConfigV1Alpha1()
 	uvc.VolumeType = ptr.To(blockpb.VolumeTypeDisk)
-	uvc.MetaName = request.Msg.Device
+	uvc.MetaName = request.Msg.Name
 	uvc.ProvisioningSpec = block.ProvisioningSpec{
 		DiskSelectorSpec: block.DiskSelector{
-			Match: cel.MustExpression(cel.ParseBooleanExpression("!system_disk", celenv.DiskLocator())),
+			Match: cel.MustExpression(cel.ParseBooleanExpression(buildDiskSelector(disk), celenv.DiskLocator())),
 		},
 	}
 
@@ -363,6 +362,30 @@ func convertDiskType(d *blockpb.DiskSpec) v1.DiskType {
 	default:
 		return v1.DiskType_DEVICE_TYPE_UNSPECIFIED
 	}
+}
+
+// construct CEL expression: uuid -> wwid -> serial -> symlinks
+func buildDiskSelector(d *blockpb.DiskSpec) string {
+	if d.UUID != "" {
+		return fmt.Sprintf("disk.uuid == '%s'", d.UUID)
+	}
+
+	if d.WWID != "" {
+		return fmt.Sprintf("disk.wwid == '%s'", d.WWID)
+	}
+
+	if d.Serial != "" {
+		return fmt.Sprintf("disk.serial == '%s'", d.Serial)
+	}
+
+	for _, symlink := range d.Symlinks {
+		if strings.HasPrefix(symlink, "/dev/disk/by-id") {
+			return fmt.Sprintf("'%s' in disk.symlinks", symlink)
+		}
+	}
+
+	// no consistent way to select the disk
+	return "false"
 }
 
 func upgradeKubernetes(ctx context.Context, c *client.Client, toVersion string) error {

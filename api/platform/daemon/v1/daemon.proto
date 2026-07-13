@@ -71,8 +71,10 @@ message GetDisksResponse {
 }
 
 message LoadDiskRequest {
-  // e.g. sdb or nvme1n1
+  // the deivce name: sdb, nvme1n1
   string device = 1;
+  // the name to assign to the created volume: apps1, bigdata
+  string name = 2;
 }
 message LoadDiskResponse {
   string id = 1;

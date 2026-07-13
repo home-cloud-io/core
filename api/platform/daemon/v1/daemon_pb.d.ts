@@ -295,11 +295,18 @@ export declare const GetDisksResponseSchema: GenMessage<GetDisksResponse>;
  */
 export declare type LoadDiskRequest = Message<"platform.daemon.v1.LoadDiskRequest"> & {
   /**
-   * e.g. sdb or nvme1n1
+   * the deivce name: sdb, nvme1n1
    *
    * @generated from field: string device = 1;
    */
   device: string;
+
+  /**
+   * the name to assign to the created volume: apps1, bigdata
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
 };
 
 /**
