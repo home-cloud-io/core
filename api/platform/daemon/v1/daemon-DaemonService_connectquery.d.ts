@@ -36,3 +36,11 @@ export const createVolume: typeof DaemonService["method"]["createVolume"];
  * @generated from rpc platform.daemon.v1.DaemonService.DeleteVolume
  */
 export const deleteVolume: typeof DaemonService["method"]["deleteVolume"];
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.GetDisks
+ */
+export const getDisks: typeof DaemonService["method"]["getDisks"];
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.LoadDisk
+ */
+export const loadDisk: typeof DaemonService["method"]["loadDisk"];

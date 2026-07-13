@@ -2,7 +2,7 @@
 // @generated from file platform/daemon/v1/system.proto (package platform.daemon.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 
@@ -196,4 +196,90 @@ export declare type Log = Message<"platform.daemon.v1.Log"> & {
  * Use `create(LogSchema)` to create a new message.
  */
 export declare const LogSchema: GenMessage<Log>;
+
+/**
+ * @generated from message platform.daemon.v1.Disk
+ */
+export declare type Disk = Message<"platform.daemon.v1.Disk"> & {
+  /**
+   * @generated from field: string device_name = 1;
+   */
+  deviceName: string;
+
+  /**
+   * @generated from field: string model = 2;
+   */
+  model: string;
+
+  /**
+   * @generated from field: string serial = 3;
+   */
+  serial: string;
+
+  /**
+   * @generated from field: string wwid = 4;
+   */
+  wwid: string;
+
+  /**
+   * @generated from field: string uuid = 5;
+   */
+  uuid: string;
+
+  /**
+   * @generated from field: platform.daemon.v1.DiskType type = 6;
+   */
+  type: DiskType;
+
+  /**
+   * @generated from field: bool system_disk = 7;
+   */
+  systemDisk: boolean;
+
+  /**
+   * @generated from field: uint64 size = 8;
+   */
+  size: bigint;
+
+  /**
+   * @generated from field: repeated string symlinks = 9;
+   */
+  symlinks: string[];
+};
+
+/**
+ * Describes the message platform.daemon.v1.Disk.
+ * Use `create(DiskSchema)` to create a new message.
+ */
+export declare const DiskSchema: GenMessage<Disk>;
+
+/**
+ * @generated from enum platform.daemon.v1.DiskType
+ */
+export enum DiskType {
+  /**
+   * @generated from enum value: DEVICE_TYPE_UNSPECIFIED = 0;
+   */
+  DEVICE_TYPE_UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: DEVICE_TYPE_SSD = 1;
+   */
+  DEVICE_TYPE_SSD = 1,
+
+  /**
+   * @generated from enum value: DEVICE_TYPE_HDD = 2;
+   */
+  DEVICE_TYPE_HDD = 2,
+
+  /**
+   * @generated from enum value: DEVICE_TYPE_NVME = 3;
+   */
+  DEVICE_TYPE_NVME = 3,
+}
+
+/**
+ * Describes the enum platform.daemon.v1.DiskType.
+ */
+export declare const DiskTypeSchema: GenEnum<DiskType>;
 

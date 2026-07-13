@@ -43,3 +43,13 @@ export const createVolume = DaemonService.method.createVolume;
  * @generated from rpc platform.daemon.v1.DaemonService.DeleteVolume
  */
 export const deleteVolume = DaemonService.method.deleteVolume;
+
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.GetDisks
+ */
+export const getDisks = DaemonService.method.getDisks;
+
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.LoadDisk
+ */
+export const loadDisk = DaemonService.method.loadDisk;

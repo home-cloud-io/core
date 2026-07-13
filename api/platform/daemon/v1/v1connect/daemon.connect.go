@@ -55,6 +55,10 @@ const (
 	// DaemonServiceDeleteVolumeProcedure is the fully-qualified name of the DaemonService's
 	// DeleteVolume RPC.
 	DaemonServiceDeleteVolumeProcedure = "/platform.daemon.v1.DaemonService/DeleteVolume"
+	// DaemonServiceGetDisksProcedure is the fully-qualified name of the DaemonService's GetDisks RPC.
+	DaemonServiceGetDisksProcedure = "/platform.daemon.v1.DaemonService/GetDisks"
+	// DaemonServiceLoadDiskProcedure is the fully-qualified name of the DaemonService's LoadDisk RPC.
+	DaemonServiceLoadDiskProcedure = "/platform.daemon.v1.DaemonService/LoadDisk"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -68,6 +72,8 @@ var (
 	daemonServiceUpgradeKubernetesMethodDescriptor = daemonServiceServiceDescriptor.Methods().ByName("UpgradeKubernetes")
 	daemonServiceCreateVolumeMethodDescriptor      = daemonServiceServiceDescriptor.Methods().ByName("CreateVolume")
 	daemonServiceDeleteVolumeMethodDescriptor      = daemonServiceServiceDescriptor.Methods().ByName("DeleteVolume")
+	daemonServiceGetDisksMethodDescriptor          = daemonServiceServiceDescriptor.Methods().ByName("GetDisks")
+	daemonServiceLoadDiskMethodDescriptor          = daemonServiceServiceDescriptor.Methods().ByName("LoadDisk")
 )
 
 // DaemonServiceClient is a client for the platform.daemon.v1.DaemonService service.
@@ -80,6 +86,8 @@ type DaemonServiceClient interface {
 	UpgradeKubernetes(context.Context, *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error)
 	CreateVolume(context.Context, *connect.Request[v1.CreateVolumeRequest]) (*connect.Response[v1.CreateVolumeResponse], error)
 	DeleteVolume(context.Context, *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error)
+	GetDisks(context.Context, *connect.Request[v1.GetDisksRequest]) (*connect.Response[v1.GetDisksResponse], error)
+	LoadDisk(context.Context, *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error)
 }
 
 // NewDaemonServiceClient constructs a client for the platform.daemon.v1.DaemonService service. By
@@ -140,6 +148,18 @@ func NewDaemonServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(daemonServiceDeleteVolumeMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getDisks: connect.NewClient[v1.GetDisksRequest, v1.GetDisksResponse](
+			httpClient,
+			baseURL+DaemonServiceGetDisksProcedure,
+			connect.WithSchema(daemonServiceGetDisksMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		loadDisk: connect.NewClient[v1.LoadDiskRequest, v1.LoadDiskResponse](
+			httpClient,
+			baseURL+DaemonServiceLoadDiskProcedure,
+			connect.WithSchema(daemonServiceLoadDiskMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -153,6 +173,8 @@ type daemonServiceClient struct {
 	upgradeKubernetes *connect.Client[v1.UpgradeKubernetesRequest, v1.UpgradeKubernetesResponse]
 	createVolume      *connect.Client[v1.CreateVolumeRequest, v1.CreateVolumeResponse]
 	deleteVolume      *connect.Client[v1.DeleteVolumeRequest, v1.DeleteVolumeResponse]
+	getDisks          *connect.Client[v1.GetDisksRequest, v1.GetDisksResponse]
+	loadDisk          *connect.Client[v1.LoadDiskRequest, v1.LoadDiskResponse]
 }
 
 // ShutdownHost calls platform.daemon.v1.DaemonService.ShutdownHost.
@@ -195,6 +217,16 @@ func (c *daemonServiceClient) DeleteVolume(ctx context.Context, req *connect.Req
 	return c.deleteVolume.CallUnary(ctx, req)
 }
 
+// GetDisks calls platform.daemon.v1.DaemonService.GetDisks.
+func (c *daemonServiceClient) GetDisks(ctx context.Context, req *connect.Request[v1.GetDisksRequest]) (*connect.Response[v1.GetDisksResponse], error) {
+	return c.getDisks.CallUnary(ctx, req)
+}
+
+// LoadDisk calls platform.daemon.v1.DaemonService.LoadDisk.
+func (c *daemonServiceClient) LoadDisk(ctx context.Context, req *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error) {
+	return c.loadDisk.CallUnary(ctx, req)
+}
+
 // DaemonServiceHandler is an implementation of the platform.daemon.v1.DaemonService service.
 type DaemonServiceHandler interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
@@ -205,6 +237,8 @@ type DaemonServiceHandler interface {
 	UpgradeKubernetes(context.Context, *connect.Request[v1.UpgradeKubernetesRequest]) (*connect.Response[v1.UpgradeKubernetesResponse], error)
 	CreateVolume(context.Context, *connect.Request[v1.CreateVolumeRequest]) (*connect.Response[v1.CreateVolumeResponse], error)
 	DeleteVolume(context.Context, *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error)
+	GetDisks(context.Context, *connect.Request[v1.GetDisksRequest]) (*connect.Response[v1.GetDisksResponse], error)
+	LoadDisk(context.Context, *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error)
 }
 
 // NewDaemonServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -261,6 +295,18 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(daemonServiceDeleteVolumeMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	daemonServiceGetDisksHandler := connect.NewUnaryHandler(
+		DaemonServiceGetDisksProcedure,
+		svc.GetDisks,
+		connect.WithSchema(daemonServiceGetDisksMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	daemonServiceLoadDiskHandler := connect.NewUnaryHandler(
+		DaemonServiceLoadDiskProcedure,
+		svc.LoadDisk,
+		connect.WithSchema(daemonServiceLoadDiskMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.daemon.v1.DaemonService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DaemonServiceShutdownHostProcedure:
@@ -279,6 +325,10 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 			daemonServiceCreateVolumeHandler.ServeHTTP(w, r)
 		case DaemonServiceDeleteVolumeProcedure:
 			daemonServiceDeleteVolumeHandler.ServeHTTP(w, r)
+		case DaemonServiceGetDisksProcedure:
+			daemonServiceGetDisksHandler.ServeHTTP(w, r)
+		case DaemonServiceLoadDiskProcedure:
+			daemonServiceLoadDiskHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -318,4 +368,12 @@ func (UnimplementedDaemonServiceHandler) CreateVolume(context.Context, *connect.
 
 func (UnimplementedDaemonServiceHandler) DeleteVolume(context.Context, *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.DeleteVolume is not implemented"))
+}
+
+func (UnimplementedDaemonServiceHandler) GetDisks(context.Context, *connect.Request[v1.GetDisksRequest]) (*connect.Response[v1.GetDisksResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.GetDisks is not implemented"))
+}
+
+func (UnimplementedDaemonServiceHandler) LoadDisk(context.Context, *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.LoadDisk is not implemented"))
 }

@@ -7,7 +7,6 @@ require (
 	dario.cat/mergo v1.0.2
 	github.com/coreos/go-iptables v0.8.0
 	github.com/cosi-project/runtime v1.16.0
-	github.com/dustin/go-humanize v1.0.1
 	github.com/go-logr/logr v1.4.3
 	github.com/google/uuid v1.6.0
 	github.com/netbirdio/netbird v0.59.7
@@ -98,6 +97,7 @@ require (
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/distribution/reference v0.6.0 // indirect
+	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emicklei/dot v1.11.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
 	github.com/evanphx/json-patch v5.9.11+incompatible // indirect
