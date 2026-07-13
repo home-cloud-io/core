@@ -45,15 +45,17 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 		return err
 	}
 
+	// default if no daemon
 	hostPath := fmt.Sprintf("%s/%s", DefaultHostPath, objName)
 
-	// if daemon is enabled, get the path before creating PV/PVC and use the returned path
+	// if daemon is enabled, get the path before creating PV/PVC
 	if !install.Spec.Daemon.Disable {
 		// TODO: get the path/disk/UserVolume to use
 		// - should use some logic to optimize placement for multi-disk installs?
 		// - or just have the user select the disk during install?
 		// - I think with this new method we could technically move apps pretty easily between disks
-		hostPath = fmt.Sprintf("%s/%s/%s", "/var/mnt/apps1", namespace, objName)
+		volumeName := "apps1"
+		hostPath = fmt.Sprintf("%s/%s/%s/%s", "/var/mnt", volumeName, namespace, objName)
 	}
 
 	quantity, err := resource.ParseQuantity(p.Size)

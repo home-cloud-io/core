@@ -128,6 +128,7 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	}
 
 	// TODO: get disk total amounts, then subtract UserVolume usage?
+	// TODO: actually it seems `discoveredvolumes` CRs may have the info we need here - read from COSI client
 	mountsResp, err := client.MachineClient.Mounts(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
@@ -208,6 +209,7 @@ func (h *rpcHandler) UpgradeKubernetes(ctx context.Context, request *connect.Req
 	return connect.NewResponse(&v1.UpgradeKubernetesResponse{}), nil
 }
 
+// TODO: may just want to junk this whole concept
 func (h *rpcHandler) CreateVolume(ctx context.Context, request *connect.Request[v1.CreateVolumeRequest]) (*connect.Response[v1.CreateVolumeResponse], error) {
 	h.logger.Info("creating volume")
 
@@ -268,6 +270,7 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
 	}
 
+	// get the system disk
 	getResp, err := client.COSI.Get(ctx, resource.NewMetadata("runtime", blockpb.SystemDiskType, blockpb.SystemDiskID, resource.VersionUndefined))
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get system disk")
@@ -275,6 +278,7 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 	}
 	systemDisk := getResp.Spec().(*blockpb.SystemDiskSpec)
 
+	// list all disks (included system disk)
 	listResp, err := client.COSI.List(ctx, resource.NewMetadata("runtime", blockpb.DiskType, "", resource.VersionUndefined))
 	if err != nil {
 		h.logger.WithError(err).Error("failed to list disks")
@@ -283,7 +287,8 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 	disks := []*v1.Disk{}
 	for _, item := range listResp.Items {
 		disk := item.Spec().(*blockpb.DiskSpec)
-		diskType := convertDiskType(disk)
+		diskType := mapDiskType(disk)
+		// skip disks of unspecified types
 		if diskType == v1.DiskType_DEVICE_TYPE_UNSPECIFIED {
 			continue
 		}
@@ -294,6 +299,7 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 			Wwid:       disk.WWID,
 			Uuid:       disk.UUID,
 			Type:       diskType,
+			// flag system disk by matching IDs
 			SystemDisk: systemDisk != nil && item.Metadata().ID() == systemDisk.DiskID,
 			Size:       disk.Size,
 			Symlinks:   disk.Symlinks,
@@ -305,7 +311,8 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 	}), nil
 }
 
-// TODO: basically the same as CreateVolume but uses the VolumeTypeDisk which loads the entire disk as a UserVolume
+// LoadDisk creates a "disk" type UserVolume which takes over the entire disk so that it can PersistentVolumes
+// can be created against it.
 func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error) {
 
 	client, err := talos.Client(ctx)
@@ -314,6 +321,7 @@ func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.L
 		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
 	}
 
+	// get the requested disk
 	getResp, err := client.COSI.Get(ctx, resource.NewMetadata("runtime", blockpb.DiskType, request.Msg.Device, resource.VersionUndefined))
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get disk")
@@ -321,6 +329,7 @@ func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.L
 	}
 	disk := getResp.Spec().(*blockpb.DiskSpec)
 
+	// create the UserVolume
 	uvc := block.NewUserVolumeConfigV1Alpha1()
 	uvc.VolumeType = ptr.To(blockpb.VolumeTypeDisk)
 	uvc.MetaName = request.Msg.Name
@@ -330,12 +339,14 @@ func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.L
 		},
 	}
 
+	// validate before applying config
 	_, err = uvc.Validate(talos.ValidationMode{})
 	if err != nil {
 		h.logger.WithError(err).Warn("failed UserVolumeConfig validation")
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	// apply config
 	id, err := talos.CreateUserVolume(ctx, h.logger, uvc)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to create volume")
@@ -349,7 +360,10 @@ func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.L
 
 // helpers
 
-func convertDiskType(d *blockpb.DiskSpec) v1.DiskType {
+// we only care about system and data disks: NVME, SSD, and HDD
+// everything else will get DEVICE_TYPE_UNSPECIFIED so that they're filtered out of
+// the GetDisks list
+func mapDiskType(d *blockpb.DiskSpec) v1.DiskType {
 	switch {
 	case d.CDROM:
 		return v1.DiskType_DEVICE_TYPE_UNSPECIFIED
