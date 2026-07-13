@@ -3,18 +3,24 @@ package server
 import (
 	"context"
 	"fmt"
+	"math/big"
+	"strings"
 
 	"connectrpc.com/connect"
+	"github.com/cosi-project/runtime/pkg/resource"
+	"github.com/dustin/go-humanize"
 	"github.com/siderolabs/go-kubernetes/kubernetes/upgrade"
 	"github.com/siderolabs/talos/pkg/cluster"
 	k8s "github.com/siderolabs/talos/pkg/cluster/kubernetes"
 	"github.com/siderolabs/talos/pkg/machinery/api/machine"
+	"github.com/siderolabs/talos/pkg/machinery/api/storage"
 	"github.com/siderolabs/talos/pkg/machinery/cel"
 	"github.com/siderolabs/talos/pkg/machinery/cel/celenv"
 	"github.com/siderolabs/talos/pkg/machinery/client"
 	"github.com/siderolabs/talos/pkg/machinery/config/encoder"
 	"github.com/siderolabs/talos/pkg/machinery/config/types/block"
 	"github.com/siderolabs/talos/pkg/machinery/constants"
+	blockpb "github.com/siderolabs/talos/pkg/machinery/resources/block"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -124,12 +130,12 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	}
 
 	// TODO: get disk total amounts, then subtract UserVolume usage?
-	drivesResp, err := client.MachineClient.Mounts(ctx, &emptypb.Empty{})
+	mountsResp, err := client.MachineClient.Mounts(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
 	}
 	stats.Drives = []*v1.DriveStats{}
-	for _, mount := range drivesResp.Messages[0].Stats {
+	for _, mount := range mountsResp.Messages[0].Stats {
 		if mount.MountedOn == "/" {
 			stats.Drives = []*v1.DriveStats{
 				{
@@ -255,7 +261,114 @@ func (h *rpcHandler) DeleteVolume(ctx context.Context, request *connect.Request[
 	return nil, status.Error(codes.Unimplemented, "unimplemented")
 }
 
+func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.GetDisksRequest]) (*connect.Response[v1.GetDisksResponse], error) {
+	h.logger.Debug("getting disks")
+
+	client, err := talos.Client(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(talos.ErrFailedToCreateClient)
+		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
+	}
+
+	list, err := client.COSI.List(ctx, resource.NewMetadata("runtime", blockpb.DiskType, "", resource.VersionUndefined))
+	if err != nil {
+		h.logger.WithError(err).Error("failed to list disks")
+	}
+	for _, item := range list.Items {
+		disk := item.Spec().(*blockpb.DiskSpec)
+		fmt.Println(disk.Symlinks)
+	}
+
+
+	disksStatsResp, err := client.MachineClient.DiskStats(ctx, &emptypb.Empty{})
+	if err != nil {
+		h.logger.WithError(err).Error("failed to get disk stats")
+		return nil, err
+	}
+
+	for _, msg := range disksStatsResp.Messages {
+		for _, device := range msg.Devices {
+			if strings.HasPrefix(device.Name, "sd") && len(device.Name) == 3 {
+				fmt.Printf("Disk: %s\n", device.Name)
+				continue
+			}
+			if strings.HasPrefix(device.Name, "nvme") && len(device.Name) == 7 {
+				fmt.Printf("Disk: %s\n", device.Name)
+				continue
+			}
+		}
+	}
+
+	disksResp, err := client.StorageClient.Disks(ctx, &emptypb.Empty{})
+	if err != nil {
+		h.logger.WithError(err).Error("failed to get disks")
+		return nil, err
+	}
+
+	disks := []*v1.Disk{}
+	for _, msg := range disksResp.Messages {
+		for _, disk := range msg.Disks {
+			// we only consider NVME, SSD, and HDD usable drives
+			if disk.Type == storage.Disk_NVME ||
+				disk.Type == storage.Disk_SSD ||
+				disk.Type == storage.Disk_HDD {
+				fmt.Printf("%s - %s - %s\n", disk.DeviceName, humanize.BigBytes(big.NewInt(int64(disk.Size))), disk.BusPath)
+				disks = append(disks, &v1.Disk{
+					DeviceName: disk.DeviceName,
+					Model:      disk.Model,
+					Serial:     disk.Serial,
+					Wwid:       disk.Wwid,
+					Uuid:       disk.Uuid,
+					Type:       convertDiskType(disk.Type),
+					SystemDisk: disk.SystemDisk,
+					Size:       disk.Size,
+				})
+			}
+		}
+	}
+
+	// stream, err := client.MachineClient.DiskUsage(ctx, &machine.DiskUsageRequest{
+	// 	Paths: []string{"/", "/mnt/apps1"},
+	// })
+	// if err != nil {
+	// 	h.logger.WithError(err).Error("failed to get disk usage")
+	// 	return nil, err
+	// }
+
+	// err = helpers.ReadGRPCStream(stream, func(info *machine.DiskUsageInfo, node string, multipleNodes bool) error {
+	// 	fmt.Printf("%s - %s: %d\n", node, info.Name, info.GetSize())
+	// 	return nil
+	// })
+	// if err != nil {
+	// 	h.logger.WithError(err).Error("failed to stream disk usage info")
+	// 	return nil, err
+	// }
+
+	return connect.NewResponse(&v1.GetDisksResponse{
+		Disks: disks,
+	}), nil
+}
+
+// TODO: basically the same as CreateVolume but uses the VolumeTypeDisk which loads the entire disk as a UserVolume
+func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error) {
+	h.logger.Error("unimplemented")
+	return nil, status.Error(codes.Unimplemented, "unimplemented")
+}
+
 // helpers
+
+func convertDiskType(t storage.Disk_DiskType) v1.DiskType {
+	switch t {
+	case storage.Disk_SSD:
+		return v1.DiskType_DEVICE_TYPE_SSD
+	case storage.Disk_HDD:
+		return v1.DiskType_DEVICE_TYPE_HDD
+	case storage.Disk_NVME:
+		return v1.DiskType_DEVICE_TYPE_NVME
+	default:
+		return v1.DiskType_DEVICE_TYPE_UNSPECIFIED
+	}
+}
 
 func upgradeKubernetes(ctx context.Context, c *client.Client, toVersion string) error {
 

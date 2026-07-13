@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"connectrpc.com/connect"
 	"dario.cat/mergo"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -13,8 +12,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	"github.com/home-cloud-io/core/cmd/operator/controller/daemon"
 	"github.com/home-cloud-io/core/pkg/install/resources"
 )
 
@@ -50,19 +47,13 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 
 	hostPath := fmt.Sprintf("%s/%s", DefaultHostPath, objName)
 
-	// if daemon is enabled, create volume before creating PV/PVC and use the returned path
+	// if daemon is enabled, get the path before creating PV/PVC and use the returned path
 	if !install.Spec.Daemon.Disable {
-		resp, err := daemon.DaemonClient(install.Spec.Daemon.Address).CreateVolume(ctx, connect.NewRequest(&dv1.CreateVolumeRequest{
-			Name:    objName,
-			MinSize: p.Size,
-			// TODO: update App spec to have min/max
-			MaxSize: p.Size,
-		}))
-		if err != nil {
-			return err
-		}
-
-		hostPath = resp.Msg.Path
+		// TODO: get the path/disk/UserVolume to use
+		// - should use some logic to optimize placement for multi-disk installs?
+		// - or just have the user select the disk during install?
+		// - I think with this new method we could technically move apps pretty easily between disks
+		hostPath = fmt.Sprintf("%s/%s/%s", "/var/mnt/apps1", namespace, objName)
 	}
 
 	quantity, err := resource.ParseQuantity(p.Size)
