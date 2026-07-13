@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"k8s.io/utils/ptr"
 
 	v1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
@@ -305,8 +306,46 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 
 // TODO: basically the same as CreateVolume but uses the VolumeTypeDisk which loads the entire disk as a UserVolume
 func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error) {
-	h.logger.Error("unimplemented")
-	return nil, status.Error(codes.Unimplemented, "unimplemented")
+
+	client, err := talos.Client(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(talos.ErrFailedToCreateClient)
+		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
+	}
+
+	getResp, err := client.COSI.Get(ctx, resource.NewMetadata("runtime", blockpb.DiskType, request.Msg.Device, resource.VersionUndefined))
+	if err != nil {
+		h.logger.WithError(err).Error("failed to get disk")
+		return nil, err
+	}
+	disk := getResp.(*blockpb.Device)
+
+	// TODO: construct CEL expression: uuid -> wwid -> serial -> symlinks
+
+	uvc := block.NewUserVolumeConfigV1Alpha1()
+	uvc.VolumeType = ptr.To(blockpb.VolumeTypeDisk)
+	uvc.MetaName = request.Msg.Device
+	uvc.ProvisioningSpec = block.ProvisioningSpec{
+		DiskSelectorSpec: block.DiskSelector{
+			Match: cel.MustExpression(cel.ParseBooleanExpression("!system_disk", celenv.DiskLocator())),
+		},
+	}
+
+	_, err = uvc.Validate(talos.ValidationMode{})
+	if err != nil {
+		h.logger.WithError(err).Warn("failed UserVolumeConfig validation")
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	id, err := talos.CreateUserVolume(ctx, h.logger, uvc)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to create volume")
+		return nil, err
+	}
+
+	return connect.NewResponse(&v1.LoadDiskResponse{
+		Id: id,
+	}), nil
 }
 
 // helpers

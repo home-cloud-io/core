@@ -294,6 +294,12 @@ export declare const GetDisksResponseSchema: GenMessage<GetDisksResponse>;
  * @generated from message platform.daemon.v1.LoadDiskRequest
  */
 export declare type LoadDiskRequest = Message<"platform.daemon.v1.LoadDiskRequest"> & {
+  /**
+   * e.g. sdb or nvme1n1
+   *
+   * @generated from field: string device = 1;
+   */
+  device: string;
 };
 
 /**
@@ -306,6 +312,10 @@ export declare const LoadDiskRequestSchema: GenMessage<LoadDiskRequest>;
  * @generated from message platform.daemon.v1.LoadDiskResponse
  */
 export declare type LoadDiskResponse = Message<"platform.daemon.v1.LoadDiskResponse"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
 };
 
 /**

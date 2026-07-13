@@ -1966,6 +1966,8 @@ func (m *LoadDiskRequest) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for Device
+
 	if len(errors) > 0 {
 		return LoadDiskRequestMultiError(errors)
 	}
@@ -2065,6 +2067,8 @@ func (m *LoadDiskResponse) validate(all bool) error {
 	}
 
 	var errors []error
+
+	// no validation rules for Id
 
 	if len(errors) > 0 {
 		return LoadDiskResponseMultiError(errors)

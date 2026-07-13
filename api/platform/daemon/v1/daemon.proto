@@ -70,5 +70,10 @@ message GetDisksResponse {
   repeated platform.daemon.v1.Disk disks = 1;
 }
 
-message LoadDiskRequest {}
-message LoadDiskResponse {}
+message LoadDiskRequest {
+  // e.g. sdb or nvme1n1
+  string device = 1;
+}
+message LoadDiskResponse {
+  string id = 1;
+}
