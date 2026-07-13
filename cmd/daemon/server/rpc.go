@@ -3,17 +3,13 @@ package server
 import (
 	"context"
 	"fmt"
-	"math/big"
-	"strings"
 
 	"connectrpc.com/connect"
 	"github.com/cosi-project/runtime/pkg/resource"
-	"github.com/dustin/go-humanize"
 	"github.com/siderolabs/go-kubernetes/kubernetes/upgrade"
 	"github.com/siderolabs/talos/pkg/cluster"
 	k8s "github.com/siderolabs/talos/pkg/cluster/kubernetes"
 	"github.com/siderolabs/talos/pkg/machinery/api/machine"
-	"github.com/siderolabs/talos/pkg/machinery/api/storage"
 	"github.com/siderolabs/talos/pkg/machinery/cel"
 	"github.com/siderolabs/talos/pkg/machinery/cel/celenv"
 	"github.com/siderolabs/talos/pkg/machinery/client"
@@ -270,79 +266,37 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
 	}
 
-	list, err := client.COSI.List(ctx, resource.NewMetadata("runtime", blockpb.DiskType, "", resource.VersionUndefined))
+	getResp, err := client.COSI.Get(ctx, resource.NewMetadata("runtime", blockpb.SystemDiskType, blockpb.SystemDiskID, resource.VersionUndefined))
+	if err != nil {
+		h.logger.WithError(err).Error("failed to get system disk")
+		return nil, err
+	}
+	systemDisk := getResp.Spec().(*blockpb.SystemDiskSpec)
+
+	listResp, err := client.COSI.List(ctx, resource.NewMetadata("runtime", blockpb.DiskType, "", resource.VersionUndefined))
 	if err != nil {
 		h.logger.WithError(err).Error("failed to list disks")
-	}
-	for _, item := range list.Items {
-		disk := item.Spec().(*blockpb.DiskSpec)
-		fmt.Println(disk.Symlinks)
-	}
-
-
-	disksStatsResp, err := client.MachineClient.DiskStats(ctx, &emptypb.Empty{})
-	if err != nil {
-		h.logger.WithError(err).Error("failed to get disk stats")
 		return nil, err
 	}
-
-	for _, msg := range disksStatsResp.Messages {
-		for _, device := range msg.Devices {
-			if strings.HasPrefix(device.Name, "sd") && len(device.Name) == 3 {
-				fmt.Printf("Disk: %s\n", device.Name)
-				continue
-			}
-			if strings.HasPrefix(device.Name, "nvme") && len(device.Name) == 7 {
-				fmt.Printf("Disk: %s\n", device.Name)
-				continue
-			}
-		}
-	}
-
-	disksResp, err := client.StorageClient.Disks(ctx, &emptypb.Empty{})
-	if err != nil {
-		h.logger.WithError(err).Error("failed to get disks")
-		return nil, err
-	}
-
 	disks := []*v1.Disk{}
-	for _, msg := range disksResp.Messages {
-		for _, disk := range msg.Disks {
-			// we only consider NVME, SSD, and HDD usable drives
-			if disk.Type == storage.Disk_NVME ||
-				disk.Type == storage.Disk_SSD ||
-				disk.Type == storage.Disk_HDD {
-				fmt.Printf("%s - %s - %s\n", disk.DeviceName, humanize.BigBytes(big.NewInt(int64(disk.Size))), disk.BusPath)
-				disks = append(disks, &v1.Disk{
-					DeviceName: disk.DeviceName,
-					Model:      disk.Model,
-					Serial:     disk.Serial,
-					Wwid:       disk.Wwid,
-					Uuid:       disk.Uuid,
-					Type:       convertDiskType(disk.Type),
-					SystemDisk: disk.SystemDisk,
-					Size:       disk.Size,
-				})
-			}
+	for _, item := range listResp.Items {
+		disk := item.Spec().(*blockpb.DiskSpec)
+		diskType := convertDiskType(disk)
+		if diskType == v1.DiskType_DEVICE_TYPE_UNSPECIFIED {
+			continue
 		}
+		disks = append(disks, &v1.Disk{
+			DeviceName: disk.DevPath,
+			Model:      disk.Model,
+			Serial:     disk.Serial,
+			Wwid:       disk.WWID,
+			Uuid:       disk.UUID,
+			Type:       diskType,
+			SystemDisk: systemDisk != nil && item.Metadata().ID() == systemDisk.DiskID,
+			Size:       disk.Size,
+			Symlinks:   disk.Symlinks,
+		})
 	}
-
-	// stream, err := client.MachineClient.DiskUsage(ctx, &machine.DiskUsageRequest{
-	// 	Paths: []string{"/", "/mnt/apps1"},
-	// })
-	// if err != nil {
-	// 	h.logger.WithError(err).Error("failed to get disk usage")
-	// 	return nil, err
-	// }
-
-	// err = helpers.ReadGRPCStream(stream, func(info *machine.DiskUsageInfo, node string, multipleNodes bool) error {
-	// 	fmt.Printf("%s - %s: %d\n", node, info.Name, info.GetSize())
-	// 	return nil
-	// })
-	// if err != nil {
-	// 	h.logger.WithError(err).Error("failed to stream disk usage info")
-	// 	return nil, err
-	// }
 
 	return connect.NewResponse(&v1.GetDisksResponse{
 		Disks: disks,
@@ -357,14 +311,16 @@ func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.L
 
 // helpers
 
-func convertDiskType(t storage.Disk_DiskType) v1.DiskType {
-	switch t {
-	case storage.Disk_SSD:
-		return v1.DiskType_DEVICE_TYPE_SSD
-	case storage.Disk_HDD:
-		return v1.DiskType_DEVICE_TYPE_HDD
-	case storage.Disk_NVME:
+func convertDiskType(d *blockpb.DiskSpec) v1.DiskType {
+	switch {
+	case d.CDROM:
+		return v1.DiskType_DEVICE_TYPE_UNSPECIFIED
+	case d.Transport == "nvme":
 		return v1.DiskType_DEVICE_TYPE_NVME
+	case d.Rotational:
+		return v1.DiskType_DEVICE_TYPE_HDD
+	case d.Transport != "":
+		return v1.DiskType_DEVICE_TYPE_SSD
 	default:
 		return v1.DiskType_DEVICE_TYPE_UNSPECIFIED
 	}

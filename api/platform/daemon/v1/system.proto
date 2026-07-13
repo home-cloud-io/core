@@ -57,6 +57,7 @@ message Disk {
   DiskType type = 6;
   bool system_disk = 7;
   uint64 size = 8;
+  repeated string symlinks = 9;
 }
 
 enum DiskType {
