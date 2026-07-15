@@ -49,15 +49,17 @@ message Log {
 }
 
 message Disk {
-  string device_name = 1;
-  string model = 2;
-  string serial = 3;
-  string wwid = 4;
-  string uuid = 5;
-  DiskType type = 6;
-  bool system_disk = 7;
-  uint64 size = 8;
-  repeated string symlinks = 9;
+  // for Talos this is the UserVolume name (minus the "u-" prefix)
+  string name = 1;
+  string device_path = 2;
+  string model = 3;
+  string serial = 4;
+  string wwid = 5;
+  string uuid = 6;
+  DiskType type = 7;
+  bool system_disk = 8;
+  uint64 size = 9;
+  repeated string symlinks = 10;
 }
 
 enum DiskType {

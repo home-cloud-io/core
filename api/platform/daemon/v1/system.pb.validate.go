@@ -865,7 +865,9 @@ func (m *Disk) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for DeviceName
+	// no validation rules for Name
+
+	// no validation rules for DevicePath
 
 	// no validation rules for Model
 

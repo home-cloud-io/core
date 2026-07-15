@@ -202,47 +202,54 @@ export declare const LogSchema: GenMessage<Log>;
  */
 export declare type Disk = Message<"platform.daemon.v1.Disk"> & {
   /**
-   * @generated from field: string device_name = 1;
+   * for Talos this is the UserVolume name (minus the "u-" prefix)
+   *
+   * @generated from field: string name = 1;
    */
-  deviceName: string;
+  name: string;
 
   /**
-   * @generated from field: string model = 2;
+   * @generated from field: string device_path = 2;
+   */
+  devicePath: string;
+
+  /**
+   * @generated from field: string model = 3;
    */
   model: string;
 
   /**
-   * @generated from field: string serial = 3;
+   * @generated from field: string serial = 4;
    */
   serial: string;
 
   /**
-   * @generated from field: string wwid = 4;
+   * @generated from field: string wwid = 5;
    */
   wwid: string;
 
   /**
-   * @generated from field: string uuid = 5;
+   * @generated from field: string uuid = 6;
    */
   uuid: string;
 
   /**
-   * @generated from field: platform.daemon.v1.DiskType type = 6;
+   * @generated from field: platform.daemon.v1.DiskType type = 7;
    */
   type: DiskType;
 
   /**
-   * @generated from field: bool system_disk = 7;
+   * @generated from field: bool system_disk = 8;
    */
   systemDisk: boolean;
 
   /**
-   * @generated from field: uint64 size = 8;
+   * @generated from field: uint64 size = 9;
    */
   size: bigint;
 
   /**
-   * @generated from field: repeated string symlinks = 9;
+   * @generated from field: repeated string symlinks = 10;
    */
   symlinks: string[];
 };
