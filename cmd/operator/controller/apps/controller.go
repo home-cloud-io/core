@@ -3,6 +3,7 @@ package apps
 import (
 	"context"
 	"fmt"
+	"slices"
 	"time"
 
 	"dario.cat/mergo"
@@ -16,10 +17,13 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
@@ -95,10 +99,38 @@ func (r *AppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 	return ctrl.Result{}, nil
 }
 
+func (r *AppReconciler) ReconcileDisk() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) (requests []reconcile.Request) {
+		l := log.FromContext(ctx)
+		l.Info("Reconciling Disk for Apps")
+
+		requests = []reconcile.Request{}
+
+		install, err := shared.GetInstall(ctx, r.Client)
+		if err != nil {
+			l.Error(err, "failed to get install")
+			return
+		}
+
+		for _, appName := range install.Spec.Settings.StorageApps {
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      appName,
+					Namespace: install.Namespace, // Use the namespace of the changed Busybox
+				},
+			})
+		}
+
+		return
+	})
+}
+
 // SetupWithManager sets up the controller with the Manager.
 func (r *AppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1.App{}).
+		// watch disks so we can trigger a reconcile on storage apps
+		Watches(&v1.Disk{}, r.ReconcileDisk()).
 		Complete(r)
 }
 
@@ -130,13 +162,16 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 		return err
 	}
 
+	// override from any changes in createDependencies
+	values["homeCloud"] = *appConfig
+
 	// finally, install helm chart
 	_, err = act.Run(chart, values)
 	if err != nil {
 		return err
 	}
 
-	// create routes
+	// create routes (after helm so that Services already exist for DNS annotation)
 	for _, route := range appConfig.Routes {
 		err = r.createRoute(ctx, appConfig.Namespace, route)
 		if err != nil {
@@ -174,12 +209,15 @@ func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
 		return err
 	}
 
+	// override from any changes in createDependencies
+	values["homeCloud"] = *appConfig
+
 	_, err = act.Run(app.Spec.Release, chart, values)
 	if err != nil {
 		return err
 	}
 
-	// update routes
+	// update routes (after helm so that Services already exist for DNS annotation)
 	for _, route := range appConfig.Routes {
 		err = r.createRoute(ctx, appConfig.Namespace, route)
 		if err != nil {
@@ -266,6 +304,22 @@ func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, app
 		err := r.createPersistence(ctx, p, app, appConfig.Namespace)
 		if err != nil {
 			return err
+		}
+	}
+
+	// if a storage app, create disk PV/PVCs
+	install, err := shared.GetInstall(ctx, r.Client)
+	if err != nil {
+		return err
+	}
+	if slices.Contains(install.Spec.Settings.StorageApps, app.Name) {
+		for i, disk := range appConfig.Disks {
+			claimName, err := r.createDiskPersistence(ctx, disk.Name, app, app.Namespace)
+			if err != nil {
+				return err
+			}
+			// save created claim name for helm install/upgrade
+			appConfig.Disks[i].ClaimName = claimName
 		}
 	}
 

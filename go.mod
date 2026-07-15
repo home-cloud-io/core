@@ -7,6 +7,7 @@ require (
 	dario.cat/mergo v1.0.2
 	github.com/coreos/go-iptables v0.8.0
 	github.com/cosi-project/runtime v1.16.0
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v1.4.3
 	github.com/google/uuid v1.6.0
 	github.com/netbirdio/netbird v0.59.7
@@ -109,7 +110,6 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.1 // indirect
 	github.com/gertd/go-pluralize v0.2.1 // indirect
-	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
 	github.com/go-openapi/jsonpointer v0.22.5 // indirect

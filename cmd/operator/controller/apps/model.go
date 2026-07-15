@@ -10,6 +10,7 @@ type (
 		Databases   []AppDatabase
 		Persistence []AppPersistence
 		Secrets     []AppSecret
+		Disks       []AppDisk
 	}
 	AppRoute struct {
 		Name    string
@@ -36,5 +37,9 @@ type (
 		Name                string
 		Length              int
 		NoSpecialCharacters bool `yaml:"noSpecialCharacters"`
+	}
+	AppDisk struct {
+		Name      string
+		ClaimName string `yaml:"claimName"`
 	}
 )

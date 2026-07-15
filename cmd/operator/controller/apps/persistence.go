@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"dario.cat/mergo"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -12,7 +11,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
-	"github.com/home-cloud-io/core/pkg/install/resources"
+	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
 )
 
 // TODO: think about making this pluggable for different types of PV sources (ie. not just host path)
@@ -23,24 +22,23 @@ const (
 	DefaultHostPath = "/mnt/home-cloud"
 )
 
+var (
+	storageClassName = "manual"
+)
+
+type (
+	Disks []DiskItem
+	DiskItem struct {
+		Name string
+	}
+)
+
 func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence, app *v1.App, namespace string) error {
 	var (
-		objName          = fmt.Sprintf("%s-%s", app.Spec.Release, p.Name)
-		storageClassName = "manual"
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, p.Name)
 	)
 
-	// get current install config
-	install := &v1.Install{}
-	err := r.Client.Get(ctx, types.NamespacedName{
-		Name:      "install",
-		Namespace: "home-cloud-system",
-	}, install)
-	if err != nil {
-		return err
-	}
-
-	// set defaults: any values set on the resource will override the defaults
-	err = mergo.Merge(install, resources.DefaultInstall)
+	install, err := shared.GetInstall(ctx, r.Client)
 	if err != nil {
 		return err
 	}
@@ -63,10 +61,48 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 		return err
 	}
 
-	// create PV
-	err = r.Client.Create(ctx, &corev1.PersistentVolume{
+	err = r.createPersistentVolume(ctx, objName, namespace, quantity, hostPath)
+	if client.IgnoreAlreadyExists(err) != nil {
+		return err
+	}
+
+	// create PVC
+	err = r.createPersistentVolumeClaim(ctx, objName, namespace, quantity)
+	if client.IgnoreAlreadyExists(err) != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *AppReconciler) createDiskPersistence(ctx context.Context, diskName string, app *v1.App, namespace string) (claimName string, err error) {
+	var (
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, diskName)
+	)
+
+	disk := &v1.Disk{}
+	err = r.Get(ctx, types.NamespacedName{ Namespace: namespace, Name: diskName }, disk)
+	if err != nil {
+		return "", err
+	}
+
+	err = r.createPersistentVolume(ctx, objName, namespace, disk.Spec.Details.Size, disk.Spec.Details.MountPath)
+	if client.IgnoreAlreadyExists(err) != nil {
+		return "", err
+	}
+
+	err = r.createPersistentVolumeClaim(ctx, objName, namespace, disk.Spec.Details.Size)
+	if client.IgnoreAlreadyExists(err) != nil {
+		return "", err
+	}
+
+	return objName, nil
+}
+
+func (r *AppReconciler) createPersistentVolume(ctx context.Context, name string, namespace string, quantity resource.Quantity, hostPath string) error {
+	return r.Client.Create(ctx, &corev1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: objName,
+			Name: name,
 			Labels: map[string]string{
 				"type": "local",
 			},
@@ -87,19 +123,17 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 			},
 			ClaimRef: &corev1.ObjectReference{
 				Namespace: namespace,
-				Name:      objName,
+				Name:      name,
 			},
 			// TODO: NodeAffinity
 		},
 	})
-	if client.IgnoreAlreadyExists(err) != nil {
-		return err
-	}
+}
 
-	// create PVC
-	err = r.Client.Create(ctx, &corev1.PersistentVolumeClaim{
+func (r *AppReconciler) createPersistentVolumeClaim(ctx context.Context, name string, namespace string, quantity resource.Quantity) error {
+	return r.Client.Create(ctx, &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      objName,
+			Name:      name,
 			Namespace: namespace,
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
@@ -114,9 +148,4 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 			},
 		},
 	})
-	if client.IgnoreAlreadyExists(err) != nil {
-		return err
-	}
-
-	return nil
 }
