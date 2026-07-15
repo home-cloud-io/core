@@ -184,6 +184,34 @@ spec:
                     description: 'Hostname defines the base hostname for the install
                       (default: home-cloud.local)'
                     type: string
+                  storageApps:
+                    description: |-
+                      StorageApps are apps designated as apps responsible for managing all application storage.
+                      Functionally this means these apps will be provided with PV/PVCs for all application disks.
+                      This is provided through the `homeCloud.disks` entry in the Helm values for the App which
+                      should be parsed into volume/volumeMounts.
+
+                      For example:
+
+                        containers:
+                          - name: some_app
+                            ...
+                            volumeMounts:
+                              {{- range .Values.homeCloud.disks }}
+                              - mountPath: {{ printf "/some_path/%s" .name }}
+                                name: {{ .name }}
+                              {{- end }}
+                        volumes:
+                          {{- range .Values.homeCloud.disks }}
+                          - name: {{ .name }}
+                            persistentVolumeClaim:
+                              claimName: {{ .claimName }}
+                          {{- end }}
+                    items:
+                      type: string
+                    type: array
+                required:
+                - storageApps
                 type: object
               tunnel:
                 properties:
