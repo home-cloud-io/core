@@ -113,7 +113,7 @@ func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d Ap
 			"username": []byte(d.Name),
 			"password": []byte(pass),
 			"port":     []byte("5432"),
-			"uri":      []byte(fmt.Sprintf("postgres://%s:%s@postgres.postgres:5432/%s?sslmode=disable", d.Name, pass, d.Name)),
+			"uri":      []byte(fmt.Sprintf("postgresql://%s:%s@postgres.postgres:5432/%s?sslmode=disable", d.Name, pass, d.Name)),
 		},
 	})
 	if client.IgnoreAlreadyExists(err) != nil {
