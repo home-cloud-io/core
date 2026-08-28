@@ -18,6 +18,7 @@ import (
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 	"github.com/home-cloud-io/core/cmd/operator/controller/apps"
+	"github.com/home-cloud-io/core/cmd/operator/controller/disks"
 	"github.com/home-cloud-io/core/cmd/operator/controller/installs"
 	"github.com/home-cloud-io/core/pkg/logr"
 	talos "github.com/home-cloud-io/core/pkg/talos/api"
@@ -88,6 +89,17 @@ func Start(l chassis.Logger) {
 		Cancel:          cancel,
 	}).SetupWithManager(mgr); err != nil {
 		l.WithField("controller", "Install").WithError(err).Error("failed to create controller")
+		return
+	}
+
+	// create disk controller
+	if err = (&disks.DiskReconciler{
+		Client:          mgr.GetClient(),
+		DiscoveryClient: discoveryClient,
+		Scheme:          mgr.GetScheme(),
+		Config:          mgr.GetConfig(),
+	}).SetupWithManager(mgr); err != nil {
+		l.WithField("controller", "Disk").WithError(err).Error("failed to create controller")
 		return
 	}
 

@@ -39,7 +39,7 @@ spec:
             properties:
               details:
                 properties:
-                  deviceName:
+                  devicePath:
                     description: e.g. /dev/sda (keep in mind that this is *not* a
                       stable value)
                     type: string
@@ -67,9 +67,7 @@ spec:
                     type: string
                 type: object
               name:
-                description: |-
-                  Not necessarily the device name of the disk (e.g. sda) but instead the *stable*
-                  alias of the drive (for Talos: the name of the UserVolume?)
+                description: A *stable* id of the disk (e.g. /disk/by-path, wwn, serial)
                 type: string
               node:
                 description: The node in the cluster the disk is mounted to

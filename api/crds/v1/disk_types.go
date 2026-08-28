@@ -12,10 +12,9 @@ type DiskSpec struct {
 	// valid types: ssd, hdd, nvme
 	// +required
 	Type string `json:"type,omitempty"`
-	// Not necessarily the device name of the disk (e.g. sda) but instead the *stable*
-	// alias of the drive (for Talos: the name of the UserVolume?)
+	// A *stable* id of the disk (e.g. /disk/by-path, wwn, serial)
 	// +required
-	Name string `json:"name,omitempty"`
+	Identifier string `json:"name,omitempty"`
 	// whether the operating system is installed to this disk
 	// usually do not want to use it also as an application disk
 	// +required
@@ -26,7 +25,7 @@ type DiskSpec struct {
 
 type DiskDetails struct {
 	// e.g. /dev/sda (keep in mind that this is *not* a stable value)
-	DevicePath string `json:"deviceName,omitempty"`
+	DevicePath string `json:"devicePath,omitempty"`
 	// e.g. /mnt/my-disk (for Talos: /var/mnt/<alias>)
 	MountPath string `json:"mountPath,omitempty"`
 	// size in bytes

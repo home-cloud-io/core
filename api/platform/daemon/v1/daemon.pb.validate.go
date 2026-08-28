@@ -1966,7 +1966,7 @@ func (m *LoadDiskRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Device
+	// no validation rules for DevicePath
 
 	// no validation rules for Name
 
@@ -2070,7 +2070,7 @@ func (m *LoadDiskResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Id
+	// no validation rules for MountPath
 
 	if len(errors) > 0 {
 		return LoadDiskResponseMultiError(errors)

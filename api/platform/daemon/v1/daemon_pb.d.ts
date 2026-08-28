@@ -295,14 +295,16 @@ export declare const GetDisksResponseSchema: GenMessage<GetDisksResponse>;
  */
 export declare type LoadDiskRequest = Message<"platform.daemon.v1.LoadDiskRequest"> & {
   /**
-   * the deivce name: sdb, nvme1n1
+   * the device path (e.g. /dev/sdb, /dev/nvme1n1)
+   * NOTE: this name is not stable but when loading the disk the association
+   * to the usable volume *must* be stable (reference uuid, serial, etc.).
    *
-   * @generated from field: string device = 1;
+   * @generated from field: string device_path = 1;
    */
-  device: string;
+  devicePath: string;
 
   /**
-   * the name to assign to the created volume: apps1, bigdata
+   * the name to assign to the created volume (e.g. apps1, bigdata)
    *
    * @generated from field: string name = 2;
    */
@@ -320,9 +322,11 @@ export declare const LoadDiskRequestSchema: GenMessage<LoadDiskRequest>;
  */
 export declare type LoadDiskResponse = Message<"platform.daemon.v1.LoadDiskResponse"> & {
   /**
-   * @generated from field: string id = 1;
+   * the host mount path of the created volume (e.g. /mnt/apps1, /var/mnt/bigdata)
+   *
+   * @generated from field: string mount_path = 1;
    */
-  id: string;
+  mountPath: string;
 };
 
 /**

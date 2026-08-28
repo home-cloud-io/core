@@ -71,11 +71,14 @@ message GetDisksResponse {
 }
 
 message LoadDiskRequest {
-  // the deivce name: sdb, nvme1n1
-  string device = 1;
-  // the name to assign to the created volume: apps1, bigdata
+  // the device path (e.g. /dev/sdb, /dev/nvme1n1)
+  // NOTE: this name is not stable but when loading the disk the association
+  // to the usable volume *must* be stable (reference uuid, serial, etc.).
+  string device_path = 1;
+  // the name to assign to the created volume (e.g. apps1, bigdata)
   string name = 2;
 }
 message LoadDiskResponse {
-  string id = 1;
+  // the host mount path of the created volume (e.g. /mnt/apps1, /var/mnt/bigdata)
+  string mount_path = 1;
 }

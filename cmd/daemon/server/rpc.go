@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"connectrpc.com/connect"
@@ -293,7 +294,7 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 			continue
 		}
 		disks = append(disks, &v1.Disk{
-			DeviceName: disk.DevPath,
+			DevicePath: disk.DevPath,
 			Model:      disk.Model,
 			Serial:     disk.Serial,
 			Wwid:       disk.WWID,
@@ -311,7 +312,7 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 	}), nil
 }
 
-// LoadDisk creates a "disk" type UserVolume which takes over the entire disk so that it can PersistentVolumes
+// LoadDisk creates a "disk" type UserVolume which takes over the entire disk so that PersistentVolumes
 // can be created against it.
 func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error) {
 
@@ -321,8 +322,10 @@ func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.L
 		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
 	}
 
+	_, device := filepath.Split(request.Msg.DevicePath)
+
 	// get the requested disk
-	getResp, err := client.COSI.Get(ctx, resource.NewMetadata("runtime", blockpb.DiskType, request.Msg.Device, resource.VersionUndefined))
+	getResp, err := client.COSI.Get(ctx, resource.NewMetadata("runtime", blockpb.DiskType, device, resource.VersionUndefined))
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get disk")
 		return nil, err
@@ -347,14 +350,14 @@ func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.L
 	}
 
 	// apply config
-	id, err := talos.CreateUserVolume(ctx, h.logger, uvc)
+	_, err = talos.CreateUserVolume(ctx, h.logger, uvc)
 	if err != nil {
 		h.logger.WithError(err).Error("failed to create volume")
 		return nil, err
 	}
 
 	return connect.NewResponse(&v1.LoadDiskResponse{
-		Id: id,
+		MountPath: fmt.Sprintf("/var/mnt/%s", request.Msg.Name),
 	}), nil
 }
 
