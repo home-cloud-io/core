@@ -2,7 +2,6 @@ package disks
 
 import (
 	"context"
-	"reflect"
 	"strings"
 	"time"
 
@@ -157,7 +156,6 @@ func (r *DiskReconciler) poll() {
 
 		// match disks from daemon with disks in kube (creating as necessary)
 		for _, hostDisk := range disksResp.Msg.Disks {
-			log.Info("processing disk", "disk", hostDisk.Symlinks)
 
 			// find /dev/device/by-id symlink and use that
 			// TODO: can probably make this smarter by using other unique values? (e.g. serial, uuid)
@@ -165,8 +163,6 @@ func (r *DiskReconciler) poll() {
 				if !strings.HasPrefix(id, "/dev/disk/by-id") {
 					continue
 				}
-
-				log.Info("registering disk")
 
 				// TODO: don't hardcode this
 				node := "home-cloud"
@@ -201,12 +197,12 @@ func (r *DiskReconciler) poll() {
 					new.Spec.Details.MountPath = old.Spec.Details.MountPath
 
 					// compare and update if not same
-					// TODO: should probably do a more targeted comparison
-					if !reflect.DeepEqual(new.Spec, old.Spec) {
+					if !new.Equal(old) {
 
 						// replace spec for update
 						old.Spec = new.Spec
 
+						log.Info("updating disk", "disk", old.Name)
 						err := r.Client.Update(ctx, &old)
 						if err != nil {
 							log.Error(err, "failed to update disk")
@@ -219,6 +215,7 @@ func (r *DiskReconciler) poll() {
 
 				// set name and create
 				new.Name = names.SimpleNameGenerator.GenerateName("disk-")
+				log.Info("creating disk", "disk", new.Name)
 				err := r.Client.Create(ctx, &new)
 				if err != nil {
 					log.Error(err, "failed to create disk")

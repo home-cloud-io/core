@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"slices"
+
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -75,4 +77,19 @@ type DiskList struct {
 
 func init() {
 	SchemeBuilder.Register(&Disk{}, &DiskList{})
+}
+
+func (d Disk) Equal(other Disk) bool {
+	return d.Spec.Node == other.Spec.Node &&
+		d.Spec.Type == other.Spec.Type &&
+		d.Spec.Identifier == other.Spec.Identifier &&
+		d.Spec.SystemDisk == other.Spec.SystemDisk &&
+		d.Spec.Details.DevicePath == other.Spec.Details.DevicePath &&
+		d.Spec.Details.MountPath == other.Spec.Details.MountPath &&
+		d.Spec.Details.Size.Equal(other.Spec.Details.Size) &&
+		d.Spec.Details.Model == other.Spec.Details.Model &&
+		d.Spec.Details.Serial == other.Spec.Details.Serial &&
+		d.Spec.Details.Wwid == other.Spec.Details.Wwid &&
+		d.Spec.Details.Uuid == other.Spec.Details.Uuid &&
+		slices.Equal(d.Spec.Details.Symlinks, other.Spec.Details.Symlinks)
 }
