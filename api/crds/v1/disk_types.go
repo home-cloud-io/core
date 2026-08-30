@@ -49,6 +49,14 @@ type DiskStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
+// Disk is the Schema for the apps API
+//
+// +kubebuilder:printcolumn:name="Node",type=string,JSONPath=`.spec.node`
+// +kubebuilder:printcolumn:name="System Disk",type=boolean,JSONPath=`.spec.systemDisk`
+// +kubebuilder:printcolumn:name="Type",type=string,JSONPath=`.spec.type`
+// +kubebuilder:printcolumn:name="Model",type=string,JSONPath=`.spec.details.model`
+// +kubebuilder:printcolumn:name="Device Path",type=string,JSONPath=`.spec.details.devicePath`
+// +kubebuilder:printcolumn:name="Mount Path",type=string,JSONPath=`.spec.details.mountPath`
 type Disk struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

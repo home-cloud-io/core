@@ -14,9 +14,29 @@ spec:
     singular: disk
   scope: Namespaced
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.node
+      name: Node
+      type: string
+    - jsonPath: .spec.systemDisk
+      name: System Disk
+      type: boolean
+    - jsonPath: .spec.type
+      name: Type
+      type: string
+    - jsonPath: .spec.details.model
+      name: Model
+      type: string
+    - jsonPath: .spec.details.devicePath
+      name: Device Path
+      type: string
+    - jsonPath: .spec.details.mountPath
+      name: Mount Path
+      type: string
+    name: v1
     schema:
       openAPIV3Schema:
+        description: Disk is the Schema for the apps API
         properties:
           apiVersion:
             description: |-

@@ -211,6 +211,8 @@ type KubernetesStatus struct {
 //+kubebuilder:subresource:status
 
 // Install is the Schema for the installs API
+//
+// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.version`
 type Install struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

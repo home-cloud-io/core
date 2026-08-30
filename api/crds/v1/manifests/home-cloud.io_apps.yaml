@@ -14,7 +14,11 @@ spec:
     singular: app
   scope: Namespaced
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.version
+      name: Version
+      type: string
+    name: v1
     schema:
       openAPIV3Schema:
         description: App is the Schema for the apps API
