@@ -75,6 +75,26 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 	return nil
 }
 
+
+func (r *AppReconciler) deletePersistence(ctx context.Context, p AppPersistence, app *v1.App, namespace string) error {
+	var (
+		err error
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, p.Name)
+	)
+
+	err = r.deletePersistentVolumeClaim(ctx, objName, namespace)
+	if client.IgnoreNotFound(err) != nil {
+		return err
+	}
+
+	err = r.deletePersistentVolume(ctx, objName)
+	if client.IgnoreNotFound(err) != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *AppReconciler) createDiskPersistence(ctx context.Context, diskName string, app *v1.App, namespace string) (claimName string, err error) {
 	var (
 		objName = fmt.Sprintf("%s-%s", app.Spec.Release, diskName)
@@ -93,6 +113,24 @@ func (r *AppReconciler) createDiskPersistence(ctx context.Context, diskName stri
 
 	err = r.createPersistentVolumeClaim(ctx, objName, namespace, disk.Spec.Details.Size)
 	if client.IgnoreAlreadyExists(err) != nil {
+		return "", err
+	}
+
+	return objName, nil
+}
+
+func (r *AppReconciler) deleteDiskPersistence(ctx context.Context, diskName string, app *v1.App, namespace string) (claimName string, err error) {
+	var (
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, diskName)
+	)
+
+	err = r.deletePersistentVolumeClaim(ctx, objName, namespace)
+	if client.IgnoreNotFound(err) != nil {
+		return "", err
+	}
+
+	err = r.deletePersistentVolume(ctx, objName)
+	if client.IgnoreNotFound(err) != nil {
 		return "", err
 	}
 
@@ -130,6 +168,17 @@ func (r *AppReconciler) createPersistentVolume(ctx context.Context, name string,
 	})
 }
 
+func (r *AppReconciler) deletePersistentVolume(ctx context.Context, name string) error {
+	return r.Client.Delete(ctx, &corev1.PersistentVolume{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+			Labels: map[string]string{
+				"type": "local",
+			},
+		},
+	})
+}
+
 func (r *AppReconciler) createPersistentVolumeClaim(ctx context.Context, name string, namespace string, quantity resource.Quantity) error {
 	return r.Client.Create(ctx, &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
@@ -146,6 +195,15 @@ func (r *AppReconciler) createPersistentVolumeClaim(ctx context.Context, name st
 					corev1.ResourceStorage: quantity,
 				},
 			},
+		},
+	})
+}
+
+func (r *AppReconciler) deletePersistentVolumeClaim(ctx context.Context, name string, namespace string) error {
+	return r.Client.Delete(ctx, &corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
 		},
 	})
 }

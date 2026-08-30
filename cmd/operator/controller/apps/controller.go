@@ -27,6 +27,7 @@ import (
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
+	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
 const AppFinalizer = "apps.home-cloud.io/finalizer"
@@ -35,6 +36,7 @@ const AppFinalizer = "apps.home-cloud.io/finalizer"
 type AppReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	Config chassis.Config
 }
 
 // HelmRepositoryIndex represents the index.yaml file that holds the information of helm charts within a helm repo
@@ -249,6 +251,7 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 	}
 
 	// delete all routes
+	// we always delete routes so that we aren't routing to a missing app
 	for _, route := range appConfig.Routes {
 		err = r.deleteRoute(ctx, appConfig.Namespace, route.Name)
 		if err != nil {
@@ -256,7 +259,13 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 		}
 	}
 
-	// TODO: option to hard-delete all add-on components (namespace, secrets, PV/PVCs, etc.)
+	// delete all other dependencies if requested (namespace, secrets, persistence, databases/users, etc.)
+	if shared.IsAnnotationTrue(app.Annotations, v1.AnnotationAppCleanUninstall) {
+		err = r.deleteDependencies(ctx, app, appConfig)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -329,6 +338,62 @@ func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, app
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (r *AppReconciler) deleteDependencies(ctx context.Context, app *v1.App, appConfig *AppConfig) error {
+	var (
+		err error
+	)
+
+	// delete secrets
+	for _, s := range appConfig.Secrets {
+		err := r.deleteSecret(ctx, s, appConfig.Namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// delete persistence (PV/PVCs)
+	for _, p := range appConfig.Persistence {
+		err := r.deletePersistence(ctx, p, app, appConfig.Namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// if a storage app, delete disk PV/PVCs
+	install, err := shared.GetInstall(ctx, r.Client)
+	if err != nil {
+		return err
+	}
+	if slices.Contains(install.Spec.Settings.StorageApps, app.Name) {
+		for _, disk := range appConfig.Disks {
+			_, err := r.deleteDiskPersistence(ctx, disk.Name, app, app.Namespace)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// delete databases (and users)
+	for _, d := range appConfig.Databases {
+		err := r.deleteDatabase(ctx, d, appConfig.Namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// delete namespace
+	err = r.Client.Delete(ctx, &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: appConfig.Namespace,
+		},
+	})
+	if err != nil {
+		return err
 	}
 
 	return nil
