@@ -18,7 +18,7 @@ type DiskSpec struct {
 	// whether the operating system is installed to this disk
 	// usually do not want to use it also as an application disk
 	// +required
-	SystemDisk bool `json:"systemDisk,omitempty"`
+	SystemDisk bool `json:"systemDisk"`
 
 	Details DiskDetails `json:"details"`
 }

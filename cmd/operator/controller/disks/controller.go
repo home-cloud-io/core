@@ -12,6 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -117,7 +118,7 @@ func (r *DiskReconciler) reconcile(ctx context.Context, disk *v1.Disk) error {
 }
 
 func (r *DiskReconciler) poll() {
-	t := time.NewTicker(time.Minute)
+	t := time.NewTicker(time.Second * 15)
 
 	for {
 		<-t.C
@@ -156,21 +157,25 @@ func (r *DiskReconciler) poll() {
 
 		// match disks from daemon with disks in kube (creating as necessary)
 		for _, hostDisk := range disksResp.Msg.Disks {
+			log.Info("processing disk", "disk", hostDisk.Symlinks)
+
 			// find /dev/device/by-id symlink and use that
 			// TODO: can probably make this smarter by using other unique values? (e.g. serial, uuid)
 			for _, id := range hostDisk.Symlinks {
-				if !strings.HasPrefix(id, "/dev/device/by-id") {
+				if !strings.HasPrefix(id, "/dev/disk/by-id") {
 					continue
 				}
 
-				new := &v1.Disk{
+				log.Info("registering disk")
+
+				// TODO: don't hardcode this
+				node := "home-cloud"
+				new := v1.Disk{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      "",
 						Namespace: install.Namespace,
 					},
 					Spec: v1.DiskSpec{
-						// TODO: don't hardcode this
-						Node:       "home-cloud",
+						Node:       node,
 						Type:       convertDiskType(hostDisk.Type),
 						Identifier: id,
 						SystemDisk: hostDisk.SystemDisk,
@@ -191,15 +196,30 @@ func (r *DiskReconciler) poll() {
 				// use by-id symlink to check existence
 				old, found := kubeDiskMap[id]
 				if found {
-					if reflect.DeepEqual(new.Spec, old.Spec) {
-						err := r.Client.Update(ctx, new)
+					// copy unset values
+					new.Name = old.Name
+					new.Spec.Details.MountPath = old.Spec.Details.MountPath
+
+					// compare and update if not same
+					// TODO: should probably do a more targeted comparison
+					if !reflect.DeepEqual(new.Spec, old.Spec) {
+
+						// replace spec for update
+						old.Spec = new.Spec
+
+						err := r.Client.Update(ctx, &old)
 						if err != nil {
 							log.Error(err, "failed to update disk")
 							continue
 						}
 					}
+
+					continue
 				}
-				err := r.Client.Create(ctx, new)
+
+				// set name and create
+				new.Name = names.SimpleNameGenerator.GenerateName("disk-")
+				err := r.Client.Create(ctx, &new)
 				if err != nil {
 					log.Error(err, "failed to create disk")
 					continue
