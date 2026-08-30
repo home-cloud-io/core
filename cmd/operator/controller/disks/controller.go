@@ -2,6 +2,7 @@ package disks
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -73,6 +74,10 @@ func (r *DiskReconciler) reconcile(ctx context.Context, disk *v1.Disk) error {
 		if meta.IsStatusConditionTrue(disk.Status.Conditions, v1.StatusConditionLoaded) {
 			delete(disk.Annotations, v1.AnnotationDiskLoadRequested)
 			return r.Update(ctx, disk)
+		}
+
+		if disk.Spec.SystemDisk {
+			return errors.New("cannot load system disk")
 		}
 
 		l.Info("loading disk")
