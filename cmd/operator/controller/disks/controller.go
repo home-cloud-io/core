@@ -24,11 +24,6 @@ import (
 	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
 )
 
-const (
-	StatusConditionLoadRequested = "home-cloud.io/disk-load-requested"
-	StatusConditionLoaded        = "home-cloud.io/disk-loaded"
-)
-
 // DiskReconciler reconciles a Disk object
 type DiskReconciler struct {
 	client.Client
@@ -53,14 +48,12 @@ func (r *DiskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return ctrl.Result{}, err
 	}
 
-	return ctrl.Result{
-		// poll the daemon for disk changes
-		RequeueAfter: time.Minute,
-	}, r.reconcile(ctx, disk)
+	return ctrl.Result{}, r.reconcile(ctx, disk)
 }
 
 func (r *DiskReconciler) reconcile(ctx context.Context, disk *v1.Disk) error {
-	l := log.FromContext(ctx)
+	l := log.FromContext(ctx).WithValues("disk", disk.Name)
+	l.Info("reconciling disk")
 
 	install, err := shared.GetInstall(ctx, r.Client)
 	if err != nil {
@@ -74,7 +67,15 @@ func (r *DiskReconciler) reconcile(ctx context.Context, disk *v1.Disk) error {
 	}
 
 	// load disk if requested
-	if meta.IsStatusConditionTrue(disk.Status.Conditions, StatusConditionLoadRequested) {
+	if shared.IsAnnotationTrue(disk.Annotations, v1.AnnotationDiskLoadRequested) {
+
+		// if annotation is set but already loaded, remove annotation and return
+		if meta.IsStatusConditionTrue(disk.Status.Conditions, v1.StatusConditionLoaded) {
+			delete(disk.Annotations, v1.AnnotationDiskLoadRequested)
+			return r.Update(ctx, disk)
+		}
+
+		l.Info("loading disk")
 
 		// tell daemon to load disk
 		client := daemon.DaemonClient(install.Spec.Daemon.Address)
@@ -87,23 +88,19 @@ func (r *DiskReconciler) reconcile(ctx context.Context, disk *v1.Disk) error {
 			return err
 		}
 
-		// update disk with mount path
+		// add mount path
 		disk.Spec.Details.MountPath = loadResp.Msg.MountPath
+		// remove annotation
+		delete(disk.Annotations, v1.AnnotationDiskLoadRequested)
 		err = r.Update(ctx, disk)
 		if err != nil {
 			l.Error(err, "failed to update disk")
 			return err
 		}
 
-		// update condition
+		// add condition
 		meta.SetStatusCondition(&disk.Status.Conditions, metav1.Condition{
-			Type:    StatusConditionLoadRequested,
-			Status:  metav1.ConditionFalse,
-			Reason:  "Loaded",
-			Message: "",
-		})
-		meta.SetStatusCondition(&disk.Status.Conditions, metav1.Condition{
-			Type:    StatusConditionLoaded,
+			Type:    v1.StatusConditionLoaded,
 			Status:  metav1.ConditionTrue,
 			Reason:  "Loaded",
 			Message: "",

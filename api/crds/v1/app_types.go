@@ -52,3 +52,7 @@ type AppList struct {
 func init() {
 	SchemeBuilder.Register(&App{}, &AppList{})
 }
+
+const (
+	AnnotationAppCleanUninstall = "apps.home-cloud.io/clean-uninstall"
+)

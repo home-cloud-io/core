@@ -8,6 +8,8 @@ import (
 )
 
 type DiskSpec struct {
+	// A user-specified alias that can be used for display purposes
+	Alias string `json:"alias,omitempty"`
 	// The node in the cluster the disk is mounted to
 	// +required
 	Node string `json:"node,omitempty"`
@@ -53,6 +55,7 @@ type DiskStatus struct {
 
 // Disk is the Schema for the apps API
 //
+// +kubebuilder:printcolumn:name="Alias",type=string,JSONPath=`.spec.alias`
 // +kubebuilder:printcolumn:name="Node",type=string,JSONPath=`.spec.node`
 // +kubebuilder:printcolumn:name="System Disk",type=boolean,JSONPath=`.spec.systemDisk`
 // +kubebuilder:printcolumn:name="Type",type=string,JSONPath=`.spec.type`
@@ -78,6 +81,13 @@ type DiskList struct {
 func init() {
 	SchemeBuilder.Register(&Disk{}, &DiskList{})
 }
+
+// FUNCTIONAL
+
+const (
+	AnnotationDiskLoadRequested = "disks.home-cloud.io/load-requested"
+	StatusConditionLoaded       = "disks.home-cloud.io/loaded"
+)
 
 func (d Disk) Equal(other Disk) bool {
 	return d.Spec.Node == other.Spec.Node &&

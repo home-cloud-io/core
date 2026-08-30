@@ -15,6 +15,9 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .spec.alias
+      name: Alias
+      type: string
     - jsonPath: .spec.node
       name: Node
       type: string
@@ -57,6 +60,9 @@ spec:
             type: object
           spec:
             properties:
+              alias:
+                description: A user-specified alias that can be used for display purposes
+                type: string
               details:
                 properties:
                   devicePath:
