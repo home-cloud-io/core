@@ -18,7 +18,7 @@ import (
 	v1 "github.com/home-cloud-io/core/api/platform/server/v1"
 	"github.com/home-cloud-io/core/cmd/operator/server/apps"
 	k8sclient "github.com/home-cloud-io/core/cmd/operator/server/k8s-client"
-	hstrings "github.com/home-cloud-io/core/pkg/strings"
+	"github.com/home-cloud-io/core/pkg/compare"
 )
 
 type (
@@ -146,11 +146,11 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 	}
 
 	if settings.AutoUpdateApps {
-		c.actl.AutoUpdate(ctx, logger, hstrings.Default(settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule))
+		c.actl.AutoUpdate(ctx, logger, compare.Default(settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule))
 	}
 
 	if settings.AutoUpdateSystem {
-		c.AutoUpdate(ctx, logger, hstrings.Default(settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule))
+		c.AutoUpdate(ctx, logger, compare.Default(settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule))
 	}
 
 	install.Spec.Settings.Hostname = settings.Hostname

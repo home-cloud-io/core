@@ -71,6 +71,7 @@ func Start(l chassis.Logger) {
 	if err = (&apps.AppReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
+		Config: chassis.GetConfig(),
 	}).SetupWithManager(mgr); err != nil {
 		l.WithField("controller", "app").WithError(err).Error("failed to create controller")
 		return

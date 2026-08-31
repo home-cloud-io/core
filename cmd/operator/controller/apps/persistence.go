@@ -7,7 +7,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
@@ -95,16 +94,10 @@ func (r *AppReconciler) deletePersistence(ctx context.Context, p AppPersistence,
 	return nil
 }
 
-func (r *AppReconciler) createDiskPersistence(ctx context.Context, diskName string, app *v1.App, namespace string) (claimName string, err error) {
+func (r *AppReconciler) createDiskPersistence(ctx context.Context, disk v1.Disk, app *v1.App, namespace string) (claimName string, err error) {
 	var (
-		objName = fmt.Sprintf("%s-%s", app.Spec.Release, diskName)
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, disk.Name)
 	)
-
-	disk := &v1.Disk{}
-	err = r.Get(ctx, types.NamespacedName{ Namespace: namespace, Name: diskName }, disk)
-	if err != nil {
-		return "", err
-	}
 
 	err = r.createPersistentVolume(ctx, objName, namespace, disk.Spec.Details.Size, disk.Spec.Details.MountPath)
 	if client.IgnoreAlreadyExists(err) != nil {
@@ -119,9 +112,9 @@ func (r *AppReconciler) createDiskPersistence(ctx context.Context, diskName stri
 	return objName, nil
 }
 
-func (r *AppReconciler) deleteDiskPersistence(ctx context.Context, diskName string, app *v1.App, namespace string) (claimName string, err error) {
+func (r *AppReconciler) deleteDiskPersistence(ctx context.Context, disk v1.Disk, app *v1.App, namespace string) (claimName string, err error) {
 	var (
-		objName = fmt.Sprintf("%s-%s", app.Spec.Release, diskName)
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, disk.Name)
 	)
 
 	err = r.deletePersistentVolumeClaim(ctx, objName, namespace)

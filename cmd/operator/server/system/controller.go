@@ -8,8 +8,7 @@ import (
 	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	"github.com/home-cloud-io/core/cmd/operator/server/apps"
 	k8sclient "github.com/home-cloud-io/core/cmd/operator/server/k8s-client"
-	"github.com/home-cloud-io/core/pkg/strings"
-	hstrings "github.com/home-cloud-io/core/pkg/strings"
+	"github.com/home-cloud-io/core/pkg/compare"
 	"github.com/robfig/cron/v3"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
@@ -54,7 +53,7 @@ func NewController(logger chassis.Logger, kclient k8sclient.System, actl apps.Co
 
 	daemonAddress := defaultAddress
 	if install.Spec.Daemon != nil {
-		daemonAddress = strings.Default(install.Spec.Daemon.Address, defaultAddress)
+		daemonAddress = compare.Default(install.Spec.Daemon.Address, defaultAddress)
 	}
 	c := &controller{
 		actl:         actl,
@@ -65,12 +64,12 @@ func NewController(logger chassis.Logger, kclient k8sclient.System, actl apps.Co
 	if install.Spec.Settings != nil {
 		// run app auto update if configured
 		if install.Spec.Settings.AutoUpdateApps {
-			go c.actl.AutoUpdate(ctx, logger, hstrings.Default(install.Spec.Settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule))
+			go c.actl.AutoUpdate(ctx, logger, compare.Default(install.Spec.Settings.AutoUpdateAppsSchedule, apps.DefaultAutoUpdateAppsSchedule))
 		}
 
 		// run system auto update if configured
 		if install.Spec.Settings.AutoUpdateSystem {
-			go c.AutoUpdate(ctx, logger, hstrings.Default(install.Spec.Settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule))
+			go c.AutoUpdate(ctx, logger, compare.Default(install.Spec.Settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule))
 		}
 	}
 

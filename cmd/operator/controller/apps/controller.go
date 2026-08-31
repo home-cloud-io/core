@@ -27,6 +27,7 @@ import (
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
+	"github.com/home-cloud-io/core/pkg/compare"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
@@ -92,13 +93,9 @@ func (r *AppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		return ctrl.Result{}, r.install(ctx, app)
 	}
 
-	// upgrade if conditions are met
-	if shouldUpgrade(app) {
-		l.Info("Upgrading App")
-		return ctrl.Result{}, r.upgrade(ctx, app)
-	}
-
-	return ctrl.Result{}, nil
+	// upgrade as default
+	l.Info("Upgrading App")
+	return ctrl.Result{}, r.upgrade(ctx, app)
 }
 
 func (r *AppReconciler) ReconcileDisk() handler.EventHandler {
@@ -118,7 +115,7 @@ func (r *AppReconciler) ReconcileDisk() handler.EventHandler {
 			requests = append(requests, reconcile.Request{
 				NamespacedName: types.NamespacedName{
 					Name:      appName,
-					Namespace: install.Namespace, // Use the namespace of the changed Busybox
+					Namespace: install.Namespace,
 				},
 			})
 		}
@@ -165,7 +162,10 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 	}
 
 	// override from any changes in createDependencies
-	values["homeCloud"] = *appConfig
+	values, err = appConfig.ToValues(values)
+	if err != nil {
+		return err
+	}
 
 	// finally, install helm chart
 	_, err = act.Run(chart, values)
@@ -212,7 +212,10 @@ func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
 	}
 
 	// override from any changes in createDependencies
-	values["homeCloud"] = *appConfig
+	values, err = appConfig.ToValues(values)
+	if err != nil {
+		return err
+	}
 
 	_, err = act.Run(app.Spec.Release, chart, values)
 	if err != nil {
@@ -270,6 +273,7 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 	return nil
 }
 
+// createDependencies creates app dependencies and saves any updated values to AppConfig (e.g. disk claims)
 func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, appConfig *AppConfig) error {
 	var (
 		err error
@@ -322,13 +326,28 @@ func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, app
 		return err
 	}
 	if slices.Contains(install.Spec.Settings.StorageApps, app.Name) {
-		for i, disk := range appConfig.Disks {
-			claimName, err := r.createDiskPersistence(ctx, disk.Name, app, app.Namespace)
+		disks := &v1.DiskList{}
+		err := r.Client.List(ctx, disks)
+		if err != nil {
+			return err
+		}
+		appConfig.Disks = []AppDisk{}
+		for _, disk := range disks.Items {
+			if disk.Spec.SystemDisk {
+				continue
+			}
+
+			claimName, err := r.createDiskPersistence(ctx, disk, app, appConfig.Namespace)
 			if err != nil {
 				return err
 			}
+
 			// save created claim name for helm install/upgrade
-			appConfig.Disks[i].ClaimName = claimName
+			appConfig.Disks = append(appConfig.Disks, AppDisk{
+				// use disk.Alias if available for user visibility
+				Name:      compare.Default(disk.Spec.Alias, disk.Name),
+				ClaimName: claimName,
+			})
 		}
 	}
 
@@ -358,6 +377,7 @@ func (r *AppReconciler) deleteDependencies(ctx context.Context, app *v1.App, app
 
 	// delete persistence (PV/PVCs)
 	for _, p := range appConfig.Persistence {
+		// TODO: this doesn't actually wipe the files...
 		err := r.deletePersistence(ctx, p, app, appConfig.Namespace)
 		if err != nil {
 			return err
@@ -370,8 +390,17 @@ func (r *AppReconciler) deleteDependencies(ctx context.Context, app *v1.App, app
 		return err
 	}
 	if slices.Contains(install.Spec.Settings.StorageApps, app.Name) {
-		for _, disk := range appConfig.Disks {
-			_, err := r.deleteDiskPersistence(ctx, disk.Name, app, app.Namespace)
+		disks := &v1.DiskList{}
+		err := r.Client.List(ctx, disks)
+		if err != nil {
+			return err
+		}
+		appConfig.Disks = make([]AppDisk, len(disks.Items))
+		for _, disk := range disks.Items {
+			if disk.Spec.SystemDisk {
+				continue
+			}
+			_, err := r.deleteDiskPersistence(ctx, disk, app, app.Namespace)
 			if err != nil {
 				return err
 			}
