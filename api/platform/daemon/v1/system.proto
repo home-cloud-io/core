@@ -47,3 +47,24 @@ message Log {
   string log = 4;
   google.protobuf.Timestamp timestamp = 5;
 }
+
+message Disk {
+  // for Talos this is the UserVolume name (minus the "u-" prefix)
+  string name = 1;
+  string device_path = 2;
+  string model = 3;
+  string serial = 4;
+  string wwid = 5;
+  string uuid = 6;
+  DiskType type = 7;
+  bool system_disk = 8;
+  uint64 size = 9;
+  repeated string symlinks = 10;
+}
+
+enum DiskType {
+  DEVICE_TYPE_UNSPECIFIED = 0;
+  DEVICE_TYPE_SSD = 1;
+  DEVICE_TYPE_HDD = 2;
+  DEVICE_TYPE_NVME = 3;
+}

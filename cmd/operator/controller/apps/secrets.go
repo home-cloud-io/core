@@ -38,3 +38,18 @@ func (r *AppReconciler) createSecret(ctx context.Context, s AppSecret, namespace
 
 	return nil
 }
+
+func (r *AppReconciler) deleteSecret(ctx context.Context, s AppSecret, namespace string) error {
+
+	// delete secret on cluster
+	err := r.Client.Delete(ctx, &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      s.Name,
+			Namespace: namespace,
+		},
+	})
+	if client.IgnoreNotFound(err) != nil {
+		return err
+	}
+	return nil
+}

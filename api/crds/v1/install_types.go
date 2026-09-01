@@ -118,6 +118,28 @@ type SettingsSpec struct {
 	// You must restart the server after changing this value for it to take
 	// effect if updating the Kuberenetes resource directly.
 	AutoUpdateSystemSchedule string `json:"autoUpdateSystemSchedule,omitempty"`
+	// StorageApps are apps designated as apps responsible for managing all application storage.
+	// Functionally this means these apps will be provided with PV/PVCs for all application disks.
+	// This is provided through the `homeCloud.disks` entry in the Helm values for the App which
+	// should be parsed into volume/volumeMounts.
+	//
+	// For example:
+	//
+    //   containers:
+    //     - name: some_app
+    //       ...
+    //       volumeMounts:
+    //         {{- range .Values.homeCloud.disks }}
+    //         - mountPath: {{ printf "/some_path/%s" .name }}
+    //           name: {{ .name }}
+    //         {{- end }}
+    //   volumes:
+    //     {{- range .Values.homeCloud.disks }}
+    //     - name: {{ .name }}
+    //       persistentVolumeClaim:
+    //         claimName: {{ .claimName }}
+    //     {{- end }}
+	StorageApps []string `json:"storageApps"`
 }
 
 type AppStore struct {
@@ -189,6 +211,8 @@ type KubernetesStatus struct {
 //+kubebuilder:subresource:status
 
 // Install is the Schema for the installs API
+//
+// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.version`
 type Install struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

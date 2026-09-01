@@ -119,12 +119,27 @@ This will open your browser to the web client running locally on `localhost:3000
 
 ### Install Steps
 
+> [!NOTE]
+> This new install process for Home Cloud is still pretty rough around the edges. It will get easier over time.
+
+To install Home Cloud on dedicated hardware you'll need the following:
+
+- A physical host with at least: 4 CPU cores, 8GB of RAM, and two separate SSDs (HDDs are not recommended)
+- A USB drive that you can flash an ISO to (2GB minimum)
+- A linux/unix shell (WSL works if on Windows)
+
+#### Install tools
+
 ```bash
 # install talosctl
 curl -sL https://talos.dev/install | sh
 # install kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+```
 
+#### Install OS
+
+```bash
 # get from machine display out
 export MACHINE_IP="192.168.1.183"
 

@@ -4,6 +4,13 @@ This folder contains the Home Cloud Custom Resource Definitions (CRDs). This is 
 
 The actual implementation of the controllers for these CRDs is elsewhere in the repository.
 
+## Controllers
+
+- [apps](../../cmd/operator/controller/apps/)
+- [disks](../../cmd/operator/controller/disks/)
+- [install](../../cmd/operator/controller/installs/)
+- [wireguard](../../cmd/tunnel/wireguard/)
+
 ## How to use
 
 Install the `controller-gen` CLI:

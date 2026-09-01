@@ -4,18 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"connectrpc.com/connect"
-	"dario.cat/mergo"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
-	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
-	"github.com/home-cloud-io/core/cmd/operator/controller/daemon"
-	"github.com/home-cloud-io/core/pkg/install/resources"
+	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
 )
 
 // TODO: think about making this pluggable for different types of PV sources (ie. not just host path)
@@ -26,43 +21,38 @@ const (
 	DefaultHostPath = "/mnt/home-cloud"
 )
 
+var (
+	storageClassName = "manual"
+)
+
+type (
+	Disks []DiskItem
+	DiskItem struct {
+		Name string
+	}
+)
+
 func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence, app *v1.App, namespace string) error {
 	var (
-		objName          = fmt.Sprintf("%s-%s", app.Spec.Release, p.Name)
-		storageClassName = "manual"
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, p.Name)
 	)
 
-	// get current install config
-	install := &v1.Install{}
-	err := r.Client.Get(ctx, types.NamespacedName{
-		Name:      "install",
-		Namespace: "home-cloud-system",
-	}, install)
+	install, err := shared.GetInstall(ctx, r.Client)
 	if err != nil {
 		return err
 	}
 
-	// set defaults: any values set on the resource will override the defaults
-	err = mergo.Merge(install, resources.DefaultInstall)
-	if err != nil {
-		return err
-	}
-
+	// default if no daemon
 	hostPath := fmt.Sprintf("%s/%s", DefaultHostPath, objName)
 
-	// if daemon is enabled, create volume before creating PV/PVC and use the returned path
+	// if daemon is enabled, get the path before creating PV/PVC
 	if !install.Spec.Daemon.Disable {
-		resp, err := daemon.DaemonClient(install.Spec.Daemon.Address).CreateVolume(ctx, connect.NewRequest(&dv1.CreateVolumeRequest{
-			Name:    objName,
-			MinSize: p.Size,
-			// TODO: update App spec to have min/max
-			MaxSize: p.Size,
-		}))
-		if err != nil {
-			return err
-		}
-
-		hostPath = resp.Msg.Path
+		// TODO: get the path/disk/UserVolume to use
+		// - should use some logic to optimize placement for multi-disk installs?
+		// - or just have the user select the disk during install?
+		// - I think with this new method we could technically move apps pretty easily between disks
+		volumeName := "apps1"
+		hostPath = fmt.Sprintf("%s/%s/%s/%s", "/var/mnt", volumeName, namespace, objName)
 	}
 
 	quantity, err := resource.ParseQuantity(p.Size)
@@ -70,10 +60,80 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 		return err
 	}
 
-	// create PV
-	err = r.Client.Create(ctx, &corev1.PersistentVolume{
+	err = r.createPersistentVolume(ctx, objName, namespace, quantity, hostPath)
+	if client.IgnoreAlreadyExists(err) != nil {
+		return err
+	}
+
+	// create PVC
+	err = r.createPersistentVolumeClaim(ctx, objName, namespace, quantity)
+	if client.IgnoreAlreadyExists(err) != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+func (r *AppReconciler) deletePersistence(ctx context.Context, p AppPersistence, app *v1.App, namespace string) error {
+	var (
+		err error
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, p.Name)
+	)
+
+	err = r.deletePersistentVolumeClaim(ctx, objName, namespace)
+	if client.IgnoreNotFound(err) != nil {
+		return err
+	}
+
+	err = r.deletePersistentVolume(ctx, objName)
+	if client.IgnoreNotFound(err) != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *AppReconciler) createDiskPersistence(ctx context.Context, disk v1.Disk, app *v1.App, namespace string) (claimName string, err error) {
+	var (
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, disk.Name)
+	)
+
+	err = r.createPersistentVolume(ctx, objName, namespace, disk.Spec.Details.Size, disk.Spec.Details.MountPath)
+	if client.IgnoreAlreadyExists(err) != nil {
+		return "", err
+	}
+
+	err = r.createPersistentVolumeClaim(ctx, objName, namespace, disk.Spec.Details.Size)
+	if client.IgnoreAlreadyExists(err) != nil {
+		return "", err
+	}
+
+	return objName, nil
+}
+
+func (r *AppReconciler) deleteDiskPersistence(ctx context.Context, disk v1.Disk, app *v1.App, namespace string) (claimName string, err error) {
+	var (
+		objName = fmt.Sprintf("%s-%s", app.Spec.Release, disk.Name)
+	)
+
+	err = r.deletePersistentVolumeClaim(ctx, objName, namespace)
+	if client.IgnoreNotFound(err) != nil {
+		return "", err
+	}
+
+	err = r.deletePersistentVolume(ctx, objName)
+	if client.IgnoreNotFound(err) != nil {
+		return "", err
+	}
+
+	return objName, nil
+}
+
+func (r *AppReconciler) createPersistentVolume(ctx context.Context, name string, namespace string, quantity resource.Quantity, hostPath string) error {
+	return r.Client.Create(ctx, &corev1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: objName,
+			Name: name,
 			Labels: map[string]string{
 				"type": "local",
 			},
@@ -94,19 +154,28 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 			},
 			ClaimRef: &corev1.ObjectReference{
 				Namespace: namespace,
-				Name:      objName,
+				Name:      name,
 			},
 			// TODO: NodeAffinity
 		},
 	})
-	if client.IgnoreAlreadyExists(err) != nil {
-		return err
-	}
+}
 
-	// create PVC
-	err = r.Client.Create(ctx, &corev1.PersistentVolumeClaim{
+func (r *AppReconciler) deletePersistentVolume(ctx context.Context, name string) error {
+	return r.Client.Delete(ctx, &corev1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      objName,
+			Name: name,
+			Labels: map[string]string{
+				"type": "local",
+			},
+		},
+	})
+}
+
+func (r *AppReconciler) createPersistentVolumeClaim(ctx context.Context, name string, namespace string, quantity resource.Quantity) error {
+	return r.Client.Create(ctx, &corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
 			Namespace: namespace,
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
@@ -121,9 +190,13 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 			},
 		},
 	})
-	if client.IgnoreAlreadyExists(err) != nil {
-		return err
-	}
+}
 
-	return nil
+func (r *AppReconciler) deletePersistentVolumeClaim(ctx context.Context, name string, namespace string) error {
+	return r.Client.Delete(ctx, &corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
+	})
 }

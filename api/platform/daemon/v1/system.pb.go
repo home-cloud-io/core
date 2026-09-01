@@ -21,6 +21,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type DiskType int32
+
+const (
+	DiskType_DEVICE_TYPE_UNSPECIFIED DiskType = 0
+	DiskType_DEVICE_TYPE_SSD         DiskType = 1
+	DiskType_DEVICE_TYPE_HDD         DiskType = 2
+	DiskType_DEVICE_TYPE_NVME        DiskType = 3
+)
+
+// Enum value maps for DiskType.
+var (
+	DiskType_name = map[int32]string{
+		0: "DEVICE_TYPE_UNSPECIFIED",
+		1: "DEVICE_TYPE_SSD",
+		2: "DEVICE_TYPE_HDD",
+		3: "DEVICE_TYPE_NVME",
+	}
+	DiskType_value = map[string]int32{
+		"DEVICE_TYPE_UNSPECIFIED": 0,
+		"DEVICE_TYPE_SSD":         1,
+		"DEVICE_TYPE_HDD":         2,
+		"DEVICE_TYPE_NVME":        3,
+	}
+)
+
+func (x DiskType) Enum() *DiskType {
+	p := new(DiskType)
+	*p = x
+	return p
+}
+
+func (x DiskType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DiskType) Descriptor() protoreflect.EnumDescriptor {
+	return file_platform_daemon_v1_system_proto_enumTypes[0].Descriptor()
+}
+
+func (DiskType) Type() protoreflect.EnumType {
+	return &file_platform_daemon_v1_system_proto_enumTypes[0]
+}
+
+func (x DiskType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DiskType.Descriptor instead.
+func (DiskType) EnumDescriptor() ([]byte, []int) {
+	return file_platform_daemon_v1_system_proto_rawDescGZIP(), []int{0}
+}
+
 type SystemStats struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -447,6 +499,126 @@ func (x *Log) GetTimestamp() *timestamppb.Timestamp {
 	return nil
 }
 
+type Disk struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// for Talos this is the UserVolume name (minus the "u-" prefix)
+	Name       string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name" bun:"name" csv:"name" pg:"name" yaml:"name"`
+	DevicePath string   `protobuf:"bytes,2,opt,name=device_path,json=devicePath,proto3" json:"device_path" bun:"device_path" csv:"device_path" pg:"device_path" yaml:"devicePath"`
+	Model      string   `protobuf:"bytes,3,opt,name=model,proto3" json:"model" bun:"model" csv:"model" pg:"model" yaml:"model"`
+	Serial     string   `protobuf:"bytes,4,opt,name=serial,proto3" json:"serial" bun:"serial" csv:"serial" pg:"serial" yaml:"serial"`
+	Wwid       string   `protobuf:"bytes,5,opt,name=wwid,proto3" json:"wwid" bun:"wwid" csv:"wwid" pg:"wwid" yaml:"wwid"`
+	Uuid       string   `protobuf:"bytes,6,opt,name=uuid,proto3" json:"uuid" bun:"uuid" csv:"uuid" pg:"uuid" yaml:"uuid"`
+	Type       DiskType `protobuf:"varint,7,opt,name=type,proto3,enum=platform.daemon.v1.DiskType" json:"type" bun:"type" csv:"type" pg:"type" yaml:"type"`
+	SystemDisk bool     `protobuf:"varint,8,opt,name=system_disk,json=systemDisk,proto3" json:"system_disk" bun:"system_disk" csv:"system_disk" pg:"system_disk" yaml:"systemDisk"`
+	Size       uint64   `protobuf:"varint,9,opt,name=size,proto3" json:"size" bun:"size" csv:"size" pg:"size" yaml:"size"`
+	Symlinks   []string `protobuf:"bytes,10,rep,name=symlinks,proto3" json:"symlinks" bun:"symlinks" csv:"symlinks" pg:"symlinks" yaml:"symlinks"`
+}
+
+func (x *Disk) Reset() {
+	*x = Disk{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_platform_daemon_v1_system_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Disk) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Disk) ProtoMessage() {}
+
+func (x *Disk) ProtoReflect() protoreflect.Message {
+	mi := &file_platform_daemon_v1_system_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Disk.ProtoReflect.Descriptor instead.
+func (*Disk) Descriptor() ([]byte, []int) {
+	return file_platform_daemon_v1_system_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *Disk) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Disk) GetDevicePath() string {
+	if x != nil {
+		return x.DevicePath
+	}
+	return ""
+}
+
+func (x *Disk) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *Disk) GetSerial() string {
+	if x != nil {
+		return x.Serial
+	}
+	return ""
+}
+
+func (x *Disk) GetWwid() string {
+	if x != nil {
+		return x.Wwid
+	}
+	return ""
+}
+
+func (x *Disk) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
+}
+
+func (x *Disk) GetType() DiskType {
+	if x != nil {
+		return x.Type
+	}
+	return DiskType_DEVICE_TYPE_UNSPECIFIED
+}
+
+func (x *Disk) GetSystemDisk() bool {
+	if x != nil {
+		return x.SystemDisk
+	}
+	return false
+}
+
+func (x *Disk) GetSize() uint64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *Disk) GetSymlinks() []string {
+	if x != nil {
+		return x.Symlinks
+	}
+	return nil
+}
+
 var File_platform_daemon_v1_system_proto protoreflect.FileDescriptor
 
 var file_platform_daemon_v1_system_proto_rawDesc = []byte{
@@ -516,7 +688,31 @@ var file_platform_daemon_v1_system_proto_rawDesc = []byte{
 	0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x05, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x74,
-	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68,
+	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x94, 0x02, 0x0a, 0x04, 0x44, 0x69, 0x73,
+	0x6b, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x5f,
+	0x70, 0x61, 0x74, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x64, 0x65, 0x76, 0x69,
+	0x63, 0x65, 0x50, 0x61, 0x74, 0x68, 0x12, 0x14, 0x0a, 0x05, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x12, 0x16, 0x0a, 0x06,
+	0x73, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x65,
+	0x72, 0x69, 0x61, 0x6c, 0x12, 0x12, 0x0a, 0x04, 0x77, 0x77, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x04, 0x77, 0x77, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75, 0x69, 0x64,
+	0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x12, 0x30, 0x0a, 0x04,
+	0x74, 0x79, 0x70, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1c, 0x2e, 0x70, 0x6c, 0x61,
+	0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2e, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e,
+	0x44, 0x69, 0x73, 0x6b, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x1f,
+	0x0a, 0x0b, 0x73, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x5f, 0x64, 0x69, 0x73, 0x6b, 0x18, 0x08, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x0a, 0x73, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x44, 0x69, 0x73, 0x6b, 0x12,
+	0x12, 0x0a, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x18, 0x09, 0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x73,
+	0x69, 0x7a, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x73, 0x79, 0x6d, 0x6c, 0x69, 0x6e, 0x6b, 0x73, 0x18,
+	0x0a, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x73, 0x79, 0x6d, 0x6c, 0x69, 0x6e, 0x6b, 0x73, 0x2a,
+	0x67, 0x0a, 0x08, 0x44, 0x69, 0x73, 0x6b, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1b, 0x0a, 0x17, 0x44,
+	0x45, 0x56, 0x49, 0x43, 0x45, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45,
+	0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x13, 0x0a, 0x0f, 0x44, 0x45, 0x56, 0x49,
+	0x43, 0x45, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x53, 0x53, 0x44, 0x10, 0x01, 0x12, 0x13, 0x0a,
+	0x0f, 0x44, 0x45, 0x56, 0x49, 0x43, 0x45, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x48, 0x44, 0x44,
+	0x10, 0x02, 0x12, 0x14, 0x0a, 0x10, 0x44, 0x45, 0x56, 0x49, 0x43, 0x45, 0x5f, 0x54, 0x59, 0x50,
+	0x45, 0x5f, 0x4e, 0x56, 0x4d, 0x45, 0x10, 0x03, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68,
 	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x68, 0x6f, 0x6d, 0x65, 0x2d, 0x63, 0x6c, 0x6f, 0x75,
 	0x64, 0x2d, 0x69, 0x6f, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x6c,
 	0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x2f, 0x64, 0x61, 0x65, 0x6d, 0x6f, 0x6e, 0x2f, 0x76, 0x31,
@@ -535,28 +731,32 @@ func file_platform_daemon_v1_system_proto_rawDescGZIP() []byte {
 	return file_platform_daemon_v1_system_proto_rawDescData
 }
 
-var file_platform_daemon_v1_system_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_platform_daemon_v1_system_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_platform_daemon_v1_system_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_platform_daemon_v1_system_proto_goTypes = []any{
-	(*SystemStats)(nil),           // 0: platform.daemon.v1.SystemStats
-	(*ComputeStats)(nil),          // 1: platform.daemon.v1.ComputeStats
-	(*MemoryStats)(nil),           // 2: platform.daemon.v1.MemoryStats
-	(*DriveStats)(nil),            // 3: platform.daemon.v1.DriveStats
-	(*ComponentVersion)(nil),      // 4: platform.daemon.v1.ComponentVersion
-	(*Log)(nil),                   // 5: platform.daemon.v1.Log
-	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
+	(DiskType)(0),                 // 0: platform.daemon.v1.DiskType
+	(*SystemStats)(nil),           // 1: platform.daemon.v1.SystemStats
+	(*ComputeStats)(nil),          // 2: platform.daemon.v1.ComputeStats
+	(*MemoryStats)(nil),           // 3: platform.daemon.v1.MemoryStats
+	(*DriveStats)(nil),            // 4: platform.daemon.v1.DriveStats
+	(*ComponentVersion)(nil),      // 5: platform.daemon.v1.ComponentVersion
+	(*Log)(nil),                   // 6: platform.daemon.v1.Log
+	(*Disk)(nil),                  // 7: platform.daemon.v1.Disk
+	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
 }
 var file_platform_daemon_v1_system_proto_depIdxs = []int32{
-	6, // 0: platform.daemon.v1.SystemStats.start_time:type_name -> google.protobuf.Timestamp
-	6, // 1: platform.daemon.v1.SystemStats.end_time:type_name -> google.protobuf.Timestamp
-	1, // 2: platform.daemon.v1.SystemStats.compute:type_name -> platform.daemon.v1.ComputeStats
-	2, // 3: platform.daemon.v1.SystemStats.memory:type_name -> platform.daemon.v1.MemoryStats
-	3, // 4: platform.daemon.v1.SystemStats.drives:type_name -> platform.daemon.v1.DriveStats
-	6, // 5: platform.daemon.v1.Log.timestamp:type_name -> google.protobuf.Timestamp
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	8, // 0: platform.daemon.v1.SystemStats.start_time:type_name -> google.protobuf.Timestamp
+	8, // 1: platform.daemon.v1.SystemStats.end_time:type_name -> google.protobuf.Timestamp
+	2, // 2: platform.daemon.v1.SystemStats.compute:type_name -> platform.daemon.v1.ComputeStats
+	3, // 3: platform.daemon.v1.SystemStats.memory:type_name -> platform.daemon.v1.MemoryStats
+	4, // 4: platform.daemon.v1.SystemStats.drives:type_name -> platform.daemon.v1.DriveStats
+	8, // 5: platform.daemon.v1.Log.timestamp:type_name -> google.protobuf.Timestamp
+	0, // 6: platform.daemon.v1.Disk.type:type_name -> platform.daemon.v1.DiskType
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_platform_daemon_v1_system_proto_init() }
@@ -637,19 +837,32 @@ func file_platform_daemon_v1_system_proto_init() {
 				return nil
 			}
 		}
+		file_platform_daemon_v1_system_proto_msgTypes[6].Exporter = func(v any, i int) any {
+			switch v := v.(*Disk); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_platform_daemon_v1_system_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   6,
+			NumEnums:      1,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_platform_daemon_v1_system_proto_goTypes,
 		DependencyIndexes: file_platform_daemon_v1_system_proto_depIdxs,
+		EnumInfos:         file_platform_daemon_v1_system_proto_enumTypes,
 		MessageInfos:      file_platform_daemon_v1_system_proto_msgTypes,
 	}.Build()
 	File_platform_daemon_v1_system_proto = out.File

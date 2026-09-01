@@ -30,6 +30,8 @@ type AppStatus struct {
 //+kubebuilder:subresource:status
 
 // App is the Schema for the apps API
+//
+// +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.version`
 type App struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -50,3 +52,7 @@ type AppList struct {
 func init() {
 	SchemeBuilder.Register(&App{}, &AppList{})
 }
+
+const (
+	AnnotationAppCleanUninstall = "apps.home-cloud.io/clean-uninstall"
+)

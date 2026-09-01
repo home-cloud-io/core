@@ -3,6 +3,7 @@ package apps
 import (
 	"context"
 	"fmt"
+	"slices"
 	"time"
 
 	"dario.cat/mergo"
@@ -16,13 +17,18 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
+	"github.com/home-cloud-io/core/pkg/compare"
+	"github.com/steady-bytes/draft/pkg/chassis"
 )
 
 const AppFinalizer = "apps.home-cloud.io/finalizer"
@@ -31,6 +37,7 @@ const AppFinalizer = "apps.home-cloud.io/finalizer"
 type AppReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	Config chassis.Config
 }
 
 // HelmRepositoryIndex represents the index.yaml file that holds the information of helm charts within a helm repo
@@ -86,19 +93,43 @@ func (r *AppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		return ctrl.Result{}, r.install(ctx, app)
 	}
 
-	// upgrade if conditions are met
-	if shouldUpgrade(app) {
-		l.Info("Upgrading App")
-		return ctrl.Result{}, r.upgrade(ctx, app)
-	}
+	// upgrade as default
+	l.Info("Upgrading App")
+	return ctrl.Result{}, r.upgrade(ctx, app)
+}
 
-	return ctrl.Result{}, nil
+func (r *AppReconciler) ReconcileDisk() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) (requests []reconcile.Request) {
+		l := log.FromContext(ctx)
+		l.Info("Reconciling Disk for Apps")
+
+		requests = []reconcile.Request{}
+
+		install, err := shared.GetInstall(ctx, r.Client)
+		if err != nil {
+			l.Error(err, "failed to get install")
+			return
+		}
+
+		for _, appName := range install.Spec.Settings.StorageApps {
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      appName,
+					Namespace: install.Namespace,
+				},
+			})
+		}
+
+		return
+	})
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *AppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1.App{}).
+		// watch disks so we can trigger a reconcile on storage apps
+		Watches(&v1.Disk{}, r.ReconcileDisk()).
 		Complete(r)
 }
 
@@ -130,13 +161,19 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 		return err
 	}
 
+	// override from any changes in createDependencies
+	values, err = appConfig.ToValues(values)
+	if err != nil {
+		return err
+	}
+
 	// finally, install helm chart
 	_, err = act.Run(chart, values)
 	if err != nil {
 		return err
 	}
 
-	// create routes
+	// create routes (after helm so that Services already exist for DNS annotation)
 	for _, route := range appConfig.Routes {
 		err = r.createRoute(ctx, appConfig.Namespace, route)
 		if err != nil {
@@ -174,12 +211,18 @@ func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
 		return err
 	}
 
+	// override from any changes in createDependencies
+	values, err = appConfig.ToValues(values)
+	if err != nil {
+		return err
+	}
+
 	_, err = act.Run(app.Spec.Release, chart, values)
 	if err != nil {
 		return err
 	}
 
-	// update routes
+	// update routes (after helm so that Services already exist for DNS annotation)
 	for _, route := range appConfig.Routes {
 		err = r.createRoute(ctx, appConfig.Namespace, route)
 		if err != nil {
@@ -211,6 +254,7 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 	}
 
 	// delete all routes
+	// we always delete routes so that we aren't routing to a missing app
 	for _, route := range appConfig.Routes {
 		err = r.deleteRoute(ctx, appConfig.Namespace, route.Name)
 		if err != nil {
@@ -218,11 +262,18 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 		}
 	}
 
-	// TODO: option to hard-delete all add-on components (namespace, secrets, PV/PVCs, etc.)
+	// delete all other dependencies if requested (namespace, secrets, persistence, databases/users, etc.)
+	if shared.IsAnnotationTrue(app.Annotations, v1.AnnotationAppCleanUninstall) {
+		err = r.deleteDependencies(ctx, app, appConfig)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
+// createDependencies creates app dependencies and saves any updated values to AppConfig (e.g. disk claims)
 func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, appConfig *AppConfig) error {
 	var (
 		err error
@@ -269,12 +320,109 @@ func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, app
 		}
 	}
 
+	// if a storage app, create disk PV/PVCs
+	install, err := shared.GetInstall(ctx, r.Client)
+	if err != nil {
+		return err
+	}
+	if slices.Contains(install.Spec.Settings.StorageApps, app.Name) {
+		disks := &v1.DiskList{}
+		err := r.Client.List(ctx, disks)
+		if err != nil {
+			return err
+		}
+		appConfig.Disks = []AppDisk{}
+		for _, disk := range disks.Items {
+			if disk.Spec.SystemDisk {
+				continue
+			}
+
+			claimName, err := r.createDiskPersistence(ctx, disk, app, appConfig.Namespace)
+			if err != nil {
+				return err
+			}
+
+			// save created claim name for helm install/upgrade
+			appConfig.Disks = append(appConfig.Disks, AppDisk{
+				// use disk.Alias if available for user visibility
+				Name:      compare.Default(disk.Spec.Alias, disk.Name),
+				ClaimName: claimName,
+			})
+		}
+	}
+
 	// create database (and users/initialization scripts)
 	for _, d := range appConfig.Databases {
 		err := r.createDatabase(ctx, d, appConfig.Namespace)
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (r *AppReconciler) deleteDependencies(ctx context.Context, app *v1.App, appConfig *AppConfig) error {
+	var (
+		err error
+	)
+
+	// delete secrets
+	for _, s := range appConfig.Secrets {
+		err := r.deleteSecret(ctx, s, appConfig.Namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// delete persistence (PV/PVCs)
+	for _, p := range appConfig.Persistence {
+		// TODO: this doesn't actually wipe the files...
+		err := r.deletePersistence(ctx, p, app, appConfig.Namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// if a storage app, delete disk PV/PVCs
+	install, err := shared.GetInstall(ctx, r.Client)
+	if err != nil {
+		return err
+	}
+	if slices.Contains(install.Spec.Settings.StorageApps, app.Name) {
+		disks := &v1.DiskList{}
+		err := r.Client.List(ctx, disks)
+		if err != nil {
+			return err
+		}
+		appConfig.Disks = make([]AppDisk, len(disks.Items))
+		for _, disk := range disks.Items {
+			if disk.Spec.SystemDisk {
+				continue
+			}
+			_, err := r.deleteDiskPersistence(ctx, disk, app, app.Namespace)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// delete databases (and users)
+	for _, d := range appConfig.Databases {
+		err := r.deleteDatabase(ctx, d, appConfig.Namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	// delete namespace
+	err = r.Client.Delete(ctx, &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: appConfig.Namespace,
+		},
+	})
+	if err != nil {
+		return err
 	}
 
 	return nil

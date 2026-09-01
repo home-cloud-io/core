@@ -4,7 +4,7 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
-import type { SystemStats } from "./system_pb";
+import type { Disk, SystemStats } from "./system_pb";
 
 /**
  * Describes the file platform/daemon/v1/daemon.proto.
@@ -216,7 +216,7 @@ export declare const CreateVolumeRequestSchema: GenMessage<CreateVolumeRequest>;
  */
 export declare type CreateVolumeResponse = Message<"platform.daemon.v1.CreateVolumeResponse"> & {
   /**
-   * identifier of the created volume, to be used when calling DeleteVolume() 
+   * identifier of the created volume, to be used when calling DeleteVolume()
    *
    * @generated from field: string id = 1;
    */
@@ -261,6 +261,79 @@ export declare type DeleteVolumeResponse = Message<"platform.daemon.v1.DeleteVol
  * Use `create(DeleteVolumeResponseSchema)` to create a new message.
  */
 export declare const DeleteVolumeResponseSchema: GenMessage<DeleteVolumeResponse>;
+
+/**
+ * @generated from message platform.daemon.v1.GetDisksRequest
+ */
+export declare type GetDisksRequest = Message<"platform.daemon.v1.GetDisksRequest"> & {
+};
+
+/**
+ * Describes the message platform.daemon.v1.GetDisksRequest.
+ * Use `create(GetDisksRequestSchema)` to create a new message.
+ */
+export declare const GetDisksRequestSchema: GenMessage<GetDisksRequest>;
+
+/**
+ * @generated from message platform.daemon.v1.GetDisksResponse
+ */
+export declare type GetDisksResponse = Message<"platform.daemon.v1.GetDisksResponse"> & {
+  /**
+   * @generated from field: repeated platform.daemon.v1.Disk disks = 1;
+   */
+  disks: Disk[];
+};
+
+/**
+ * Describes the message platform.daemon.v1.GetDisksResponse.
+ * Use `create(GetDisksResponseSchema)` to create a new message.
+ */
+export declare const GetDisksResponseSchema: GenMessage<GetDisksResponse>;
+
+/**
+ * @generated from message platform.daemon.v1.LoadDiskRequest
+ */
+export declare type LoadDiskRequest = Message<"platform.daemon.v1.LoadDiskRequest"> & {
+  /**
+   * the device path (e.g. /dev/sdb, /dev/nvme1n1)
+   * NOTE: this name is not stable but when loading the disk the association
+   * to the usable volume *must* be stable (reference uuid, serial, etc.).
+   *
+   * @generated from field: string device_path = 1;
+   */
+  devicePath: string;
+
+  /**
+   * the name to assign to the created volume (e.g. apps1, bigdata)
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
+};
+
+/**
+ * Describes the message platform.daemon.v1.LoadDiskRequest.
+ * Use `create(LoadDiskRequestSchema)` to create a new message.
+ */
+export declare const LoadDiskRequestSchema: GenMessage<LoadDiskRequest>;
+
+/**
+ * @generated from message platform.daemon.v1.LoadDiskResponse
+ */
+export declare type LoadDiskResponse = Message<"platform.daemon.v1.LoadDiskResponse"> & {
+  /**
+   * the host mount path of the created volume (e.g. /mnt/apps1, /var/mnt/bigdata)
+   *
+   * @generated from field: string mount_path = 1;
+   */
+  mountPath: string;
+};
+
+/**
+ * Describes the message platform.daemon.v1.LoadDiskResponse.
+ * Use `create(LoadDiskResponseSchema)` to create a new message.
+ */
+export declare const LoadDiskResponseSchema: GenMessage<LoadDiskResponse>;
 
 /**
  * @generated from service platform.daemon.v1.DaemonService
@@ -329,6 +402,22 @@ export declare const DaemonService: GenService<{
     methodKind: "unary";
     input: typeof DeleteVolumeRequestSchema;
     output: typeof DeleteVolumeResponseSchema;
+  },
+  /**
+   * @generated from rpc platform.daemon.v1.DaemonService.GetDisks
+   */
+  getDisks: {
+    methodKind: "unary";
+    input: typeof GetDisksRequestSchema;
+    output: typeof GetDisksResponseSchema;
+  },
+  /**
+   * @generated from rpc platform.daemon.v1.DaemonService.LoadDisk
+   */
+  loadDisk: {
+    methodKind: "unary";
+    input: typeof LoadDiskRequestSchema;
+    output: typeof LoadDiskResponseSchema;
   },
 }>;
 

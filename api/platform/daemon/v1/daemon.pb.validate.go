@@ -1709,3 +1709,443 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteVolumeResponseValidationError{}
+
+// Validate checks the field values on GetDisksRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GetDisksRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDisksRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDisksRequestMultiError, or nil if none found.
+func (m *GetDisksRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDisksRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return GetDisksRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDisksRequestMultiError is an error wrapping multiple validation errors
+// returned by GetDisksRequest.ValidateAll() if the designated constraints
+// aren't met.
+type GetDisksRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDisksRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDisksRequestMultiError) AllErrors() []error { return m }
+
+// GetDisksRequestValidationError is the validation error returned by
+// GetDisksRequest.Validate if the designated constraints aren't met.
+type GetDisksRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDisksRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDisksRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDisksRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDisksRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDisksRequestValidationError) ErrorName() string { return "GetDisksRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetDisksRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDisksRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDisksRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDisksRequestValidationError{}
+
+// Validate checks the field values on GetDisksResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GetDisksResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDisksResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDisksResponseMultiError, or nil if none found.
+func (m *GetDisksResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDisksResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetDisks() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetDisksResponseValidationError{
+						field:  fmt.Sprintf("Disks[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetDisksResponseValidationError{
+						field:  fmt.Sprintf("Disks[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetDisksResponseValidationError{
+					field:  fmt.Sprintf("Disks[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetDisksResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDisksResponseMultiError is an error wrapping multiple validation errors
+// returned by GetDisksResponse.ValidateAll() if the designated constraints
+// aren't met.
+type GetDisksResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDisksResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDisksResponseMultiError) AllErrors() []error { return m }
+
+// GetDisksResponseValidationError is the validation error returned by
+// GetDisksResponse.Validate if the designated constraints aren't met.
+type GetDisksResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDisksResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDisksResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDisksResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDisksResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDisksResponseValidationError) ErrorName() string { return "GetDisksResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetDisksResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDisksResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDisksResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDisksResponseValidationError{}
+
+// Validate checks the field values on LoadDiskRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *LoadDiskRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadDiskRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadDiskRequestMultiError, or nil if none found.
+func (m *LoadDiskRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadDiskRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for DevicePath
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return LoadDiskRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadDiskRequestMultiError is an error wrapping multiple validation errors
+// returned by LoadDiskRequest.ValidateAll() if the designated constraints
+// aren't met.
+type LoadDiskRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadDiskRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadDiskRequestMultiError) AllErrors() []error { return m }
+
+// LoadDiskRequestValidationError is the validation error returned by
+// LoadDiskRequest.Validate if the designated constraints aren't met.
+type LoadDiskRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadDiskRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadDiskRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadDiskRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadDiskRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadDiskRequestValidationError) ErrorName() string { return "LoadDiskRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoadDiskRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadDiskRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadDiskRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadDiskRequestValidationError{}
+
+// Validate checks the field values on LoadDiskResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *LoadDiskResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on LoadDiskResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// LoadDiskResponseMultiError, or nil if none found.
+func (m *LoadDiskResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LoadDiskResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for MountPath
+
+	if len(errors) > 0 {
+		return LoadDiskResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// LoadDiskResponseMultiError is an error wrapping multiple validation errors
+// returned by LoadDiskResponse.ValidateAll() if the designated constraints
+// aren't met.
+type LoadDiskResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LoadDiskResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LoadDiskResponseMultiError) AllErrors() []error { return m }
+
+// LoadDiskResponseValidationError is the validation error returned by
+// LoadDiskResponse.Validate if the designated constraints aren't met.
+type LoadDiskResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LoadDiskResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LoadDiskResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LoadDiskResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LoadDiskResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LoadDiskResponseValidationError) ErrorName() string { return "LoadDiskResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LoadDiskResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLoadDiskResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LoadDiskResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LoadDiskResponseValidationError{}

@@ -50,6 +50,10 @@ resources:
 			},
 			Settings: &v1.SettingsSpec{
 				Hostname: "home-cloud.local",
+				StorageApps: []string{
+					"filebrowser",
+					"nextexplorer",
+				},
 			},
 		},
 		Status: v1.InstallStatus{

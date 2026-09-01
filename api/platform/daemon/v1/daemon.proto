@@ -15,6 +15,8 @@ service DaemonService {
   rpc UpgradeKubernetes(UpgradeKubernetesRequest) returns (UpgradeKubernetesResponse) {}
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {}
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {}
+  rpc GetDisks(GetDisksRequest) returns (GetDisksResponse) {}
+  rpc LoadDisk(LoadDiskRequest) returns (LoadDiskResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -48,12 +50,12 @@ message UpgradeKubernetesResponse {}
 message CreateVolumeRequest {
   string name = 1;
   // minimum size of the volume: parsed with https://github.com/dustin/go-humanize
-  string min_size = 2; 
+  string min_size = 2;
   // maximum size of the volume: parsed with https://github.com/dustin/go-humanize
   string max_size = 3;
 }
 message CreateVolumeResponse {
-  // identifier of the created volume, to be used when calling DeleteVolume() 
+  // identifier of the created volume, to be used when calling DeleteVolume()
   string id = 1;
   string path = 2;
 }
@@ -62,3 +64,21 @@ message DeleteVolumeRequest {
   string id = 1;
 }
 message DeleteVolumeResponse {}
+
+message GetDisksRequest {}
+message GetDisksResponse {
+  repeated platform.daemon.v1.Disk disks = 1;
+}
+
+message LoadDiskRequest {
+  // the device path (e.g. /dev/sdb, /dev/nvme1n1)
+  // NOTE: this name is not stable but when loading the disk the association
+  // to the usable volume *must* be stable (reference uuid, serial, etc.).
+  string device_path = 1;
+  // the name to assign to the created volume (e.g. apps1, bigdata)
+  string name = 2;
+}
+message LoadDiskResponse {
+  // the host mount path of the created volume (e.g. /mnt/apps1, /var/mnt/bigdata)
+  string mount_path = 1;
+}
