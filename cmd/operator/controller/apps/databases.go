@@ -40,28 +40,14 @@ func (r *AppReconciler) createDatabase(ctx context.Context, d AppDatabase, names
 		sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
 		db := bun.NewDB(sqldb, pgdialect.New())
 
-		// check if user already exists (this happens on a reinstall without wiping old data)
-		exists, err := sysObjectExists(ctx, db, fmt.Sprintf("SELECT 1 FROM pg_roles WHERE rolname='%s'", d.Name))
+		err = r.createPostgresUser(ctx, db, d, namespace)
 		if err != nil {
 			return err
-		}
-		if !exists {
-			err = r.createPostgresUser(ctx, db, d, namespace)
-			if err != nil {
-				return err
-			}
 		}
 
-		// check if user database already exists (this happens on a reinstall without wiping old data)
-		exists, err = sysObjectExists(ctx, db, fmt.Sprintf("SELECT 1 FROM pg_database WHERE datname = '%s'", d.Name))
+		err = r.createPostgresUserDatabase(ctx, db, d, secret)
 		if err != nil {
 			return err
-		}
-		if !exists {
-			err = r.createPostgresUserDatabase(ctx, db, d, secret)
-			if err != nil {
-				return err
-			}
 		}
 	case "mysql":
 		// TODO
@@ -135,14 +121,22 @@ func sysObjectExists(ctx context.Context, db *bun.DB, query string) (bool, error
 }
 
 func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d AppDatabase, namespace string) error {
-	// create user within database
 	pass, err := secrets.Generate(24, true)
 	if err != nil {
 		return err
 	}
-	_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", d.Name, pass))
+
+	// check if user database already exists (this happens on a reinstall without wiping old data)
+	exists, err := sysObjectExists(ctx, db, fmt.Sprintf("SELECT 1 FROM pg_database WHERE datname = '%s'", d.Name))
 	if err != nil {
 		return err
+	}
+	if !exists {
+		// create user within database
+		_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", d.Name, pass))
+		if err != nil {
+			return err
+		}
 	}
 
 	// create kube secret with access credentials
@@ -189,10 +183,17 @@ func (r *AppReconciler) deletePostgresUser(ctx context.Context, db *bun.DB, d Ap
 }
 
 func (r *AppReconciler) createPostgresUserDatabase(ctx context.Context, db *bun.DB, d AppDatabase, secret *corev1.Secret) error {
-	// create database for user (using system db client)
-	_, err := db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s OWNER %s", d.Name, d.Name))
+	// check if user already exists (this happens on a reinstall without wiping old data)
+	exists, err := sysObjectExists(ctx, db, fmt.Sprintf("SELECT 1 FROM pg_roles WHERE rolname='%s'", d.Name))
 	if err != nil {
 		return err
+	}
+	if !exists {
+		// create database for user (using system db client)
+		_, err := db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s OWNER %s", d.Name, d.Name))
+		if err != nil {
+			return err
+		}
 	}
 
 	// execute init script (if provided)
