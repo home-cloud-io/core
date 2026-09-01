@@ -126,20 +126,8 @@ func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d Ap
 		return err
 	}
 
-	// check if user database already exists (this happens on a reinstall without wiping old data)
-	exists, err := sysObjectExists(ctx, db, fmt.Sprintf("SELECT 1 FROM pg_database WHERE datname = '%s'", d.Name))
-	if err != nil {
-		return err
-	}
-	if !exists {
-		// create user within database
-		_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", d.Name, pass))
-		if err != nil {
-			return err
-		}
-	}
-
 	// create kube secret with access credentials
+	var newSecret bool
 	err = r.Client.Create(ctx, &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", d.Type, d.Name),
@@ -155,8 +143,32 @@ func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d Ap
 			"uri":      []byte(fmt.Sprintf("postgresql://%s:%s@postgres.postgres:5432/%s?sslmode=disable", d.Name, pass, d.Name)),
 		},
 	})
+	if err == nil {
+		newSecret = true
+	}
 	if client.IgnoreAlreadyExists(err) != nil {
 		return err
+	}
+
+	// check if user database already exists (this happens on a reinstall without wiping old data)
+	exists, err := sysObjectExists(ctx, db, fmt.Sprintf("SELECT 1 FROM pg_database WHERE datname = '%s'", d.Name))
+	if err != nil {
+		return err
+	}
+	if !exists {
+		// create user within database
+		_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", d.Name, pass))
+		if err != nil {
+			return err
+		}
+	}
+	// new secret (maybe the old one was deleted)
+	if exists && newSecret {
+		// update user password within database
+		_, err = db.ExecContext(ctx, fmt.Sprintf("ALTER USER %s WITH PASSWORD '%s'", d.Name, pass))
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
