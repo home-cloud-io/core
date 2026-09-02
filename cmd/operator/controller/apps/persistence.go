@@ -2,6 +2,7 @@ package apps
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
@@ -10,16 +11,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
-	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
 )
 
 // TODO: think about making this pluggable for different types of PV sources (ie. not just host path)
-
-const (
-	// if daemon is disabled, the user is responsible for creating this hostPath so that
-	// Home Cloud can provision PersistentVolumes against it
-	DefaultHostPath = "/mnt/home-cloud"
-)
 
 var (
 	storageClassName = "manual"
@@ -37,23 +31,26 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 		objName = fmt.Sprintf("%s-%s", app.Spec.Release, p.Name)
 	)
 
-	install, err := shared.GetInstall(ctx, r.Client)
+	diskList := &v1.DiskList{}
+	err := r.Client.List(ctx, diskList)
 	if err != nil {
 		return err
 	}
 
-	// default if no daemon
-	hostPath := fmt.Sprintf("%s/%s", DefaultHostPath, objName)
-
-	// if daemon is enabled, get the path before creating PV/PVC
-	if !install.Spec.Daemon.Disable {
-		// TODO: get the path/disk/UserVolume to use
-		// - should use some logic to optimize placement for multi-disk installs?
-		// - or just have the user select the disk during install?
-		// - I think with this new method we could technically move apps pretty easily between disks
-		volumeName := "apps1"
-		hostPath = fmt.Sprintf("%s/%s/%s/%s", "/var/mnt", volumeName, namespace, objName)
+	basePath := ""
+	for _, disk := range diskList.Items {
+		if disk.Spec.SystemDisk {
+			continue
+		}
+		// TODO: should have user select the disk for each app
+		//		for now we'll just take the first one
+		basePath = disk.Spec.Details.MountPath
+		break
 	}
+	if basePath == "" {
+		return errors.New("failed to find a non-system disk for persistence")
+	}
+	hostPath := fmt.Sprintf("%s/%s/%s", basePath, namespace, objName)
 
 	quantity, err := resource.ParseQuantity(p.Size)
 	if err != nil {
