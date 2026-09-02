@@ -202,8 +202,6 @@ export declare const LogSchema: GenMessage<Log>;
  */
 export declare type Disk = Message<"platform.daemon.v1.Disk"> & {
   /**
-   * for Talos this is the UserVolume name (minus the "u-" prefix)
-   *
    * @generated from field: string name = 1;
    */
   name: string;
@@ -252,6 +250,11 @@ export declare type Disk = Message<"platform.daemon.v1.Disk"> & {
    * @generated from field: repeated string symlinks = 10;
    */
   symlinks: string[];
+
+  /**
+   * @generated from field: string mount_path = 11;
+   */
+  mountPath: string;
 };
 
 /**

@@ -49,7 +49,6 @@ message Log {
 }
 
 message Disk {
-  // for Talos this is the UserVolume name (minus the "u-" prefix)
   string name = 1;
   string device_path = 2;
   string model = 3;
@@ -60,6 +59,7 @@ message Disk {
   bool system_disk = 8;
   uint64 size = 9;
   repeated string symlinks = 10;
+  string mount_path = 11;
 }
 
 enum DiskType {

@@ -271,6 +271,13 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
 	}
 
+	// get UserVolumes so we can match to disks (MountPath)
+	vcList, err := client.COSI.List(ctx, resource.NewMetadata("runtime", blockpb.VolumeConfigType, "", resource.VersionUndefined))
+	if err != nil {
+		h.logger.WithError(err).Error("failed to list VolumeConfigs")
+		return nil, err
+	}
+
 	// get the system disk
 	getResp, err := client.COSI.Get(ctx, resource.NewMetadata("runtime", blockpb.SystemDiskType, blockpb.SystemDiskID, resource.VersionUndefined))
 	if err != nil {
@@ -280,20 +287,43 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 	systemDisk := getResp.Spec().(*blockpb.SystemDiskSpec)
 
 	// list all disks (included system disk)
-	listResp, err := client.COSI.List(ctx, resource.NewMetadata("runtime", blockpb.DiskType, "", resource.VersionUndefined))
+	diskList, err := client.COSI.List(ctx, resource.NewMetadata("runtime", blockpb.DiskType, "", resource.VersionUndefined))
 	if err != nil {
 		h.logger.WithError(err).Error("failed to list disks")
 		return nil, err
 	}
 	disks := []*v1.Disk{}
-	for _, item := range listResp.Items {
-		disk := item.Spec().(*blockpb.DiskSpec)
+	for _, dItem := range diskList.Items {
+		disk := dItem.Spec().(*blockpb.DiskSpec)
 		diskType := mapDiskType(disk)
 		// skip disks of unspecified types
 		if diskType == v1.DiskType_DEVICE_TYPE_UNSPECIFIED {
 			continue
 		}
+
+		id := buildDiskSelector(disk)
+		if id == "false" {
+			h.logger.WithField("disk", disk.DevPath).Warn("invalid disk selector")
+			continue
+		}
+
+		// set DiskName/MountPath from VolumeConfig if there is one that matches
+		// only happens if the Disk kube resource was deleted but the Talos UserVolume was not
+		diskName := ""
+		mountPath := ""
+		for _, vcItem := range vcList.Items {
+			volumeConfig := vcItem.Spec().(*blockpb.VolumeConfigSpec)
+			// TODO: this never matches becuase the CEL expression is always empty, not sure why yet but I'm guessing
+			// it's something to do with proto/yaml marshalling with the COSI client.
+			if volumeConfig.Provisioning.DiskSelector.Match.String() == id {
+				diskName = volumeConfig.Mount.TargetPath
+				mountPath = filepath.Join(volumeConfig.Mount.ParentID, volumeConfig.Mount.TargetPath)
+				break
+			}
+		}
+
 		disks = append(disks, &v1.Disk{
+			Name:       diskName,
 			DevicePath: disk.DevPath,
 			Model:      disk.Model,
 			Serial:     disk.Serial,
@@ -301,9 +331,10 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 			Uuid:       disk.UUID,
 			Type:       diskType,
 			// flag system disk by matching IDs
-			SystemDisk: systemDisk != nil && item.Metadata().ID() == systemDisk.DiskID,
+			SystemDisk: systemDisk != nil && dItem.Metadata().ID() == systemDisk.DiskID,
 			Size:       disk.Size,
 			Symlinks:   disk.Symlinks,
+			MountPath:  mountPath,
 		})
 	}
 
