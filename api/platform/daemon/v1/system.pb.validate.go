@@ -883,6 +883,8 @@ func (m *Disk) validate(all bool) error {
 
 	// no validation rules for Size
 
+	// no validation rules for MountPath
+
 	if len(errors) > 0 {
 		return DiskMultiError(errors)
 	}

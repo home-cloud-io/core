@@ -3,7 +3,6 @@ package disks
 import (
 	"context"
 	"errors"
-	"strings"
 	"time"
 
 	"connectrpc.com/connect"
@@ -159,70 +158,71 @@ func (r *DiskReconciler) poll() {
 		// match disks from daemon with disks in kube (creating as necessary)
 		for _, hostDisk := range disksResp.Msg.Disks {
 
-			// find /dev/device/by-id symlink and use that
-			// TODO: can probably make this smarter by using other unique values? (e.g. serial, uuid)
-			for _, id := range hostDisk.Symlinks {
-				if !strings.HasPrefix(id, "/dev/disk/by-id") {
-					continue
-				}
+			id, err := GetDiskIdentifier(hostDisk)
+			if err != nil {
+				log.Error(err, "failed to process disk", "disk", hostDisk.DevicePath)
+				continue
+			}
 
-				// TODO: don't hardcode this
-				node := "home-cloud"
-				new := v1.Disk{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: install.Namespace,
+			// TODO: don't hardcode this
+			node := "home-cloud"
+			new := v1.Disk{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      hostDisk.Name, // only set when recreating a deleted kube Disk resource but the host still has a reference
+					Namespace: install.Namespace,
+				},
+				Spec: v1.DiskSpec{
+					Node:       node,
+					Type:       convertDiskType(hostDisk.Type),
+					Identifier: id,
+					SystemDisk: hostDisk.SystemDisk,
+					Details: v1.DiskDetails{
+						DevicePath: hostDisk.DevicePath, // only set when recreating a deleted kube Disk resource but the host still has a reference
+						MountPath:  hostDisk.MountPath,
+						Size:       *resource.NewQuantity(int64(hostDisk.Size), resource.DecimalSI),
+						Model:      hostDisk.Model,
+						Serial:     hostDisk.Serial,
+						Wwid:       hostDisk.Wwid,
+						Uuid:       hostDisk.Uuid,
+						Symlinks:   hostDisk.Symlinks,
 					},
-					Spec: v1.DiskSpec{
-						Node:       node,
-						Type:       convertDiskType(hostDisk.Type),
-						Identifier: id,
-						SystemDisk: hostDisk.SystemDisk,
-						Details: v1.DiskDetails{
-							DevicePath: hostDisk.DevicePath,
-							// no mount path until loaded
-							MountPath: "",
-							Size:      *resource.NewQuantity(int64(hostDisk.Size), resource.DecimalSI),
-							Model:     hostDisk.Model,
-							Serial:    hostDisk.Serial,
-							Wwid:      hostDisk.Wwid,
-							Uuid:      hostDisk.Uuid,
-							Symlinks:  hostDisk.Symlinks,
-						},
-					},
-				}
+				},
+			}
 
-				// use by-id symlink to check existence
-				old, found := kubeDiskMap[id]
-				if found {
-					// copy unset values
-					new.Name = old.Name
-					new.Spec.Details.MountPath = old.Spec.Details.MountPath
+			// use by-id symlink to check existence
+			old, found := kubeDiskMap[id]
+			if found {
+				// copy unset values
+				new.Name = old.Name
+				new.Spec.Details.MountPath = old.Spec.Details.MountPath
 
-					// compare and update if not same
-					if !new.Equal(old) {
+				// compare and update if not same
+				if !new.Equal(old) {
 
-						// replace spec for update
-						old.Spec = new.Spec
+					// replace spec for update
+					old.Spec = new.Spec
 
-						log.Info("updating disk", "disk", old.Name)
-						err := r.Client.Update(ctx, &old)
-						if err != nil {
-							log.Error(err, "failed to update disk")
-							continue
-						}
+					log.Info("updating disk", "disk", old.Name)
+					err := r.Client.Update(ctx, &old)
+					if err != nil {
+						log.Error(err, "failed to update disk")
+						continue
 					}
-
-					continue
 				}
 
-				// set name and create
+				// unchanged - nothing to do
+				continue
+			}
+
+			// set name (if needed) and create
+			if new.Name == "" {
 				new.Name = names.SimpleNameGenerator.GenerateName("disk-")
-				log.Info("creating disk", "disk", new.Name)
-				err := r.Client.Create(ctx, &new)
-				if err != nil {
-					log.Error(err, "failed to create disk")
-					continue
-				}
+			}
+			log.Info("creating disk", "disk", new.Name)
+			err = r.Client.Create(ctx, &new)
+			if err != nil {
+				log.Error(err, "failed to create disk")
+				continue
 			}
 		}
 	}

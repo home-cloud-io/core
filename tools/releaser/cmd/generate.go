@@ -25,6 +25,7 @@ var (
 
 	crdFiles = []string{
 		"home-cloud.io_apps.yaml",
+		"home-cloud.io_disks.yaml",
 		"home-cloud.io_installs.yaml",
 		"home-cloud.io_wireguards.yaml",
 	}
