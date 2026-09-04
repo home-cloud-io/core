@@ -14,7 +14,7 @@ func GetDiskIdentifier(d *dv1.Disk) (string, error) {
 		return d.Uuid, nil
 	}
 	if d.Wwid != "" {
-		return d.Uuid, nil
+		return d.Wwid, nil
 	}
 	if d.Serial != "" {
 		return d.Serial, nil

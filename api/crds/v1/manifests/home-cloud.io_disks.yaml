@@ -92,7 +92,7 @@ spec:
                   wwid:
                     type: string
                 type: object
-              name:
+              identifier:
                 description: A *stable* id of the disk (e.g. /disk/by-path, wwn, serial)
                 type: string
               node:
@@ -108,7 +108,7 @@ spec:
                 type: string
             required:
             - details
-            - name
+            - identifier
             - node
             - systemDisk
             - type
