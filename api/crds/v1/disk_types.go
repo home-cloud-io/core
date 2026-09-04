@@ -18,7 +18,7 @@ type DiskSpec struct {
 	Type string `json:"type,omitempty"`
 	// A *stable* id of the disk (e.g. /disk/by-path, wwn, serial)
 	// +required
-	Identifier string `json:"name,omitempty"`
+	Identifier string `json:"identifier,omitempty"`
 	// whether the operating system is installed to this disk
 	// usually do not want to use it also as an application disk
 	// +required
