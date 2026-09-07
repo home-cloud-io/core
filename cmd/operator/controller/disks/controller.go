@@ -189,7 +189,7 @@ func (r *DiskReconciler) poll() {
 				},
 			}
 
-			// use by-id symlink to check existence
+			// use identifier to check existence
 			old, found := kubeDiskMap[id]
 			if found {
 				// copy unset values

@@ -136,7 +136,7 @@ func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d Ap
 		return err
 	}
 
-	if err != nil {
+	if err == nil {
 		// get password from secret
 		var ok bool
 		pass, ok = secret.Data["password"]

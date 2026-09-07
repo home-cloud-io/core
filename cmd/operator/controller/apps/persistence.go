@@ -20,7 +20,7 @@ var (
 )
 
 type (
-	Disks []DiskItem
+	Disks    []DiskItem
 	DiskItem struct {
 		Name string
 	}
@@ -42,8 +42,13 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 		if disk.Spec.SystemDisk {
 			continue
 		}
+
+		if disk.Spec.Details.MountPath == "" {
+			continue
+		}
+
 		// TODO: should have user select the disk for each app
-		//		for now we'll just take the first one
+		//		for now we'll just take the first one that's mounted
 		basePath = disk.Spec.Details.MountPath
 		break
 	}
@@ -71,10 +76,9 @@ func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence,
 	return nil
 }
 
-
 func (r *AppReconciler) deletePersistence(ctx context.Context, p AppPersistence, app *v1.App, namespace string) error {
 	var (
-		err error
+		err     error
 		objName = fmt.Sprintf("%s-%s", app.Spec.Release, p.Name)
 	)
 
