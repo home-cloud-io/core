@@ -9,7 +9,6 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -135,16 +134,17 @@ func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d Ap
 	}, secret)
 	if client.IgnoreNotFound(err) != nil {
 		return err
-	} else {
+	}
+
+	if err != nil {
+		// get password from secret
 		var ok bool
 		pass, ok = secret.Data["password"]
 		if !ok {
 			return fmt.Errorf("database secret contained no 'password' key")
 		}
-	}
-
-	// create secret if not found
-	if errors.IsNotFound(err) {
+	} else {
+		// generate new password and create secret
 		pass, err = secrets.Generate(24, true)
 		if err != nil {
 			return err
