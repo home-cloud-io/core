@@ -81,6 +81,11 @@ func (r *AppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		return ctrl.Result{}, err
 	}
 
+	// skip reconcile if told to ignore
+	if shared.IsAnnotationTrue(app.Annotations, v1.AnnotationAppIgnore) {
+		return ctrl.Result{}, nil
+	}
+
 	// if marked for deletion, try to delete/uninstall
 	if app.GetDeletionTimestamp() != nil {
 		l.Info("Uninstalling App")
