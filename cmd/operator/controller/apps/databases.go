@@ -133,6 +133,7 @@ func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d Ap
 		Name:      objName,
 		Namespace: namespace,
 	}, secret)
+	// TODO: wrong logic here -> leads to empty secret on NotFound which loops on that no password key error
 	if client.IgnoreNotFound(err) != nil {
 		return err
 	} else {
