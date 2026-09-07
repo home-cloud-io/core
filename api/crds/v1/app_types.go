@@ -54,5 +54,10 @@ func init() {
 }
 
 const (
+	// signals the controller to delete all persistence resources (databases, secrets, volumes, etc.)
+	// during a delete
 	AnnotationAppCleanUninstall = "apps.home-cloud.io/clean-uninstall"
+	// signals the controller to skip reconciling this App. useful when debugging Apps or if a user
+	// wanted to migrate an App off of Home Cloud.
+	AnnotationAppIgnore = "apps.home-cloud.io/ignore"
 )

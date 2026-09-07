@@ -102,6 +102,8 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		if reflect.DeepEqual(install.Status.Version, *oldStatus) {
 			return
 		}
+
+		// TODO: this panics sometimes
 		err := r.Status().Update(ctx, install)
 		if err != nil {
 			panic(err)
