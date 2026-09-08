@@ -12,6 +12,7 @@ import (
 
 	"connectrpc.com/connect"
 	"dario.cat/mergo"
+	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
@@ -44,7 +45,7 @@ type InstallReconciler struct {
 	Scheme          *runtime.Scheme
 	Config          *rest.Config
 	// global cancel function to shutdown the manager (useful for operator upgrades)
-	Cancel          context.CancelFunc
+	Cancel context.CancelFunc
 }
 
 const (
@@ -268,7 +269,8 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 func (r *InstallReconciler) reconcileHomeCloudCRDs(ctx context.Context, install *v1.Install) error {
 	l := log.FromContext(ctx)
 
-	if install.Spec.Version != install.Status.Version {
+	switch semver.Compare(install.Spec.Version, install.Status.Version) {
+	case 1:
 		l.Info("reconciling home cloud crds")
 
 		resp, err := http.Get(fmt.Sprintf("%s/%s/crds.yaml", ReleasesURL, install.Spec.Version))
@@ -281,8 +283,13 @@ func (r *InstallReconciler) reconcileHomeCloudCRDs(ctx context.Context, install 
 		}
 
 		install.Status.Version = install.Spec.Version
-	} else {
+	case 0:
 		l.V(1).Info("unchanged home cloud crds: skipping reconcile")
+		return nil
+	case -1:
+		l.Error(fmt.Errorf("invalid CRD version"), "cannot install older CRDs over a newer version",
+			"spec_version", install.Spec.Version, "status_version", install.Status.Version)
+		// we won't kill the rest of the reconcile, just log and continue
 		return nil
 	}
 
