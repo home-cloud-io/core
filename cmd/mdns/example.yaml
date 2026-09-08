@@ -4,7 +4,7 @@ metadata:
   name: example
   namespace: home-cloud-system
   annotations:
-    "home-cloud.io/dns": "example.local"
+    "dns.home-cloud.io/domains": "example.local"
 spec:
   ports:
   - name: http

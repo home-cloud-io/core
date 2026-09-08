@@ -2,6 +2,7 @@ package resources
 
 import (
 	"fmt"
+	"strings"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -10,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 )
@@ -155,7 +157,7 @@ var (
 						"app": "operator",
 					},
 					Annotations: map[string]string{
-						"home-cloud.io/dns": install.Spec.Settings.Hostname,
+						v1.AnnotationDNSHostnames: GenerateDNSValue(install, "home-cloud"),
 					},
 				},
 				Spec: corev1.ServiceSpec{
@@ -175,3 +177,24 @@ var (
 		}
 	}
 )
+
+// TODO: change these to subdomains? (*.home-cloud.local)
+// subdomains don't work on Windows with mDNS so this would require running our
+// own DNS server (which we want to do anyway)
+
+func GenerateDNSValue(install *v1.Install, label string) string {
+	values := ""
+	for _, domain := range install.Spec.Settings.Domains {
+		values = fmt.Sprintf("%s,%s.%s", values, label, domain)
+	}
+	return strings.TrimPrefix(values, ",")
+}
+
+func GenerateGatewayHostnames(install *v1.Install, label string) []gwv1.Hostname {
+	hostnames := make([]gwv1.Hostname, len(install.Spec.Settings.Domains))
+	for i, domain := range install.Spec.Settings.Domains {
+		hostnames[i] = gwv1.Hostname(fmt.Sprintf("%s.%s", label, domain))
+	}
+	return hostnames
+}
+

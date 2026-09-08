@@ -2,28 +2,29 @@ package apps
 
 import (
 	"context"
-	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
-)
 
-var (
-	// TODO: get this value from the install
-	GatewayName      = "ingress-gateway"
-	GatewayNamespace = gwv1.Namespace("istio-system")
+	v1 "github.com/home-cloud-io/core/api/crds/v1"
+	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
+	"github.com/home-cloud-io/core/pkg/install/resources"
 )
 
 func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route AppRoute) error {
-	hostname := fmt.Sprintf("%s.local", route.Name)
+	install, err := shared.GetInstall(ctx, r.Client)
+	if err != nil {
+		return err
+	}
 
 	// create httproute
 	port := gwv1.PortNumber(int32(route.Service.Port))
-	err := r.Client.Create(ctx, &gwv1.HTTPRoute{
+	err = r.Client.Create(ctx, &gwv1.HTTPRoute{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      route.Name,
 			Namespace: namespace,
@@ -32,16 +33,12 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 			CommonRouteSpec: gwv1.CommonRouteSpec{
 				ParentRefs: []gwv1.ParentReference{
 					{
-						// TODO: derive these from Install CRD
-						Name:      gwv1.ObjectName(GatewayName),
-						Namespace: &GatewayNamespace,
+						Name:      gwv1.ObjectName(install.Spec.Istio.IngressGatewayName),
+						Namespace: ptr.To(gwv1.Namespace(install.Spec.Istio.Namespace)),
 					},
 				},
 			},
-			// TODO: change this to subdomain? (*.home-cloud.local)
-			// subdomains don't work on Windows with mDNS so this would require running our
-			// own DNS server (which we want to do anyway)
-			Hostnames: []gwv1.Hostname{gwv1.Hostname(hostname)},
+			Hostnames: resources.GenerateGatewayHostnames(install, route.Name),
 			Rules: []gwv1.HTTPRouteRule{
 				{
 					BackendRefs: []gwv1.HTTPBackendRef{
@@ -71,7 +68,7 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 	if err != nil {
 		return err
 	}
-	service.Annotations["home-cloud.io/dns"] = hostname
+	service.Annotations[v1.AnnotationDNSHostnames] = resources.GenerateDNSValue(install, route.Name)
 	err = r.Client.Update(ctx, service)
 	if err != nil {
 		return err

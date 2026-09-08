@@ -70,9 +70,7 @@ var (
 							},
 						},
 					},
-					Hostnames: []gwv1.Hostname{
-						gwv1.Hostname(install.Spec.Settings.Hostname),
-					},
+					Hostnames: GenerateGatewayHostnames(install, "home-cloud"),
 					Rules: []gwv1.HTTPRouteRule{
 						{
 							BackendRefs: []gwv1.HTTPBackendRef{

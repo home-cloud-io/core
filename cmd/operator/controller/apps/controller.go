@@ -108,14 +108,13 @@ func (r *AppReconciler) ReconcileDisk() handler.EventHandler {
 		l := log.FromContext(ctx)
 		l.Info("Reconciling Disk for Apps")
 
-		requests = []reconcile.Request{}
-
 		install, err := shared.GetInstall(ctx, r.Client)
 		if err != nil {
 			l.Error(err, "failed to get install")
 			return
 		}
 
+		requests = []reconcile.Request{}
 		for _, appName := range install.Spec.Settings.StorageApps {
 			requests = append(requests, reconcile.Request{
 				NamespacedName: types.NamespacedName{
@@ -129,12 +128,38 @@ func (r *AppReconciler) ReconcileDisk() handler.EventHandler {
 	})
 }
 
+func (r *AppReconciler) ReconcileInstall() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) (requests []reconcile.Request) {
+		l := log.FromContext(ctx)
+		l.Info("Reconciling Install for Apps")
+
+		apps := &v1.AppList{}
+		err := r.Client.List(ctx, apps)
+		if err != nil {
+			l.Error(err, "failed to list apps")
+			return
+		}
+
+		requests = make([]reconcile.Request, len(apps.Items))
+		for i, app := range apps.Items {
+			requests[i] = reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      app.Name,
+					Namespace: app.Namespace,
+				},
+			}
+		}
+
+		return requests
+	})
+}
+
 // SetupWithManager sets up the controller with the Manager.
 func (r *AppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1.App{}).
-		// watch disks so we can trigger a reconcile on storage apps
 		Watches(&v1.Disk{}, r.ReconcileDisk()).
+		Watches(&v1.Install{}, r.ReconcileInstall()).
 		Complete(r)
 }
 
