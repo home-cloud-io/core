@@ -102,8 +102,9 @@ type SettingsSpec struct {
 	AutoUpdateApps bool `json:"autoUpdateApps,omitempty"`
 	// AutoUpdateSystem (default: true)
 	AutoUpdateSystem bool `json:"autoUpdateSystem,omitempty"`
-	// Hostname defines the base hostname for the install (default: home-cloud.local)
-	Hostname string `json:"hostname,omitempty"`
+	// Domains defines the domains to host routes/mdns addresses under. For example,
+	// `home.arpa` or `my-custom-domain.com` (default: [ "local" ])
+	Domains []string `json:"domains"`
 	// AppStores defines the app stores to install apps from
 	AppStores []AppStore `json:"appStores,omitempty"`
 	// AutoUpdateAppsSchedule is a cron string that defines the freqency with which the server
@@ -234,3 +235,10 @@ type InstallList struct {
 func init() {
 	SchemeBuilder.Register(&Install{}, &InstallList{})
 }
+
+// FUNCTIONAL
+
+const (
+	AnnotationDNSHostnames = "dns.home-cloud.io/domains"
+)
+
