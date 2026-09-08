@@ -55,7 +55,6 @@ func (c *controller) GetServerSettings(ctx context.Context, logger chassis.Logge
 		return nil, err
 	}
 	s := &v1.DeviceSettings{
-		Hostname:                 settings.Hostname,
 		AutoUpdateApps:           settings.AutoUpdateApps,
 		AutoUpdateSystem:         settings.AutoUpdateSystem,
 		AutoUpdateAppsSchedule:   settings.AutoUpdateAppsSchedule,
@@ -153,7 +152,6 @@ func (c *controller) SetServerSettings(ctx context.Context, logger chassis.Logge
 		c.AutoUpdate(ctx, logger, compare.Default(settings.AutoUpdateSystemSchedule, DefaultAutoUpdateSystemSchedule))
 	}
 
-	install.Spec.Settings.Hostname = settings.Hostname
 	install.Spec.Settings.AutoUpdateApps = settings.AutoUpdateApps
 	install.Spec.Settings.AutoUpdateSystem = settings.AutoUpdateSystem
 	install.Spec.Settings.AutoUpdateAppsSchedule = settings.AutoUpdateAppsSchedule

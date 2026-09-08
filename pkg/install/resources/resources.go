@@ -15,7 +15,7 @@ var (
 		Spec: v1.InstallSpec{
 			GatewayAPI: &v1.GatewayAPISpec{},
 			Istio: &v1.IstioSpec{
-				Namespace:          "istio-system",
+				Namespace: "istio-system",
 				// TODO: do this through a separate Gateway resources so that people can run without Istio
 				IngressGatewayName: "ingress-gateway",
 				Base:               &v1.BaseSpec{},
@@ -49,7 +49,7 @@ resources:
 				Kubernetes: &v1.KubernetesSpec{},
 			},
 			Settings: &v1.SettingsSpec{
-				Hostname: "home-cloud.local",
+				Domains: []string{"local"},
 				StorageApps: []string{
 					"filebrowser",
 					"nextexplorer",
@@ -58,11 +58,11 @@ resources:
 		},
 		Status: v1.InstallStatus{
 			GatewayAPI: &v1.GatewayAPIStatus{},
-			Istio: &v1.IstioStatus{},
-			MDNS: &v1.MDNSStatus{},
-			Tunnel: &v1.TunnelStatus{},
-			Operator: &v1.OperatorStatus{},
-			Daemon: &v1.DaemonStatus{},
+			Istio:      &v1.IstioStatus{},
+			MDNS:       &v1.MDNSStatus{},
+			Tunnel:     &v1.TunnelStatus{},
+			Operator:   &v1.OperatorStatus{},
+			Daemon:     &v1.DaemonStatus{},
 		},
 	}
 )
