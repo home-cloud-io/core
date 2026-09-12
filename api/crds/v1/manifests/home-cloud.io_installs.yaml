@@ -93,6 +93,15 @@ spec:
                   version:
                     type: string
                 type: object
+              genericDevicePlugin:
+                properties:
+                  disable:
+                    type: boolean
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
               istio:
                 properties:
                   base:
@@ -265,6 +274,13 @@ spec:
                   url:
                     type: string
                   version:
+                    type: string
+                type: object
+              genericDevicePlugin:
+                properties:
+                  image:
+                    type: string
+                  tag:
                     type: string
                 type: object
               istio:

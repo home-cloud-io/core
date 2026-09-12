@@ -117,11 +117,17 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) error {
 	l := log.FromContext(ctx)
 
+	// Home Cloud CRDs
+	err := r.reconcileHomeCloudCRDs(ctx, install)
+	if err != nil {
+		return err
+	}
+
 	// OPERATOR
 	// install the operator before the other components since it may be necessary to patch a bug in itself to
 	// prevent getting locked up on other components
 	installed := install.Status.Operator != nil
-	err := r.reconcileObjects(ctx, "operator", install.Spec.Operator.Disable, installed, resources.OperatorObjects(install))
+	err = r.reconcileObjects(ctx, "operator", install.Spec.Operator.Disable, installed, resources.OperatorObjects(install))
 	if err != nil {
 		return err
 	}
@@ -142,12 +148,6 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		}
 	} else {
 		install.Status.Operator = nil
-	}
-
-	// Home Cloud CRDs
-	err = r.reconcileHomeCloudCRDs(ctx, install)
-	if err != nil {
-		return err
 	}
 
 	// GATEWAY API
