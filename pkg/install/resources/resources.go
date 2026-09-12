@@ -75,7 +75,7 @@ resources:
 		},
 	}
 
-	GenericDevicePlugin = func(install *v1.Install) []client.Object {
+	GenericDevicePluginObjects = func(install *v1.Install) []client.Object {
 		return []client.Object{
 			&appsv1.DaemonSet{
 				ObjectMeta: metav1.ObjectMeta{

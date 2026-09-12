@@ -250,6 +250,21 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 		install.Status.Daemon = nil
 	}
 
+	// GENERIC DEVICE PLUGIN
+	installed = install.Status.GenericDevicePlugin != nil
+	err = r.reconcileObjects(ctx, "generic-device-plugin", install.Spec.GenericDevicePlugin.Disable, installed, resources.GenericDevicePluginObjects(install))
+	if err != nil {
+		return err
+	}
+	if !install.Spec.GenericDevicePlugin.Disable {
+		install.Status.GenericDevicePlugin = &v1.GenericDevicePluginStatus{
+			Image: install.Spec.GenericDevicePlugin.Image,
+			Tag:   install.Spec.GenericDevicePlugin.Tag,
+		}
+	} else {
+		install.Status.GenericDevicePlugin = nil
+	}
+
 	// SYSTEM
 	err = r.reconcileSystem(ctx, install)
 	if err != nil {
