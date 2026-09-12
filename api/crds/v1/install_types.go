@@ -6,12 +6,13 @@ import (
 
 // InstallSpec defines the desired state of Install
 type InstallSpec struct {
-	Version    string         `json:"version"`
-	GatewayAPI *GatewayAPISpec `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
-	Istio      *IstioSpec      `json:"istio,omitempty"`
-	MDNS       *MDNSSpec       `json:"mdns,omitempty"`
-	Tunnel     *TunnelSpec     `json:"tunnel,omitempty"`
-	Operator   *OperatorSpec   `json:"operator,omitempty"`
+	Version             string                   `json:"version"`
+	GatewayAPI          *GatewayAPISpec          `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
+	Istio               *IstioSpec               `json:"istio,omitempty"`
+	GenericDevicePlugin *GenericDevicePluginSpec `json:"genericDevicePlugin,omitempty" yaml:"genericDevicePlugin"`
+	MDNS                *MDNSSpec                `json:"mdns,omitempty"`
+	Tunnel              *TunnelSpec              `json:"tunnel,omitempty"`
+	Operator            *OperatorSpec            `json:"operator,omitempty"`
 	// TODO: document API
 	Daemon   *DaemonSpec   `json:"daemon,omitempty"`
 	Settings *SettingsSpec `json:"settings,omitempty"`
@@ -54,6 +55,12 @@ type ZtunnelSpec struct {
 	Values string `json:"values,omitempty"`
 }
 
+type GenericDevicePluginSpec struct {
+	Disable bool   `json:"disable,omitempty"`
+	Image   string `json:"image,omitempty"`
+	Tag     string `json:"tag,omitempty"`
+}
+
 type MDNSSpec struct {
 	Disable bool   `json:"disable,omitempty"`
 	Image   string `json:"image,omitempty"`
@@ -73,10 +80,10 @@ type OperatorSpec struct {
 }
 
 type DaemonSpec struct {
-	Disable    bool           `json:"disable,omitempty"`
-	Image      string         `json:"image,omitempty"`
-	Tag        string         `json:"tag,omitempty"`
-	Address    string         `json:"address,omitempty"`
+	Disable    bool            `json:"disable,omitempty"`
+	Image      string          `json:"image,omitempty"`
+	Tag        string          `json:"tag,omitempty"`
+	Address    string          `json:"address,omitempty"`
 	System     *SystemSpec     `json:"system,omitempty"`
 	Kubernetes *KubernetesSpec `json:"kubernetes,omitempty"`
 }
@@ -126,20 +133,20 @@ type SettingsSpec struct {
 	//
 	// For example:
 	//
-    //   containers:
-    //     - name: some_app
-    //       ...
-    //       volumeMounts:
-    //         {{- range .Values.homeCloud.disks }}
-    //         - mountPath: {{ printf "/some_path/%s" .name }}
-    //           name: {{ .name }}
-    //         {{- end }}
-    //   volumes:
-    //     {{- range .Values.homeCloud.disks }}
-    //     - name: {{ .name }}
-    //       persistentVolumeClaim:
-    //         claimName: {{ .claimName }}
-    //     {{- end }}
+	//   containers:
+	//     - name: some_app
+	//       ...
+	//       volumeMounts:
+	//         {{- range .Values.homeCloud.disks }}
+	//         - mountPath: {{ printf "/some_path/%s" .name }}
+	//           name: {{ .name }}
+	//         {{- end }}
+	//   volumes:
+	//     {{- range .Values.homeCloud.disks }}
+	//     - name: {{ .name }}
+	//       persistentVolumeClaim:
+	//         claimName: {{ .claimName }}
+	//     {{- end }}
 	StorageApps []string `json:"storageApps"`
 }
 
@@ -158,13 +165,14 @@ type ImageVersion struct {
 
 // InstallStatus defines the observed state of Install
 type InstallStatus struct {
-	Version    string            `json:"version,omitempty"`
-	GatewayAPI *GatewayAPIStatus `json:"gatewayApi,omitempty"`
-	Istio      *IstioStatus      `json:"istio,omitempty"`
-	MDNS       *MDNSStatus       `json:"mdns,omitempty"`
-	Tunnel     *TunnelStatus     `json:"tunnel,omitempty"`
-	Operator   *OperatorStatus   `json:"operator,omitempty"`
-	Daemon     *DaemonStatus     `json:"daemon,omitempty"`
+	Version             string                     `json:"version,omitempty"`
+	GatewayAPI          *GatewayAPIStatus          `json:"gatewayApi,omitempty"`
+	Istio               *IstioStatus               `json:"istio,omitempty"`
+	GenericDevicePlugin *GenericDevicePluginStatus `json:"genericDevicePlugin,omitempty"`
+	MDNS                *MDNSStatus                `json:"mdns,omitempty"`
+	Tunnel              *TunnelStatus              `json:"tunnel,omitempty"`
+	Operator            *OperatorStatus            `json:"operator,omitempty"`
+	Daemon              *DaemonStatus              `json:"daemon,omitempty"`
 }
 
 type GatewayAPIStatus struct {
@@ -175,6 +183,11 @@ type GatewayAPIStatus struct {
 type IstioStatus struct {
 	Source  string `json:"repo,omitempty"`
 	Version string `json:"version,omitempty"`
+}
+
+type GenericDevicePluginStatus struct {
+	Image string `json:"image,omitempty"`
+	Tag   string `json:"tag,omitempty"`
 }
 
 type MDNSStatus struct {
@@ -241,4 +254,3 @@ func init() {
 const (
 	AnnotationDNSHostnames = "dns.home-cloud.io/domains"
 )
-
