@@ -97,6 +97,9 @@ func manifestRelease() (*opv1.InstallSpec, error) {
 	output.Print("Istio: %s -> ?", latest.Istio.Version)
 	latest.Istio.Version = GetWithDefault(latest.Istio.Version)
 
+	output.Print("Generic Device Plugin: %s -> ?", latest.GenericDevicePlugin.Tag)
+	latest.GenericDevicePlugin.Tag = GetWithDefault(latest.GenericDevicePlugin.Tag)
+
 	output.Print("Talos: %s -> ?", latest.Daemon.System.Version)
 	latest.Daemon.System.Version = GetWithDefault(latest.Daemon.System.Version)
 
