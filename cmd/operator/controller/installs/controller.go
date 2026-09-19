@@ -177,6 +177,12 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 			return err
 		}
 
+		l.Info("reconciling certificates")
+		err = r.installResources(ctx, resources.Certificates(install))
+		if err != nil {
+			return err
+		}
+
 		install.Status.CertManager = &v1.CertManagerStatus{
 			Source:  install.Spec.CertManager.Source,
 			Version: install.Spec.CertManager.Version,
@@ -184,6 +190,9 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	} else {
 		// only try and uninstall if currently installed
 		if install.Status.CertManager != nil {
+
+			// TODO: remove certificates? I think this should only be on a force/clean uninstall option
+
 			l.Info("cert-manager is disabled: removing previous installation")
 			err = uninstallCertManager(ctx, install)
 			if err != nil {
