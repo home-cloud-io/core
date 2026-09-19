@@ -33,6 +33,23 @@ var (
 								},
 							},
 						},
+						{
+							Name:     "https",
+							Port:     443,
+							Protocol: gwv1.HTTPSProtocolType,
+							AllowedRoutes: &gwv1.AllowedRoutes{
+								Namespaces: &gwv1.RouteNamespaces{
+									From: ptr.To[gwv1.FromNamespaces]("All"),
+								},
+							},
+							TLS: &gwv1.ListenerTLSConfig{
+								CertificateRefs: []gwv1.SecretObjectReference{
+									{
+										Name: "gateway-certs",
+									},
+								},
+							},
+						},
 					},
 					Infrastructure: &gwv1.GatewayInfrastructure{
 						ParametersRef: &gwv1.LocalParametersReference{
@@ -53,6 +70,8 @@ var (
   ports:
   - port: 80
     nodePort: 80
+  - port: 443
+    nodePort: 443
 `,
 				},
 			},

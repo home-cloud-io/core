@@ -48,6 +48,17 @@ resources:
 `,
 				},
 			},
+			CertManager: &v1.CertManagerSpec{
+				Namespace: "cert-manager-system",
+				Values: `
+crds:
+  enabled: true
+prometheus:
+  enabled: false
+startupapicheck:
+  enabled: false
+`,
+			},
 			GenericDevicePlugin: &v1.GenericDevicePluginSpec{},
 			MDNS:                &v1.MDNSSpec{},
 			Tunnel:              &v1.TunnelSpec{},
