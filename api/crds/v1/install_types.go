@@ -9,13 +9,13 @@ type InstallSpec struct {
 	Version             string                   `json:"version"`
 	GatewayAPI          *GatewayAPISpec          `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
 	Istio               *IstioSpec               `json:"istio,omitempty"`
+	CertManager         *CertManagerSpec         `json:"certManager,omitempty" yaml:"certManager"`
 	GenericDevicePlugin *GenericDevicePluginSpec `json:"genericDevicePlugin,omitempty" yaml:"genericDevicePlugin"`
 	MDNS                *MDNSSpec                `json:"mdns,omitempty"`
 	Tunnel              *TunnelSpec              `json:"tunnel,omitempty"`
 	Operator            *OperatorSpec            `json:"operator,omitempty"`
-	// TODO: document API
-	Daemon   *DaemonSpec   `json:"daemon,omitempty"`
-	Settings *SettingsSpec `json:"settings,omitempty"`
+	Daemon              *DaemonSpec              `json:"daemon,omitempty"`
+	Settings            *SettingsSpec            `json:"settings,omitempty"`
 }
 
 type GatewayAPISpec struct {
@@ -28,7 +28,7 @@ type GatewayAPISpec struct {
 
 type IstioSpec struct {
 	Disable            bool   `json:"disable,omitempty"`
-	Namespace          string `json:"istio,omitempty"`
+	Namespace          string `json:"namespace,omitempty"`
 	Source             string `json:"source,omitempty"`
 	Version            string `json:"version,omitempty"`
 	IngressGatewayName string `json:"ingressGatewayName,omitempty"`
@@ -53,6 +53,14 @@ type CNISpec struct {
 
 type ZtunnelSpec struct {
 	Values string `json:"values,omitempty"`
+}
+
+type CertManagerSpec struct {
+	Disable   bool   `json:"disable,omitempty"`
+	Namespace string `json:"namespace,omitempty"`
+	Source    string `json:"source,omitempty"`
+	Version   string `json:"version,omitempty"`
+	Values    string `json:"values,omitempty"`
 }
 
 type GenericDevicePluginSpec struct {
@@ -176,12 +184,17 @@ type InstallStatus struct {
 }
 
 type GatewayAPIStatus struct {
-	Source  string `json:"url,omitempty"`
+	Source  string `json:"source,omitempty"`
 	Version string `json:"version,omitempty"`
 }
 
 type IstioStatus struct {
-	Source  string `json:"repo,omitempty"`
+	Source  string `json:"source,omitempty"`
+	Version string `json:"version,omitempty"`
+}
+
+type CertManagerStatus struct {
+	Source  string `json:"source,omitempty"`
 	Version string `json:"version,omitempty"`
 }
 
