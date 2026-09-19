@@ -554,6 +554,11 @@ func (in *InstallStatus) DeepCopyInto(out *InstallStatus) {
 		*out = new(GenericDevicePluginStatus)
 		**out = **in
 	}
+	if in.CertManager != nil {
+		in, out := &in.CertManager, &out.CertManager
+		*out = new(CertManagerStatus)
+		**out = **in
+	}
 	if in.MDNS != nil {
 		in, out := &in.MDNS, &out.MDNS
 		*out = new(MDNSStatus)

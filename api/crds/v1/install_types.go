@@ -177,6 +177,7 @@ type InstallStatus struct {
 	GatewayAPI          *GatewayAPIStatus          `json:"gatewayApi,omitempty"`
 	Istio               *IstioStatus               `json:"istio,omitempty"`
 	GenericDevicePlugin *GenericDevicePluginStatus `json:"genericDevicePlugin,omitempty"`
+	CertManager         *CertManagerStatus         `json:"certManager,omitempty"`
 	MDNS                *MDNSStatus                `json:"mdns,omitempty"`
 	Tunnel              *TunnelStatus              `json:"tunnel,omitempty"`
 	Operator            *OperatorStatus            `json:"operator,omitempty"`

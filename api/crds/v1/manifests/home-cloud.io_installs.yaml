@@ -263,6 +263,13 @@ spec:
           status:
             description: InstallStatus defines the observed state of Install
             properties:
+              certManager:
+                properties:
+                  source:
+                    type: string
+                  version:
+                    type: string
+                type: object
               daemon:
                 properties:
                   image:

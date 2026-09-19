@@ -166,9 +166,36 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	}
 	// no status update
 
+	// CERT MANAGER
+	if !install.Spec.CertManager.Disable {
+		// NOTE: we can't simply skip an install if the version hasn't changed since the values
+		// might have changed with no version bump
+
+		l.Info("reconciling cert-manager install")
+		err = reconcileCertManager(ctx, install)
+		if err != nil {
+			return err
+		}
+
+		install.Status.CertManager = &v1.CertManagerStatus{
+			Source:  install.Spec.CertManager.Source,
+			Version: install.Spec.CertManager.Version,
+		}
+	} else {
+		// only try and uninstall if currently installed
+		if install.Status.CertManager != nil {
+			l.Info("cert-manager is disabled: removing previous installation")
+			err = uninstallCertManager(ctx, install)
+			if err != nil {
+				return err
+			}
+		}
+		install.Status.CertManager = nil
+	}
+
 	// ISTIO
 	if !install.Spec.Istio.Disable {
-		// NOTE: we can't simply skip an istio install if the version hasn't changed since the values
+		// NOTE: we can't simply skip an install if the version hasn't changed since the values
 		// might have changed with no version bump
 
 		l.Info("reconciling ingress gateway")
@@ -441,6 +468,54 @@ func (r *InstallReconciler) reconcileKubernetes(ctx context.Context, install *v1
 	}
 
 	l.V(1).Info("unchanged kubernetes install: skipping reconcile")
+	return nil
+}
+
+func reconcileCertManager(ctx context.Context, install *v1.Install) error {
+
+	cfg, err := shared.CreateHelmAction(install.Spec.CertManager.Namespace)
+	if err != nil {
+		return err
+	}
+	iAct := action.NewInstall(cfg)
+	iAct.Version = install.Spec.CertManager.Version
+	iAct.Namespace = install.Spec.CertManager.Namespace
+	iAct.RepoURL = install.Spec.CertManager.Source
+	iAct.Wait = true
+	iAct.Timeout = 5 * time.Minute
+
+	uAct := action.NewUpgrade(cfg)
+	uAct.Version = install.Spec.CertManager.Version
+	uAct.Namespace = install.Spec.CertManager.Namespace
+	uAct.RepoURL = install.Spec.CertManager.Source
+	uAct.Wait = true
+	uAct.Timeout = 5 * time.Minute
+
+	iAct.ReleaseName = "cert-manager"
+	err = helmInstallOrUpgrade(ctx, cfg, iAct, uAct, install.Spec.CertManager.Values)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func uninstallCertManager(ctx context.Context, install *v1.Install) error {
+	actionConfiguration, err := shared.CreateHelmAction(install.Spec.CertManager.Namespace)
+	if err != nil {
+		return err
+	}
+
+	act := action.NewUninstall(actionConfiguration)
+	act.IgnoreNotFound = true
+	act.Wait = true
+	act.Timeout = 5 * time.Minute
+
+	_, err = act.Run("cert-manager")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
