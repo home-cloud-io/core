@@ -10,6 +10,7 @@ type InstallSpec struct {
 	GatewayAPI          *GatewayAPISpec          `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
 	Istio               *IstioSpec               `json:"istio,omitempty"`
 	CertManager         *CertManagerSpec         `json:"certManager,omitempty" yaml:"certManager"`
+	Blocky              *BlockySpec              `json:"blocky,omitempty"`
 	GenericDevicePlugin *GenericDevicePluginSpec `json:"genericDevicePlugin,omitempty" yaml:"genericDevicePlugin"`
 	MDNS                *MDNSSpec                `json:"mdns,omitempty"`
 	Tunnel              *TunnelSpec              `json:"tunnel,omitempty"`
@@ -61,6 +62,12 @@ type CertManagerSpec struct {
 	Source    string `json:"source,omitempty"`
 	Version   string `json:"version,omitempty"`
 	Values    string `json:"values,omitempty"`
+}
+
+type BlockySpec struct {
+	Disable bool   `json:"disable,omitempty"`
+	Image   string `json:"image,omitempty"`
+	Tag     string `json:"tag,omitempty"`
 }
 
 type GenericDevicePluginSpec struct {
@@ -117,9 +124,6 @@ type SettingsSpec struct {
 	AutoUpdateApps bool `json:"autoUpdateApps,omitempty"`
 	// AutoUpdateSystem (default: true)
 	AutoUpdateSystem bool `json:"autoUpdateSystem,omitempty"`
-	// Domains defines the domains to host routes/mdns addresses under. For example,
-	// `home.arpa` or `my-custom-domain.com` (default: [ "local" ])
-	Domains []string `json:"domains"`
 	// AppStores defines the app stores to install apps from
 	AppStores []AppStore `json:"appStores,omitempty"`
 	// AutoUpdateAppsSchedule is a cron string that defines the freqency with which the server
@@ -156,6 +160,31 @@ type SettingsSpec struct {
 	//         claimName: {{ .claimName }}
 	//     {{- end }}
 	StorageApps []string `json:"storageApps"`
+
+	Network NetworkSettingsSpec `json:"networkSettingsSpec,omitempty"`
+}
+
+
+type NetworkSettingsSpec struct {
+	// Domain defines the domain of install. For example, `my-custom-domain.com` (default: "home-cloud.local")
+	Domain string `json:"domain"`
+
+	DNS DNSNetworkSettingsSpec `json:"dnsNetworkSettingsSpec,omitempty"`
+}
+
+type DNSNetworkSettingsSpec struct {
+	// UpstreamServers defines the upstream DNS servers to forward to (default: [ "1.1.1.1", "1.0.0.1" ])
+	UpstreamServers []string `json:"upstreamServers"`
+	// DenyListSources is a list of sources to read deny lists from (default: [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ])
+	DenyListSources []string `json:"denyListSources"`
+	// AllowListSources is a list of sources to read allow lists from (default: [ "" ])
+	AllowListSources []string `json:"allowListSources"`
+	// DenyDomains is a list of plain domains to deny. Wildcards are supported. (default: [ "" ])
+	DenyDomains []string `json:"denyDomains"`
+	// AllowDomains is a list of plain domains to allow. Wildcards are supported. (default: [ "" ])
+	AllowDomains []string `json:"allowDomains"`
+
+	// TODO: support more Blocky config like groups and client-specific rules
 }
 
 type AppStore struct {
@@ -176,8 +205,9 @@ type InstallStatus struct {
 	Version             string                     `json:"version,omitempty"`
 	GatewayAPI          *GatewayAPIStatus          `json:"gatewayApi,omitempty"`
 	Istio               *IstioStatus               `json:"istio,omitempty"`
-	GenericDevicePlugin *GenericDevicePluginStatus `json:"genericDevicePlugin,omitempty"`
 	CertManager         *CertManagerStatus         `json:"certManager,omitempty"`
+	Blocky              *BlockyStatus              `json:"blocky,omitempty"`
+	GenericDevicePlugin *GenericDevicePluginStatus `json:"genericDevicePlugin,omitempty"`
 	MDNS                *MDNSStatus                `json:"mdns,omitempty"`
 	Tunnel              *TunnelStatus              `json:"tunnel,omitempty"`
 	Operator            *OperatorStatus            `json:"operator,omitempty"`
@@ -197,6 +227,11 @@ type IstioStatus struct {
 type CertManagerStatus struct {
 	Source  string `json:"source,omitempty"`
 	Version string `json:"version,omitempty"`
+}
+
+type BlockyStatus struct {
+	Image string `json:"image,omitempty"`
+	Tag   string `json:"tag,omitempty"`
 }
 
 type GenericDevicePluginStatus struct {
