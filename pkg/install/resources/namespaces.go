@@ -21,6 +21,14 @@ var (
 			},
 			&corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
+					Name: install.Spec.CertManager.Namespace,
+					Labels: map[string]string{
+						"istio.io/dataplane-mode": "ambient",
+					},
+				},
+			},
+			&corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
 					// namespace for Home Cloud installation (recommended home-cloud-system)
 					Name: install.Namespace,
 					Labels: map[string]string{

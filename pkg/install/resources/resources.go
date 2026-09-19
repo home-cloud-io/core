@@ -52,11 +52,20 @@ resources:
 				},
 			},
 			CertManager: &v1.CertManagerSpec{
+				// TODO: get source/version from release
+				Source:    "https://charts.jetstack.io",
+				Version:   "v1.21.2",
 				Namespace: "cert-manager-system",
 				Values: `
 crds:
   enabled: true
 `,
+			},
+
+			Blocky: &v1.BlockySpec{
+				// TODO: get source/version from release
+				Image: "ghcr.io/0xerr0r/blocky",
+				Tag:   "v0.35.0",
 			},
 			GenericDevicePlugin: &v1.GenericDevicePluginSpec{},
 			MDNS:                &v1.MDNSSpec{},
@@ -67,10 +76,16 @@ crds:
 				Kubernetes: &v1.KubernetesSpec{},
 			},
 			Settings: &v1.SettingsSpec{
-				Domains: []string{"local"},
 				StorageApps: []string{
 					"filebrowser",
 					"nextexplorer",
+				},
+				Network: v1.NetworkSettingsSpec{
+					Domain: "home-cloud.local",
+					DNS: v1.DNSNetworkSettingsSpec{
+						UpstreamServers: []string{"1.1.1.1", "1.0.0.1"},
+						DenyListSources: []string{"https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"},
+					},
 				},
 			},
 		},

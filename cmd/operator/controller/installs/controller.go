@@ -115,10 +115,13 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 }
 
 func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) error {
-	l := log.FromContext(ctx)
+	var (
+		l = log.FromContext(ctx)
+		err error
+	)
 
 	// Home Cloud CRDs
-	err := r.reconcileHomeCloudCRDs(ctx, install)
+	err = r.reconcileHomeCloudCRDs(ctx, install)
 	if err != nil {
 		return err
 	}
@@ -239,6 +242,21 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 			}
 		}
 		install.Status.Istio = nil
+	}
+
+	// BLOCKY
+	installed = install.Status.Blocky != nil
+	err = r.reconcileObjects(ctx, "blocky", install.Spec.Blocky.Disable, installed, resources.BlockyObjects(install))
+	if err != nil {
+		return err
+	}
+	if !install.Spec.Blocky.Disable {
+		install.Status.Blocky = &v1.BlockyStatus{
+			Image: install.Spec.Blocky.Image,
+			Tag:   install.Spec.Blocky.Tag,
+		}
+	} else {
+		install.Status.Blocky = nil
 	}
 
 	// MDNS

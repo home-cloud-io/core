@@ -2,7 +2,6 @@ package resources
 
 import (
 	"fmt"
-	"strings"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -178,23 +177,13 @@ var (
 	}
 )
 
-// TODO: change these to subdomains? (*.home-cloud.local)
-// subdomains don't work on Windows with mDNS so this would require running our
-// own DNS server (which we want to do anyway)
-
 func GenerateDNSValue(install *v1.Install, label string) string {
-	values := ""
-	for _, domain := range install.Spec.Settings.Domains {
-		values = fmt.Sprintf("%s,%s.%s", values, label, domain)
-	}
-	return strings.TrimPrefix(values, ",")
+	return fmt.Sprintf("%s.%s", label, install.Spec.Settings.Network.Domain)
 }
 
 func GenerateGatewayHostnames(install *v1.Install, label string) []gwv1.Hostname {
-	hostnames := make([]gwv1.Hostname, len(install.Spec.Settings.Domains))
-	for i, domain := range install.Spec.Settings.Domains {
-		hostnames[i] = gwv1.Hostname(fmt.Sprintf("%s.%s", label, domain))
+	return []gwv1.Hostname{
+		gwv1.Hostname(fmt.Sprintf("%s.%s", label, install.Spec.Settings.Network.Domain)),
 	}
-	return hostnames
 }
 
