@@ -150,7 +150,10 @@ export function System(props: SystemStatsProps) {
           type="dashboard"
           strokeColor={progressColors}
           status="normal"
-          percent={Math.round(100 * (Number(props.stats.compute?.userPercent) + Number(props.stats.compute?.systemPercent)))}
+          percent={formatPercentage(
+            Number(props.stats.compute?.idlePercent),
+            Number(1)
+          )}
           percentPosition={{ align: "start", type: "outer" }}
         />
       </Badge>

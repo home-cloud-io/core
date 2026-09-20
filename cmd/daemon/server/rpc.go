@@ -100,7 +100,9 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	stats := &v1.SystemStats{}
 	stats.StartTime = timestamppb.Now()
 
-	// TODO: this seems to always be roughly 0%
+	// CPU
+	// TODO: this seems to be some rolling average over the past X time as it's accurate and changing, but
+	// 		 not accurate instantaneously.
 	computeResp, err := client.MachineClient.SystemStat(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get load average stats")
@@ -116,7 +118,7 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 		IdlePercent:   float32(idle / total),
 	}
 
-	// TODO: returns 42% when talosctl dashboard shows 32%
+	// MEMORY
 	memoryResp, err := client.MachineClient.Memory(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
@@ -130,7 +132,7 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 		AvailableBytes: m.Memavailable << 10,
 	}
 
-	// get disk total amounts
+	// DRIVES
 	mountsResp, err := client.MachineClient.Mounts(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
