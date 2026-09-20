@@ -31,6 +31,7 @@ type (
 	Default interface {
 		Create(ctx context.Context, obj crclient.Object) error
 		Get(ctx context.Context, key crclient.ObjectKey, obj crclient.Object) error
+		List(ctx context.Context, list crclient.ObjectList) error
 		Update(ctx context.Context, obj crclient.Object) error
 		Delete(ctx context.Context, obj crclient.Object) error
 		// Settings returns the installation settings
@@ -122,6 +123,10 @@ func (c *client) Create(ctx context.Context, obj crclient.Object) error {
 
 func (c *client) Get(ctx context.Context, key crclient.ObjectKey, obj crclient.Object) error {
 	return c.client.Get(ctx, key, obj)
+}
+
+func (c *client) List(ctx context.Context, list crclient.ObjectList) error {
+	return c.client.List(ctx, list)
 }
 
 func (c *client) Update(ctx context.Context, obj crclient.Object) error {

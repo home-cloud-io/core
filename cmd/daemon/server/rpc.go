@@ -123,28 +123,33 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	}
 	m := memoryResp.Messages[0].Meminfo
 	stats.Memory = &v1.MemoryStats{
-		TotalBytes:     m.Memtotal<<10,
-		UsedBytes:      (m.Memtotal - m.Memfree - m.Buffers - m.Cached)<<10,
-		FreeBytes:      m.Memfree<<10,
-		CachedBytes:    m.Cached<<10,
-		AvailableBytes: m.Memavailable<<10,
+		TotalBytes:     m.Memtotal << 10,
+		UsedBytes:      (m.Memtotal - m.Memfree - m.Buffers - m.Cached) << 10,
+		FreeBytes:      m.Memfree << 10,
+		CachedBytes:    m.Cached << 10,
+		AvailableBytes: m.Memavailable << 10,
 	}
-	// TODO: actually it seems `discoveredvolumes` CRs may have the info we need here - read from COSI client
+
+	// get disk total amounts
 	mountsResp, err := client.MachineClient.Mounts(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
 	}
 	stats.Drives = []*v1.DriveStats{}
 	for _, mount := range mountsResp.Messages[0].Stats {
-		if mount.MountedOn == "/" {
-			stats.Drives = []*v1.DriveStats{
-				{
-					MountPoint: mount.MountedOn,
-					TotalBytes: mount.Size,
-					FreeBytes:  mount.Available,
-				},
-			}
+		// HACK: quick and dirty to get only "real" disks
+		if !strings.HasPrefix(mount.Filesystem, "/dev") {
+			continue
 		}
+		if mount.MountedOn != "/var" && !strings.HasPrefix(mount.MountedOn, "/var/mnt") {
+			continue
+		}
+
+		stats.Drives = append(stats.Drives, &v1.DriveStats{
+			MountPoint: mount.MountedOn,
+			TotalBytes: mount.Size,
+			FreeBytes:  mount.Available,
+		})
 	}
 
 	stats.EndTime = timestamppb.Now()

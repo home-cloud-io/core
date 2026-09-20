@@ -3,6 +3,7 @@ package system
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
@@ -34,6 +35,30 @@ func (c *controller) SystemStats(ctx context.Context, loger chassis.Logger) (*dv
 	if err != nil {
 		return nil, err
 	}
+
+	diskList := &opv1.DiskList{}
+	err = c.k8sclient.List(ctx, diskList)
+	if err != nil {
+		return nil, err
+	}
+
+	// HACK: messy matching between mounts and disks so that we have aliases displayed in the UI
+	for _, mount := range resp.Msg.Stats.Drives {
+		for _, disk := range diskList.Items {
+			if mount.MountPoint == disk.Spec.Details.MountPath {
+				if disk.Spec.Alias != "" {
+					mount.MountPoint = disk.Spec.Alias
+					break
+				}
+				mount.MountPoint = disk.Name
+				break
+			}
+		}
+		if strings.HasPrefix(mount.MountPoint, "/") {
+			mount.MountPoint = "system"
+		}
+	}
+
 	return resp.Msg.Stats, nil
 }
 
