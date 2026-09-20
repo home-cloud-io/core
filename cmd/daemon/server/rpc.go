@@ -106,13 +106,14 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 		h.logger.WithError(err).Error("failed to get load average stats")
 	}
 	stat := computeResp.Messages[0].CpuTotal
+	user := stat.User
+	system := stat.Nice + stat.System + stat.Irq + stat.Steal + stat.SoftIrq
 	idle := stat.Idle + stat.Iowait
-	nonIdle := stat.User + stat.Nice + stat.System + stat.Irq + stat.Steal + stat.SoftIrq
-	total := idle + nonIdle
+	total := user + system + idle
 	stats.Compute = &v1.ComputeStats{
-		UserPercent:   float32(computeResp.Messages[0].CpuTotal.User / total),
-		SystemPercent: float32(computeResp.Messages[0].CpuTotal.System / total),
-		IdlePercent:   float32(computeResp.Messages[0].CpuTotal.Idle / total),
+		UserPercent:   float32(user / total),
+		SystemPercent: float32(system / total),
+		IdlePercent:   float32(idle / total),
 	}
 
 	// TODO: returns 42% when talosctl dashboard shows 32%
@@ -120,15 +121,14 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
 	}
+	m := memoryResp.Messages[0].Meminfo
 	stats.Memory = &v1.MemoryStats{
-		TotalBytes:     memoryResp.Messages[0].Meminfo.Memtotal,
-		FreeBytes:      memoryResp.Messages[0].Meminfo.Memfree,
-		AvailableBytes: memoryResp.Messages[0].Meminfo.Memavailable,
-		UsedBytes:      memoryResp.Messages[0].Meminfo.Memtotal - memoryResp.Messages[0].Meminfo.Memavailable,
-		CachedBytes:    memoryResp.Messages[0].Meminfo.Cached,
+		TotalBytes:     m.Memtotal<<10,
+		UsedBytes:      (m.Memtotal - m.Memfree - m.Buffers - m.Cached)<<10,
+		FreeBytes:      m.Memfree<<10,
+		CachedBytes:    m.Cached<<10,
+		AvailableBytes: m.Memavailable<<10,
 	}
-
-	// TODO: get disk total amounts, then subtract UserVolume usage?
 	// TODO: actually it seems `discoveredvolumes` CRs may have the info we need here - read from COSI client
 	mountsResp, err := client.MachineClient.Mounts(ctx, &emptypb.Empty{})
 	if err != nil {
@@ -210,51 +210,9 @@ func (h *rpcHandler) UpgradeKubernetes(ctx context.Context, request *connect.Req
 	return connect.NewResponse(&v1.UpgradeKubernetesResponse{}), nil
 }
 
-// TODO: may just want to junk this whole concept
 func (h *rpcHandler) CreateVolume(ctx context.Context, request *connect.Request[v1.CreateVolumeRequest]) (*connect.Response[v1.CreateVolumeResponse], error) {
-	h.logger.Info("creating volume")
-
-	var minSize block.ByteSize
-	err := minSize.UnmarshalText([]byte(request.Msg.MinSize))
-	if err != nil {
-		h.logger.WithError(err).Warn("invalid min_size")
-		return nil, status.Error(codes.InvalidArgument, "invalid min_size")
-	}
-
-	var maxSize block.Size
-	err = maxSize.UnmarshalText([]byte(request.Msg.MaxSize))
-	if err != nil {
-		h.logger.WithError(err).Warn("invalid max_size")
-		return nil, status.Error(codes.InvalidArgument, "invalid max_size")
-	}
-
-	uvc := block.NewUserVolumeConfigV1Alpha1()
-	uvc.MetaName = request.Msg.Name
-	uvc.ProvisioningSpec = block.ProvisioningSpec{
-		DiskSelectorSpec: block.DiskSelector{
-			// TODO: will probably want to expose this expression on the API
-			Match: cel.MustExpression(cel.ParseBooleanExpression("!system_disk", celenv.DiskLocator())),
-		},
-		ProvisioningMinSize: minSize,
-		ProvisioningMaxSize: maxSize,
-	}
-
-	_, err = uvc.Validate(talos.ValidationMode{})
-	if err != nil {
-		h.logger.WithError(err).Warn("failed UserVolumeConfig validation")
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	id, err := talos.CreateUserVolume(ctx, h.logger, uvc)
-	if err != nil {
-		h.logger.WithError(err).Error("failed to create volume")
-		return nil, err
-	}
-
-	return connect.NewResponse(&v1.CreateVolumeResponse{
-		Id:   id,
-		Path: fmt.Sprintf("/var/mnt/%s", request.Msg.Name),
-	}), nil
+	h.logger.Error("unimplemented")
+	return nil, status.Error(codes.Unimplemented, "unimplemented")
 }
 
 func (h *rpcHandler) DeleteVolume(ctx context.Context, request *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error) {

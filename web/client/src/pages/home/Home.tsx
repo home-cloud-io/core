@@ -117,7 +117,8 @@ export function DriveList(props: SystemStatsProps) {
         return (
           <Tooltip
             key={drive.mountPoint}
-            title={`Free: ${formatBytes(Number(drive.freeBytes))}`}
+            title={`Total: ${formatBytes(Number(drive.totalBytes))}\n
+                    Free: ${formatBytes(Number(drive.freeBytes))}`}
             placement={"bottom"}
           >
             <Flex vertical justify="center" gap="small">
@@ -142,9 +143,6 @@ export function DriveList(props: SystemStatsProps) {
 }
 
 export function System(props: SystemStatsProps) {
-  let totalFreeMemory =
-    Number(props.stats.memory?.totalBytes) -
-    Number(props.stats.memory?.usedBytes);
   return (
     <Flex gap="large" justify="space-around" wrap>
       <Badge count={"CPU"} color={"#643f91"}>
@@ -152,12 +150,14 @@ export function System(props: SystemStatsProps) {
           type="dashboard"
           strokeColor={progressColors}
           status="normal"
-          percent={Math.round(Number(props.stats.compute?.userPercent))}
+          percent={Math.round(100 * (Number(props.stats.compute?.userPercent) + Number(props.stats.compute?.systemPercent)))}
           percentPosition={{ align: "start", type: "outer" }}
         />
       </Badge>
       <Tooltip
-        title={`Free: ${formatBytes(totalFreeMemory)}`}
+        title={`Total: ${formatBytes(Number(props.stats.memory?.totalBytes))}\n
+                Used: ${formatBytes(Number(props.stats.memory?.usedBytes))}\n
+                Free: ${formatBytes(Number(props.stats.memory?.availableBytes))}`}
         placement={"bottom"}
       >
         <Badge count={"Memory"} color={"#643f91"}>
@@ -166,7 +166,7 @@ export function System(props: SystemStatsProps) {
             strokeColor={progressColors}
             status="normal"
             percent={formatPercentage(
-              totalFreeMemory,
+              Number(props.stats.memory?.totalBytes) - Number(props.stats.memory?.usedBytes),
               Number(props.stats.memory?.totalBytes)
             )}
             percentPosition={{ align: "start", type: "outer" }}
@@ -253,12 +253,13 @@ function Application(props: Props) {
 // HELPERS
 
 function driveName(mountPoint: string) {
-  switch (mountPoint) {
-    case "/":
-      return "System";
-    default:
-      return "Apps";
-  }
+  // switch (mountPoint) {
+  //   case "/":
+  //     return "System";
+  //   default:
+  //     return "Apps";
+  // }
+  return mountPoint
 }
 
 const progressColors: ProgressProps["strokeColor"] = {
