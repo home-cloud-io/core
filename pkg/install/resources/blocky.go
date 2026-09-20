@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 
+	"github.com/steady-bytes/draft/pkg/chassis"
 	"go.yaml.in/yaml/v4"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -12,6 +13,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
+)
+
+const (
+	HostIPConfigKey = "operator.host_ip"
 )
 
 var (
@@ -42,8 +47,7 @@ var (
 			CustomDNS: BlockyCustomDNS{
 				CustomTTL: "1h",
 				Mapping: map[string]string{
-					// TODO: need host IP address here
-					install.Spec.Settings.Network.Domain: "192.168.1.145",
+					install.Spec.Settings.Network.Domain: chassis.GetConfig().GetString(HostIPConfigKey),
 				},
 			},
 		}

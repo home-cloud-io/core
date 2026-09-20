@@ -98,6 +98,16 @@ var (
 								{
 									Name:  "operator",
 									Image: fmt.Sprintf("%s:%s", install.Spec.Operator.Image, install.Spec.Operator.Tag),
+									Env: []corev1.EnvVar{
+										{
+											Name: "DRAFT_OPERATOR_HOST_IP",
+											ValueFrom: &corev1.EnvVarSource{
+												FieldRef: &corev1.ObjectFieldSelector{
+													FieldPath: "status.hostIP",
+												},
+											},
+										},
+									},
 									Ports: []corev1.ContainerPort{
 										{
 											Name:          "http",
@@ -186,4 +196,3 @@ func GenerateGatewayHostnames(install *v1.Install, label string) []gwv1.Hostname
 		gwv1.Hostname(fmt.Sprintf("%s.%s", label, install.Spec.Settings.Network.Domain)),
 	}
 }
-
