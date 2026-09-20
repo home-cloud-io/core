@@ -16,16 +16,6 @@ import (
 
 var (
 	BlockyObjects = func(install *v1.Install) []client.Object {
-
-		denyDomains := make([]string, 0)
-		for _, v := range install.Spec.Settings.Network.DNS.DenyDomains {
-			denyDomains = append(denyDomains, fmt.Sprintf("%s\n%s", v))
-		}
-		allowDomains := make([]string, 0)
-		for _, v := range install.Spec.Settings.Network.DNS.AllowDomains {
-			allowDomains = append(allowDomains, fmt.Sprintf("%s\n%s", v))
-		}
-
 		bconfig := BlockyConfig{
 			Upstreams: BlockyUpstreams{
 				Groups: map[string][]string{
@@ -38,13 +28,13 @@ var (
 			},
 			Blocking: BlockyBlocking{
 				DenyLists: map[string][]string{
-					"main": append(denyDomains, install.Spec.Settings.Network.DNS.DenyListSources...),
+					"main": combineDomainsAndSources(install.Spec.Settings.Network.DNS.DenyDomains, install.Spec.Settings.Network.DNS.DenyListSources),
 				},
 				AllowLists: map[string][]string{
-					"main": append(allowDomains, install.Spec.Settings.Network.DNS.AllowListSources...),
+					"main": combineDomainsAndSources(install.Spec.Settings.Network.DNS.AllowDomains, install.Spec.Settings.Network.DNS.AllowListSources),
 				},
 				ClientGroupsBlock: map[string][]string{
-					"default": []string{
+					"default": {
 						"main",
 					},
 				},
@@ -63,7 +53,6 @@ var (
 			// TODO: we don't yet have a pattern for error handling in object functions...
 			return make([]client.Object, 0)
 		}
-		strbconfig := string(byaml)
 
 		return []client.Object{
 			&corev1.ConfigMap{
@@ -72,7 +61,7 @@ var (
 					Namespace: install.Namespace,
 				},
 				Data: map[string]string{
-					"config.yml": strbconfig,
+					"config.yml": string(byaml),
 				},
 			},
 			&corev1.Service{
@@ -215,3 +204,14 @@ type (
 		Mapping   map[string]string
 	}
 )
+
+func combineDomainsAndSources(domains, sources []string) []string {
+	if len(domains) > 0 {
+		denyDomains := "# user specified domains"
+		for _, v := range domains {
+			denyDomains = fmt.Sprintf("%s\n%s", denyDomains, v)
+		}
+		return append(sources, denyDomains)
+	}
+	return sources
+}
