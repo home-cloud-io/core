@@ -55,7 +55,7 @@ resources:
 				// TODO: get source/version from release
 				Source:    "https://charts.jetstack.io",
 				Version:   "v1.21.2",
-				Namespace: "cert-manager-system",
+				Namespace: "cert-manager",
 				Values: `
 crds:
   enabled: true
@@ -128,7 +128,8 @@ crds:
 						Duration: time.Hour * 78840, // 9y
 					},
 					PrivateKey: &cmv1.CertificatePrivateKey{
-						Algorithm: cmv1.Ed25519KeyAlgorithm,
+						Algorithm: cmv1.ECDSAKeyAlgorithm,
+						Size:      256,
 						Encoding:  cmv1.PKCS8,
 					},
 					IssuerRef: cmmetav1.IssuerReference{
@@ -162,7 +163,8 @@ crds:
 						"*.home-cloud.local",
 					},
 					PrivateKey: &cmv1.CertificatePrivateKey{
-						Algorithm: cmv1.Ed25519KeyAlgorithm,
+						Algorithm: cmv1.ECDSAKeyAlgorithm,
+						Size:      256,
 						Encoding:  cmv1.PKCS8,
 					},
 					IssuerRef: cmmetav1.IssuerReference{

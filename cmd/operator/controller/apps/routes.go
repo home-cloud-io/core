@@ -2,6 +2,7 @@ package apps
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -24,7 +25,7 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 
 	// create httproute
 	port := gwv1.PortNumber(int32(route.Service.Port))
-	err = r.Client.Create(ctx, &gwv1.HTTPRoute{
+	err = shared.CreateOrUpdate(ctx, r.Client,  &gwv1.HTTPRoute{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      route.Name,
 			Namespace: namespace,
@@ -38,7 +39,9 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 					},
 				},
 			},
-			Hostnames: resources.GenerateGatewayHostnames(install, route.Name),
+			Hostnames: []gwv1.Hostname{
+				gwv1.Hostname(fmt.Sprintf("%s.%s", route.Name, install.Spec.Settings.Network.Domain)),
+			},
 			Rules: []gwv1.HTTPRouteRule{
 				{
 					BackendRefs: []gwv1.HTTPBackendRef{

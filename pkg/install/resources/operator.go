@@ -10,7 +10,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 )
@@ -189,10 +188,4 @@ var (
 
 func GenerateDNSValue(install *v1.Install, label string) string {
 	return fmt.Sprintf("%s.%s", label, install.Spec.Settings.Network.Domain)
-}
-
-func GenerateGatewayHostnames(install *v1.Install, label string) []gwv1.Hostname {
-	return []gwv1.Hostname{
-		gwv1.Hostname(fmt.Sprintf("%s.%s", label, install.Spec.Settings.Network.Domain)),
-	}
 }

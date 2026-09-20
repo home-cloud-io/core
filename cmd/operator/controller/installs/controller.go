@@ -162,7 +162,7 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	// NAMESPACES
 	l.Info("reconciling namespaces")
 	for _, o := range resources.NamespaceObjects(install) {
-		err = kubeCreateOrUpdate(ctx, r.Client, o)
+		err = shared.CreateOrUpdate(ctx, r.Client, o)
 		if err != nil {
 			return err
 		}
@@ -668,7 +668,7 @@ func (r *InstallReconciler) reconcileObjects(ctx context.Context, name string, d
 
 func (r *InstallReconciler) installResources(ctx context.Context, objects []client.Object) error {
 	for _, o := range objects {
-		err := kubeCreateOrUpdate(ctx, r.Client, o)
+		err := shared.CreateOrUpdate(ctx, r.Client, o)
 		if err != nil {
 			return err
 		}
@@ -701,23 +701,6 @@ func (r *InstallReconciler) tryDeletions(ctx context.Context, install *v1.Instal
 		}
 	}
 	return nil
-}
-
-func kubeCreateOrUpdate(ctx context.Context, kube client.Client, obj client.Object) error {
-	err := kube.Create(ctx, obj)
-	if kerrors.IsAlreadyExists(err) {
-		// this is a bit of a mess and might not be totally necessary but it creates a new instance
-		// of the same underlying type in obj (which must be a pointer) so that we don't overwrite all
-		// fields when we really only want the ResourceVersion
-		c := reflect.New(reflect.TypeOf(obj).Elem()).Interface().(client.Object)
-		err := kube.Get(ctx, client.ObjectKeyFromObject(obj), c)
-		if err != nil {
-			return err
-		}
-		obj.SetResourceVersion(c.GetResourceVersion())
-		return kube.Update(ctx, obj)
-	}
-	return err
 }
 
 func helmExists(cfg *action.Configuration, releaseName string) (bool, error) {

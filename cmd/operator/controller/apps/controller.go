@@ -310,19 +310,7 @@ func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, app
 	)
 
 	// create namespace before installing anything else
-	err = r.Client.Create(ctx, &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: appConfig.Namespace,
-			Labels: map[string]string{
-				"istio.io/dataplane-mode": "ambient",
-			},
-		},
-	})
-	if client.IgnoreAlreadyExists(err) != nil {
-		return err
-	}
-	// TODO: probably a better way to do this
-	err = r.Client.Update(ctx, &corev1.Namespace{
+	err = shared.CreateOrUpdate(ctx, r.Client, &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: appConfig.Namespace,
 			Labels: map[string]string{

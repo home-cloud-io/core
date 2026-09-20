@@ -45,7 +45,7 @@ var (
 							TLS: &gwv1.ListenerTLSConfig{
 								CertificateRefs: []gwv1.SecretObjectReference{
 									{
-										Name: "gateway-certs",
+										Name: "gateway-cert",
 									},
 								},
 							},
@@ -89,7 +89,10 @@ var (
 							},
 						},
 					},
-					Hostnames: GenerateGatewayHostnames(install, "home-cloud"),
+					Hostnames: []gwv1.Hostname{
+						gwv1.Hostname(install.Spec.Settings.Network.Domain),
+						gwv1.Hostname(fmt.Sprintf("admin.%s", install.Spec.Settings.Network.Domain)),
+					},
 					Rules: []gwv1.HTTPRouteRule{
 						{
 							BackendRefs: []gwv1.HTTPBackendRef{
