@@ -117,8 +117,9 @@ export function DriveList(props: SystemStatsProps) {
         return (
           <Tooltip
             key={drive.mountPoint}
-            title={`Total: ${formatBytes(Number(drive.totalBytes))}\n
-                    Free: ${formatBytes(Number(drive.freeBytes))}`}
+            title={`Total: ${formatBytes(Number(drive.totalBytes), 1024)}\n
+                    Used: ${formatBytes(Number(drive.totalBytes) - Number(drive.freeBytes), 1024)}\n
+                    Free: ${formatBytes(Number(drive.freeBytes), 1024)}`}
             placement={"bottom"}
           >
             <Flex vertical justify="center" gap="small">
@@ -145,22 +146,29 @@ export function DriveList(props: SystemStatsProps) {
 export function System(props: SystemStatsProps) {
   return (
     <Flex gap="large" justify="space-around" wrap>
-      <Badge count={"CPU"} color={"#643f91"}>
-        <Progress
-          type="dashboard"
-          strokeColor={progressColors}
-          status="normal"
-          percent={formatPercentage(
-            Number(props.stats.compute?.idlePercent),
-            Number(1)
-          )}
-          percentPosition={{ align: "start", type: "outer" }}
-        />
-      </Badge>
       <Tooltip
-        title={`Total: ${formatBytes(Number(props.stats.memory?.totalBytes))}\n
-                Used: ${formatBytes(Number(props.stats.memory?.usedBytes))}\n
-                Free: ${formatBytes(Number(props.stats.memory?.availableBytes))}`}
+        title={`User: ${(Number(props.stats.compute?.userPercent) * 100).toFixed(1)}%\n
+                System: ${(Number(props.stats.compute?.userPercent) * 100).toFixed(1)}%\n
+                Idle: ${(Number(props.stats.compute?.idlePercent) * 100).toFixed(1)}%`}
+        placement={"bottom"}
+      >
+        <Badge count={"CPU"} color={"#643f91"}>
+          <Progress
+            type="dashboard"
+            strokeColor={progressColors}
+            status="normal"
+            percent={formatPercentage(
+              Number(props.stats.compute?.idlePercent),
+              Number(1)
+            )}
+            percentPosition={{ align: "start", type: "outer" }}
+          />
+        </Badge>
+      </Tooltip>
+      <Tooltip
+        title={`Total: ${formatBytes(Number(props.stats.memory?.totalBytes), 1000)}\n
+                Used: ${formatBytes(Number(props.stats.memory?.usedBytes), 1000)}\n
+                Free: ${formatBytes(Number(props.stats.memory?.availableBytes), 1000)}`}
         placement={"bottom"}
       >
         <Badge count={"Memory"} color={"#643f91"}>
@@ -271,10 +279,9 @@ const progressColors: ProgressProps["strokeColor"] = {
   "100%": "#ff4d4f",
 };
 
-const formatBytes = (bytes: number, decimals = 2) => {
+const formatBytes = (bytes: number, k: number, decimals = 2) => {
   if (bytes === 0) return "0 Bytes";
 
-  const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
   const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
