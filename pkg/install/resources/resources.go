@@ -52,21 +52,13 @@ resources:
 				},
 			},
 			CertManager: &v1.CertManagerSpec{
-				// TODO: get source/version from release
-				Source:    "https://charts.jetstack.io",
-				Version:   "v1.21.2",
 				Namespace: "cert-manager",
 				Values: `
 crds:
   enabled: true
 `,
 			},
-
-			Blocky: &v1.BlockySpec{
-				// TODO: get source/version from release
-				Image: "ghcr.io/0xerr0r/blocky",
-				Tag:   "v0.35.0",
-			},
+			Blocky:              &v1.BlockySpec{},
 			GenericDevicePlugin: &v1.GenericDevicePluginSpec{},
 			MDNS:                &v1.MDNSSpec{},
 			Tunnel:              &v1.TunnelSpec{},
@@ -157,10 +149,9 @@ crds:
 				},
 				Spec: cmv1.CertificateSpec{
 					SecretName: "gateway-cert",
-					// TODO: should pull from the configured domains in Settings
 					DNSNames: []string{
-						"home-cloud.local",
-						"*.home-cloud.local",
+						install.Spec.Settings.Network.Domain,
+						fmt.Sprintf("*.%s", install.Spec.Settings.Network.Domain),
 					},
 					PrivateKey: &cmv1.CertificatePrivateKey{
 						Algorithm: cmv1.ECDSAKeyAlgorithm,
