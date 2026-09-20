@@ -2,7 +2,10 @@ package resources
 
 import (
 	"fmt"
+	"time"
 
+	cmv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
+	cmmetav1 "github.com/cert-manager/cert-manager/pkg/apis/meta/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -48,6 +51,14 @@ resources:
 `,
 				},
 			},
+			CertManager: &v1.CertManagerSpec{
+				Namespace: "cert-manager",
+				Values: `
+crds:
+  enabled: true
+`,
+			},
+			Blocky:              &v1.BlockySpec{},
 			GenericDevicePlugin: &v1.GenericDevicePluginSpec{},
 			MDNS:                &v1.MDNSSpec{},
 			Tunnel:              &v1.TunnelSpec{},
@@ -57,10 +68,16 @@ resources:
 				Kubernetes: &v1.KubernetesSpec{},
 			},
 			Settings: &v1.SettingsSpec{
-				Domains: []string{"local"},
 				StorageApps: []string{
 					"filebrowser",
 					"nextexplorer",
+				},
+				Network: v1.NetworkSettingsSpec{
+					Domain: "home-cloud.local",
+					DNS: v1.DNSNetworkSettingsSpec{
+						UpstreamServers: []string{"1.1.1.1", "1.0.0.1"},
+						DenyListSources: []string{"https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"},
+					},
 				},
 			},
 		},
@@ -73,6 +90,81 @@ resources:
 			Operator:            &v1.OperatorStatus{},
 			Daemon:              &v1.DaemonStatus{},
 		},
+	}
+
+	Certificates = func(install *v1.Install) []client.Object {
+		return []client.Object{
+			&cmv1.ClusterIssuer{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "selfsigned-issuer",
+				},
+				Spec: cmv1.IssuerSpec{
+					IssuerConfig: cmv1.IssuerConfig{
+						SelfSigned: &cmv1.SelfSignedIssuer{},
+					},
+				},
+			},
+			&cmv1.Certificate{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "selfsigned-ca",
+					Namespace: install.Spec.CertManager.Namespace,
+				},
+				Spec: cmv1.CertificateSpec{
+					IsCA:       true,
+					CommonName: "home-cloud-selfsigned-ca",
+					SecretName: "root-ca-secret",
+					Duration: &metav1.Duration{
+						Duration: time.Hour * 87600, // 10y
+					},
+					RenewBefore: &metav1.Duration{
+						Duration: time.Hour * 78840, // 9y
+					},
+					PrivateKey: &cmv1.CertificatePrivateKey{
+						Algorithm: cmv1.ECDSAKeyAlgorithm,
+						Size:      256,
+						Encoding:  cmv1.PKCS8,
+					},
+					IssuerRef: cmmetav1.IssuerReference{
+						Name: "selfsigned-issuer",
+						Kind: cmv1.ClusterIssuerKind,
+					},
+				},
+			},
+			&cmv1.ClusterIssuer{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "selfsigned-ca-issuer",
+				},
+				Spec: cmv1.IssuerSpec{
+					IssuerConfig: cmv1.IssuerConfig{
+						CA: &cmv1.CAIssuer{
+							SecretName: "root-ca-secret",
+						},
+					},
+				},
+			},
+			&cmv1.Certificate{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "gateway",
+					Namespace: install.Spec.Istio.Namespace,
+				},
+				Spec: cmv1.CertificateSpec{
+					SecretName: "gateway-cert",
+					DNSNames: []string{
+						install.Spec.Settings.Network.Domain,
+						fmt.Sprintf("*.%s", install.Spec.Settings.Network.Domain),
+					},
+					PrivateKey: &cmv1.CertificatePrivateKey{
+						Algorithm: cmv1.ECDSAKeyAlgorithm,
+						Size:      256,
+						Encoding:  cmv1.PKCS8,
+					},
+					IssuerRef: cmmetav1.IssuerReference{
+						Name: "selfsigned-ca-issuer",
+						Kind: cmv1.ClusterIssuerKind,
+					},
+				},
+			},
+		}
 	}
 
 	GenericDevicePluginObjects = func(install *v1.Install) []client.Object {

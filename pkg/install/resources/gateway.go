@@ -33,6 +33,23 @@ var (
 								},
 							},
 						},
+						{
+							Name:     "https",
+							Port:     443,
+							Protocol: gwv1.HTTPSProtocolType,
+							AllowedRoutes: &gwv1.AllowedRoutes{
+								Namespaces: &gwv1.RouteNamespaces{
+									From: ptr.To[gwv1.FromNamespaces]("All"),
+								},
+							},
+							TLS: &gwv1.ListenerTLSConfig{
+								CertificateRefs: []gwv1.SecretObjectReference{
+									{
+										Name: "gateway-cert",
+									},
+								},
+							},
+						},
 					},
 					Infrastructure: &gwv1.GatewayInfrastructure{
 						ParametersRef: &gwv1.LocalParametersReference{
@@ -53,6 +70,8 @@ var (
   ports:
   - port: 80
     nodePort: 80
+  - port: 443
+    nodePort: 443
 `,
 				},
 			},
@@ -70,7 +89,10 @@ var (
 							},
 						},
 					},
-					Hostnames: GenerateGatewayHostnames(install, "home-cloud"),
+					Hostnames: []gwv1.Hostname{
+						gwv1.Hostname(install.Spec.Settings.Network.Domain),
+						gwv1.Hostname(fmt.Sprintf("admin.%s", install.Spec.Settings.Network.Domain)),
+					},
 					Rules: []gwv1.HTTPRouteRule{
 						{
 							BackendRefs: []gwv1.HTTPBackendRef{

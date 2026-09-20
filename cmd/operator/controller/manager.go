@@ -8,6 +8,7 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
+	cmv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -35,6 +36,8 @@ func init() {
 	utilruntime.Must(v1.AddToScheme(scheme))
 	// add gateway api crds
 	utilruntime.Must(gwv1.Install(scheme))
+	// add cert-manager api crds
+	utilruntime.Must(cmv1.AddToScheme(scheme))
 	// add talos crds
 	utilruntime.Must(talos.AddToScheme(scheme))
 }

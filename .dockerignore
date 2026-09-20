@@ -9,8 +9,6 @@
 **/main
 **/_out
 **/main
-**/*.yaml
-**/*.yml
 **/*.md
 **/Makefile
 **/PROJECT

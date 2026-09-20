@@ -8,3 +8,5 @@ _out
 out
 TODO
 .vscode
+.local
+_proxmox

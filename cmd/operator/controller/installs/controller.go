@@ -115,10 +115,13 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 }
 
 func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) error {
-	l := log.FromContext(ctx)
+	var (
+		l = log.FromContext(ctx)
+		err error
+	)
 
 	// Home Cloud CRDs
-	err := r.reconcileHomeCloudCRDs(ctx, install)
+	err = r.reconcileHomeCloudCRDs(ctx, install)
 	if err != nil {
 		return err
 	}
@@ -159,16 +162,52 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 	// NAMESPACES
 	l.Info("reconciling namespaces")
 	for _, o := range resources.NamespaceObjects(install) {
-		err = kubeCreateOrUpdate(ctx, r.Client, o)
+		err = shared.CreateOrUpdate(ctx, r.Client, o)
 		if err != nil {
 			return err
 		}
 	}
 	// no status update
 
+	// CERT MANAGER
+	if !install.Spec.CertManager.Disable {
+		// NOTE: we can't simply skip an install if the version hasn't changed since the values
+		// might have changed with no version bump
+
+		l.Info("reconciling cert-manager install")
+		err = reconcileCertManager(ctx, install)
+		if err != nil {
+			return err
+		}
+
+		l.Info("reconciling certificates")
+		err = r.installResources(ctx, resources.Certificates(install))
+		if err != nil {
+			return err
+		}
+
+		install.Status.CertManager = &v1.CertManagerStatus{
+			Source:  install.Spec.CertManager.Source,
+			Version: install.Spec.CertManager.Version,
+		}
+	} else {
+		// only try and uninstall if currently installed
+		if install.Status.CertManager != nil {
+
+			// TODO: remove certificates? I think this should only be on a force/clean uninstall option
+
+			l.Info("cert-manager is disabled: removing previous installation")
+			err = uninstallCertManager(ctx, install)
+			if err != nil {
+				return err
+			}
+		}
+		install.Status.CertManager = nil
+	}
+
 	// ISTIO
 	if !install.Spec.Istio.Disable {
-		// NOTE: we can't simply skip an istio install if the version hasn't changed since the values
+		// NOTE: we can't simply skip an install if the version hasn't changed since the values
 		// might have changed with no version bump
 
 		l.Info("reconciling ingress gateway")
@@ -203,6 +242,21 @@ func (r *InstallReconciler) reconcile(ctx context.Context, install *v1.Install) 
 			}
 		}
 		install.Status.Istio = nil
+	}
+
+	// BLOCKY
+	installed = install.Status.Blocky != nil
+	err = r.reconcileObjects(ctx, "blocky", install.Spec.Blocky.Disable, installed, resources.BlockyObjects(install))
+	if err != nil {
+		return err
+	}
+	if !install.Spec.Blocky.Disable {
+		install.Status.Blocky = &v1.BlockyStatus{
+			Image: install.Spec.Blocky.Image,
+			Tag:   install.Spec.Blocky.Tag,
+		}
+	} else {
+		install.Status.Blocky = nil
 	}
 
 	// MDNS
@@ -444,6 +498,54 @@ func (r *InstallReconciler) reconcileKubernetes(ctx context.Context, install *v1
 	return nil
 }
 
+func reconcileCertManager(ctx context.Context, install *v1.Install) error {
+
+	cfg, err := shared.CreateHelmAction(install.Spec.CertManager.Namespace)
+	if err != nil {
+		return err
+	}
+	iAct := action.NewInstall(cfg)
+	iAct.Version = install.Spec.CertManager.Version
+	iAct.Namespace = install.Spec.CertManager.Namespace
+	iAct.RepoURL = install.Spec.CertManager.Source
+	iAct.Wait = true
+	iAct.Timeout = 5 * time.Minute
+
+	uAct := action.NewUpgrade(cfg)
+	uAct.Version = install.Spec.CertManager.Version
+	uAct.Namespace = install.Spec.CertManager.Namespace
+	uAct.RepoURL = install.Spec.CertManager.Source
+	uAct.Wait = true
+	uAct.Timeout = 5 * time.Minute
+
+	iAct.ReleaseName = "cert-manager"
+	err = helmInstallOrUpgrade(ctx, cfg, iAct, uAct, install.Spec.CertManager.Values)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func uninstallCertManager(ctx context.Context, install *v1.Install) error {
+	actionConfiguration, err := shared.CreateHelmAction(install.Spec.CertManager.Namespace)
+	if err != nil {
+		return err
+	}
+
+	act := action.NewUninstall(actionConfiguration)
+	act.IgnoreNotFound = true
+	act.Wait = true
+	act.Timeout = 5 * time.Minute
+
+	_, err = act.Run("cert-manager")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func reconcileIstio(ctx context.Context, install *v1.Install) error {
 
 	cfg, err := shared.CreateHelmAction(install.Spec.Istio.Namespace)
@@ -566,7 +668,7 @@ func (r *InstallReconciler) reconcileObjects(ctx context.Context, name string, d
 
 func (r *InstallReconciler) installResources(ctx context.Context, objects []client.Object) error {
 	for _, o := range objects {
-		err := kubeCreateOrUpdate(ctx, r.Client, o)
+		err := shared.CreateOrUpdate(ctx, r.Client, o)
 		if err != nil {
 			return err
 		}
@@ -599,23 +701,6 @@ func (r *InstallReconciler) tryDeletions(ctx context.Context, install *v1.Instal
 		}
 	}
 	return nil
-}
-
-func kubeCreateOrUpdate(ctx context.Context, kube client.Client, obj client.Object) error {
-	err := kube.Create(ctx, obj)
-	if kerrors.IsAlreadyExists(err) {
-		// this is a bit of a mess and might not be totally necessary but it creates a new instance
-		// of the same underlying type in obj (which must be a pointer) so that we don't overwrite all
-		// fields when we really only want the ResourceVersion
-		c := reflect.New(reflect.TypeOf(obj).Elem()).Interface().(client.Object)
-		err := kube.Get(ctx, client.ObjectKeyFromObject(obj), c)
-		if err != nil {
-			return err
-		}
-		obj.SetResourceVersion(c.GetResourceVersion())
-		return kube.Update(ctx, obj)
-	}
-	return err
 }
 
 func helmExists(cfg *action.Configuration, releaseName string) (bool, error) {

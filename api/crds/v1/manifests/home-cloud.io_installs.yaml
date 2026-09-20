@@ -46,6 +46,28 @@ spec:
           spec:
             description: InstallSpec defines the desired state of Install
             properties:
+              blocky:
+                properties:
+                  disable:
+                    type: boolean
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              certManager:
+                properties:
+                  disable:
+                    type: boolean
+                  namespace:
+                    type: string
+                  source:
+                    type: string
+                  values:
+                    type: string
+                  version:
+                    type: string
+                type: object
               daemon:
                 properties:
                   address:
@@ -118,13 +140,13 @@ spec:
                     type: boolean
                   ingressGatewayName:
                     type: string
-                  istio:
-                    type: string
                   istiod:
                     properties:
                       values:
                         type: string
                     type: object
+                  namespace:
+                    type: string
                   source:
                     type: string
                   version:
@@ -196,13 +218,56 @@ spec:
                       You must restart the server after changing this value for it to take
                       effect if updating the Kuberenetes resource directly.
                     type: string
-                  domains:
-                    description: |-
-                      Domains defines the domains to host routes/mdns addresses under. For example,
-                      `home.arpa` or `my-custom-domain.com` (default: [ "local" ])
-                    items:
-                      type: string
-                    type: array
+                  networkSettingsSpec:
+                    properties:
+                      dnsNetworkSettingsSpec:
+                        properties:
+                          allowDomains:
+                            description: 'AllowDomains is a list of plain domains
+                              to allow. Wildcards are supported. (default: [ "" ])'
+                            items:
+                              type: string
+                            type: array
+                          allowListSources:
+                            description: 'AllowListSources is a list of sources to
+                              read allow lists from (default: [ "" ])'
+                            items:
+                              type: string
+                            type: array
+                          denyDomains:
+                            description: 'DenyDomains is a list of plain domains to
+                              deny. Wildcards are supported. (default: [ "" ])'
+                            items:
+                              type: string
+                            type: array
+                          denyListSources:
+                            description: 'DenyListSources is a list of sources to
+                              read deny lists from (default: [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
+                              ])'
+                            items:
+                              type: string
+                            type: array
+                          upstreamServers:
+                            description: 'UpstreamServers defines the upstream DNS
+                              servers to forward to (default: [ "1.1.1.1", "1.0.0.1"
+                              ])'
+                            items:
+                              type: string
+                            type: array
+                        required:
+                        - allowDomains
+                        - allowListSources
+                        - denyDomains
+                        - denyListSources
+                        - upstreamServers
+                        type: object
+                      domain:
+                        description: 'Domain defines the domain of install. For example,
+                          `my-custom-domain.com` (default: "home-cloud.local")'
+                        type: string
+                    required:
+                    - domain
+                    type: object
                   storageApps:
                     description: |-
                       StorageApps are apps designated as apps responsible for managing all application storage.
@@ -230,7 +295,6 @@ spec:
                       type: string
                     type: array
                 required:
-                - domains
                 - storageApps
                 type: object
               tunnel:
@@ -250,6 +314,20 @@ spec:
           status:
             description: InstallStatus defines the observed state of Install
             properties:
+              blocky:
+                properties:
+                  image:
+                    type: string
+                  tag:
+                    type: string
+                type: object
+              certManager:
+                properties:
+                  source:
+                    type: string
+                  version:
+                    type: string
+                type: object
               daemon:
                 properties:
                   image:
@@ -271,7 +349,7 @@ spec:
                 type: object
               gatewayApi:
                 properties:
-                  url:
+                  source:
                     type: string
                   version:
                     type: string
@@ -285,7 +363,7 @@ spec:
                 type: object
               istio:
                 properties:
-                  repo:
+                  source:
                     type: string
                   version:
                     type: string
