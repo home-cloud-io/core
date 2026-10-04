@@ -3,11 +3,25 @@ package apps
 import (
 	"context"
 
-	"github.com/home-cloud-io/core/cmd/operator/controller/secrets"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	v1 "github.com/home-cloud-io/core/api/crds/v1"
+	"github.com/home-cloud-io/core/cmd/operator/controller/secrets"
 )
+
+func reconcileSecrets(ctx context.Context, r *AppReconciler, app *v1.App, config *AppConfig) error {
+
+	for _, s := range config.Secrets {
+		err := r.createSecret(ctx, s, config.Namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 func (r *AppReconciler) createSecret(ctx context.Context, s AppSecret, namespace string) error {
 	// generate secret for each key

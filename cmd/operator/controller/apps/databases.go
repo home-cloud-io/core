@@ -14,8 +14,21 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	v1 "github.com/home-cloud-io/core/api/crds/v1"
 	"github.com/home-cloud-io/core/cmd/operator/controller/secrets"
 )
+
+func reconcileDatabases(ctx context.Context, r *AppReconciler, app *v1.App, config *AppConfig) error {
+
+	for _, d := range config.Databases {
+		err := r.createDatabase(ctx, d, config.Namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 func (r *AppReconciler) createDatabase(ctx context.Context, d AppDatabase, namespace string) error {
 	log.FromContext(ctx).Info("creating database", "db_name", d.Name, "db_type", d.Type)
@@ -164,7 +177,7 @@ func (r *AppReconciler) createPostgresUser(ctx context.Context, db *bun.DB, d Ap
 				"username": []byte(d.Name),
 				"password": []byte(pass),
 				"port":     []byte("5432"),
-				"uri":      []byte(fmt.Sprintf("postgresql://%s:%s@postgres.postgres:5432/%s?sslmode=disable", d.Name, pass, d.Name)),
+				"uri":      fmt.Appendf(nil, "postgresql://%s:%s@postgres.postgres:5432/%s?sslmode=disable", d.Name, pass, d.Name),
 			},
 		})
 		if err != nil {

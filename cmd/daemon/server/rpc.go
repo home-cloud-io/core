@@ -178,6 +178,7 @@ func (h *rpcHandler) Version(ctx context.Context, request *connect.Request[v1.Ve
 	return connect.NewResponse(&v1.VersionResponse{
 		Name:    "talos",
 		Version: resp.Messages[0].Version.Tag,
+		Source:  "ghcr.io/siderolabs/installer",
 	}), nil
 }
 
