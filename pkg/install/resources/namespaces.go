@@ -33,8 +33,7 @@ var (
 					Name: install.Namespace,
 					Labels: map[string]string{
 						"pod-security.kubernetes.io/enforce": "privileged",
-						// TODO: does this work with the tunnel?
-						"istio.io/dataplane-mode": "ambient",
+						"istio.io/dataplane-mode":            "ambient",
 					},
 				},
 			},
