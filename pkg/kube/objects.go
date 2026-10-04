@@ -37,20 +37,20 @@ func UninstallResources(ctx context.Context, kube client.Client, objects []clien
 }
 
 func CreateOrUpdate(ctx context.Context, kube client.Client, obj client.Object) error {
-	err := kube.Create(ctx, obj)
-	if kerrors.IsAlreadyExists(err) {
-		// this is a bit of a mess and might not be totally necessary but it creates a new instance
-		// of the same underlying type in obj (which must be a pointer) so that we don't overwrite all
-		// fields when we really only want the ResourceVersion
-		c := reflect.New(reflect.TypeOf(obj).Elem()).Interface().(client.Object)
-		err := kube.Get(ctx, client.ObjectKeyFromObject(obj), c)
-		if err != nil {
-			return err
+	// this is a bit of a mess and might not be totally necessary but it creates a new instance
+	// of the same underlying type in obj (which must be a pointer) so that we don't overwrite all
+	// fields when we really only want the ResourceVersion
+	c := reflect.New(reflect.TypeOf(obj).Elem()).Interface().(client.Object)
+
+	err := kube.Get(ctx, client.ObjectKeyFromObject(obj), c)
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			return kube.Create(ctx, obj)
 		}
-		obj.SetResourceVersion(c.GetResourceVersion())
-		return kube.Update(ctx, obj)
+		return err
 	}
-	return err
+	obj.SetResourceVersion(c.GetResourceVersion())
+	return kube.Update(ctx, obj)
 }
 
 // Apply applies the given YAML manifests to kubernetes
