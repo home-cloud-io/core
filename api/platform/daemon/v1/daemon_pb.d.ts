@@ -112,6 +112,11 @@ export declare type VersionResponse = Message<"platform.daemon.v1.VersionRespons
    * @generated from field: string version = 2;
    */
   version: string;
+
+  /**
+   * @generated from field: string source = 3;
+   */
+  source: string;
 };
 
 /**
