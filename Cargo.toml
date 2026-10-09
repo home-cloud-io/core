@@ -1,0 +1,27 @@
+[package]
+name = "home-cloud"
+version = "0.1.0"
+authors = ["jgkawell"]
+edition = "2021"
+
+[dependencies]
+dioxus = { version = "0.7.10", features = [ "router" ] }
+reqwest = { version = "0.13.5", features = ["json"] }
+serde = { version = "1.0.229", features = ["derive"] }
+
+tonic-web-wasm-client = "0.9"
+tonic = { version = "0.14", default-features = false, features = ["codegen"] }
+tonic-prost = "0.14"
+prost = "0.14"
+prost-types = "0.14"
+
+dioxus-primitives = { git = "https://github.com/DioxusLabs/components", version = "0.0.1", default-features = false }
+
+[build-dependencies]
+tonic-prost-build = { version = "0.14", default-features = false }
+
+[features]
+default = ["web"]
+web = ["dioxus/web"]
+desktop = ["dioxus/desktop"]
+mobile = ["dioxus/mobile"]
