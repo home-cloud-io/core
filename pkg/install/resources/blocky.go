@@ -13,6 +13,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
+	"github.com/home-cloud-io/core/pkg/kube"
 )
 
 const (
@@ -117,6 +118,10 @@ var (
 								"app": "blocky",
 								// we don't want ztunnel to capture traffic
 								"istio.io/dataplane-mode": "none",
+							},
+							Annotations: map[string]string{
+								// store checksum of config so we get a redeploy on a config change
+								"checksum/config": kube.ComputeSHA256Sum(string(byaml)),
 							},
 						},
 						Spec: corev1.PodSpec{
