@@ -17,6 +17,18 @@ import (
 	"github.com/home-cloud-io/core/pkg/install/resources"
 )
 
+func reconcileRoutes(ctx context.Context, r *AppReconciler, app *v1.App, config *AppConfig) error {
+
+	for _, route := range config.Routes {
+		err := r.createRoute(ctx, config.Namespace, route)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route AppRoute) error {
 	install, err := shared.GetInstall(ctx, r.Client)
 	if err != nil {

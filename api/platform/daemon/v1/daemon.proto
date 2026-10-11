@@ -34,6 +34,7 @@ message VersionRequest {}
 message VersionResponse {
   string name = 1;
   string version = 2;
+  string source = 3;
 }
 
 message UpgradeRequest {

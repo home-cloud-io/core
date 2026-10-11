@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"dario.cat/mergo"
-	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
@@ -27,17 +26,16 @@ import (
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
-	"github.com/home-cloud-io/core/pkg/compare"
+	"github.com/home-cloud-io/core/pkg/helm"
 	"github.com/steady-bytes/draft/pkg/chassis"
 )
-
-const AppFinalizer = "apps.home-cloud.io/finalizer"
 
 // AppReconciler reconciles a App object
 type AppReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
-	Config chassis.Config
+	Scheme                *runtime.Scheme
+	Config                chassis.Config
+	DependencyReconcilers []dependencyReconcilerFunc
 }
 
 // HelmRepositoryIndex represents the index.yaml file that holds the information of helm charts within a helm repo
@@ -60,11 +58,25 @@ type HelmChartVersion struct {
 	Version     string    `yaml:"version"`
 }
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.3/pkg/reconcile
+type dependencyReconcilerFunc func(ctx context.Context, r *AppReconciler, app *v1.App, config *AppConfig) error
+
+const (
+	AppFinalizer = "apps.home-cloud.io/finalizer"
+)
+
+var (
+	preReconcilers = []dependencyReconcilerFunc{
+		reconcileNamespaces,
+		reconcileSecrets,
+		reconcilePersistence,
+		reconcileDisks,
+		reconcileDatabases,
+	}
+	postReconcilers = []dependencyReconcilerFunc{
+		reconcileRoutes,
+	}
+)
+
 func (r *AppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
 	l.Info("Reconciling App")
@@ -92,18 +104,10 @@ func (r *AppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		return ctrl.Result{}, r.tryDeletions(ctx, app)
 	}
 
-	// if the version isn't set in the status, installation is needed
-	if app.Status.Version == "" {
-		l.Info("Installing App")
-		return ctrl.Result{}, r.install(ctx, app)
-	}
-
-	// upgrade as default
-	l.Info("Upgrading App")
-	return ctrl.Result{}, r.upgrade(ctx, app)
+	return ctrl.Result{}, r.reconcile(ctx, app)
 }
 
-func (r *AppReconciler) ReconcileDisk() handler.EventHandler {
+func (r *AppReconciler) HandleDiskEvent() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) (requests []reconcile.Request) {
 		l := log.FromContext(ctx)
 		l.Info("Reconciling Disk for Apps")
@@ -128,7 +132,7 @@ func (r *AppReconciler) ReconcileDisk() handler.EventHandler {
 	})
 }
 
-func (r *AppReconciler) ReconcileInstall() handler.EventHandler {
+func (r *AppReconciler) HandleInstallEvent() handler.EventHandler {
 	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) (requests []reconcile.Request) {
 		l := log.FromContext(ctx)
 		l.Info("Reconciling Install for Apps")
@@ -158,12 +162,12 @@ func (r *AppReconciler) ReconcileInstall() handler.EventHandler {
 func (r *AppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1.App{}).
-		Watches(&v1.Disk{}, r.ReconcileDisk()).
-		Watches(&v1.Install{}, r.ReconcileInstall()).
+		Watches(&v1.Disk{}, r.HandleDiskEvent()).
+		Watches(&v1.Install{}, r.HandleInstallEvent()).
 		Complete(r)
 }
 
-func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
+func (r *AppReconciler) reconcile(ctx context.Context, app *v1.App) error {
 
 	// read combined app config from chart values and override values configured in the app
 	appConfig, err := config(app)
@@ -171,22 +175,31 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 		return err
 	}
 
-	err = r.createDependencies(ctx, app, appConfig)
+	// run pre- reconcilers
+	err = r.reconcileDeps(ctx, app, appConfig, preReconcilers)
 	if err != nil {
 		return err
 	}
 
 	// construct helm configuration
-	actionConfiguration, err := shared.CreateHelmAction(app.Namespace)
+	actionConfiguration, err := helm.ActionConfiguration(app.Namespace)
 	if err != nil {
 		return err
 	}
-	act := action.NewInstall(actionConfiguration)
-	act.Version = app.Spec.Version
-	act.Namespace = app.Namespace
-	act.RepoURL = repoURL(app)
-	act.ReleaseName = app.Spec.Release
-	chart, values, err := getChartAndValues(act.ChartPathOptions, app)
+	iAct := action.NewInstall(actionConfiguration)
+	iAct.ReleaseName = app.Spec.Release
+	iAct.Version = app.Spec.Version
+	iAct.Namespace = app.Namespace
+	iAct.RepoURL = repoURL(app)
+	// TODO: Wait and Timeout?
+
+	uAct := action.NewUpgrade(actionConfiguration)
+	uAct.Version = app.Spec.Version
+	uAct.Namespace = app.Namespace
+	uAct.RepoURL = repoURL(app)
+	// TODO: Wait and Timeout?
+
+	_, values, err := getChartAndValues(iAct.ChartPathOptions, app)
 	if err != nil {
 		return err
 	}
@@ -197,74 +210,23 @@ func (r *AppReconciler) install(ctx context.Context, app *v1.App) error {
 		return err
 	}
 
-	// finally, install helm chart
-	_, err = act.Run(chart, values)
+	// install/upgrade helm chart
+	err = helm.InstallOrUpgrade(ctx, actionConfiguration, iAct, uAct, values)
 	if err != nil {
 		return err
 	}
 
-	// create routes (after helm so that Services already exist for DNS annotation)
-	for _, route := range appConfig.Routes {
-		err = r.createRoute(ctx, appConfig.Namespace, route)
-		if err != nil {
-			return err
-		}
-	}
-
-	return r.updateStatus(ctx, app)
-}
-
-func (r *AppReconciler) upgrade(ctx context.Context, app *v1.App) error {
-
-	// read combined app config from chart values and override values configured in the app
-	appConfig, err := config(app)
+	// run post- reconcilers
+	err = r.reconcileDeps(ctx, app, appConfig, postReconcilers)
 	if err != nil {
 		return err
-	}
-
-	err = r.createDependencies(ctx, app, appConfig)
-	if err != nil {
-		return err
-	}
-
-	// construct helm configuration
-	actionConfiguration, err := shared.CreateHelmAction(app.Namespace)
-	if err != nil {
-		return err
-	}
-	act := action.NewUpgrade(actionConfiguration)
-	act.Version = app.Spec.Version
-	act.Namespace = app.Namespace
-	act.RepoURL = repoURL(app)
-	chart, values, err := getChartAndValues(act.ChartPathOptions, app)
-	if err != nil {
-		return err
-	}
-
-	// override from any changes in createDependencies
-	values, err = appConfig.ToValues(values)
-	if err != nil {
-		return err
-	}
-
-	_, err = act.Run(app.Spec.Release, chart, values)
-	if err != nil {
-		return err
-	}
-
-	// update routes (after helm so that Services already exist for DNS annotation)
-	for _, route := range appConfig.Routes {
-		err = r.createRoute(ctx, appConfig.Namespace, route)
-		if err != nil {
-			return err
-		}
 	}
 
 	return r.updateStatus(ctx, app)
 }
 
 func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
-	actionConfiguration, err := shared.CreateHelmAction(app.Namespace)
+	actionConfiguration, err := helm.ActionConfiguration(app.Namespace)
 	if err != nil {
 		return err
 	}
@@ -303,75 +265,11 @@ func (r *AppReconciler) uninstall(ctx context.Context, app *v1.App) error {
 	return nil
 }
 
-// createDependencies creates app dependencies and saves any updated values to AppConfig (e.g. disk claims)
-func (r *AppReconciler) createDependencies(ctx context.Context, app *v1.App, appConfig *AppConfig) error {
-	var (
-		err error
-	)
+func (r *AppReconciler) reconcileDeps(ctx context.Context, app *v1.App, config *AppConfig, funcs []dependencyReconcilerFunc) error {
 
-	// create namespace before installing anything else
-	err = shared.CreateOrUpdate(ctx, r.Client, &corev1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: appConfig.Namespace,
-			Labels: map[string]string{
-				"istio.io/dataplane-mode": "ambient",
-			},
-		},
-	})
-	if err != nil {
-		return err
-	}
-
-	// create secrets
-	for _, s := range appConfig.Secrets {
-		err := r.createSecret(ctx, s, appConfig.Namespace)
-		if err != nil {
-			return err
-		}
-	}
-
-	// create persistence (PV/PVCs)
-	for _, p := range appConfig.Persistence {
-		err := r.createPersistence(ctx, p, app, appConfig.Namespace)
-		if err != nil {
-			return err
-		}
-	}
-
-	// if a storage app, create disk PV/PVCs
-	install, err := shared.GetInstall(ctx, r.Client)
-	if err != nil {
-		return err
-	}
-	if slices.Contains(install.Spec.Settings.StorageApps, app.Name) {
-		disks := &v1.DiskList{}
-		err := r.Client.List(ctx, disks)
-		if err != nil {
-			return err
-		}
-		appConfig.Disks = []AppDisk{}
-		for _, disk := range disks.Items {
-			if disk.Spec.SystemDisk {
-				continue
-			}
-
-			claimName, err := r.createDiskPersistence(ctx, disk, app, appConfig.Namespace)
-			if err != nil {
-				return err
-			}
-
-			// save created claim name for helm install/upgrade
-			appConfig.Disks = append(appConfig.Disks, AppDisk{
-				// use disk.Alias if available for user visibility
-				Name:      compare.Default(disk.Spec.Alias, disk.Name),
-				ClaimName: claimName,
-			})
-		}
-	}
-
-	// create database (and users/initialization scripts)
-	for _, d := range appConfig.Databases {
-		err := r.createDatabase(ctx, d, appConfig.Namespace)
+	// run all reconcile functions (in order)
+	for _, f := range funcs {
+		err := f(ctx, r, app, config)
 		if err != nil {
 			return err
 		}
@@ -496,30 +394,13 @@ func getChartAndValues(opt action.ChartPathOptions, app *v1.App) (*chart.Chart, 
 	return chart, values, nil
 }
 
-// shouldUpgrade determines if the given app needs upgrading based on the version and values.
-func shouldUpgrade(app *v1.App) bool {
-	installedVersion := app.Status.Version
-	if installedVersion != "" {
-		installedVersion = "v" + installedVersion
-	}
-	requestedVersion := app.Spec.Version
-	if requestedVersion != "" {
-		requestedVersion = "v" + requestedVersion
-	}
-	// UPGRADE
-	// if the requested version is greater than the installed version
-	// OR
-	// if the current values in the spec are different than those in the status
-	return semver.Compare(requestedVersion, installedVersion) != 0 || app.Spec.Values != app.Status.Values
-}
-
 func repoURL(app *v1.App) string {
 	return "https://" + app.Spec.Repo
 }
 
 func config(app *v1.App) (config *AppConfig, err error) {
 	// get chart from app spec
-	actionConfiguration, err := shared.CreateHelmAction(app.Namespace)
+	actionConfiguration, err := helm.ActionConfiguration(app.Namespace)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -11,6 +12,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
+	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
+	"github.com/home-cloud-io/core/pkg/compare"
 )
 
 // TODO: think about making this pluggable for different types of PV sources (ie. not just host path)
@@ -25,6 +28,54 @@ type (
 		Name string
 	}
 )
+
+func reconcilePersistence(ctx context.Context, r *AppReconciler, app *v1.App, config *AppConfig) error {
+
+	for _, p := range config.Persistence {
+		err := r.createPersistence(ctx, p, app, config.Namespace)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func reconcileDisks(ctx context.Context, r *AppReconciler, app *v1.App, config *AppConfig) error {
+
+	// if a storage app, create disk PV/PVCs
+	install, err := shared.GetInstall(ctx, r.Client)
+	if err != nil {
+		return err
+	}
+	if slices.Contains(install.Spec.Settings.StorageApps, app.Name) {
+		disks := &v1.DiskList{}
+		err := r.Client.List(ctx, disks)
+		if err != nil {
+			return err
+		}
+		config.Disks = []AppDisk{}
+		for _, disk := range disks.Items {
+			if disk.Spec.SystemDisk {
+				continue
+			}
+
+			claimName, err := r.createDiskPersistence(ctx, disk, app, config.Namespace)
+			if err != nil {
+				return err
+			}
+
+			// save created claim name for helm install/upgrade
+			config.Disks = append(config.Disks, AppDisk{
+				// use disk.Alias if available for user visibility
+				Name:      compare.Default(disk.Spec.Alias, disk.Name),
+				ClaimName: claimName,
+			})
+		}
+	}
+
+	return nil
+}
 
 func (r *AppReconciler) createPersistence(ctx context.Context, p AppPersistence, app *v1.App, namespace string) error {
 	var (

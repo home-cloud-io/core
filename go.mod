@@ -28,6 +28,7 @@ require (
 	github.com/uptrace/bun/dialect/pgdialect v1.2.15
 	github.com/uptrace/bun/driver/pgdriver v1.2.15
 	github.com/vishvananda/netlink v1.3.1
+	go.yaml.in/yaml/v2 v2.4.4
 	go.yaml.in/yaml/v4 v4.0.0-rc.4
 	golang.org/x/mod v0.40.0
 	golang.org/x/net v0.58.0
@@ -256,7 +257,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.28.0 // indirect
-	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.56.0 // indirect
 	golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa // indirect
