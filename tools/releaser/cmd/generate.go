@@ -91,20 +91,26 @@ func manifestRelease() (*opv1.InstallSpec, error) {
 	latest.Operator.Tag = latest.Version
 	latest.Daemon.Tag = latest.Version
 
-	output.Print("Gateway API: %s -> ?", latest.GatewayAPI.Version)
-	latest.GatewayAPI.Version = GetWithDefault(latest.GatewayAPI.Version)
-
-	output.Print("Istio: %s -> ?", latest.Istio.Version)
-	latest.Istio.Version = GetWithDefault(latest.Istio.Version)
-
-	output.Print("Generic Device Plugin: %s -> ?", latest.GenericDevicePlugin.Tag)
-	latest.GenericDevicePlugin.Tag = GetWithDefault(latest.GenericDevicePlugin.Tag)
-
 	output.Print("Talos: %s -> ?", latest.Daemon.System.Version)
 	latest.Daemon.System.Version = GetWithDefault(latest.Daemon.System.Version)
 
 	output.Print("Kubernetes: %s -> ?", latest.Daemon.Kubernetes.Version)
 	latest.Daemon.Kubernetes.Version = GetWithDefault(latest.Daemon.Kubernetes.Version)
+
+	output.Print("Gateway API: %s -> ?", latest.GatewayAPI.Version)
+	latest.GatewayAPI.Version = GetWithDefault(latest.GatewayAPI.Version)
+
+	output.Print("cert-manager: %s -> ?", latest.CertManager.Version)
+	latest.CertManager.Version = GetWithDefault(latest.CertManager.Version)
+
+	output.Print("Blocky: %s -> ?", latest.Blocky.Tag)
+	latest.Blocky.Tag = GetWithDefault(latest.Blocky.Tag)
+
+	output.Print("Generic Device Plugin: %s -> ?", latest.GenericDevicePlugin.Tag)
+	latest.GenericDevicePlugin.Tag = GetWithDefault(latest.GenericDevicePlugin.Tag)
+
+	output.Print("Istio: %s -> ?", latest.Istio.Version)
+	latest.Istio.Version = GetWithDefault(latest.Istio.Version)
 
 	data, err := k8syaml.Marshal(latest)
 	if err != nil {

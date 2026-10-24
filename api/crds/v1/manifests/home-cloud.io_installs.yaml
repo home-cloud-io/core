@@ -254,19 +254,11 @@ spec:
                             items:
                               type: string
                             type: array
-                        required:
-                        - allowDomains
-                        - allowListSources
-                        - denyDomains
-                        - denyListSources
-                        - upstreamServers
                         type: object
                       domain:
                         description: 'Domain defines the domain of install. For example,
                           `my-custom-domain.com` (default: "home-cloud.local")'
                         type: string
-                    required:
-                    - domain
                     type: object
                   storageApps:
                     description: |-
@@ -294,8 +286,6 @@ spec:
                     items:
                       type: string
                     type: array
-                required:
-                - storageApps
                 type: object
               tunnel:
                 properties:
