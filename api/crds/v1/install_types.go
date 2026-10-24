@@ -159,7 +159,7 @@ type SettingsSpec struct {
 	//       persistentVolumeClaim:
 	//         claimName: {{ .claimName }}
 	//     {{- end }}
-	StorageApps []string `json:"storageApps"`
+	StorageApps []string `json:"storageApps,omitempty"`
 
 	Network NetworkSettingsSpec `json:"networkSettingsSpec,omitempty"`
 }
@@ -167,22 +167,22 @@ type SettingsSpec struct {
 
 type NetworkSettingsSpec struct {
 	// Domain defines the domain of install. For example, `my-custom-domain.com` (default: "home-cloud.local")
-	Domain string `json:"domain"`
+	Domain string `json:"domain,omitempty"`
 
 	DNS DNSNetworkSettingsSpec `json:"dnsNetworkSettingsSpec,omitempty"`
 }
 
 type DNSNetworkSettingsSpec struct {
 	// UpstreamServers defines the upstream DNS servers to forward to (default: [ "1.1.1.1", "1.0.0.1" ])
-	UpstreamServers []string `json:"upstreamServers"`
+	UpstreamServers []string `json:"upstreamServers,omitempty"`
 	// DenyListSources is a list of sources to read deny lists from (default: [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ])
-	DenyListSources []string `json:"denyListSources"`
+	DenyListSources []string `json:"denyListSources,omitempty"`
 	// AllowListSources is a list of sources to read allow lists from (default: [ "" ])
-	AllowListSources []string `json:"allowListSources"`
+	AllowListSources []string `json:"allowListSources,omitempty"`
 	// DenyDomains is a list of plain domains to deny. Wildcards are supported. (default: [ "" ])
-	DenyDomains []string `json:"denyDomains"`
+	DenyDomains []string `json:"denyDomains,omitempty"`
 	// AllowDomains is a list of plain domains to allow. Wildcards are supported. (default: [ "" ])
-	AllowDomains []string `json:"allowDomains"`
+	AllowDomains []string `json:"allowDomains,omitempty"`
 
 	// TODO: support more Blocky config like groups and client-specific rules
 }
