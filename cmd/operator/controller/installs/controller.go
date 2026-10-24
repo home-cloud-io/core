@@ -116,9 +116,10 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return
 		}
 
-		// TODO: this panics sometimes
 		err := r.Status().Update(ctx, install)
 		if err != nil {
+			l.Error(err, "failed to update status")
+			// TODO: should probably just return the error somehow
 			panic(err)
 		}
 	}()
