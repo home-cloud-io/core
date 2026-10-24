@@ -165,6 +165,7 @@ var (
 						"app": "operator",
 					},
 					Annotations: map[string]string{
+						// we need mdns for initial setup (users will use the built-in dns server after that)
 						v1.AnnotationDNSHostnames: GenerateDNSValue(install, "home-cloud"),
 					},
 				},

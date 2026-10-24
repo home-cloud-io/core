@@ -4,17 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gwv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	v1 "github.com/home-cloud-io/core/api/crds/v1"
 	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
-	"github.com/home-cloud-io/core/pkg/install/resources"
 )
 
 func reconcileRoutes(ctx context.Context, r *AppReconciler, app *v1.App, config *AppConfig) error {
@@ -37,7 +34,7 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 
 	// create httproute
 	port := gwv1.PortNumber(int32(route.Service.Port))
-	err = shared.CreateOrUpdate(ctx, r.Client,  &gwv1.HTTPRoute{
+	err = shared.CreateOrUpdate(ctx, r.Client, &gwv1.HTTPRoute{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      route.Name,
 			Namespace: namespace,
@@ -71,21 +68,6 @@ func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route
 		},
 	})
 	if client.IgnoreAlreadyExists(err) != nil {
-		return err
-	}
-
-	// annotate service for dns
-	service := &corev1.Service{}
-	err = r.Client.Get(ctx, types.NamespacedName{
-		Name:      route.Service.Name,
-		Namespace: namespace,
-	}, service)
-	if err != nil {
-		return err
-	}
-	service.Annotations[v1.AnnotationDNSHostnames] = resources.GenerateDNSValue(install, route.Name)
-	err = r.Client.Update(ctx, service)
-	if err != nil {
 		return err
 	}
 
