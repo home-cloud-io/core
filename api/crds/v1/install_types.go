@@ -6,7 +6,7 @@ import (
 
 // InstallSpec defines the desired state of Install
 type InstallSpec struct {
-	Version             string                   `json:"version"`
+	Version             string                   `json:"version,omitempty"`
 	GatewayAPI          *GatewayAPISpec          `json:"gatewayApi,omitempty" yaml:"gatewayApi"`
 	Istio               *IstioSpec               `json:"istio,omitempty"`
 	CertManager         *CertManagerSpec         `json:"certManager,omitempty" yaml:"certManager"`
@@ -163,7 +163,6 @@ type SettingsSpec struct {
 
 	Network NetworkSettingsSpec `json:"networkSettingsSpec,omitempty"`
 }
-
 
 type NetworkSettingsSpec struct {
 	// Domain defines the domain of install. For example, `my-custom-domain.com` (default: "home-cloud.local")
