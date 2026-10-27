@@ -75,7 +75,7 @@ func helmCertManager(ctx context.Context, install *v1.Install) error {
 	uAct.Wait = true
 	uAct.Timeout = 5 * time.Minute
 
-	values, err := helm.UnmarshalValues(install.Spec.Istio.CNI.Values)
+	values, err := helm.UnmarshalValues(install.Spec.CertManager.Values)
 	if err != nil {
 		return err
 	}
