@@ -24,9 +24,9 @@ require (
 	github.com/steady-bytes/draft/pkg/loggers v0.2.6
 	github.com/steady-bytes/draft/tools/dctl v0.2.4
 	github.com/stretchr/testify v1.12.1
-	github.com/uptrace/bun v1.2.15
+	github.com/uptrace/bun v1.3.0
 	github.com/uptrace/bun/dialect/pgdialect v1.2.15
-	github.com/uptrace/bun/driver/pgdriver v1.2.15
+	github.com/uptrace/bun/driver/pgdriver v1.3.0
 	github.com/vishvananda/netlink v1.3.1
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
 	golang.org/x/mod v0.41.0
