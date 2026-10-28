@@ -11,7 +11,7 @@ require (
 	github.com/go-logr/logr v1.4.4
 	github.com/google/uuid v1.6.0
 	github.com/netbirdio/netbird v0.59.7
-	github.com/pion/mdns/v2 v2.1.0
+	github.com/pion/mdns/v2 v2.2.2
 	github.com/pion/stun/v2 v2.0.0
 	github.com/pion/turn/v4 v4.1.4
 	github.com/robfig/cron/v3 v3.0.1
