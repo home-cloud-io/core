@@ -3,7 +3,6 @@ package k8sclient
 import (
 	"bufio"
 	"context"
-	"os"
 	"strings"
 	"time"
 
@@ -14,12 +13,12 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 	crclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	opv1 "github.com/home-cloud-io/core/api/crds/v1"
 	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
 	webv1 "github.com/home-cloud-io/core/api/platform/server/v1"
+	"github.com/home-cloud-io/core/pkg/kube"
 )
 
 type (
@@ -82,38 +81,16 @@ const (
 )
 
 func NewClient(logger chassis.Logger) Client {
-	// NOTE: this will attempt first to build the config from the KUBECONFIG env var and then
-	// fallback on the in-cluster config if no path is given
-	kubeConfig, err := clientcmd.BuildConfigFromFlags("", os.Getenv("KUBECONFIG"))
+	c, err := kube.NewClient()
 	if err != nil {
-		logger.WithError(err).Error("failed to read kube config")
-		panic(err)
-	}
-
-	c, err := crclient.New(kubeConfig, crclient.Options{})
-	if err != nil {
-		logger.WithError(err).Error("failed to create new k8s client")
-		panic(err)
-	} else {
-		opv1.AddToScheme(c.Scheme())
-	}
-
-	cs, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		logger.WithError(err).Error("failed to create new k8s clientset")
-		panic(err)
-	}
-
-	dc, err := discovery.NewDiscoveryClientForConfig(kubeConfig)
-	if err != nil {
-		logger.WithError(err).Error("failed to create new k8s discovery client")
+		logger.WithError(err).Error("failed to create kube client")
 		panic(err)
 	}
 
 	return &client{
-		client:          c,
-		clientset:       cs,
-		discoveryClient: dc,
+		client:          c.Client,
+		clientset:       c.Clientset,
+		discoveryClient: c.DiscoveryClient,
 	}
 }
 
