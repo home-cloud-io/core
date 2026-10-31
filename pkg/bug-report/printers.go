@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -40,17 +41,74 @@ func (p Printer) Print(ctx context.Context) error {
 		return err
 	}
 
+	fmt.Println("collecting crds")
+	err = p.collectCRDs(ctx)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("collecting cluster scoped resources")
 	err = p.printClusterScoped(ctx)
 	if err != nil {
 		return err
 	}
 
+	fmt.Println("collecting namespace scoped resources")
 	err = p.printNamespaceScoped(ctx)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (p Printer) collectCRDs(ctx context.Context) error {
+	list := &apiextensionsv1.CustomResourceDefinitionList{}
+	err := p.Client.Client.List(ctx, list)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(filepath.Join(p.Root, "crds.yaml"))
+	if err != nil {
+		return err
+	}
+
+	for _, crds := range list.Items {
+		crds.SetGroupVersionKind(schema.GroupVersionKind{
+			Group:   apiextensionsv1.SchemeGroupVersion.Group,
+			Version: apiextensionsv1.SchemeGroupVersion.Version,
+			Kind:    "CustomResourceDefinition",
+		})
+		err = p.Printer.PrintObj(crds.DeepCopyObject(), f)
+		if err != nil {
+			return err
+		}
+
+		switch crds.Spec.Scope {
+		case apiextensionsv1.ClusterScoped:
+			registerCRD(clusterTypes, crds)
+		case apiextensionsv1.NamespaceScoped:
+			registerCRD(namespacedTypes, crds)
+		}
+	}
+
+	return nil
+}
+
+func registerCRD(types map[string]typeConfig, crd apiextensionsv1.CustomResourceDefinition) {
+	for _, version := range crd.Spec.Versions {
+		if !version.Served || !version.Storage {
+			continue
+		}
+		namespacedTypes[crd.Spec.Names.Plural] = typeConfig{
+			gvk: schema.GroupVersionKind{
+				Group:   crd.Spec.Group,
+				Version: version.Name,
+				Kind:    crd.Spec.Names.Kind,
+			},
+		}
+	}
 }
 
 func (p Printer) Archive() error {
@@ -268,9 +326,6 @@ func (p Printer) printUnstructuredList(ctx context.Context, kind string, namespa
 		if err != nil {
 			return err
 		}
-	}
-	if err != nil {
-		return err
 	}
 
 	return nil

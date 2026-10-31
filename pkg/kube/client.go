@@ -4,6 +4,7 @@ import (
 	"os"
 
 	cmv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -34,6 +35,7 @@ func NewClient() (client Client, err error) {
 	if err != nil {
 		return
 	} else {
+		apiextensionsv1.AddToScheme(c.Scheme())
 		opv1.AddToScheme(c.Scheme())
 		gwv1.Install(c.Scheme())
 		cmv1.AddToScheme(c.Scheme())
