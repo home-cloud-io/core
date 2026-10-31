@@ -8,9 +8,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/netbirdio/netbird/sharedsock"
-	"github.com/pion/stun/v2"
+	"github.com/pion/stun/v4"
 	"github.com/steady-bytes/draft/pkg/chassis"
+
+	"github.com/home-cloud-io/core/pkg/netbird/sharedsock"
 )
 
 type (

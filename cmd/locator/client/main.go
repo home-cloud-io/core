@@ -12,11 +12,11 @@ import (
 	"github.com/google/uuid"
 	v1 "github.com/home-cloud-io/core/api/platform/locator/v1"
 	sdConnect "github.com/home-cloud-io/core/api/platform/locator/v1/v1connect"
+	"github.com/home-cloud-io/core/pkg/netbird/encryption"
+	"github.com/home-cloud-io/core/pkg/netbird/sharedsock"
 
 	"connectrpc.com/connect"
-	"github.com/netbirdio/netbird/encryption"
-	"github.com/netbirdio/netbird/sharedsock"
-	"github.com/pion/stun/v2"
+	"github.com/pion/stun/v4"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
