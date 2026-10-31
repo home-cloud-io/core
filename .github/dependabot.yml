@@ -5,7 +5,15 @@ updates:
       - "/"
     schedule:
       interval: "monthly"
+    ignore:
+      - dependency-name: "github.com/siderolabs/*"
+      - dependency-name: "sigs.k8s.io/gateway-api"
+      - dependency-name: "github.com/cert-manager/cert-manager"
     groups:
       all-dependencies:
         patterns:
           - "*"
+        exclude-patterns:
+          - "github.com/siderolabs/*"
+          - "sigs.k8s.io/gateway-api"
+          - "github.com/cert-manager/cert-manager"
