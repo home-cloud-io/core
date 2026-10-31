@@ -14,7 +14,7 @@ require (
 	github.com/netbirdio/netbird v0.65.3
 	github.com/pion/mdns/v2 v2.2.2
 	github.com/pion/stun/v4 v4.0.1
-	github.com/pion/turn/v4 v4.1.4
+	github.com/pion/turn/v5 v5.1.3
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sethvargo/go-password v0.3.1
 	github.com/siderolabs/go-kubernetes v0.2.38
@@ -193,10 +193,8 @@ require (
 	github.com/pion/dtls/v3 v3.1.9 // indirect
 	github.com/pion/logging v0.2.4 // indirect
 	github.com/pion/randutil v0.1.0 // indirect
-	github.com/pion/stun/v3 v3.1.0 // indirect
 	github.com/pion/transport/v3 v3.1.1 // indirect
-	github.com/pion/transport/v4 v4.0.1 // indirect
-	github.com/pion/transport/v5 v5.0.0 // indirect
+	github.com/pion/transport/v5 v5.1.1 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20250313105119-ba97887b0a25 // indirect
