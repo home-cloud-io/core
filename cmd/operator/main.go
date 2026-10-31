@@ -24,6 +24,7 @@ func main() {
 
 	c = c.WithClientApplication(client.Files, client.Root).
 		WithRPCHandler(web.New(c.Logger(), actl, sctl)).
+		WithRPCHandler(web.NewHttp(c.Logger())).
 		WithRunner(func() {
 			controller.Start(c.Logger())
 		})
