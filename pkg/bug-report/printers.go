@@ -41,19 +41,16 @@ func (p Printer) Print(ctx context.Context) error {
 		return err
 	}
 
-	fmt.Println("collecting crds")
 	err = p.collectCRDs(ctx)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("collecting cluster scoped resources")
 	err = p.printClusterScoped(ctx)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("collecting namespace scoped resources")
 	err = p.printNamespaceScoped(ctx)
 	if err != nil {
 		return err
