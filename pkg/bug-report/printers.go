@@ -24,8 +24,8 @@ import (
 type Printer struct {
 	Root         string
 	SkippedTypes []string
-	Client  kube.Client
-	Printer printers.ResourcePrinter
+	Client       kube.Client
+	Printer      printers.ResourcePrinter
 }
 
 func (p Printer) Print(ctx context.Context) error {
@@ -40,12 +40,12 @@ func (p Printer) Print(ctx context.Context) error {
 		return err
 	}
 
-	err = p.printNodes(ctx)
+	err = p.printClusterScoped(ctx)
 	if err != nil {
 		return err
 	}
 
-	err = p.printNamespaced(ctx)
+	err = p.printNamespaceScoped(ctx)
 	if err != nil {
 		return err
 	}
@@ -102,22 +102,12 @@ func (p Printer) Archive() error {
 	return nil
 }
 
-func (p Printer) printNodes(ctx context.Context) error {
-	list, err := p.Client.Clientset.CoreV1().Nodes().List(ctx, v1.ListOptions{})
-	if err != nil {
-		return err
-	}
-	f, err := os.Create(filepath.Join(p.Root, "nodes.yaml"))
-	if err != nil {
-		return err
-	}
-	for _, node := range list.Items {
-		node.SetGroupVersionKind(schema.GroupVersionKind{
-			Group:   corev1.SchemeGroupVersion.Group,
-			Version: corev1.SchemeGroupVersion.Version,
-			Kind:    "Node",
-		})
-		err = p.Printer.PrintObj(node.DeepCopy(), f)
+func (p Printer) printClusterScoped(ctx context.Context) error {
+	for kind, t := range clusterTypes {
+		if slices.Contains(p.SkippedTypes, kind) {
+			continue
+		}
+		err := p.printUnstructuredList(ctx, kind, "", t)
 		if err != nil {
 			return err
 		}
@@ -125,7 +115,7 @@ func (p Printer) printNodes(ctx context.Context) error {
 	return nil
 }
 
-func (p Printer) printNamespaced(ctx context.Context) error {
+func (p Printer) printNamespaceScoped(ctx context.Context) error {
 	list, err := p.Client.Clientset.CoreV1().Namespaces().List(ctx, v1.ListOptions{})
 	if err != nil {
 		return err
@@ -159,7 +149,7 @@ func (p Printer) printNamespaced(ctx context.Context) error {
 		}
 
 		// print configured namespaced types
-		for kind, t := range typesMap {
+		for kind, t := range namespacedTypes {
 			if slices.Contains(p.SkippedTypes, kind) {
 				continue
 			}

@@ -1,6 +1,7 @@
 package bugreport
 
 import (
+	cmv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -15,7 +16,31 @@ type typeConfig struct {
 	filter func(o *unstructured.Unstructured)
 }
 
-var typesMap = map[string]typeConfig{
+var clusterTypes = map[string]typeConfig{
+	"nodes": {
+		gvk: schema.GroupVersionKind{
+			Group:   corev1.SchemeGroupVersion.Group,
+			Version: corev1.SchemeGroupVersion.Version,
+			Kind:    "Node",
+		},
+	},
+	"persistentvolumes": {
+		gvk: schema.GroupVersionKind{
+			Group:   corev1.SchemeGroupVersion.Group,
+			Version: corev1.SchemeGroupVersion.Version,
+			Kind:    "PersistentVolume",
+		},
+	},
+	"clusterissuers": {
+		gvk: schema.GroupVersionKind{
+			Group:   cmv1.SchemeGroupVersion.Group,
+			Version: cmv1.SchemeGroupVersion.Version,
+			Kind:    "ClusterIssuer",
+		},
+	},
+}
+
+var namespacedTypes = map[string]typeConfig{
 	// CORE
 	"configmaps": {
 		gvk: schema.GroupVersionKind{
@@ -35,6 +60,13 @@ var typesMap = map[string]typeConfig{
 		},
 		filter: func(o *unstructured.Unstructured) {
 			unstructured.RemoveNestedField(o.Object, "data")
+		},
+	},
+	"persistentvolumesclaims": {
+		gvk: schema.GroupVersionKind{
+			Group:   corev1.SchemeGroupVersion.Group,
+			Version: corev1.SchemeGroupVersion.Version,
+			Kind:    "PersistentVolumeClaim",
 		},
 	},
 	// NOTE: we don't do pods here because we're already listing pods to get their logs
@@ -66,6 +98,13 @@ var typesMap = map[string]typeConfig{
 			Group:   appsv1.SchemeGroupVersion.Group,
 			Version: appsv1.SchemeGroupVersion.Version,
 			Kind:    "DaemonSet",
+		},
+	},
+	"services": {
+		gvk: schema.GroupVersionKind{
+			Group:   corev1.SchemeGroupVersion.Group,
+			Version: corev1.SchemeGroupVersion.Version,
+			Kind:    "Service",
 		},
 	},
 	// GATEWAY API
@@ -112,5 +151,12 @@ var typesMap = map[string]typeConfig{
 			Kind:    "Wireguard",
 		},
 	},
-	// TODO: cert-manager... and more??
+	// CERT MANAGER
+	"certificates": {
+		gvk: schema.GroupVersionKind{
+			Group:   cmv1.SchemeGroupVersion.Group,
+			Version: cmv1.SchemeGroupVersion.Version,
+			Kind:    "Certificate",
+		},
+	},
 }
