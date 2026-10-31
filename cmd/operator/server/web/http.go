@@ -3,7 +3,6 @@ package web
 import (
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"k8s.io/cli-runtime/pkg/printers"
@@ -19,14 +18,12 @@ type (
 
 	httpHandler struct {
 		logger chassis.Logger
-		timer  *time.Timer
 	}
 )
 
 func NewHttp(logger chassis.Logger) Http {
 	return &httpHandler{
 		logger: logger,
-		timer:  time.NewTimer(time.Second),
 	}
 }
 
@@ -55,28 +52,20 @@ func (h *httpHandler) fileUploadHandler(w http.ResponseWriter, r *http.Request) 
 		},
 	}
 
-	select {
-	case <-h.timer.C:
-		h.logger.Info("creating bug report")
-		err = printer.Print(ctx)
-		if err != nil {
-			h.logger.WithError(err).Error("failed to generate bug report")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	h.logger.Info("creating bug report")
+	err = printer.Print(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to generate bug report")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-		h.logger.Info("creating bug report archive")
-		err = printer.Archive()
-		if err != nil {
-			h.logger.WithError(err).Error("failed to create bug report archive")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		// effectively rate limits new reports to every 30s
-		h.timer.Reset(30 * time.Second)
-	default:
-		h.logger.Info("skipping recent report generation")
+	h.logger.Info("creating bug report archive")
+	err = printer.Archive()
+	if err != nil {
+		h.logger.WithError(err).Error("failed to create bug report archive")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	f, err := os.ReadFile("./bug-report.tar.gz")
