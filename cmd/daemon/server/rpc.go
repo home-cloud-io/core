@@ -106,6 +106,7 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	computeResp, err := client.MachineClient.SystemStat(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get load average stats")
+		return nil, err
 	}
 	stat := computeResp.Messages[0].CpuTotal
 	user := stat.User
@@ -122,6 +123,7 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	memoryResp, err := client.MachineClient.Memory(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
+		return nil, err
 	}
 	m := memoryResp.Messages[0].Meminfo
 	stats.Memory = &v1.MemoryStats{
@@ -136,6 +138,7 @@ func (h *rpcHandler) SystemStats(ctx context.Context, request *connect.Request[v
 	mountsResp, err := client.MachineClient.Mounts(ctx, &emptypb.Empty{})
 	if err != nil {
 		h.logger.WithError(err).Error("failed to get memory stats")
+		return nil, err
 	}
 	stats.Drives = []*v1.DriveStats{}
 	for _, mount := range mountsResp.Messages[0].Stats {
