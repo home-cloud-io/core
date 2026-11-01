@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/cosi-project/runtime/pkg/resource"
 	"github.com/cosi-project/runtime/pkg/state"
+	"github.com/home-cloud-io/core/pkg/compare"
 	"github.com/siderolabs/talos/cmd/talosctl/pkg/talos/yamlstrip"
 	"github.com/siderolabs/talos/pkg/machinery/api/machine"
 	"github.com/siderolabs/talos/pkg/machinery/client"
@@ -21,6 +23,7 @@ import (
 const (
 	talosConfigKey     = "daemon.talos_config"
 	defaultTalosConfig = "/var/run/secrets/talos.dev/config"
+	defaultTalosConfigEnvVar = "TALOSCONFIG"
 
 	ErrFailedToCreateClient = "failed to create talos client"
 )
@@ -33,7 +36,7 @@ func init() {
 // if they are rotated on disk. Therefore it is best to create new clients on use instead of using a single
 // long-lived client.
 func Client(ctx context.Context) (*client.Client, error) {
-	configPath := chassis.GetConfig().GetString(talosConfigKey)
+	configPath := compare.Default(os.Getenv(defaultTalosConfigEnvVar), chassis.GetConfig().GetString(talosConfigKey))
 	cfg, err := clientconfig.Open(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open config file %q: %w", configPath, err)
