@@ -18,14 +18,14 @@ pub fn SideMenu() -> Element {
     rsx! {
         SidebarProvider {
             Sidebar {
-                class: "border-2 border-dashed border-red-700 w-min",
-                variant: SidebarVariant::Floating,
+                class: "w-min",
+                variant: SidebarVariant::Sidebar,
                 collapsible: collapsible(),
                 side: side(),
-                SidebarHeader { class: "border-2 border-dashed border-orange-700 w-max" }
+                SidebarHeader { class: "w-max" }
                 SidebarContent {
-                    SidebarMenu { class: "border-2 border-dashed border-purple-700 flex-auto",
-                        SidebarMenuItem { class: "rounded-sm m-1 hover:bg-violet-400 active:bg-violet-700",
+                    SidebarMenu { class: "flex-auto",
+                        SidebarMenuItem { class: "rounded-sm m-1",
                             Link { to: Route::Home,
                                 SidebarMenuButton { class: "p-4",
                                     House {}
@@ -33,7 +33,7 @@ pub fn SideMenu() -> Element {
                                 }
                             }
                         }
-                        SidebarMenuItem { class: "rounded-sm m-1 hover:bg-violet-400 active:bg-violet-700",
+                        SidebarMenuItem { class: "rounded-sm m-1",
                             Link { to: Route::Store,
                                 SidebarMenuButton { class: "p-4",
                                     Grid2x2 {}
@@ -41,7 +41,7 @@ pub fn SideMenu() -> Element {
                                 }
                             }
                         }
-                        SidebarMenuItem { class: "rounded-sm m-1 hover:bg-violet-400 active:bg-violet-700",
+                        SidebarMenuItem { class: "rounded-sm m-1",
                             Link { to: Route::Settings,
                                 SidebarMenuButton { class: "p-4",
                                     Settings {}
@@ -49,7 +49,7 @@ pub fn SideMenu() -> Element {
                                 }
                             }
                         }
-                        SidebarMenuItem { class: "rounded-sm m-1 hover:bg-violet-400 active:bg-violet-700",
+                        SidebarMenuItem { class: "rounded-sm m-1",
                             Link { to: Route::About,
                                 SidebarMenuButton { class: "p-4",
                                     Info {}
@@ -59,15 +59,15 @@ pub fn SideMenu() -> Element {
                         }
                     }
                 }
-                SidebarFooter { class: "border-2 border-dashed border-blue-700 w-max" }
+                SidebarFooter { class: "w-max" }
                 SidebarRail {}
             }
             SidebarInset {
-                header { class: "border-2 border-dashed border-blue-700 flex min-h-fit items-center gap-0.5",
+                header { class: "flex min-h-fit items-center gap-0.5",
                     SidebarTrigger {}
                     Separator { height: "1rem", horizontal: false }
-                    img { class: "scale-200", src: FAVICON }
-                    div { class: "flex font-bold", "Home Cloud" }
+                    img { class: "scale-80", src: FAVICON }
+                    div { class: "flex font-bold dark:text-white", "Home Cloud" }
                 }
                 Outlet::<Route> {}
             }

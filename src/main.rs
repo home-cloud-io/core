@@ -29,6 +29,7 @@ fn App() -> Element {
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
         document::Stylesheet { href: CSS }
+        document::Stylesheet { href: asset!("/assets/dx-components-theme.css") }
         Router::<Route> {}
     }
 }
