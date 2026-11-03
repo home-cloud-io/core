@@ -24,6 +24,9 @@ type AppStatus struct {
 	Version string `json:"version"`
 	// Values that were used for the current Chart install.
 	Values string `json:"values,omitempty"`
+	// URL is the user-facing homepage of the App defined as the first
+	// route configured in Values (included default chart values).
+	URL string `json:"url,omitempty"`
 }
 
 //+kubebuilder:object:root=true

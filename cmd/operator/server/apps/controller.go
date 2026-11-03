@@ -306,11 +306,10 @@ func (c *controller) PrettyHealthcheck(ctx context.Context, logger chassis.Logge
 				if ok {
 					name = displayName
 				}
-				app.Display = &v1.AppDisplay{
-					Name:        name,
-					IconUrl:     storeApp.Icon,
-					Description: storeApp.Description,
-				}
+				app.Display.Name = name
+				app.Display.IconUrl = storeApp.Icon
+				app.Display.Description = storeApp.Description
+				// url is set in Healthcheck (yes this is a tragic design)
 			}
 		}
 	}

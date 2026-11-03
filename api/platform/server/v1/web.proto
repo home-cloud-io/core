@@ -118,6 +118,7 @@ message AppDisplay {
   string name = 1;
   string icon_url = 2;
   string description = 3;
+  string app_url = 4;
 }
 
 message GetSystemStatsRequest {}

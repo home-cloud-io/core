@@ -68,6 +68,11 @@ spec:
           status:
             description: AppStatus defines the observed state of an App
             properties:
+              url:
+                description: |-
+                  URL is the user-facing homepage of the App defined as the first
+                  route configured in Values (included default chart values).
+                type: string
               values:
                 description: Values that were used for the current Chart install.
                 type: string

@@ -3,8 +3,10 @@ use crate::api::{build_client, platform::server::v1::*};
 use crate::components::button::*;
 use crate::components::card::*;
 use crate::components::progress::*;
+use crate::components::tooltip::*;
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{ChevronRight, CircleCheck, CircleX};
+use dioxus_icons::lucide::{ChevronRight, CircleCheck, CircleX, Ban, Info};
+use dioxus_primitives::ContentSide;
 
 #[component]
 pub fn Home() -> Element {
@@ -163,8 +165,35 @@ fn AppsList(checks: Vec<AppHealth>) -> Element {
                                 CircleX { class: "w-4 m-2 text-red-400" }
                             }
                         }
-                        // TODO: wrap with link to app url (see proto)
-                        ChevronRight { class: "m-4 dark:text-white" }
+                        if has_url(app.clone().display.unwrap_or_default().app_url) {
+                            a {
+                                // TODO: support https
+                                href: format!("http://{}", app.clone().display.unwrap_or_default().app_url),
+                                target: "_blank",
+                                rel: "noopener noreferrer",
+                                Tooltip {
+                                    TooltipTrigger {
+                                        ChevronRight { class: "m-4 dark:text-white" }
+                                    }
+                                    TooltipContent {
+                                        class: "text-nowrap",
+                                        side: ContentSide::Left,
+                                        span { "Open app" }
+                                    }
+                                }
+                            }
+                        } else {
+                            Tooltip {
+                                TooltipTrigger {
+                                    Info { class: "m-4 dark:text-white" }
+                                }
+                                TooltipContent {
+                                    class: "text-nowrap",
+                                    side: ContentSide::Left,
+                                    span { "App has no URL" }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -182,6 +211,14 @@ fn format_percentage(free: f64, total: f64) -> f64 {
 
 fn is_healthy(status: i32) -> bool {
     if status == AppStatus::Healthy as i32 {
+        true
+    } else {
+        false
+    }
+}
+
+fn has_url(url: String) -> bool {
+    if url != "" {
         true
     } else {
         false

@@ -12,6 +12,9 @@
     --color-green-400: oklch(79.2% 0.209 151.711);
     --color-white: #fff;
     --spacing: 0.25rem;
+    --container-xs: 20rem;
+    --container-sm: 24rem;
+    --container-md: 28rem;
     --font-weight-light: 300;
     --font-weight-bold: 700;
     --radius-sm: 0.25rem;
@@ -226,9 +229,6 @@
   .min-h-fit {
     min-height: fit-content;
   }
-  .w-2 {
-    width: calc(var(--spacing) * 2);
-  }
   .w-4 {
     width: calc(var(--spacing) * 4);
   }
@@ -241,29 +241,26 @@
   .w-12 {
     width: calc(var(--spacing) * 12);
   }
-  .w-16 {
-    width: calc(var(--spacing) * 16);
-  }
-  .w-20 {
-    width: calc(var(--spacing) * 20);
-  }
   .w-25 {
     width: calc(var(--spacing) * 25);
-  }
-  .w-64 {
-    width: calc(var(--spacing) * 64);
   }
   .w-max {
     width: max-content;
   }
+  .w-md {
+    width: var(--container-md);
+  }
   .w-min {
     width: min-content;
   }
+  .w-sm {
+    width: var(--container-sm);
+  }
+  .w-xs {
+    width: var(--container-xs);
+  }
   .flex-auto {
     flex: auto;
-  }
-  .flex-shrink {
-    flex-shrink: 1;
   }
   .border-collapse {
     border-collapse: collapse;
@@ -286,20 +283,11 @@
   .flex-row {
     flex-direction: row;
   }
-  .flex-wrap {
-    flex-wrap: wrap;
-  }
   .items-center {
     align-items: center;
   }
-  .items-start {
-    align-items: flex-start;
-  }
   .justify-between {
     justify-content: space-between;
-  }
-  .justify-center {
-    justify-content: center;
   }
   .justify-start {
     justify-content: flex-start;
@@ -323,17 +311,11 @@
     border-style: var(--tw-border-style);
     border-width: 1px;
   }
-  .border-green-300 {
-    border-color: var(--color-green-300);
-  }
   .p-4 {
     padding: calc(var(--spacing) * 4);
   }
   .text-center {
     text-align: center;
-  }
-  .align-middle {
-    vertical-align: middle;
   }
   .font-bold {
     --tw-font-weight: var(--font-weight-bold);
@@ -343,11 +325,11 @@
     --tw-font-weight: var(--font-weight-light);
     font-weight: var(--font-weight-light);
   }
+  .text-nowrap {
+    text-wrap: nowrap;
+  }
   .text-wrap {
     text-wrap: wrap;
-  }
-  .text-green-300 {
-    color: var(--color-green-300);
   }
   .text-green-400 {
     color: var(--color-green-400);
@@ -377,11 +359,6 @@
   .dark\:border-white {
     @media (prefers-color-scheme: dark) {
       border-color: var(--color-white);
-    }
-  }
-  .dark\:bg-white {
-    @media (prefers-color-scheme: dark) {
-      background-color: var(--color-white);
     }
   }
   .dark\:text-white {

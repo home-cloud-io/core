@@ -15,9 +15,18 @@ import (
 )
 
 func reconcileRoutes(ctx context.Context, r *AppReconciler, app *v1.App, config *AppConfig) error {
+	install, err := shared.GetInstall(ctx, r.Client)
+	if err != nil {
+		return err
+	}
 
-	for _, route := range config.Routes {
-		err := r.createRoute(ctx, config.Namespace, route)
+	for i, route := range config.Routes {
+		// first route is the user-facing url
+		if i == 0 {
+			app.Status.URL = fmt.Sprintf("%s.%s", route.Name, install.Spec.Settings.Network.Domain)
+		}
+
+		err := r.createRoute(ctx, install, config.Namespace, route)
 		if err != nil {
 			return err
 		}
@@ -26,15 +35,11 @@ func reconcileRoutes(ctx context.Context, r *AppReconciler, app *v1.App, config 
 	return nil
 }
 
-func (r *AppReconciler) createRoute(ctx context.Context, namespace string, route AppRoute) error {
-	install, err := shared.GetInstall(ctx, r.Client)
-	if err != nil {
-		return err
-	}
+func (r *AppReconciler) createRoute(ctx context.Context, install *v1.Install, namespace string, route AppRoute) error {
 
 	// create httproute
 	port := gwv1.PortNumber(int32(route.Service.Port))
-	err = shared.CreateOrUpdate(ctx, r.Client, &gwv1.HTTPRoute{
+	err := shared.CreateOrUpdate(ctx, r.Client, &gwv1.HTTPRoute{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      route.Name,
 			Namespace: namespace,

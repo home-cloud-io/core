@@ -166,6 +166,9 @@ func (c *client) Healthcheck(ctx context.Context) ([]*webv1.AppHealth, error) {
 		checks[index] = &webv1.AppHealth{
 			Name:   app.Name,
 			Status: webv1.AppStatus_APP_STATUS_HEALTHY,
+			Display: &webv1.AppDisplay{
+				AppUrl: app.Status.URL,
+			},
 		}
 
 		// get all pods in app namespace

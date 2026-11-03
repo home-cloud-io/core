@@ -257,6 +257,8 @@ export declare type AppHealth = Message<"platform.server.v1.AppHealth"> & {
   status: AppStatus;
 
   /**
+   * TODO: add app url (e.g. photos.home-cloud.local - generated from config)
+   *
    * @generated from field: platform.server.v1.AppDisplay display = 3;
    */
   display?: AppDisplay;
@@ -286,6 +288,11 @@ export declare type AppDisplay = Message<"platform.server.v1.AppDisplay"> & {
    * @generated from field: string description = 3;
    */
   description: string;
+
+  /**
+   * @generated from field: string app_url = 4;
+   */
+  appUrl: string;
 };
 
 /**
