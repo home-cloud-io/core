@@ -17,6 +17,7 @@ prost-types = "0.14"
 
 dioxus-primitives = { git = "https://github.com/DioxusLabs/components", version = "0.0.1", default-features = false }
 dioxus-icons = { version = "0.1.0", default-features = false }
+markdown = "1.0.0"
 
 [build-dependencies]
 tonic-prost-build = { version = "0.14", default-features = false }
