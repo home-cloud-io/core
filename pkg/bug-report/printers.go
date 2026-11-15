@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strings"
 
+	"connectrpc.com/connect"
 	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -19,6 +20,8 @@ import (
 	"k8s.io/cli-runtime/pkg/printers"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	dv1 "github.com/home-cloud-io/core/api/platform/daemon/v1"
+	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	"github.com/home-cloud-io/core/pkg/kube"
 )
 
@@ -26,6 +29,7 @@ type Printer struct {
 	Root         string
 	SkippedTypes []string
 	Client       kube.Client
+	DaemonClient dv1connect.DaemonServiceClient
 	Printer      printers.ResourcePrinter
 }
 
@@ -39,6 +43,13 @@ func (p Printer) Print(ctx context.Context) error {
 	err = os.MkdirAll(p.Root, os.ModePerm)
 	if err != nil {
 		return err
+	}
+
+	if p.DaemonClient != nil {
+		err = p.printSystem(ctx)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = p.collectCRDs(ctx)
@@ -326,5 +337,18 @@ func (p Printer) printUnstructuredList(ctx context.Context, kind string, namespa
 	}
 
 	return nil
+}
 
+func (p Printer) printSystem(ctx context.Context) error {
+	resp, err := p.DaemonClient.BugReport(ctx, connect.NewRequest(&dv1.BugReportRequest{}))
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(filepath.Join(p.Root, "system-bug-report.zip"), resp.Msg.Archive, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

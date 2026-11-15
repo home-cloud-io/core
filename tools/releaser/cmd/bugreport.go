@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"net/http"
+
 	"github.com/spf13/cobra"
 	"k8s.io/cli-runtime/pkg/printers"
 
+	dv1connect "github.com/home-cloud-io/core/api/platform/daemon/v1/v1connect"
 	bugreport "github.com/home-cloud-io/core/pkg/bug-report"
 	"github.com/home-cloud-io/core/pkg/kube"
 )
@@ -29,7 +32,8 @@ var bugReportCmd = &cobra.Command{
 		printer := bugreport.Printer{
 			Root:         root,
 			SkippedTypes: skippedTypes,
-			Client: c,
+			Client:       c,
+			DaemonClient: dv1connect.NewDaemonServiceClient(http.DefaultClient, "http://localhost:9000"),
 			Printer: &printers.OmitManagedFieldsPrinter{
 				Delegate: &printers.YAMLPrinter{},
 			},

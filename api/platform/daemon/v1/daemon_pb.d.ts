@@ -341,6 +341,34 @@ export declare type LoadDiskResponse = Message<"platform.daemon.v1.LoadDiskRespo
 export declare const LoadDiskResponseSchema: GenMessage<LoadDiskResponse>;
 
 /**
+ * @generated from message platform.daemon.v1.BugReportRequest
+ */
+export declare type BugReportRequest = Message<"platform.daemon.v1.BugReportRequest"> & {
+};
+
+/**
+ * Describes the message platform.daemon.v1.BugReportRequest.
+ * Use `create(BugReportRequestSchema)` to create a new message.
+ */
+export declare const BugReportRequestSchema: GenMessage<BugReportRequest>;
+
+/**
+ * @generated from message platform.daemon.v1.BugReportResponse
+ */
+export declare type BugReportResponse = Message<"platform.daemon.v1.BugReportResponse"> & {
+  /**
+   * @generated from field: bytes archive = 1;
+   */
+  archive: Uint8Array;
+};
+
+/**
+ * Describes the message platform.daemon.v1.BugReportResponse.
+ * Use `create(BugReportResponseSchema)` to create a new message.
+ */
+export declare const BugReportResponseSchema: GenMessage<BugReportResponse>;
+
+/**
  * @generated from service platform.daemon.v1.DaemonService
  */
 export declare const DaemonService: GenService<{
@@ -423,6 +451,14 @@ export declare const DaemonService: GenService<{
     methodKind: "unary";
     input: typeof LoadDiskRequestSchema;
     output: typeof LoadDiskResponseSchema;
+  },
+  /**
+   * @generated from rpc platform.daemon.v1.DaemonService.BugReport
+   */
+  bugReport: {
+    methodKind: "unary";
+    input: typeof BugReportRequestSchema;
+    output: typeof BugReportResponseSchema;
   },
 }>;
 

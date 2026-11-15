@@ -1,14 +1,19 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"connectrpc.com/connect"
 	"github.com/cosi-project/runtime/pkg/resource"
 	"github.com/siderolabs/go-kubernetes/kubernetes/upgrade"
+	"github.com/siderolabs/go-talos-support/support"
+	"github.com/siderolabs/go-talos-support/support/bundle"
+	"github.com/siderolabs/go-talos-support/support/collectors"
 	"github.com/siderolabs/talos/pkg/cluster"
 	k8s "github.com/siderolabs/talos/pkg/cluster/kubernetes"
 	"github.com/siderolabs/talos/pkg/machinery/api/machine"
@@ -178,7 +183,8 @@ func (h *rpcHandler) Version(ctx context.Context, request *connect.Request[v1.Ve
 	return connect.NewResponse(&v1.VersionResponse{
 		Name:    "talos",
 		Version: resp.Messages[0].Version.Tag,
-		Source:  "ghcr.io/siderolabs/installer",
+		// TODO: derive this?
+		Source: "factory.talos.dev/metal-installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba",
 	}), nil
 }
 
@@ -312,6 +318,7 @@ func (h *rpcHandler) GetDisks(ctx context.Context, request *connect.Request[v1.G
 // LoadDisk creates a "disk" type UserVolume which takes over the entire disk so that PersistentVolumes
 // can be created against it.
 func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error) {
+	h.logger.Info("loading disk")
 
 	client, err := talos.Client(ctx)
 	if err != nil {
@@ -355,6 +362,50 @@ func (h *rpcHandler) LoadDisk(ctx context.Context, request *connect.Request[v1.L
 
 	return connect.NewResponse(&v1.LoadDiskResponse{
 		MountPath: fmt.Sprintf("/var/mnt/%s", request.Msg.Name),
+	}), nil
+}
+
+func (h *rpcHandler) BugReport(ctx context.Context, request *connect.Request[v1.BugReportRequest]) (*connect.Response[v1.BugReportResponse], error) {
+	h.logger.Info("generating bug report")
+
+	c, err := talos.Client(ctx)
+	if err != nil {
+		h.logger.WithError(err).Error(talos.ErrFailedToCreateClient)
+		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
+	}
+
+	nodes := c.GetConfigContext().Nodes
+	provider := func(ctx context.Context, node string) (context.Context, *client.Client, error) {
+		// TODO: handle multi-node
+		return ctx, c, nil
+	}
+
+	numWorkers := runtime.NumCPU()
+	if numWorkers > 1 {
+		numWorkers -= 1
+	}
+
+	var w bytes.Buffer
+	options := bundle.NewOptions([]bundle.Option{
+		bundle.WithArchiveOutput(&w),
+		bundle.WithTalosClientProvider(provider),
+		bundle.WithNodes(nodes...),
+		bundle.WithNumWorkers(numWorkers),
+	}...)
+
+	cols, err := collectors.GetForOptions(ctx, options)
+	if err != nil {
+		return nil, err
+	}
+
+	err = support.CreateSupportBundle(ctx, options, cols...)
+	if err != nil {
+		return nil, err
+	}
+
+	h.logger.Info("returning bug report")
+	return connect.NewResponse(&v1.BugReportResponse{
+		Archive: w.Bytes(),
 	}), nil
 }
 

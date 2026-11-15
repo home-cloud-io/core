@@ -17,6 +17,7 @@ service DaemonService {
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {}
   rpc GetDisks(GetDisksRequest) returns (GetDisksResponse) {}
   rpc LoadDisk(LoadDiskRequest) returns (LoadDiskResponse) {}
+  rpc BugReport(BugReportRequest) returns (BugReportResponse) {}
 }
 
 message ShutdownHostRequest {}
@@ -82,4 +83,9 @@ message LoadDiskRequest {
 message LoadDiskResponse {
   // the host mount path of the created volume (e.g. /mnt/apps1, /var/mnt/bigdata)
   string mount_path = 1;
+}
+
+message BugReportRequest {}
+message BugReportResponse {
+  bytes archive = 1;
 }

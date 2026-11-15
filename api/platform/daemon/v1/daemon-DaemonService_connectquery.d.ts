@@ -44,3 +44,7 @@ export const getDisks: typeof DaemonService["method"]["getDisks"];
  * @generated from rpc platform.daemon.v1.DaemonService.LoadDisk
  */
 export const loadDisk: typeof DaemonService["method"]["loadDisk"];
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.BugReport
+ */
+export const bugReport: typeof DaemonService["method"]["bugReport"];
