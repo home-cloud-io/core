@@ -178,7 +178,8 @@ func (h *rpcHandler) Version(ctx context.Context, request *connect.Request[v1.Ve
 	return connect.NewResponse(&v1.VersionResponse{
 		Name:    "talos",
 		Version: resp.Messages[0].Version.Tag,
-		Source:  "ghcr.io/siderolabs/installer",
+		// TODO: derive this?
+		Source:  "factory.talos.dev/metal-installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba",
 	}), nil
 }
 
