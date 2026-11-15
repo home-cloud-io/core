@@ -94,3 +94,22 @@ fn map_status_to_color(status: String) -> String {
         _ => "white".to_string()
     }
 }
+
+
+fn install_app(app: App) {
+    let mut response = use_resource(|| async move {
+        let mut client = build_client();
+        let request = tonic::Request::new(InstallAppRequest {
+            repo: "apps.home-cloud.io".to_string(),
+            chart: app.name.clone(),
+            release: app.name.clone(),
+            version: app.version.clone(),
+            values: "".to_string(),
+        });
+        client
+            .install_app(request)
+            .await
+            .unwrap()
+            .into_inner()
+    });
+}
