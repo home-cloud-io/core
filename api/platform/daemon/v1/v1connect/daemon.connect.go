@@ -59,6 +59,8 @@ const (
 	DaemonServiceGetDisksProcedure = "/platform.daemon.v1.DaemonService/GetDisks"
 	// DaemonServiceLoadDiskProcedure is the fully-qualified name of the DaemonService's LoadDisk RPC.
 	DaemonServiceLoadDiskProcedure = "/platform.daemon.v1.DaemonService/LoadDisk"
+	// DaemonServiceBugReportProcedure is the fully-qualified name of the DaemonService's BugReport RPC.
+	DaemonServiceBugReportProcedure = "/platform.daemon.v1.DaemonService/BugReport"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -74,6 +76,7 @@ var (
 	daemonServiceDeleteVolumeMethodDescriptor      = daemonServiceServiceDescriptor.Methods().ByName("DeleteVolume")
 	daemonServiceGetDisksMethodDescriptor          = daemonServiceServiceDescriptor.Methods().ByName("GetDisks")
 	daemonServiceLoadDiskMethodDescriptor          = daemonServiceServiceDescriptor.Methods().ByName("LoadDisk")
+	daemonServiceBugReportMethodDescriptor         = daemonServiceServiceDescriptor.Methods().ByName("BugReport")
 )
 
 // DaemonServiceClient is a client for the platform.daemon.v1.DaemonService service.
@@ -88,6 +91,7 @@ type DaemonServiceClient interface {
 	DeleteVolume(context.Context, *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error)
 	GetDisks(context.Context, *connect.Request[v1.GetDisksRequest]) (*connect.Response[v1.GetDisksResponse], error)
 	LoadDisk(context.Context, *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error)
+	BugReport(context.Context, *connect.Request[v1.BugReportRequest]) (*connect.Response[v1.BugReportResponse], error)
 }
 
 // NewDaemonServiceClient constructs a client for the platform.daemon.v1.DaemonService service. By
@@ -160,6 +164,12 @@ func NewDaemonServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(daemonServiceLoadDiskMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		bugReport: connect.NewClient[v1.BugReportRequest, v1.BugReportResponse](
+			httpClient,
+			baseURL+DaemonServiceBugReportProcedure,
+			connect.WithSchema(daemonServiceBugReportMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -175,6 +185,7 @@ type daemonServiceClient struct {
 	deleteVolume      *connect.Client[v1.DeleteVolumeRequest, v1.DeleteVolumeResponse]
 	getDisks          *connect.Client[v1.GetDisksRequest, v1.GetDisksResponse]
 	loadDisk          *connect.Client[v1.LoadDiskRequest, v1.LoadDiskResponse]
+	bugReport         *connect.Client[v1.BugReportRequest, v1.BugReportResponse]
 }
 
 // ShutdownHost calls platform.daemon.v1.DaemonService.ShutdownHost.
@@ -227,6 +238,11 @@ func (c *daemonServiceClient) LoadDisk(ctx context.Context, req *connect.Request
 	return c.loadDisk.CallUnary(ctx, req)
 }
 
+// BugReport calls platform.daemon.v1.DaemonService.BugReport.
+func (c *daemonServiceClient) BugReport(ctx context.Context, req *connect.Request[v1.BugReportRequest]) (*connect.Response[v1.BugReportResponse], error) {
+	return c.bugReport.CallUnary(ctx, req)
+}
+
 // DaemonServiceHandler is an implementation of the platform.daemon.v1.DaemonService service.
 type DaemonServiceHandler interface {
 	ShutdownHost(context.Context, *connect.Request[v1.ShutdownHostRequest]) (*connect.Response[v1.ShutdownHostResponse], error)
@@ -239,6 +255,7 @@ type DaemonServiceHandler interface {
 	DeleteVolume(context.Context, *connect.Request[v1.DeleteVolumeRequest]) (*connect.Response[v1.DeleteVolumeResponse], error)
 	GetDisks(context.Context, *connect.Request[v1.GetDisksRequest]) (*connect.Response[v1.GetDisksResponse], error)
 	LoadDisk(context.Context, *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error)
+	BugReport(context.Context, *connect.Request[v1.BugReportRequest]) (*connect.Response[v1.BugReportResponse], error)
 }
 
 // NewDaemonServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -307,6 +324,12 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(daemonServiceLoadDiskMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	daemonServiceBugReportHandler := connect.NewUnaryHandler(
+		DaemonServiceBugReportProcedure,
+		svc.BugReport,
+		connect.WithSchema(daemonServiceBugReportMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/platform.daemon.v1.DaemonService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DaemonServiceShutdownHostProcedure:
@@ -329,6 +352,8 @@ func NewDaemonServiceHandler(svc DaemonServiceHandler, opts ...connect.HandlerOp
 			daemonServiceGetDisksHandler.ServeHTTP(w, r)
 		case DaemonServiceLoadDiskProcedure:
 			daemonServiceLoadDiskHandler.ServeHTTP(w, r)
+		case DaemonServiceBugReportProcedure:
+			daemonServiceBugReportHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -376,4 +401,8 @@ func (UnimplementedDaemonServiceHandler) GetDisks(context.Context, *connect.Requ
 
 func (UnimplementedDaemonServiceHandler) LoadDisk(context.Context, *connect.Request[v1.LoadDiskRequest]) (*connect.Response[v1.LoadDiskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.LoadDisk is not implemented"))
+}
+
+func (UnimplementedDaemonServiceHandler) BugReport(context.Context, *connect.Request[v1.BugReportRequest]) (*connect.Response[v1.BugReportResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("platform.daemon.v1.DaemonService.BugReport is not implemented"))
 }
