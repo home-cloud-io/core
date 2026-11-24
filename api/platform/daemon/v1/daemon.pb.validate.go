@@ -2151,3 +2151,207 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoadDiskResponseValidationError{}
+
+// Validate checks the field values on BugReportRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *BugReportRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BugReportRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// BugReportRequestMultiError, or nil if none found.
+func (m *BugReportRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BugReportRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return BugReportRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// BugReportRequestMultiError is an error wrapping multiple validation errors
+// returned by BugReportRequest.ValidateAll() if the designated constraints
+// aren't met.
+type BugReportRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BugReportRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BugReportRequestMultiError) AllErrors() []error { return m }
+
+// BugReportRequestValidationError is the validation error returned by
+// BugReportRequest.Validate if the designated constraints aren't met.
+type BugReportRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BugReportRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BugReportRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BugReportRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BugReportRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BugReportRequestValidationError) ErrorName() string { return "BugReportRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e BugReportRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBugReportRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BugReportRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BugReportRequestValidationError{}
+
+// Validate checks the field values on BugReportResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *BugReportResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BugReportResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// BugReportResponseMultiError, or nil if none found.
+func (m *BugReportResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BugReportResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Archive
+
+	if len(errors) > 0 {
+		return BugReportResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// BugReportResponseMultiError is an error wrapping multiple validation errors
+// returned by BugReportResponse.ValidateAll() if the designated constraints
+// aren't met.
+type BugReportResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BugReportResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BugReportResponseMultiError) AllErrors() []error { return m }
+
+// BugReportResponseValidationError is the validation error returned by
+// BugReportResponse.Validate if the designated constraints aren't met.
+type BugReportResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BugReportResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BugReportResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BugReportResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BugReportResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BugReportResponseValidationError) ErrorName() string {
+	return "BugReportResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BugReportResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBugReportResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BugReportResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BugReportResponseValidationError{}

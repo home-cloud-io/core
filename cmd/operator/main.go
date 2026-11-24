@@ -26,6 +26,11 @@ func main() {
 		WithRPCHandler(web.New(c.Logger(), actl, sctl)).
 		WithRPCHandler(web.NewHttp(c.Logger())).
 		WithRunner(func() {
+			if chassis.GetConfig().GetBool("DISABLE_CONTROLLER") {
+				c.Logger().Info("controller disabled")
+				return
+			}
+
 			controller.Start(c.Logger())
 		})
 }

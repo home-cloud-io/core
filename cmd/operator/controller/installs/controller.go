@@ -57,10 +57,6 @@ var (
 		reconcileTunnel,
 		reconcileDaemon,
 		reconcileGenericDevicePlugin,
-		// TODO: shouldn't we actually reconcile system/kube first so that we can upgrade everything in-place?
-		// 		 for example: if we upgraded istio to something that only supports kube 1.38 we'd want to upgrade to kube 1.38
-		// 		 before istio?
-		// 		 Need to check talos docs to confirm precedence here.
 		reconcileSystem,
 		reconcileKubernetes,
 	}
@@ -119,8 +115,6 @@ func (r *InstallReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		err := r.Status().Update(ctx, install)
 		if err != nil {
 			l.Error(err, "failed to update status")
-			// TODO: should probably just return the error somehow
-			panic(err)
 		}
 	}()
 

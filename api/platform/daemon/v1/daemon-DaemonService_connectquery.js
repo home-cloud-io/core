@@ -53,3 +53,8 @@ export const getDisks = DaemonService.method.getDisks;
  * @generated from rpc platform.daemon.v1.DaemonService.LoadDisk
  */
 export const loadDisk = DaemonService.method.loadDisk;
+
+/**
+ * @generated from rpc platform.daemon.v1.DaemonService.BugReport
+ */
+export const bugReport = DaemonService.method.bugReport;

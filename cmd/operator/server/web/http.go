@@ -7,6 +7,8 @@ import (
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"k8s.io/cli-runtime/pkg/printers"
 
+	"github.com/home-cloud-io/core/cmd/operator/controller/daemon"
+	"github.com/home-cloud-io/core/cmd/operator/controller/shared"
 	bugreport "github.com/home-cloud-io/core/pkg/bug-report"
 	"github.com/home-cloud-io/core/pkg/kube"
 )
@@ -38,7 +40,13 @@ func (h *httpHandler) fileUploadHandler(w http.ResponseWriter, r *http.Request) 
 	c, err := kube.NewClient()
 	if err != nil {
 		h.logger.WithError(err).Error("failed to create kube client")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
+	install, err := shared.GetInstall(ctx, c.Client)
+	if err != nil {
+		h.logger.WithError(err).Error("failed to get install")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -47,6 +55,7 @@ func (h *httpHandler) fileUploadHandler(w http.ResponseWriter, r *http.Request) 
 		Root:         "./bug-report",
 		SkippedTypes: []string{},
 		Client:       c,
+		DaemonClient: daemon.DaemonClient(install.Spec.Daemon.Address),
 		Printer: &printers.OmitManagedFieldsPrinter{
 			Delegate: &printers.YAMLPrinter{},
 		},
