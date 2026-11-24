@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -15,7 +14,6 @@ import (
 	k8syaml "sigs.k8s.io/yaml"
 
 	opv1 "github.com/home-cloud-io/core/api/crds/v1"
-	"github.com/home-cloud-io/core/cmd/operator/server/system"
 	"github.com/home-cloud-io/core/pkg/install/resources"
 )
 
@@ -71,46 +69,24 @@ func manifestRelease() (*opv1.InstallSpec, error) {
 	defer f.Close()
 
 	// get version manifest from repo
-	resp, err := http.Get(system.LatestReleaseManifestURL)
+	b, err := os.ReadFile(filepath.Join(path, "manifest.yaml"))
 	if err != nil {
 		return nil, err
 	}
 
-	// decode body into spec
-	dec := yaml.NewDecoder(resp.Body)
+	// decode into spec
 	latest := &opv1.InstallSpec{}
-	err = dec.Decode(latest)
+	err = yaml.Unmarshal(b, latest)
 	if err != nil {
 		return nil, err
 	}
 
-	output.Print("Version: %s -> ?", latest.Version)
-	latest.Version = GetWithDefault(latest.Version)
+	output.Print("Version: ")
+	latest.Version = input.Get()
 	latest.MDNS.Tag = latest.Version
 	latest.Tunnel.Tag = latest.Version
 	latest.Operator.Tag = latest.Version
 	latest.Daemon.Tag = latest.Version
-
-	output.Print("Talos: %s -> ?", latest.Daemon.System.Version)
-	latest.Daemon.System.Version = GetWithDefault(latest.Daemon.System.Version)
-
-	output.Print("Kubernetes: %s -> ?", latest.Daemon.Kubernetes.Version)
-	latest.Daemon.Kubernetes.Version = GetWithDefault(latest.Daemon.Kubernetes.Version)
-
-	output.Print("Gateway API: %s -> ?", latest.GatewayAPI.Version)
-	latest.GatewayAPI.Version = GetWithDefault(latest.GatewayAPI.Version)
-
-	output.Print("cert-manager: %s -> ?", latest.CertManager.Version)
-	latest.CertManager.Version = GetWithDefault(latest.CertManager.Version)
-
-	output.Print("Blocky: %s -> ?", latest.Blocky.Tag)
-	latest.Blocky.Tag = GetWithDefault(latest.Blocky.Tag)
-
-	output.Print("Generic Device Plugin: %s -> ?", latest.GenericDevicePlugin.Tag)
-	latest.GenericDevicePlugin.Tag = GetWithDefault(latest.GenericDevicePlugin.Tag)
-
-	output.Print("Istio: %s -> ?", latest.Istio.Version)
-	latest.Istio.Version = GetWithDefault(latest.Istio.Version)
 
 	data, err := k8syaml.Marshal(latest)
 	if err != nil {
