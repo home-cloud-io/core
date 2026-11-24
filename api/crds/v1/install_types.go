@@ -182,8 +182,33 @@ type DNSNetworkSettingsSpec struct {
 	DenyDomains []string `json:"denyDomains,omitempty"`
 	// AllowDomains is a list of plain domains to allow. Wildcards are supported. (default: [ "" ])
 	AllowDomains []string `json:"allowDomains,omitempty"`
+	// Custom DNS settings (mappings, rewrites, etc.)
+	Custom CustomDNSNetworkSettingsSpec `json:"custom,omitempty"`
 
 	// TODO: support more Blocky config like groups and client-specific rules
+}
+
+type CustomDNSNetworkSettingsSpec struct {
+	// Duration used for custom DNS values - if undefined, unit is minutes (default: 1h)
+	TTL     string `json:"ttl,omitempty"`
+	// Domain rewriting rules applied before DNS resolution
+	Rewrite []CustomDNSRewriteEntry `json:"rewrite,omitempty"`
+	// Simple domain to IP mappings
+	Mapping []CustomDNSMappingEntry `json:"mapping,omitempty"`
+}
+
+type CustomDNSRewriteEntry struct {
+	// Rewrite this part of the domain (not the whole domain)
+	From string `json:"from"`
+	// Rewrite to this value
+	To   string `json:"to"`
+}
+
+type CustomDNSMappingEntry struct {
+	// The domain for the DNS entry
+	Domain      string   `json:"domain"`
+	// The addresses for the DNS entry (can be IPv4 or IPv6)
+	Addresseses []string `json:"addresses"`
 }
 
 type AppStore struct {

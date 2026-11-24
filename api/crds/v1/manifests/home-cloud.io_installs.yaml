@@ -234,6 +234,50 @@ spec:
                             items:
                               type: string
                             type: array
+                          custom:
+                            description: Custom DNS settings (mappings, rewrites,
+                              etc.)
+                            properties:
+                              mapping:
+                                description: Simple domain to IP mappings
+                                items:
+                                  properties:
+                                    addresses:
+                                      description: The addresses for the DNS entry
+                                        (can be IPv4 or IPv6)
+                                      items:
+                                        type: string
+                                      type: array
+                                    domain:
+                                      description: The domain for the DNS entry
+                                      type: string
+                                  required:
+                                  - addresses
+                                  - domain
+                                  type: object
+                                type: array
+                              rewrite:
+                                description: Domain rewriting rules applied before
+                                  DNS resolution
+                                items:
+                                  properties:
+                                    from:
+                                      description: Rewrite this part of the domain
+                                        (not the whole domain)
+                                      type: string
+                                    to:
+                                      description: Rewrite to this value
+                                      type: string
+                                  required:
+                                  - from
+                                  - to
+                                  type: object
+                                type: array
+                              ttl:
+                                description: 'Duration used for custom DNS values
+                                  - if undefined, unit is minutes (default: 1h)'
+                                type: string
+                            type: object
                           denyDomains:
                             description: 'DenyDomains is a list of plain domains to
                               deny. Wildcards are supported. (default: [ "" ])'
