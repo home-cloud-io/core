@@ -75,6 +75,9 @@ crds:
 				Network: v1.NetworkSettingsSpec{
 					Domain: "home-cloud.local",
 					DNS: v1.DNSNetworkSettingsSpec{
+						Custom: v1.CustomDNSNetworkSettingsSpec{
+							TTL: "1h",
+						},
 						UpstreamServers: []string{"1.1.1.1", "1.0.0.1"},
 						DenyListSources: []string{"https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"},
 					},
