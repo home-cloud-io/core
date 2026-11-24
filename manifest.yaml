@@ -1,0 +1,29 @@
+blocky:
+  image: ghcr.io/0xerr0r/blocky
+  tag: v0.35.0
+certManager:
+  source: https://charts.jetstack.io
+  version: v1.21.3
+daemon:
+  image: ghcr.io/home-cloud-io/daemon
+  kubernetes:
+    version: v1.37.1
+  system:
+    # TODO: this is a default metal installer, should we derive the version?
+    source: factory.talos.dev/metal-installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba
+    version: v1.14.6
+gatewayApi:
+  source: https://github.com/kubernetes-sigs/gateway-api/releases/download
+  version: v1.6.3
+genericDevicePlugin:
+  image: ghcr.io/squat/generic-device-plugin
+  tag: 0.2.0
+istio:
+  source: https://blob.istio.io/istio-release/charts
+  version: 1.32.0
+mdns:
+  image: ghcr.io/home-cloud-io/mdns
+operator:
+  image: ghcr.io/home-cloud-io/operator
+tunnel:
+  image: ghcr.io/home-cloud-io/tunnel
