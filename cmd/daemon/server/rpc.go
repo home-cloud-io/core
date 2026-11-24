@@ -376,8 +376,7 @@ func (h *rpcHandler) BugReport(ctx context.Context, request *connect.Request[v1.
 
 	nodes := c.GetConfigContext().Nodes
 	provider := func(ctx context.Context, node string) (context.Context, *client.Client, error) {
-		// TODO: handle multi-node
-		return ctx, c, nil
+		return client.WithNode(ctx, node), c, nil
 	}
 
 	numWorkers := runtime.NumCPU()
