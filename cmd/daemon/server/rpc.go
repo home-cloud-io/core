@@ -201,6 +201,7 @@ func (h *rpcHandler) Upgrade(ctx context.Context, request *connect.Request[v1.Up
 		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
 	}
 
+	// TODO: change to stable API
 	_, err = client.MachineClient.Upgrade(ctx, &machine.UpgradeRequest{
 		Image: fmt.Sprintf("%s:%s", request.Msg.Source, request.Msg.Version),
 	})
