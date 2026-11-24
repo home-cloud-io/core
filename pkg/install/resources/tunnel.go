@@ -109,8 +109,9 @@ service:
 							HostNetwork: true,
 							Containers: []corev1.Container{
 								{
-									Name:  "tunnel",
-									Image: fmt.Sprintf("%s:%s", install.Spec.Tunnel.Image, install.Spec.Tunnel.Tag),
+									Name:            "tunnel",
+									Image:           fmt.Sprintf("%s:%s", install.Spec.Tunnel.Image, install.Spec.Tunnel.Tag),
+									ImagePullPolicy: install.Spec.Tunnel.ImagePullPolicy,
 									SecurityContext: &corev1.SecurityContext{
 										Privileged: ptr.To(true),
 										Capabilities: &corev1.Capabilities{

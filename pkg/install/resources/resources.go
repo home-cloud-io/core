@@ -75,6 +75,9 @@ crds:
 				Network: v1.NetworkSettingsSpec{
 					Domain: "home-cloud.local",
 					DNS: v1.DNSNetworkSettingsSpec{
+						Custom: v1.CustomDNSNetworkSettingsSpec{
+							TTL: "1h",
+						},
 						UpstreamServers: []string{"1.1.1.1", "1.0.0.1"},
 						DenyListSources: []string{"https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"},
 					},
@@ -203,8 +206,9 @@ crds:
 							},
 							Containers: []corev1.Container{
 								{
-									Name:  "generic-device-plugin",
-									Image: fmt.Sprintf("%s:%s", install.Spec.GenericDevicePlugin.Image, install.Spec.GenericDevicePlugin.Tag),
+									Name:            "generic-device-plugin",
+									Image:           fmt.Sprintf("%s:%s", install.Spec.GenericDevicePlugin.Image, install.Spec.GenericDevicePlugin.Tag),
+									ImagePullPolicy: install.Spec.GenericDevicePlugin.ImagePullPolicy,
 									SecurityContext: &corev1.SecurityContext{
 										Privileged: ptr.To(true),
 									},

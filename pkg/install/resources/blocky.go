@@ -2,6 +2,7 @@ package resources
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/steady-bytes/draft/pkg/chassis"
 	"go.yaml.in/yaml/v4"
@@ -46,10 +47,9 @@ var (
 				},
 			},
 			CustomDNS: BlockyCustomDNS{
-				CustomTTL: "1h",
-				Mapping: map[string]string{
-					install.Spec.Settings.Network.Domain: chassis.GetConfig().GetString(HostIPConfigKey),
-				},
+				CustomTTL: install.Spec.Settings.Network.DNS.Custom.TTL,
+				Rewrite:   buildCustomRewrite(install),
+				Mapping:   buildCustomMapping(install),
 			},
 		}
 
@@ -127,8 +127,9 @@ var (
 						Spec: corev1.PodSpec{
 							Containers: []corev1.Container{
 								{
-									Name:  "blocky",
-									Image: fmt.Sprintf("%s:%s", install.Spec.Blocky.Image, install.Spec.Blocky.Tag),
+									Name:            "blocky",
+									Image:           fmt.Sprintf("%s:%s", install.Spec.Blocky.Image, install.Spec.Blocky.Tag),
+									ImagePullPolicy: install.Spec.Blocky.ImagePullPolicy,
 									Ports: []corev1.ContainerPort{
 										{
 											Name:          "tcp",
@@ -210,6 +211,7 @@ type (
 	}
 	BlockyCustomDNS struct {
 		CustomTTL string `yaml:"customTTL"`
+		Rewrite   map[string]string
 		Mapping   map[string]string
 	}
 )
@@ -223,4 +225,26 @@ func combineDomainsAndSources(domains, sources []string) []string {
 		return append(sources, denyDomains)
 	}
 	return sources
+}
+
+func buildCustomRewrite(install *v1.Install) map[string]string {
+	rewrite := make(map[string]string)
+	for _, entry := range install.Spec.Settings.Network.DNS.Custom.Rewrite {
+		rewrite[entry.From] = entry.To
+	}
+	return rewrite
+}
+
+func buildCustomMapping(install *v1.Install) map[string]string {
+	// register home cloud domain (which includes all subdomains)
+	mapping := map[string]string{
+		install.Spec.Settings.Network.Domain: chassis.GetConfig().GetString(HostIPConfigKey),
+	}
+
+	// register user's custom domains
+	for _, entry := range install.Spec.Settings.Network.DNS.Custom.Mapping {
+		mapping[entry.Domain] = strings.Join(entry.Addresseses, ",")
+	}
+
+	return mapping
 }
