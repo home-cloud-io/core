@@ -206,8 +206,9 @@ crds:
 							},
 							Containers: []corev1.Container{
 								{
-									Name:  "generic-device-plugin",
-									Image: fmt.Sprintf("%s:%s", install.Spec.GenericDevicePlugin.Image, install.Spec.GenericDevicePlugin.Tag),
+									Name:            "generic-device-plugin",
+									Image:           fmt.Sprintf("%s:%s", install.Spec.GenericDevicePlugin.Image, install.Spec.GenericDevicePlugin.Tag),
+									ImagePullPolicy: install.Spec.GenericDevicePlugin.ImagePullPolicy,
 									SecurityContext: &corev1.SecurityContext{
 										Privileged: ptr.To(true),
 									},

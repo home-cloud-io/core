@@ -1,6 +1,7 @@
 package v1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -65,42 +66,48 @@ type CertManagerSpec struct {
 }
 
 type BlockySpec struct {
-	Disable bool   `json:"disable,omitempty"`
-	Image   string `json:"image,omitempty"`
-	Tag     string `json:"tag,omitempty"`
+	Disable         bool              `json:"disable,omitempty"`
+	Image           string            `json:"image,omitempty"`
+	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
+	Tag             string            `json:"tag,omitempty"`
 }
 
 type GenericDevicePluginSpec struct {
-	Disable bool   `json:"disable,omitempty"`
-	Image   string `json:"image,omitempty"`
-	Tag     string `json:"tag,omitempty"`
+	Disable         bool              `json:"disable,omitempty"`
+	Image           string            `json:"image,omitempty"`
+	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
+	Tag             string            `json:"tag,omitempty"`
 }
 
 type MDNSSpec struct {
-	Disable bool   `json:"disable,omitempty"`
-	Image   string `json:"image,omitempty"`
-	Tag     string `json:"tag,omitempty"`
+	Disable         bool              `json:"disable,omitempty"`
+	Image           string            `json:"image,omitempty"`
+	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
+	Tag             string            `json:"tag,omitempty"`
 }
 
 type TunnelSpec struct {
-	Disable bool   `json:"disable,omitempty"`
-	Image   string `json:"image,omitempty"`
-	Tag     string `json:"tag,omitempty"`
+	Disable         bool              `json:"disable,omitempty"`
+	Image           string            `json:"image,omitempty"`
+	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
+	Tag             string            `json:"tag,omitempty"`
 }
 
 type OperatorSpec struct {
-	Disable bool   `json:"disable,omitempty"`
-	Image   string `json:"image,omitempty"`
-	Tag     string `json:"tag,omitempty"`
+	Disable         bool              `json:"disable,omitempty"`
+	Image           string            `json:"image,omitempty"`
+	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
+	Tag             string            `json:"tag,omitempty"`
 }
 
 type DaemonSpec struct {
-	Disable    bool            `json:"disable,omitempty"`
-	Image      string          `json:"image,omitempty"`
-	Tag        string          `json:"tag,omitempty"`
-	Address    string          `json:"address,omitempty"`
-	System     *SystemSpec     `json:"system,omitempty"`
-	Kubernetes *KubernetesSpec `json:"kubernetes,omitempty"`
+	Disable         bool              `json:"disable,omitempty"`
+	Image           string            `json:"image,omitempty"`
+	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
+	Tag             string            `json:"tag,omitempty"`
+	Address         string            `json:"address,omitempty"`
+	System          *SystemSpec       `json:"system,omitempty"`
+	Kubernetes      *KubernetesSpec   `json:"kubernetes,omitempty"`
 }
 
 type SystemSpec struct {
@@ -161,14 +168,14 @@ type SettingsSpec struct {
 	//     {{- end }}
 	StorageApps []string `json:"storageApps,omitempty"`
 
-	Network NetworkSettingsSpec `json:"networkSettingsSpec,omitempty"`
+	Network NetworkSettingsSpec `json:"network,omitempty"`
 }
 
 type NetworkSettingsSpec struct {
 	// Domain defines the domain of install. For example, `my-custom-domain.com` (default: "home-cloud.local")
 	Domain string `json:"domain,omitempty"`
 
-	DNS DNSNetworkSettingsSpec `json:"dnsNetworkSettingsSpec,omitempty"`
+	DNS DNSNetworkSettingsSpec `json:"dns,omitempty"`
 }
 
 type DNSNetworkSettingsSpec struct {
@@ -190,7 +197,7 @@ type DNSNetworkSettingsSpec struct {
 
 type CustomDNSNetworkSettingsSpec struct {
 	// Duration used for custom DNS values - if undefined, unit is minutes (default: 1h)
-	TTL     string `json:"ttl,omitempty"`
+	TTL string `json:"ttl,omitempty"`
 	// Domain rewriting rules applied before DNS resolution
 	Rewrite []CustomDNSRewriteEntry `json:"rewrite,omitempty"`
 	// Simple domain to IP mappings
@@ -201,12 +208,12 @@ type CustomDNSRewriteEntry struct {
 	// Rewrite this part of the domain (not the whole domain)
 	From string `json:"from"`
 	// Rewrite to this value
-	To   string `json:"to"`
+	To string `json:"to"`
 }
 
 type CustomDNSMappingEntry struct {
 	// The domain for the DNS entry
-	Domain      string   `json:"domain"`
+	Domain string `json:"domain"`
 	// The addresses for the DNS entry (can be IPv4 or IPv6)
 	Addresseses []string `json:"addresses"`
 }

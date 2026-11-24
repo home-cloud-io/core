@@ -127,8 +127,9 @@ var (
 						Spec: corev1.PodSpec{
 							Containers: []corev1.Container{
 								{
-									Name:  "blocky",
-									Image: fmt.Sprintf("%s:%s", install.Spec.Blocky.Image, install.Spec.Blocky.Tag),
+									Name:            "blocky",
+									Image:           fmt.Sprintf("%s:%s", install.Spec.Blocky.Image, install.Spec.Blocky.Tag),
+									ImagePullPolicy: install.Spec.Blocky.ImagePullPolicy,
 									Ports: []corev1.ContainerPort{
 										{
 											Name:          "tcp",

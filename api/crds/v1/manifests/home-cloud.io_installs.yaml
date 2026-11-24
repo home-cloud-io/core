@@ -52,6 +52,10 @@ spec:
                     type: boolean
                   image:
                     type: string
+                  imagePullPolicy:
+                    description: PullPolicy describes a policy for if/when to pull
+                      a container image
+                    type: string
                   tag:
                     type: string
                 type: object
@@ -75,6 +79,10 @@ spec:
                   disable:
                     type: boolean
                   image:
+                    type: string
+                  imagePullPolicy:
+                    description: PullPolicy describes a policy for if/when to pull
+                      a container image
                     type: string
                   kubernetes:
                     properties:
@@ -121,6 +129,10 @@ spec:
                     type: boolean
                   image:
                     type: string
+                  imagePullPolicy:
+                    description: PullPolicy describes a policy for if/when to pull
+                      a container image
+                    type: string
                   tag:
                     type: string
                 type: object
@@ -163,6 +175,10 @@ spec:
                     type: boolean
                   image:
                     type: string
+                  imagePullPolicy:
+                    description: PullPolicy describes a policy for if/when to pull
+                      a container image
+                    type: string
                   tag:
                     type: string
                 type: object
@@ -171,6 +187,10 @@ spec:
                   disable:
                     type: boolean
                   image:
+                    type: string
+                  imagePullPolicy:
+                    description: PullPolicy describes a policy for if/when to pull
+                      a container image
                     type: string
                   tag:
                     type: string
@@ -218,9 +238,9 @@ spec:
                       You must restart the server after changing this value for it to take
                       effect if updating the Kuberenetes resource directly.
                     type: string
-                  networkSettingsSpec:
+                  network:
                     properties:
-                      dnsNetworkSettingsSpec:
+                      dns:
                         properties:
                           allowDomains:
                             description: 'AllowDomains is a list of plain domains
@@ -336,6 +356,10 @@ spec:
                   disable:
                     type: boolean
                   image:
+                    type: string
+                  imagePullPolicy:
+                    description: PullPolicy describes a policy for if/when to pull
+                      a container image
                     type: string
                   tag:
                     type: string

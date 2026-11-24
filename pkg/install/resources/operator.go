@@ -95,8 +95,9 @@ var (
 							ServiceAccountName:            "operator",
 							Containers: []corev1.Container{
 								{
-									Name:  "operator",
-									Image: fmt.Sprintf("%s:%s", install.Spec.Operator.Image, install.Spec.Operator.Tag),
+									Name:            "operator",
+									Image:           fmt.Sprintf("%s:%s", install.Spec.Operator.Image, install.Spec.Operator.Tag),
+									ImagePullPolicy: install.Spec.Operator.ImagePullPolicy,
 									Env: []corev1.EnvVar{
 										{
 											Name: "DRAFT_OPERATOR_HOST_IP",

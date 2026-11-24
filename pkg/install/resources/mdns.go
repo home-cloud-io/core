@@ -92,8 +92,9 @@ service:
 							HostNetwork: true,
 							Containers: []corev1.Container{
 								{
-									Name:  "mdns",
-									Image: fmt.Sprintf("%s:%s", install.Spec.MDNS.Image, install.Spec.MDNS.Tag),
+									Name:            "mdns",
+									Image:           fmt.Sprintf("%s:%s", install.Spec.MDNS.Image, install.Spec.MDNS.Tag),
+									ImagePullPolicy: install.Spec.MDNS.ImagePullPolicy,
 									SecurityContext: &corev1.SecurityContext{
 										RunAsUser:                ptr.To(int64(65534)),
 										RunAsGroup:               ptr.To(int64(65534)),
