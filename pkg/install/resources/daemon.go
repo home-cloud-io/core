@@ -65,8 +65,9 @@ service:
 						Spec: corev1.PodSpec{
 							Containers: []corev1.Container{
 								{
-									Name:  "daemon",
-									Image: fmt.Sprintf("%s:%s", install.Spec.Daemon.Image, install.Spec.Daemon.Tag),
+									Name:            "daemon",
+									Image:           fmt.Sprintf("%s:%s", install.Spec.Daemon.Image, install.Spec.Daemon.Tag),
+									ImagePullPolicy: install.Spec.Daemon.ImagePullPolicy,
 									Ports: []corev1.ContainerPort{
 										{
 											Name:          "http",
