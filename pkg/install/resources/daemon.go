@@ -67,6 +67,16 @@ service:
 								{
 									Name:            "daemon",
 									Image:           fmt.Sprintf("%s:%s", install.Spec.Daemon.Image, install.Spec.Daemon.Tag),
+									Env: []corev1.EnvVar{
+										{
+											Name: "DRAFT_DAEMON_HOST_IP",
+											ValueFrom: &corev1.EnvVarSource{
+												FieldRef: &corev1.ObjectFieldSelector{
+													FieldPath: "status.hostIP",
+												},
+											},
+										},
+									},
 									ImagePullPolicy: install.Spec.Daemon.ImagePullPolicy,
 									Ports: []corev1.ContainerPort{
 										{

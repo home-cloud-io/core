@@ -36,6 +36,10 @@ import (
 	"github.com/home-cloud-io/core/pkg/talos"
 )
 
+const (
+	HostIPConfigKey = "daemon.host_ip"
+)
+
 type (
 	Rpc interface {
 		chassis.RPCRegistrar
@@ -374,7 +378,9 @@ func (h *rpcHandler) BugReport(ctx context.Context, request *connect.Request[v1.
 		return nil, fmt.Errorf(talos.ErrFailedToCreateClient)
 	}
 
-	nodes := c.GetConfigContext().Nodes
+	// TODO: support multi node
+	nodes := []string{chassis.GetConfig().GetString(HostIPConfigKey)}
+
 	provider := func(ctx context.Context, node string) (context.Context, *client.Client, error) {
 		return client.WithNode(ctx, node), c, nil
 	}
